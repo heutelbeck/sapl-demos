@@ -15,7 +15,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.openconjurer</groupId>
+	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demos</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
@@ -47,6 +47,9 @@
 	</properties>
 
 	<modules>
+		<module>sapl-benchmark</module>
+		<module>sapl-demo-embedded</module>
+		<module>sapl-demo-remote</module>
 	</modules>
 
 	<build>
@@ -106,7 +109,7 @@
 			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>openconjurer</id>
+			<id>openconjurer-snapshots</id>
 			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 		</snapshotRepository>
@@ -114,11 +117,11 @@
 
 	<repositories>
 		<repository>
-			<id>openconjurer</id>
+			<id>openconjurer-snapshots</id>
 			<name>OpenConjurer Nexus Maven Repository</name>
-			<url>http://nexus.openconjurer.org/content/repositories</url>
+			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 			<releases>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
