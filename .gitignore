@@ -1,0 +1,43 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+*.iml
+target/
+.idea/
+**/*.iml
+.classpath
+.project
+.apt_generated/
+.settings/
+events/
+.factorypath
+**/VAADIN/widgetsets/
+**/VAADIN/themes/**/addons.scss
+**/VAADIN/themes/**/styles.css
+generated/
+WebContent/
+.vaadin-designer2
+**/.springBeans
+.antlr-generator-3.2.0-patch.jar
+phantomjsdriver.log
+node_modules/
