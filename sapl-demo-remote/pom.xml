@@ -38,11 +38,10 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
-			<groupId>org.openconjurer</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-pdp-remote</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
