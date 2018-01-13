@@ -36,18 +36,18 @@ import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.XYChart;
-import org.openconjurer.authz.api.functions.FunctionException;
-import org.openconjurer.authz.api.interpreter.PolicyEvaluationException;
-import org.openconjurer.authz.api.pdp.Request;
-import org.openconjurer.authz.api.pdp.Response;
-import org.openconjurer.authz.api.pip.AttributeException;
-import org.openconjurer.authz.pdp.embedded.EmbeddedPolicyDecisionPoint;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.Request;
+import io.sapl.api.pdp.Response;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

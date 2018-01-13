@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 
-import org.openconjurer.authz.api.pdp.Request;
-
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.sapl.api.pdp.Request;
 
 public class PolicyGenerator {
 

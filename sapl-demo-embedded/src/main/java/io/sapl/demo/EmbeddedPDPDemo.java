@@ -23,12 +23,13 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.openconjurer.authz.api.functions.FunctionException;
-import org.openconjurer.authz.api.interpreter.PolicyEvaluationException;
-import org.openconjurer.authz.api.pip.AttributeException;
-import org.openconjurer.authz.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 
 public class EmbeddedPDPDemo {
 

@@ -21,10 +21,11 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.openconjurer.authz.api.pdp.Response;
-import org.openconjurer.authz.pdp.remote.RemotePolicyDecisionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.sapl.api.pdp.Response;
+import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 
 public class RemotePDPDemo {
     private static final Logger LOG = LoggerFactory
