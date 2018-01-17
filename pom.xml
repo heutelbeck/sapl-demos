@@ -36,6 +36,9 @@
 		<module>sapl-benchmark</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-remote</module>
+		<module>sapl-demo-domain</module>
+		<module>sapl-demo-parent</module>
+		<module>docs</module>
 	</modules>
 
 	<distributionManagement>
