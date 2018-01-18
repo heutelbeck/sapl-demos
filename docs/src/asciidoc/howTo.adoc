@@ -1,2 +1,117 @@
 = HowTo: Best Practices to Integrate SAPL with Spring Security Standard Mechanisms
+:toc:
+:toc-title:
+:linkattrs:
+
+
+
+***
+
+== Introduction
+
+Many approaches to secure web applications have been developed. Well-known frameworks
+bring along built-in components. Here we use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
+inside a https://projects.spring.io/spring-boot/[Spring Boot] Application with https://maven.apache.org/[Maven] to implement user rights
+to webpages and REST services.
+
+== Domain Model
+
+Our domain model is implemented in the submodule https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-domain[sapl-demo-domain]
+and kept simple for the sake of clarity. +
+We have patients:
+
+```java
+
+public class Patient {
+
+@Id
+@GeneratedValue(strategy = GenerationType.AUTO)
+int id;
+
+String name;
+String diagnosis;
+String healthRecordNumber;
+String phoneNumber;
+String attendingDoctor;
+String attendingNurse;
+String roomNumber;
+
+
+public Patient(String name, String diagnosis, String healthRecordNumber, String phoneNumber, String attendingDoctor, String attendingNurse, String roomNumber) {
+    this.name = name;
+    this.diagnosis = diagnosis;
+    this.healthRecordNumber = healthRecordNumber;
+    this.phoneNumber = phoneNumber;
+    this.attendingDoctor = attendingDoctor;
+    this.attendingNurse = attendingNurse;
+    this.roomNumber = roomNumber;
+}
+}
+
+```
+There are users:
+
+```java
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1;
+
+    @Id
+    String name;
+
+    String password;
+    boolean disabled;
+    ArrayList<String> functions; // DOCTOR , NURSE , VISITOR, ADMIN
+
+}
+```
+`VISITOR, DOCTOR , NURSE, ADMIN` characterize `Authorities` in the context of `Spring Security`.
+
+
+
+Relations are modeled between patients and users:
+
+```java
+public class Relation {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	int id;
+
+	String username;
+	int patientid;
+
+	public Relation (String username, int patientid) {
+		this.username = username;
+		this.patientid = patientid;
+	}
+}
+
+```
+
+== User Rights
+
+User rights are constantly refined and captured with human readable phrases within SAPL Policies.
+Here is a small excerpt of access permissions to `Patient` fields  for  particular authorities:
+
+- `VISITOR` +
+can only read phoneNumber and name; is not allowed for  updating and deleting;
+- `NURSE` +
+can read phoneNumber, name, a blackened  healthRecordNumber; can read diagnosis only if she is attendingNurse;
+is allowed for updating name, phoneNumber;
+is allowed for updating attendingNurse; is not allowed for deleting;
+- `DOCTOR` +
+ can read all Patient fields, but only diagnosis if she is attendingDoctor;
+ can update all fields, but only diagnosis if she is attendingDoctor; is allowed for deleting Patients;
+
+The following table gives an overview of all current user rights:
+
+.User rights
+[frame="topbot",options="header"]
+|=============================================================================================================================================================
+|User Role| see name|see phone|see HRN   |see diagnosis   |update diagnosis|create patient|update patient    |delete patient|change att. doctor|change att. nurse|see room number    |
+|Doctor   |    X    |     X   |   X      |X (only att.doc)|X (only att.doc)|       X      |        X         |      X       |         X        |                 | X (only relatives)|
+|Nurse    |    X    |     X   |blacken(1)|X (only att.nur)|                |              |X (name and phone)|              |                  |         X       | X (only relatives)|
+|Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
+|=============================================================================================================================================================
 
