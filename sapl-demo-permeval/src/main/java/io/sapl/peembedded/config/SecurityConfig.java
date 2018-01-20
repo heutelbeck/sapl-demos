@@ -3,11 +3,8 @@ package io.sapl.peembedded.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,11 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled=true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-	@Autowired
-	@Qualifier("pdpEmbedded")
-
-	private PolicyDecisionPoint pdp;
 
 
 	@Override
@@ -71,7 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		        throw new BadCredentialsException("user and/or password do not match");
 		    }
 		    LOGGER.trace("user successfully authenticated, will create UsernamePasswordAuthenticationToken...");
-			List<GrantedAuthority> userAuthorities = new ArrayList<GrantedAuthority>() ;
+			List<GrantedAuthority> userAuthorities = new ArrayList<>() ;
 			user.getFunctions().forEach(function ->  userAuthorities.add(new SimpleGrantedAuthority(function)));
 		    return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
 

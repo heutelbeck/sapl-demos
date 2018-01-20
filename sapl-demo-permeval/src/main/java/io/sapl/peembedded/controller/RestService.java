@@ -1,8 +1,5 @@
  package io.sapl.peembedded.controller;
 
-import java.util.*;
-
-
 import javax.servlet.http.HttpServletRequest;
 
 import io.sapl.demo.domain.Patient;
@@ -22,6 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/person/")
@@ -36,7 +38,7 @@ public class RestService {
 	public ResponseEntity<Patient> loadPerson(@PathVariable int id){
 		Optional<Patient> patient = patientenRepo.findById(id);
 		if(patient.isPresent()){
-			return new ResponseEntity<Patient>(patient.get(), HttpStatus.OK);
+			return new ResponseEntity<>(patient.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
@@ -45,7 +47,7 @@ public class RestService {
 	@PreAuthorize("hasPermission('HRN', 'read')") // using SaplPolicies = DOCTOR
 	public Map<String, Object> loadPersonAll(@PathVariable int id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
 			map.put("healthRecordNumber", patient.get().getHealthRecordNumber());
 			map.put("diagnosis", patient.get().getDiagnosis());
@@ -62,7 +64,7 @@ public class RestService {
 														// DOCTOR, NURSE
 	public Map<String, Object> loadPersonPart(@PathVariable int id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
 			map.put("diagnosis", patient.get().getDiagnosis());
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
@@ -77,7 +79,7 @@ public class RestService {
 								// NURSE
 	public Map<String, Object> loadPersonLim(@PathVariable int id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
 			map.put("name", patient.get().getName());
@@ -89,7 +91,7 @@ public class RestService {
 
 	@GetMapping("list") // permission to all users: VISITOR, DOCTOR, NURSE, ADMIN
 	public List<Map<String, Object>> loadPersonList() {
-		List<Map<String, Object>> returnList = new ArrayList<Map<String, Object>>();
+		List<Map<String, Object>> returnList = new ArrayList<>();
 		patientenRepo.findAll().forEach(p -> {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put(PHONENUMBER, p.getPhoneNumber());
@@ -128,7 +130,7 @@ public class RestService {
 			throw new IllegalArgumentException();
 		}
 
-		HashMap<String, Object> map = new HashMap<String, Object>();
+		HashMap<String, Object> map = new HashMap<>();
 
 		String newPhone = person.getPhoneNumber();
 		patient.setPhoneNumber(newPhone);

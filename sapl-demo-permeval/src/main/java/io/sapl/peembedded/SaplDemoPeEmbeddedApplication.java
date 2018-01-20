@@ -50,7 +50,7 @@ public class SaplDemoPeEmbeddedApplication {
 
 	@Bean
 	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo, ApplicationContext ctx){
-		return (args) -> {
+		return args -> {
 			userRepo.save(new User(NAME_DOMINIK, DEFAULT_PASS, false, new ArrayList<String>(Arrays.asList(ROLE_VISITOR))));
 			userRepo.save(new User(NAME_JULIA, DEFAULT_PASS, false, new ArrayList<String>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(new User(NAME_PETER, DEFAULT_PASS, false, new ArrayList<String>(Arrays.asList(ROLE_DOCTOR))));
