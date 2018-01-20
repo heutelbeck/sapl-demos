@@ -93,7 +93,7 @@ public class RestService {
 	public List<Map<String, Object>> loadPersonList() {
 		List<Map<String, Object>> returnList = new ArrayList<>();
 		patientenRepo.findAll().forEach(p -> {
-			HashMap<String, Object> map = new HashMap<String, Object>();
+			HashMap<String, Object> map = new HashMap<>();
 			map.put(PHONENUMBER, p.getPhoneNumber());
 			map.put("name", p.getName());
 			map.put("id", p.getId());
