@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletRequest;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
