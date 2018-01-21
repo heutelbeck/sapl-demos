@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
+import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
@@ -36,13 +37,14 @@ public class UIController {
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 	
-	private StandardSAPLAuthorizator pep;
+	private PolicyEnforcementPoint pep;
 
 	private PatientenRepo patientenRepo;
+
 	
 	
 	@Autowired
-	public UIController(StandardSAPLAuthorizator pep, PatientenRepo patientenRepo) {
+	public UIController(PolicyEnforcementPoint pep, PatientenRepo patientenRepo) {
 		this.pep = pep;
 		this.patientenRepo = patientenRepo; 
 		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})", pep != null , patientenRepo != null);
@@ -61,7 +63,7 @@ public class UIController {
 	}
 	
 	@PostMapping("/profiles")
-	//@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies: DOCTOR
+	@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies: DOCTOR
 	public String createProfile(@ModelAttribute(value="newPatient") Patient newPatient, HttpServletRequest request){
 		if(patientenRepo.existsById(newPatient.getId())){
 			throw new IllegalArgumentException("Profile at this Id already exists");
@@ -112,8 +114,7 @@ public class UIController {
 	
 	
 	@DeleteMapping("/patient")
-	//@PreAuthorize("hasAuthority('DOCTOR')")
-	//@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies
+	@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies
 	public String delete(@RequestParam("id") int id, HttpServletRequest request){
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
@@ -135,7 +136,7 @@ public class UIController {
 	}
 	
 	@PutMapping("/patient")
-	//@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies
+	@PreAuthorize("hasPermission(#request, #request)") //using SaplPolicies
 	public String updatePatient(@ModelAttribute ("updatePatient") Patient updatePatient, Authentication authentication, HttpServletRequest request){
 		if(!patientenRepo.existsById(updatePatient.getId())){
 			throw new IllegalArgumentException("not found");
