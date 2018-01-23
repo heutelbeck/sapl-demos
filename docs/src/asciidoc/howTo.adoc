@@ -120,10 +120,36 @@ The following table gives an overview of all current user rights:
 This submodule extensively makes use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
 
 === sapl-spring-boot-starter
-xxx
 
-=== sapl-spring-boot
-xxx
+Obtaining a decision from SAPL Policies we need a `PolicyDecisionPoint`(`PDP`). A `PDP` as a `bean`  is  available as dependency for
+a Spring Boot Starter Project, configured in the submodule https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter]
+from project https://github.com/heutelbeck/sapl-policy-engine.
+Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
+
+```java
+<dependency>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-spring-boot-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+=== sapl-spring
+
+
+In conjunction with SAPL requests we need information about an authenticated user, objects of the domain model,
+the system environment, HttpServletRequest parameters, the requested URI, et cetera,  and last but not least we need a customized
+PermissionEvaluator, the <<SAPLPermissionEvaluator>>.
+The submodule https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] from https://github.com/heutelbeck/sapl-policy-engine provides these interfaces and classes,
+which  can be integrated into a Spring Boot Project with:
+
+```java
+<dependency>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-spring</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
 
 === Spring Features
 
@@ -138,7 +164,9 @@ General spring features in this submodule are:
 * Thymeleaf
 
 === Spring Security Features
+xxx
 
 === SAPLPermissionEvaluator
+xxx
 
 
