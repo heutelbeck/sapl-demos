@@ -115,3 +115,30 @@ The following table gives an overview of all current user rights:
 |Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
+== Submodule https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permeval['sapl-demo-permeval']
+
+This submodule extensively makes use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
+
+=== sapl-spring-boot-starter
+xxx
+
+=== sapl-spring-boot
+xxx
+
+=== Spring Features
+
+General spring features in this submodule are:
+
+* https://projects.spring.io/spring-boot/[Spring Boot]
+* Standard SQL database: http://www.h2database.com[H2] (In-Memory), programmable via JPA
+* http://hibernate.org/[Hibernate]
+* web interfaces (Rest, UI) with Spring MVC
+* model classes (Patient, User, Relation), CrudRepositories in JPA
+* https://projects.spring.io/spring-security/[Spring Security]
+* Thymeleaf
+
+=== Spring Security Features
+
+=== SAPLPermissionEvaluator
+
+
