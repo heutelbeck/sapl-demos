@@ -117,7 +117,7 @@ The following table gives an overview of all current user rights:
 
 == Submodule https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permeval['sapl-demo-permeval']
 
-This submodule extensively makes use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
+This submodule  makes extensive use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
 
 === sapl-spring-boot-starter
 
@@ -164,7 +164,72 @@ General spring features in this submodule are:
 * Thymeleaf
 
 === Spring Security Features
-xxx
+
+
+We refer to the https://projects.spring.io/spring-security/[Spring Security] webpage and
+its https://docs.spring.io/spring-security/site/docs/5.0.1.BUILD-SNAPSHOT/reference/htmlsingle/[reference manual].
+
+Successfully implemented features are presented below:
+
+==== Http Security
+
+A loginPage, logoutPage is implemented. There is a secured  REST Service. Each request needs authentication.
+
+Example from a class https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/config/SecurityConfig.java[SecurityConfig.java]:
+
+
+``` java
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    LOGGER.debug("start configuring...");
+    http
+            .authorizeRequests()
+            .anyRequest().authenticated()
+            .and()
+            .formLogin()
+            .loginPage("/login").permitAll()
+            .and()
+            .logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll()
+            .and()
+            .csrf().disable();
+    http.headers().frameOptions().disable();
+
+}
+```
+
+
+
+==== @Pre and @Post Annotations [[bookmark1]]
+
+`@Pre` and `@Post` annotations are enabled with `@EnableGlobalMethodSecurity(prePostEnabled=true)`  at an instance of   `WebSecurityConfigurerAdapter` .
+
+``` java
+@Slf4j
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled=true)
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+....
+   }
+```
+
+
+
+
+==== Permission Evaluator
+
+`hasPermission()` expressions are delegated to an instance of `PermissionEvaluator`.
+
+``` java
+@PreAuthorize("hasPermission(#request, #request)")
+```
+
+
+The `PermissionEvaluator` interface is implemented in the <<SAPLPermissionEvaluator>>, which again is enabled  as bean
+in the class https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring-boot-starter/src/main/java/io/sapl/springboot/starter/PDPAutoConfiguration.java[PDPAutoConfiguration]
+from submodule https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter].
+
+
+
 
 === SAPLPermissionEvaluator
 xxx
