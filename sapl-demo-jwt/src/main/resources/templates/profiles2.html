@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Spring Security Example </title>
+    </head>
+    <body>
+    	<h3>List of Profiles (V2)</h3>
+    	<table>
+    	<tr>
+    		<th>ID</th>
+    		<th>NAME</th>
+    	</tr>
+        <tr th:each="profile : ${profiles}"> 
+        	<td th:text="${profile.id}"> 0</td>
+        	<td><a href="patient.html" th:href="@{/patient(id=${profile.id})}" th:text="${profile.name}"> Name</a></td>
+        </tr> 
+        </table>
+
+        <form th:if="${@myPEP.authorize(#authentication,'createPatientProfile','')}" action="/profiles/new">
+            <input type="submit" value="Create New Profile" />
+        </form>
+<!--         <div><span th:text="${#authentication}" ></span>, <span th:text="${request}" ></span>, <span th:text="${principal}" ></span></div>
+ -->
+        <form action="/home">
+            <input type="submit" value="Back to Home" />
+        </form>
+    </body>
+</html>
