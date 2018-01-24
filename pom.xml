@@ -39,6 +39,7 @@
 		<module>sapl-demo-domain</module>
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-permeval</module>
+		<module>sapl-demo-filterchain</module>
 	</modules>
 
 	<distributionManagement>
