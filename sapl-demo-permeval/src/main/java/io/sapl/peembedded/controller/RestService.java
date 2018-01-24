@@ -44,8 +44,8 @@ public class RestService {
 	}
 
 	@GetMapping("readAll/{id}")
-	@PreAuthorize("hasPermission('HRN', 'read')") // using SaplPolicies = DOCTOR
-	public Map<String, Object> loadPersonAll(@PathVariable int id) {
+	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
+	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
@@ -60,9 +60,8 @@ public class RestService {
 	}
 
 	@GetMapping("readDiag/{id}")
-	@PreAuthorize("hasPermission('diagnosis', 'read')") // using SaplPolicies =
-														// DOCTOR, NURSE
-	public Map<String, Object> loadPersonPart(@PathVariable int id) {
+	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR, NURSE
+	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
@@ -75,8 +74,7 @@ public class RestService {
 		return map;
 	}
 
-	@GetMapping("readLim/{id}") // permission to all users: VISITOR, DOCTOR,ADMIN
-								// NURSE
+	@GetMapping("readLim/{id}") // permission to all users: VISITOR, DOCTOR,ADMIN, NURSE
 	public Map<String, Object> loadPersonLim(@PathVariable int id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
@@ -110,9 +108,10 @@ public class RestService {
 		return ResponseEntity.created(uriComponents.toUri()).build();
 	}
 
+
 	@PutMapping("putALL/{id}")
-	@PreAuthorize("hasPermission('HRN', 'update')") // using SaplPolicies = DOCTOR
-	public Patient update(@PathVariable int id, @RequestBody Patient person) {
+	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
+	public Patient update(@PathVariable int id, @RequestBody Patient person , HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
 			throw new IllegalArgumentException("not found");
 		}
