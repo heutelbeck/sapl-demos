@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -35,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableAuthorizationServer
 @EnableResourceServer
-@Profile("exampleJWT")
 public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	// @Value("${encryptet.testpwd}")

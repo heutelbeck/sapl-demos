@@ -42,7 +42,7 @@ public class PdpAuthorizeJwtAspect {
 	private TokenStore tokenStore;
 
 	@Around("@annotation(pdpAuthorizeJwt) && execution(* *(..))")
-	public Object around(ProceedingJoinPoint pjp, PdpAuthorizeJwt pdpAuthorizeAuthentication) throws Throwable {
+	public Object around(ProceedingJoinPoint pjp, PdpAuthorizeJwt pdpAuthorizeJwt) throws Throwable {
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		JsonNode details = new ObjectMapper().convertValue(authentication.getDetails(), JsonNode.class);
