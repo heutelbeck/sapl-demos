@@ -1,4 +1,4 @@
-package io.sapl.peembedded.controller;
+package io.sapl.demo.domain.resource;
 
 import io.sapl.demo.domain.Patient;
 import io.sapl.spring.marshall.Resource;

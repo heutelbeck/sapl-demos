@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "encryptet.testpwd",
+  "type": "java.lang.String",
+  "description": "BCrypt encrypted password for development and demonstration purposes"
+}]}
