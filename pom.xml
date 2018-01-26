@@ -41,7 +41,8 @@
 		<module>sapl-demo-permeval</module>
 		<module>sapl-demo-jwt</module>
 		<module>sapl-demo-geo</module>
-	</modules>
+        <module>sapl-demo-shared</module>
+    </modules>
 
 	<distributionManagement>
 		<repository>
