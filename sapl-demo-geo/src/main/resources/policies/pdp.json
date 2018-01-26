@@ -1,0 +1,68 @@
+{
+	"algorithm": "DENY_UNLESS_PERMIT",
+	"variables": {
+		"stationsDB": {
+			"serverAdress": "localhost",
+			"port": "5432",
+			"db": "airline_backend",
+			"table": "stations",
+			"username": "sapl_pip",
+			"password": "openconjurer",
+			"geometryColName": "geom",
+			"idColName": "name",
+			"pkColName": "gid",
+			"from": 0,
+			"flipCoordinates": true
+		},
+		"airportsDB": {
+			"serverAdress": "localhost",
+			"port": "5432",
+			"db": "airline_backend",
+			"table": "airports",
+			"username": "sapl_pip",
+			"password": "openconjurer",
+			"geometryColName": "geom",
+			"idColName": "name",
+			"pkColName": "gid",
+			"from": 0,
+			"flipCoordinates": true
+		},
+		"aircraftTracking": {
+			"serverAdress": "localhost",
+			"port": "5432",
+			"db": "airline_backend",
+			"table": "ac_tracking",
+			"username": "sapl_pip",
+			"password": "openconjurer",
+			"geometryColName": "geom",
+			"idColName": "name",
+			"pkColName": "gid",
+			"from": 0,
+			"flipCoordinates": true
+		},
+	    "trustServer": "http://www.xxx.info/public/trustedLocations.kml",
+	    "pmdTracking": {
+	    	"serverUrl": "http://localhost:8082/api/",
+	    	"credentials": "YWRtaW46YWRtaW4=",
+	    	"posValidityTimespan": 200 
+	    },
+	    "param": {
+	    	"maxDistFromAc": 100,
+	    	"minAccuracy": 0.04,
+	    	"minTrust": 1,
+	    	"operationalStatus": "ACTIVE",
+	    	"meta": 0,
+	    	"restricted": 1,
+	    	"confidential": 2,
+	    	"wgs84" : "EPSG:4326",
+	    	"webMercator": "EPSG:3857"
+	    }
+	},
+	"attributeFinders": [
+		"io.sapl.pip.geo"
+	],
+	"libraries": [
+		"geo"
+	],
+	"prpImplementation": "INDEXED"
+}

@@ -40,6 +40,7 @@
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-permeval</module>
 		<module>sapl-demo-jwt</module>
+		<module>sapl-demo-geo</module>
 	</modules>
 
 	<distributionManagement>
