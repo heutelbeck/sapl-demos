@@ -1,6 +1,6 @@
 {
 	"algorithm": "DENY_UNLESS_PERMIT",
-	"attributeFinders": [
-		"patient"
-	]
+	"variables": {},
+	"attributeFinders": ["patient"],
+	"libraries": []
 }
