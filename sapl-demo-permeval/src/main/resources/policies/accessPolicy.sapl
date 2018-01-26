@@ -1,4 +1,4 @@
-import org.openconjurer.saplintegration.pip.PatientPIP as patient
+// import org.openconjurer.saplintegration.pip.PatientPIP as patient
 
 set "accessPolicy"
 deny-unless-permit
@@ -98,7 +98,8 @@ permit
    action.method == "updateDiagnosis"
 where
    subject.name == resource.attendingDoctor;
-   
+
+
 
 policy "permit_relative_see_room_number"
 permit
