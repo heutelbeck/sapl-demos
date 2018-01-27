@@ -115,7 +115,7 @@ The following table gives an overview of all current user rights:
 |Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
-== Submodule https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permeval['sapl-demo-permeval']
+== Submodule 'sapl-demo-permeval'
 
 This submodule  makes extensive use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
 
@@ -137,7 +137,7 @@ Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
 === sapl-spring
 
 
-In conjunction with SAPL requests we need information about an authenticated user, objects of the domain model,
+In conjunction with SAPL requests we need a https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator], information about an authenticated user, objects of the domain model,
 the system environment, HttpServletRequest parameters, the requested URI, et cetera,  and last but not least we need a customized
 PermissionEvaluator, the <<SAPLPermissionEvaluator>>.
 The submodule https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] from https://github.com/heutelbeck/sapl-policy-engine provides these interfaces and classes,
@@ -234,6 +234,58 @@ from submodule https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl
 
 
 === SAPLPermissionEvaluator
-xxx
+
+Here is an excerpt of the https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLPermissionEvaluator.java[SAPLPermissionEvaluator]:
+
+```java
+public class SAPLPermissionEvaluator implements PermissionEvaluator {
+
+    private StandardSAPLAuthorizator saplAuthorizer;
+
+    @Autowired
+    public SAPLPermissionEvaluator(StandardSAPLAuthorizator saplAuthorizer) {
+        this.saplAuthorizer = saplAuthorizer;
+    }
+
+    @Override //<1>
+    public boolean hasPermission(Authentication authentication, Object targetDomainObject,
+                                  Object permission) {
+        return authorize(authentication, permission, targetDomainObject); <2>
+   }
+
+    @Override //<1>
+    public boolean hasPermission(Authentication authentication, Serializable targetId,
+                                  String targetType, Object permissionText) {
+        return false;
+    }
+
+    public boolean authorize(Object subject, Object action, Object resource) { //<2>
+        LOGGER.trace(
+                "Entering hasPermission (Object subject, Object action,
+                 Object resource) \n subject: {} \n action {} \n resource: {}",
+                subject.getClass(), action.getClass(), resource.getClass());
+        if (Authentication.class.isInstance(subject)
+              && HttpServletRequest.class.isInstance(action)) {
+            Authentication auth = (Authentication) subject;
+            Subject authSubject = new AuthenticationSubject(auth);
+            HttpServletRequest request = (HttpServletRequest) action;
+            Action httpAction = new HttpAction(RequestMethod.valueOf(request.getMethod()));
+            Resource httpResource = new HttpResource(request);
+            return saplAuthorizer.authorize(authSubject, httpAction, httpResource);
+        }
+        Response response = saplAuthorizer.runPolicyCheck(subject, action, resource); //<3>
+        return response.getDecision() == Decision.PERMIT;
+    }
+
+}
+```
+
+<1> In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
+<2> SAPLPermissionEvaluator basically accepts only following _soft-wired_ expression: +
+   `hasPermission(#request, #request)`.
+<3> If you want to use other _hard-wired_   `hasPermission` expressions you have to customize them to match the method  of `runPolicyCheck` from
+    https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator].
+
+
 
 
