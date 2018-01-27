@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -169,7 +170,7 @@ public class PilDataConstructor implements ResponseConstructor {
 
 	private static String[] getNameList(String file) throws IOException {
 		InputStreamReader fileReader = new InputStreamReader(
-				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)), GeoDemoServer.ENCODING);
+				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)), StandardCharsets.UTF_8);
 
 		List<String> result = new ArrayList<>();
 		try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {

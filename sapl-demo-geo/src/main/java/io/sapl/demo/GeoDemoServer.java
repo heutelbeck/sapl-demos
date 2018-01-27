@@ -2,6 +2,7 @@ package io.sapl.demo;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import javax.net.ssl.SSLServerSocket;
@@ -28,7 +29,6 @@ public class GeoDemoServer {
 	private static final String POLICY_PATH = "./././policies";
 	private static final int MAX_REQUESTS = 10;
 	private static final int MIN_PASSENGER = 166;
-	public static final String ENCODING = "UTF-8";
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static volatile EmbeddedPolicyDecisionPoint pdp;
@@ -65,8 +65,8 @@ public class GeoDemoServer {
 		log.info("Cypher {}", session.getCipherSuite());
 		log.info("Protocol: {}", session.getProtocol());
 
-		Scanner in = new Scanner(socket.getInputStream(), ENCODING);
-		OutputStreamWriter out = new OutputStreamWriter(socket.getOutputStream(), ENCODING);
+		Scanner in = new Scanner(socket.getInputStream(), StandardCharsets.UTF_8.name());
+		OutputStreamWriter out = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8.name());
 
 		String receivedRequest = in.nextLine();
 		log.info("Request: {}", receivedRequest);
