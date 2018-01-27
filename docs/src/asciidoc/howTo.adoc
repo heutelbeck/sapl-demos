@@ -219,7 +219,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 ==== Permission Evaluator
 
-`hasPermission()` expressions are delegated to an instance of `PermissionEvaluator`.
+We refer to the documentation of the  https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface]. +
+`hasPermission()` expressions are delegated to an instance of `PermissionEvaluator` :
 
 ``` java
 @PreAuthorize("hasPermission(#request, #request)")
