@@ -284,7 +284,8 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 <2> SAPLPermissionEvaluator basically accepts only following _soft-wired_ expression: +
    `hasPermission(#request, #request)`.
 <3> If you want to use other _hard-wired_   `hasPermission` expressions you have to customize them to match the method  of `runPolicyCheck` from
-    https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator].
+    https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator] which also is available as Bean.
+
 
 
 
