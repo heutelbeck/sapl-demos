@@ -1,7 +1,7 @@
 package io.sapl.demo;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
 import java.util.Scanner;
 
 import javax.net.ssl.SSLServerSocket;
@@ -28,13 +28,12 @@ public class GeoDemoServer {
 	private static final String POLICY_PATH = "./././policies";
 	private static final int MAX_REQUESTS = 10;
 	private static final int MIN_PASSENGER = 166;
+	public static final String ENCODING = "UTF-8";
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
-	private static EmbeddedPolicyDecisionPoint pdp;
+	private static volatile EmbeddedPolicyDecisionPoint pdp;
 
-	public static void main(String[] args)
-			throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
-
+	public static void main(String[] args) {
 		try (SSLServerSocket serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault()
 				.createServerSocket(PORT)) {
 			serverSocket.setNeedClientAuth(true);
@@ -50,6 +49,12 @@ public class GeoDemoServer {
 					handleConnection(socket);
 				}
 			}
+		} catch (IOException e) {
+			log.error("Exception during Server initialization: {}", e.toString());
+			log.error(e.getMessage());
+		} catch (FunctionException | AttributeException | PolicyEvaluationException e) {
+			log.error("Exception in PDP: {}", e.toString());
+			log.error(e.getMessage());
 		}
 	}
 
@@ -60,8 +65,8 @@ public class GeoDemoServer {
 		log.info("Cypher {}", session.getCipherSuite());
 		log.info("Protocol: {}", session.getProtocol());
 
-		Scanner in = new Scanner(socket.getInputStream());
-		PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+		Scanner in = new Scanner(socket.getInputStream(), ENCODING);
+		OutputStreamWriter out = new OutputStreamWriter(socket.getOutputStream(), ENCODING);
 
 		String receivedRequest = in.nextLine();
 		log.info("Request: {}", receivedRequest);
@@ -69,15 +74,15 @@ public class GeoDemoServer {
 		Response response = pdp.decide(request);
 
 		// Execute function in accordance with decision
-		if (response.getDecision().equals(Decision.PERMIT)) {
+		if (response.getDecision() == Decision.PERMIT) {
 			log.info("Permit - sending answer");
 			PilDataConstructor pil = new PilDataConstructor(request.getResource(), MIN_PASSENGER);
-			out.println(pil.getData());
+			out.write(pil.getData());
 			out.close();
 		} else {
 			String decision = response.getDecision().toString();
 			log.info("{} - sending answer", decision);
-			out.println(decision);
+			out.write(decision);
 			out.close();
 		}
 		in.close();

@@ -1,13 +1,15 @@
 package io.sapl.demo;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
+import java.util.Locale;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -44,6 +46,7 @@ public class PilDataConstructor implements ResponseConstructor {
 	private static final int RESTRICTED = 1;
 	private static final int CONFIDENTIAL = 2;
 	private static final int MALE = 0;
+	private static final int GENDER = 2;
 	private static final long BDATE_YEAR_BEGIN = -946771200000L; // 01.01.1940
 	private static final long BDATE_TIMEFRAME = 75L * 365 * 24 * 60 * 60 * 1000; // 75 years
 	private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -51,14 +54,14 @@ public class PilDataConstructor implements ResponseConstructor {
 	private String[] firstNamesMale;
 	private String[] firstNamesFemale;
 	private String[] surnames;
-	private Random rand;
+	private SecureRandom rand;
 
 	private PilData data;
 	private JsonNode resource;
 	private int actNumPax;
 
 	public PilDataConstructor(JsonNode res, int minSeats) throws IOException {
-		rand = new Random();
+		rand = new SecureRandom();
 		data = new PilData();
 		resource = res;
 		actNumPax = minSeats + rand.nextInt(TTL_MAX - minSeats);
@@ -140,7 +143,7 @@ public class PilDataConstructor implements ResponseConstructor {
 	private PilPassenger[] constructRandomPaxDetails() {
 		PilPassenger[] pax = new PilPassenger[actNumPax];
 		for (int i = 0; i < actNumPax; i++) {
-			int gender = rand.nextInt(2);
+			int gender = rand.nextInt(GENDER);
 			pax[i] = PilPassenger.builder().name(randomName(gender)).bdate(randomBdate()).gender(gender == MALE ? M : F)
 					.seat(String.valueOf(i)).special(SPECIALS[rand.nextInt(SPECIALS.length - 1)]).build();
 		}
@@ -150,7 +153,7 @@ public class PilDataConstructor implements ResponseConstructor {
 	private String randomBdate() {
 		// random birthday between 01.01.1940 and 01.01.2015
 		long ms = BDATE_YEAR_BEGIN + (long) (rand.nextDouble() * BDATE_TIMEFRAME);
-		return new SimpleDateFormat(DATE_FORMAT).format(new Date(ms));
+		return new SimpleDateFormat(DATE_FORMAT, Locale.GERMAN).format(new Date(ms));
 	}
 
 	private String randomName(int gender) {
@@ -164,8 +167,10 @@ public class PilDataConstructor implements ResponseConstructor {
 		return name.toString();
 	}
 
-	private String[] getNameList(String file) throws IOException {
-		FileReader fileReader = new FileReader(FILE_PATH + FilenameUtils.getName(file));
+	private static String[] getNameList(String file) throws IOException {
+		InputStreamReader fileReader = new InputStreamReader(
+				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)), GeoDemoServer.ENCODING);
+
 		List<String> result = new ArrayList<>();
 		try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 			String line = null;
