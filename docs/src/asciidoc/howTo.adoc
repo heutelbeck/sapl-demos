@@ -117,7 +117,7 @@ The following table gives an overview of all current user rights:
 
 == Submodule 'sapl-demo-permeval'
 
-This submodule  makes extensive use of the Interface PermissionEvaluator from https://projects.spring.io/spring-security/[Spring Security].
+This submodule  makes extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from https://projects.spring.io/spring-security/[Spring Security].
 
 === sapl-spring-boot-starter
 
@@ -282,11 +282,34 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 ```
 
 <1> In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
-<2> SAPLPermissionEvaluator basically accepts only following _soft-wired_ expression: +
+<2> `SAPLPermissionEvaluator` basically accepts only following _soft-wired_ expression: +
    `hasPermission(#request, #request)`.
 <3> If you want to use other _hard-wired_   `hasPermission` expressions you have to customize them to match the method  of `runPolicyCheck` from
-    https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator] which also is available as Bean.
+    https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java[StandardSAPLAuthorizator]
+    (which is  enabled as Bean in https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring-boot-starter/src/main/java/io/sapl/springboot/starter/PDPAutoConfiguration.java[PDPAutoConfiguration] ).
 
+
+An example for securing the `DELETE` method from
+the https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/controller/RestService.java[RestService] is listed below:
+
+```java
+	@DeleteMapping("{id}")
+	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
+	public void delete(@PathVariable int id, HttpServletRequest request) {
+		patientenRepo.deleteById(id);
+	}
+```
+
+The corresponding SAPL policy is implemented as follows:
+
+----
+policy "permit_doctor_delete_person"
+permit
+  action.method == "DELETE"
+where
+  "DOCTOR" in subject..authority;
+  resource.uri =~ "/person/[0-9]+";
+----
 
 
 
