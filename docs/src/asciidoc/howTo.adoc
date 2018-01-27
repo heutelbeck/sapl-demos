@@ -358,7 +358,7 @@ public class PatientPIP {
 }
 
 ```
-<1> The CrudRepository `relationRepo` has not  been provided as bean at the time if  we want to access it via the PIP.
+<1> The CrudRepository `RelationRepo` has not  been provided as bean at the time if  we want to access it via the PIP.
  Therefore we use _lazy initialization_ to load it.
  On the other  hand the https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java[ApplicationContextProvider]
  has to be loaded as  bean in submodule `sapl-demo-permeval`
