@@ -31,6 +31,7 @@ public class GeoDemoServer {
 	private static final int MIN_PASSENGER = 166;
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final Object PDP_LOCK = new Object();
 	private static EmbeddedPolicyDecisionPoint pdp;
 
 	public static void main(String[] args) {
@@ -38,7 +39,9 @@ public class GeoDemoServer {
 				.createServerSocket(PORT)) {
 			serverSocket.setNeedClientAuth(true);
 
-			initPDP();
+			synchronized (PDP_LOCK) {
+				pdp = new EmbeddedPolicyDecisionPoint(POLICY_PATH);
+			}
 
 			log.info("Starting server");
 			log.info("Client-Auth: {}", serverSocket.getNeedClientAuth());
@@ -52,13 +55,7 @@ public class GeoDemoServer {
 		} catch (IOException e) {
 			log.error("Exception during Server initialization: {}", e.toString());
 			log.error(e.getMessage());
-		}
-	}
-
-	private static synchronized void initPDP() {
-		try {
-			pdp = new EmbeddedPolicyDecisionPoint(POLICY_PATH);
-		} catch (FunctionException | AttributeException | PolicyEvaluationException | IOException e) {
+		} catch (FunctionException | AttributeException | PolicyEvaluationException e) {
 			log.error("Exception in PDP: {}", e.toString());
 			log.error(e.getMessage());
 		}
