@@ -38,7 +38,7 @@ public class GeoDemoServer {
 				.createServerSocket(PORT)) {
 			serverSocket.setNeedClientAuth(true);
 
-			pdp = new EmbeddedPolicyDecisionPoint(POLICY_PATH);
+			initPDP();
 
 			log.info("Starting server");
 			log.info("Client-Auth: {}", serverSocket.getNeedClientAuth());
@@ -52,7 +52,13 @@ public class GeoDemoServer {
 		} catch (IOException e) {
 			log.error("Exception during Server initialization: {}", e.toString());
 			log.error(e.getMessage());
-		} catch (FunctionException | AttributeException | PolicyEvaluationException e) {
+		}
+	}
+
+	private static synchronized void initPDP() {
+		try {
+			pdp = new EmbeddedPolicyDecisionPoint(POLICY_PATH);
+		} catch (FunctionException | AttributeException | PolicyEvaluationException | IOException e) {
 			log.error("Exception in PDP: {}", e.toString());
 			log.error(e.getMessage());
 		}
