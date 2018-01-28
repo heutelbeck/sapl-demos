@@ -47,7 +47,7 @@ public class AuthManager implements AuthenticationManager {
 			throw new BadCredentialsException("user and/or password do not match");
 		}
 		LOGGER.trace("user successfully authenticated, will create UsernamePasswordAuthenticationToken...");
-		List<GrantedAuthority> userAuthorities = new ArrayList<GrantedAuthority>();
+		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
 		return new UsernamePasswordAuthenticationToken(username, user.getPassword(), userAuthorities);
 
