@@ -41,7 +41,9 @@
 		<module>sapl-demo-permeval</module>
 		<module>sapl-demo-filterchain</module>
 		<module>sapl-demo-jwt</module>
-	</modules>
+		<module>sapl-demo-geo</module>
+        <module>sapl-demo-shared</module>
+    </modules>
 
 	<distributionManagement>
 		<repository>

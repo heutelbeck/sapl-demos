@@ -2,10 +2,11 @@ package io.sapl.peembedded.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.sapl.demo.shared.other.PatientResource;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
 import io.sapl.spring.marshall.action.HttpAction;
@@ -36,17 +37,17 @@ public class UIController {
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 	
-	private PolicyEnforcementPoint pep;
+	private StandardSAPLAuthorizator pep;
 
 	private PatientenRepo patientenRepo;
 
 	
 	
 	@Autowired
-	public UIController(PolicyEnforcementPoint pep, PatientenRepo patientenRepo) {
+	public UIController(StandardSAPLAuthorizator pep, PatientenRepo patientenRepo) {
 		this.pep = pep;
 		this.patientenRepo = patientenRepo; 
-		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})", pep != null , patientenRepo != null);
+		LOGGER.debug("created instancewith StandardSAPLAuthorizator (!= null:{}) and PatientenRepo (!= null:{})", pep != null , patientenRepo != null);
 	}
 	
 	
@@ -95,6 +96,7 @@ public class UIController {
 		model.addAttribute("viewHRNPermission", pep.authorize(subject, new SimpleAction("read"), new StringResource("HRN")));
 		model.addAttribute("updatePermission", pep.authorize(subject,new HttpAction(RequestMethod.PUT), new HttpResource("/patient") ));
 		model.addAttribute("deletePermission", pep.authorize(subject,new HttpAction(RequestMethod.DELETE), new HttpResource("/patient")));
+		// next line only works if PatientPIP is integrated into SAPL Policies
 		model.addAttribute("viewRoomNumberPermission", pep.authorize(subject,new SimpleAction("viewRoomNumber"), patientResource));
 		
 		
