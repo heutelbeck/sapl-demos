@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -111,12 +111,7 @@ public class Benchmark {
 	}
 
 	private static double extractMdn(List<XlsRecord> data) {
-		List<Double> list = new ArrayList<>();
-		for (XlsRecord item : data) {
-			list.add(item.getDuration());
-		}
-		Collections.sort(list);
-
+		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
 		int index = list.size() / 2;
 		if (list.size() % 2 == 0) {
 			return (list.get(index) + list.get(index - 1)) / 2;
