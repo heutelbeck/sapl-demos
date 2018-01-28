@@ -2,9 +2,9 @@ package io.sapl.peembedded.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.sapl.demo.shared.other.PatientResource;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
+import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
