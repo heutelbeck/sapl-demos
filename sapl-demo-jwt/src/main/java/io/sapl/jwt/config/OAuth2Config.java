@@ -90,7 +90,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
-		LOGGER.info("Initializing JWT with public key:\n" + publicKey);
+		LOGGER.info("Initializing JWT with public key:\n{}", publicKey);
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 		converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
