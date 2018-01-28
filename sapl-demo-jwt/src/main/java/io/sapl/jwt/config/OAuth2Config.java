@@ -110,7 +110,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		Map<String, Object> claims = new HashMap<String, Object>();
+		Map<String, Object> claims = new HashMap<>();
 		claims.put("homeGatewayAccess", Arrays.asList("0123456", "6543210", "deadbeef"));
 		clients.inMemory().withClient("my-client-with-registered-redirect").authorizedGrantTypes("authorization_code")
 				.authorities(ROLE_CLIENT).scopes("read", "trust").redirectUris("http://anywhere?key=value").and()
