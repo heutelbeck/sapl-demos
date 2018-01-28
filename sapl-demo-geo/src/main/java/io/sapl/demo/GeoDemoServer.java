@@ -31,7 +31,7 @@ public class GeoDemoServer {
 	private static final int MIN_PASSENGER = 166;
 
 	private static final ObjectMapper MAPPER = new ObjectMapper();
-	private static volatile EmbeddedPolicyDecisionPoint pdp;
+	private static EmbeddedPolicyDecisionPoint pdp;
 
 	public static void main(String[] args) {
 		try (SSLServerSocket serverSocket = (SSLServerSocket) SSLServerSocketFactory.getDefault()
