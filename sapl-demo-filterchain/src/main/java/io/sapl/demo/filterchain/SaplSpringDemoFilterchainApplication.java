@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootApplication
 @EnableJpaRepositories("io.sapl.demo.repository")
-@EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository"})
+@EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
 public class SaplSpringDemoFilterchainApplication {
 
 	private static final String HRN1 = "123456";
@@ -54,7 +54,7 @@ public class SaplSpringDemoFilterchainApplication {
 	@Bean
 	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
-		return (args) -> {
+		return args -> {
 			userRepo.save(
 					new User(NAME_DOMINIK, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_VISITOR))));
 			userRepo.save(
