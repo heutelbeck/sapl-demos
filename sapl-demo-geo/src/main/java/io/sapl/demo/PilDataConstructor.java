@@ -97,7 +97,8 @@ public class PilDataConstructor implements ResponseConstructor {
 	private PilMetaInf constructMetaInf() {
 		return PilMetaInf.builder().arrAp(resource.findValue(ARR_AP).asText())
 				.depAp(resource.findValue(DEP_AP).asText()).fltNo(resource.findValue(FLT_NO).asText())
-				.date(resource.findValue(DATE).asText()).acType(AC_TYPE).build();
+				.date(resource.findValue(DATE).asText()).acType(AC_TYPE)
+				.classification(resource.findValue(FLT_NO).asInt()).build();
 	}
 
 	private PilPaxInf constructRandomPaxInf() {

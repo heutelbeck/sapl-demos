@@ -15,4 +15,5 @@ class PilMetaInf implements Serializable {
 	private String acType;
 	private String fltNo;
 	private String date;
+	private int classification;
 }

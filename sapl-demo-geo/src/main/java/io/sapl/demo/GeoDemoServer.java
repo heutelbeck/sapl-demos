@@ -30,6 +30,7 @@ public class GeoDemoServer {
 	private static final int MAX_REQUESTS = 10;
 	private static final int MIN_PASSENGER = 166;
 
+	private static final String RECURRENT = "recurrent";
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final Object PDP_LOCK = new Object();
 	private static EmbeddedPolicyDecisionPoint pdp;
@@ -79,8 +80,12 @@ public class GeoDemoServer {
 		// Execute function in accordance with decision
 		if (response.getDecision() == Decision.PERMIT) {
 			log.info("Permit - sending answer");
-			PilDataConstructor pil = new PilDataConstructor(request.getResource(), MIN_PASSENGER);
-			out.write(pil.getData());
+			if (request.getResource().has(RECURRENT) && request.getResource().findValue(RECURRENT).asBoolean()) {
+				out.write(response.getDecision().toString());
+			} else {
+				PilDataConstructor pil = new PilDataConstructor(request.getResource(), MIN_PASSENGER);
+				out.write(pil.getData());
+			}
 			out.close();
 		} else {
 			String decision = response.getDecision().toString();

@@ -40,7 +40,7 @@
 			"from": 0,
 			"flipCoordinates": true
 		},
-	    "trustServer": "http://www.xxx.info/public/trustedLocations.kml",
+	    "trustServer": "http://www.mariusmueller.info/public/trustedLocations.kml",
 	    "pmdTracking": {
 	    	"serverUrl": "http://localhost:8082/api/",
 	    	"credentials": "YWRtaW46YWRtaW4=",
