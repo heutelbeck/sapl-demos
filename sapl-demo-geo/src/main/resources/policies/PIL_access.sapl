@@ -15,7 +15,7 @@ var trackedPMD = pmdTrack.<io.sapl.pip.geo.traccar>;
 	 
 	
 	policy "restrict_meta_data"
-	deny action == "PIL:RETRIEVE" && resource.classification >= param.meta
+	deny action == "PIL:RETRIEVE" & resource.classification >= param.meta
 	where
 		var trustedLocations = resToGeometryBag(trustServer.<io.sapl.pip.geo.kml>.geofences.*);
 		!(trackedPMD.accuracy <= param.minAccuracy);
@@ -24,7 +24,7 @@ var trackedPMD = pmdTrack.<io.sapl.pip.geo.traccar>;
 		
 		
 	policy "restrict_restricted_data"
-	deny action == "PIL:RETRIEVE" && resource.classification >= param.restricted
+	deny action == "PIL:RETRIEVE" & resource.classification >= param.restricted
 	where
 		var stations = stationsDB.<io.sapl.pip.geo.postgis>.geofences;
 		var airports = airportsDB.<io.sapl.pip.geo.postgis>.geofences;
@@ -37,7 +37,7 @@ var trackedPMD = pmdTrack.<io.sapl.pip.geo.traccar>;
 			
 	
 	policy "restrict_confidential_data"
-	deny action == "PIL:RETRIEVE" && resource.classification >= param.confidential
+	deny action == "PIL:RETRIEVE" & resource.classification >= param.confidential
 	where
 		var trackedAC = aircraftTracking.<io.sapl.pip.geo.postgis>.geofences;
 		!isWithinGeoDistance(trackedAC[(resource.acReg)], trackedPMD.position, param.maxDistFromAc);
