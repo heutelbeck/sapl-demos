@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.context.ApplicationContext;
+
 @Slf4j
 @PolicyInformationPoint(name="patient", description="retrieves information about patients")
 public class PatientPIP {
@@ -24,7 +26,11 @@ public class PatientPIP {
 	private final ObjectMapper om = new ObjectMapper();
 	
 	private RelationRepo getRelationRepo(){
+		LOGGER.debug("GetRelationRepo...");
 		if(!relationRepo.isPresent()){
+			LOGGER.debug("RelRepo not present...");
+			ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+			LOGGER.debug("Context found: {}", context);
 			relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class));
 		}
 		LOGGER.debug("Found required instance of RelationRepo: {}", relationRepo.isPresent());
