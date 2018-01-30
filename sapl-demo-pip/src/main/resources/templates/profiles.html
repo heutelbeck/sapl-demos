@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>Spring Security Example </title>
@@ -15,11 +15,6 @@
         	<td><a href="patient.html" th:href="@{/patient(id=${profile.id})}" th:text="${profile.name}"> Name</a></td>
         </tr> 
         </table>
-
-        <form th:if="${createPermission}" action="/profiles/new">
-            <input type="submit" value="Create New Profile" />
-        </form>
-        <p></p>
 
         <form action="/home">
             <input type="submit" value="Back to Home" />
