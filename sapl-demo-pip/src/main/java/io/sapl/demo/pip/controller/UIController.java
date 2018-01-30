@@ -7,7 +7,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.demo.domain.Patient;
@@ -16,9 +15,7 @@ import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
-import io.sapl.spring.marshall.action.HttpAction;
 import io.sapl.spring.marshall.action.SimpleAction;
-import io.sapl.spring.marshall.resource.HttpResource;
 import io.sapl.spring.marshall.subject.AuthenticationSubject;
 import lombok.extern.slf4j.Slf4j;
 
