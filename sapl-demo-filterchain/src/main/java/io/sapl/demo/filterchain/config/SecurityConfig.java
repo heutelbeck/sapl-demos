@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		LOGGER.trace("start configuring...");
 		http.addFilterAfter(policyEnforcementFilter(), FilterSecurityInterceptor.class).authorizeRequests().anyRequest()
-				.permitAll().and().formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
+				.authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
 				.logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
 	}
 
