@@ -22,9 +22,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.spring.SaplBasedVoter;
+import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import io.sapl.voter.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.voter.obligationhandlers.EmailObligationHandler;
@@ -40,7 +41,7 @@ public class SecurityConfig {
 	private UserRepo userRepo;
 
 	@Autowired
-	private PolicyDecisionPoint pdp;
+	StandardSAPLAuthorizator saplAuthorizer;
 
 	@Bean
 	WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
@@ -77,7 +78,7 @@ public class SecurityConfig {
 
 	@Bean
 	public SaplBasedVoter saplBasedVoter() {
-		return new SaplBasedVoter();
+		return new SaplBasedVoter(saplAuthorizer);
 	}
 
 	@Bean

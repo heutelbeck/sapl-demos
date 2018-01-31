@@ -25,8 +25,8 @@ import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.Subject;
-import io.sapl.spring.marshall.action.SimpleAction;
-import io.sapl.spring.marshall.resource.StringResource;
+import io.sapl.spring.marshall.action.HttpAction;
+import io.sapl.spring.marshall.resource.HttpResource;
 import io.sapl.spring.marshall.subject.AuthenticationSubject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,10 +57,9 @@ public class PdpAuthorizeJwtAspect {
 
 		HttpServletRequest req = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-		SimpleAction action = new SimpleAction(req.getMethod());
+		HttpAction action = new HttpAction(req);
 
-		StringResource resource = new StringResource(req.getRequestURI());
-
+		HttpResource resource = new HttpResource(req);
 		LOGGER.debug("Getting pdp Response...");
 		Response response = pep.getResponse(subject, action, resource);
 
