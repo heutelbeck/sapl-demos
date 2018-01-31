@@ -1,4 +1,4 @@
-package io.saple.filterchain.obligationhandlers;
+package io.sapl.demo.filterchain.obligationhandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
