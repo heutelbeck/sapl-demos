@@ -43,7 +43,7 @@ public class JwtBasedRestTest {
 	@Test
 	public void callAspectMethodSucceeds() throws Exception {
 		String accessToken = obtainAccessToken("Julia", "password");
-		mockMvc.perform(get("/readDiag/1").header("Authorization", "Bearer " + accessToken)
+		mockMvc.perform(get("/person/readDiag/1").header("Authorization", "Bearer " + accessToken)
 				.accept("application/json;charset=UTF-8")).andExpect(status().isOk());
 	}
 
