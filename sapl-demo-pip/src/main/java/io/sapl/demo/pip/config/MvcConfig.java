@@ -28,7 +28,7 @@ public class MvcConfig implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public PIPProvider pipProvider() {
+	public PIPProvider pipProvider(ApplicationContextProvider apc) {
 		return () -> Arrays.asList(PatientPIP.class);
 	}
 

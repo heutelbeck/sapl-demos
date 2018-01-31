@@ -8,7 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -25,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @EnableJpaRepositories("io.sapl.demo.repository")
 @EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
 public class SaplDemoPipApplication {
-	
+
 	private static final String HRN1 = "123456";
 	private static final String HRN2 = "4711";
 	private static final String ROLE_DOCTOR = "DOCTOR";
@@ -50,10 +49,9 @@ public class SaplDemoPipApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SaplDemoPipApplication.class, args);
 	}
-	
+
 	@Bean
-	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo,
-			ApplicationContext ctx) {
+	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo) {
 		return args -> {
 			userRepo.save(
 					new User(NAME_DOMINIK, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_VISITOR))));
