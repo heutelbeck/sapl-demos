@@ -11,18 +11,18 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
 import io.sapl.demo.filterchain.AuthManager;
+import io.sapl.demo.filterchain.obligationhandlers.CoffeeObligationHandler;
+import io.sapl.demo.filterchain.obligationhandlers.EmailObligationHandler;
+import io.sapl.demo.filterchain.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.demo.repository.UserRepo;
 import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
-import io.saple.filterchain.obligationhandlers.CoffeeObligationHandler;
-import io.saple.filterchain.obligationhandlers.EmailObligationHandler;
-import io.saple.filterchain.obligationhandlers.SimpleLoggingObligationHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity //(debug = true)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
