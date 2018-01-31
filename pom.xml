@@ -43,6 +43,7 @@
 		<module>sapl-demo-jwt</module>
 		<module>sapl-demo-geo</module>
         <module>sapl-demo-shared</module>
+        <module>sapl-demo-pip</module>
     </modules>
 
 	<distributionManagement>
