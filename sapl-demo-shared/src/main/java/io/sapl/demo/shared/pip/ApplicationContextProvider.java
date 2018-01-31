@@ -1,4 +1,4 @@
-package io.sapl.demo.pip;
+package io.sapl.demo.shared.pip;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

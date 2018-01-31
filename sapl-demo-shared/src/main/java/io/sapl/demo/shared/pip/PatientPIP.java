@@ -1,4 +1,4 @@
-package io.sapl.demo.pip;
+package io.sapl.demo.shared.pip;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
