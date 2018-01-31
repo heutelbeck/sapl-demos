@@ -1,4 +1,4 @@
-package io.saple.filterchain.obligationhandlers;
+package io.sapl.demo.filterchain.obligationhandlers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
