@@ -1,5 +1,3 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
 set "httpPolicy"
 deny-unless-permit
 

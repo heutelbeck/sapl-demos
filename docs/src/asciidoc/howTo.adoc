@@ -313,6 +313,8 @@ where
 ----
 
 
+
+////
 === Policy Information Point
 
 A Policy Information Point (PIP) can provide further information to evaluate a policy, in case that the request doesn't contain all necessary information. To implement a PIP, the class has to be annotated with `@PolicyInformationPoint`.
@@ -402,5 +404,7 @@ Furthermore, the name of the PIP has to be notated in the _attributeFinders_ ent
     "libraries": []
 }
 ```
+////
+
 
 
