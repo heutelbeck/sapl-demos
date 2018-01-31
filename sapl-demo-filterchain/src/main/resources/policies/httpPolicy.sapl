@@ -66,7 +66,7 @@ permit
     action.method == "GET"
 where
   "DOCTOR" in subject..authority;
-  resource == "/patient/id/update";  
+  resource.uriLowerCased =~ "/patient/[0-9]*/update";  
   
 
 policy "permit_nurse_get_update_form"
@@ -74,7 +74,7 @@ permit
     action.method == "GET"
 where
   "NURSE" in subject..authority;
-  resource =~ "/patient/id/update";     
+  resource.uriLowerCased =~ "/patient/[0-9]*/update";     
   
   
 policy "permit_doctor_post_profiles"
