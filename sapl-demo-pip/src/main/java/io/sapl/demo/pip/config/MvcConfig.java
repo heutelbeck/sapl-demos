@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import io.sapl.demo.shared.pip.ApplicationContextProvider;
 import io.sapl.demo.shared.pip.PatientPIP;
 import io.sapl.spring.PIPProvider;
 
@@ -25,6 +26,11 @@ public class MvcConfig implements WebMvcConfigurer {
 		registry.addViewController("/").setViewName("home");
 		registry.addViewController("/login").setViewName("login");
 		registry.addViewController("/error").setViewName("error");
+	}
+
+	@Bean
+	public ApplicationContextProvider applicationContextProvider() {
+		return new ApplicationContextProvider();
 	}
 
 	@Bean
