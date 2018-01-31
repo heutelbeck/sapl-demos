@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
-@EnableWebSecurity(debug = true)
+@EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -37,11 +37,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PolicyEnforcementFilter policyEnforcementFilter() {
 		return new PolicyEnforcementFilter(saplAuthorizer);
 	}
-	
+
 	@Bean
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
 	}
-
 
 }
