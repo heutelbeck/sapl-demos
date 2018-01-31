@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import io.sapl.demo.pip.PatientPIP;
+import io.sapl.demo.shared.pip.PatientPIP;
 import io.sapl.spring.PIPProvider;
 
 @Configuration
