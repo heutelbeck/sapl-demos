@@ -314,7 +314,7 @@ where
 
 
 
-////
+
 === Policy Information Point
 
 A Policy Information Point (PIP) can provide further information to evaluate a policy, in case that the request doesn't contain all necessary information. To implement a PIP, the class has to be annotated with `@PolicyInformationPoint`.
@@ -326,37 +326,42 @@ Here you can see the https://github.com/heutelbeck/sapl-demos/blob/master/sapl-d
 public class PatientPIP {
 
 
-    private Optional<RelationRepo> relationRepo = Optional.empty();
+	private Optional<RelationRepo> relationRepo = Optional.empty();
 
-    private final ObjectMapper om = new ObjectMapper();
+	private final ObjectMapper om = new ObjectMapper();
 
-    private RelationRepo getRelationRepo(){
-        if(!relationRepo.isPresent()){
-            relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext()
-                           .getBean(RelationRepo.class)); //<1>
-        }
-        LOGGER.debug("Found required instance of RelationRepo: {}", relationRepo.isPresent());
-        return relationRepo.get();
-    }
+	private RelationRepo getRelationRepo(){
+		LOGGER.debug("GetRelationRepo...");
+		if(!relationRepo.isPresent()){
+			LOGGER.debug("RelRepo not present...");
+			ApplicationContext context =
+			      ApplicationContextProvider.getApplicationContext();
+			LOGGER.debug("Context found: {}", context);
+			relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); <1>
+		}
+		LOGGER.debug("Found required instance of RelationRepo: {}",
+		              relationRepo.isPresent());
+		return relationRepo.get();
+	}
 
-    @Attribute(name="related") //<2>
-    public JsonNode getRelations (JsonNode value, Map<String, JsonNode> variables) {
-        List<String> returnList = new ArrayList<>();
-        try{
-            int id = Integer.parseInt(value.asText());
-            LOGGER.debug("Entering getRelations. ID: {}", id);
+	@Attribute(name="related") <2>
+	public JsonNode getRelations (JsonNode value, Map<String, JsonNode> variables) {
+		List<String> returnList = new ArrayList<>();
+		try{
+			int id = Integer.parseInt(value.asText());
+			LOGGER.debug("Entering getRelations. ID: {}", id);
 
-            returnList.addAll(getRelationRepo().findByPatientid(id).stream()
-                    .map(Relation::getUsername)
-                    .collect(Collectors.toList()));
+			returnList.addAll(getRelationRepo().findByPatientid(id).stream()
+                      .map(Relation::getUsername)
+                      .collect(Collectors.toList()));
 
-        }catch(NumberFormatException e){
-            LOGGER.debug("getRelations couldn't parse the value to Int", e);
-        }
-        JsonNode result = om.convertValue(returnList, JsonNode.class);
-        LOGGER.debug("Result: {}", result);
-        return result;
-    }
+		}catch(NumberFormatException e){
+			LOGGER.debug("getRelations couldn't parse the value to Int", e);
+		}
+		JsonNode result = om.convertValue(returnList, JsonNode.class);
+		LOGGER.debug("Result: {}", result);
+		return result;
+	}
 }
 
 ```
@@ -404,7 +409,6 @@ Furthermore, the name of the PIP has to be notated in the _attributeFinders_ ent
     "libraries": []
 }
 ```
-////
 
 
 

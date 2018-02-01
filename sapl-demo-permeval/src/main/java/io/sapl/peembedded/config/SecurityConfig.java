@@ -6,6 +6,7 @@ import java.util.List;
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
 
+import io.sapl.demo.shared.pip.ApplicationContextProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -72,6 +73,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		};
 	}
+
+	@Bean
+	public ApplicationContextProvider applicationContextProvider(){
+		return new ApplicationContextProvider();
+	}
+
 
 
 }

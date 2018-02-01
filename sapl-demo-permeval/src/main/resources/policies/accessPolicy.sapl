@@ -1,3 +1,5 @@
+import io.sapl.demo.shared.pip.PatientPIP as patient
+
 set "accessPolicy"
 deny-unless-permit
 

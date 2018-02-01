@@ -1,79 +1,8 @@
+import io.sapl.demo.shared.pip.PatientPIP as patient
+
 set "httpPolicy"
 deny-unless-permit
 
-
-policy "permit_basic_access"
-permit
-    action.method == "GET"
-where
-    resource.uri == "/";
-
-    
-policy "permit_login"
-permit
-    action.method == "GET"
-where
-    resource.uri == "/login";
-
-
-policy "permit_getting_profiles"
-permit
-    action.method == "GET"
-where 
-    resource.uri == "/profiles";
-
-    
-policy "permit_getting_error"
-permit
-    action.method == "GET"
-where 
-    resource.uri =~ "/error";
-
-    
-policy "permit_posting_error"
-permit
-    action.method == "POST"
-where 
-    resource.uri =~ "/error";
-    
-    
-policy "permit_loading_homepage"
-permit
-    action.method == "GET"
-where 
-    resource.uri =~ "/home";
-
-
-policy "permit_seeing_patient_details"
-permit
-    action.method == "GET"
-where
-  resource.uri =~ "/patient";
-
-
-policy "permit_doctor_get_create_form"
-permit
-    action.method == "GET"
-where
-  "DOCTOR" in subject..authority;
-  resource == "/profiles/new";
-  
-  
-policy "permit_doctor_get_update_form"
-permit
-    action.method == "GET"
-where
-  "DOCTOR" in subject..authority;
-  resource == "/patient/id/update";  
-  
-
-policy "permit_nurse_get_update_form"
-permit
-    action.method == "GET"
-where
-  "NURSE" in subject..authority;
-  resource =~ "/patient/id/update";     
-  
   
 policy "permit_doctor_post_profiles"
 permit

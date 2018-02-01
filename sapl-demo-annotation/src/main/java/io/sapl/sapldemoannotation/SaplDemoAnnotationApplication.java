@@ -60,7 +60,7 @@ public class SaplDemoAnnotationApplication {
 	@Bean
 	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
-		return (args) -> {
+		return args -> {
 			userRepo.save(
 					new User(NAME_DOMINIK, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_VISITOR))));
 			userRepo.save(
