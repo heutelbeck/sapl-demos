@@ -223,7 +223,7 @@ public class PatientPIP {
 			      ApplicationContextProvider.getApplicationContext();
 			LOGGER.debug("Context found: {}", context);
 			relationRepo = 
-			Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); (1.)
+Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); (1.)
 		}
 		LOGGER.debug("Found required instance of RelationRepo: {}",
 		              relationRepo.isPresent());
