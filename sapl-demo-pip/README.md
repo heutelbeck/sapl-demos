@@ -57,7 +57,7 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
     Therefore we use _lazy initialization_ to load it.
     On the other  hand the [ApplicationContextProvider](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java)
     has to be loaded as  bean in submodule `sapl-demo-permeval`
-    as you can see in [SecurityConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/config/SecurityConfig.java) :
+    as you can see in [MvcConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/src/main/java/io/sapl/demo/pip/config/MvcConfig.java) :
 
         @Bean
         public ApplicationContextProvider applicationContextProvider(){
