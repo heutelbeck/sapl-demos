@@ -115,6 +115,21 @@ The following table gives an overview of all current user rights:
 |Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
+
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain['sapl-demo-filterchain']
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain/README.md
+
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval['sapl-demo-permeval']
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/README.md
+
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip['sapl-demo-pip']
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
+
+
+////
 == Submodule 'sapl-demo-permeval'
 
 This submodule  makes extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from https://projects.spring.io/spring-security/[Spring Security].
@@ -409,6 +424,8 @@ Furthermore, the name of the PIP has to be notated in the _attributeFinders_ ent
     "libraries": []
 }
 ```
+////
+
 
 
 
