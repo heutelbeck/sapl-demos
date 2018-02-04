@@ -133,7 +133,7 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
         this.saplAuthorizer = saplAuthorizer;
     }
 
-    @Override //(1.) (2.)
+    @Override //(1.) 
     public boolean hasPermission(Authentication authentication, Object targetDomainObject,
                                   Object permission) {
         return authorize(authentication, permission, targetDomainObject); 
@@ -169,12 +169,13 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
 1. In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
 
-2. `SAPLPermissionEvaluator` basically accepts only following _soft-wired_ expression: 
+2. `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
    `hasPermission(#request, #request)`.
    
-3. If you want to use other _hard-wired_   `hasPermission` expressions you have to customize them to match the method  of `runPolicyCheck` from
-    [StandardSAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java)
-    (which is  enabled as Bean in [PDPAutoConfiguration](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring-boot-starter/src/main/java/io/sapl/springboot/starter/PDPAutoConfiguration.java)).
+3. You can also use  _hard-wired_   expressions  like `hasPermission('someResource', 'someAction')`.
+
+
+
 
 
 An example for securing the `DELETE` method from
