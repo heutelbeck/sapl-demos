@@ -3,16 +3,16 @@ package io.sapl.voter.obligationhandlers;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.spring.marshall.obligation.Obligation;
-import io.sapl.spring.marshall.obligation.ObligationFailedException;
+import io.sapl.spring.marshall.obligation.ObligationFailed;
 import io.sapl.spring.marshall.obligation.ObligationHandler;
 
 public class CoffeeObligationHandler implements ObligationHandler {
 
 	@Override
-	public void handleObligation(Obligation obligation) throws ObligationFailedException {
+	public void handleObligation(Obligation obligation) throws ObligationFailed {
 		JsonNode obNode = obligation.getJsonObligation();
 		if (!obNode.has("coffeeAddiction")) {
-			throw new ObligationFailedException();
+			throw new ObligationFailed();
 		}
 
 	}
