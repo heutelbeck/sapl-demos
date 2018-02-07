@@ -11,8 +11,8 @@ public class SimpleLoggingAdviceHandler implements AdviceHandler {
 	
 	@Override
 	public void handleAdvice(Advice advice) {
-		JsonNode obNode = advice.getJsonAdvice();
-		if (obNode.has("message")) {
+		JsonNode adNode = advice.getJsonAdvice();
+		if (adNode.has("message")) {
 			LOGGER.info(advice.getJsonAdvice().findValue("message").asText());
 		}
 
@@ -20,9 +20,9 @@ public class SimpleLoggingAdviceHandler implements AdviceHandler {
 
 	@Override
 	public boolean canHandle(Advice advice) {
-		JsonNode obNode = advice.getJsonAdvice();
-		if (obNode.has("type")) {
-			String type = obNode.findValue("type").asText();
+		JsonNode adNode = advice.getJsonAdvice();
+		if (adNode.has("type")) {
+			String type = adNode.findValue("type").asText();
 			if ("simpleLogging".equals(type)) {
 				return true;
 			}

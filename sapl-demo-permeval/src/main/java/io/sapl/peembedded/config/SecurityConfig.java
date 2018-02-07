@@ -6,6 +6,7 @@ import java.util.List;
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
 import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
+import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
@@ -98,6 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public SimpleAdviceHandlerService setAdviceHandlers() {
 		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
 		sahs.register(new EmailAdviceHandler());
+		sahs.register(new SimpleLoggingAdviceHandler());
 		return sahs;
 	}
 
