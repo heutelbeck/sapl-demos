@@ -26,6 +26,12 @@ permit
 where
    "DOCTOR" in subject..authority;
    resource == "doctor";
+advice
+   { "type" : "sendEmail",
+     "recipient" : "supervisor@example.org",
+     "subject" : "Attending Doctor was changed",
+     "message" : subject.name + " has changed the attending Doctor of " + resource.name
+   }  
    
    
 policy "permit_nurse_update_attending_nurse"
@@ -34,6 +40,12 @@ permit
 where
    "NURSE" in subject..authority;
    resource == "nurse";
+advice
+   { "type" : "sendEmail",
+     "recipient" : "supervisor@example.org",
+     "subject" : "Attending Nurse was changed",
+     "message" : subject.name + " has changed the attending Nurse of " + resource.name
+   }  
 
 
 policy "get_blacken_and_obligation_test"
