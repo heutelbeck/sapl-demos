@@ -1,7 +1,7 @@
 package io.sapl.demo.shared.obligationhandlers;
 
 import io.sapl.spring.marshall.obligation.Obligation;
-import io.sapl.spring.marshall.obligation.ObligationFailedException;
+import io.sapl.spring.marshall.obligation.ObligationFailed;
 import io.sapl.spring.marshall.obligation.ObligationHandler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +15,7 @@ public class DebugLogObligationHandler implements ObligationHandler {
 	}
 
 	@Override
-	public void handleObligation(Obligation obligation) throws ObligationFailedException {
+	public void handleObligation(Obligation obligation) throws ObligationFailed {
 		if (canHandle(obligation)) {
 			LOGGER.debug("handled obligation with this logging. obligation: {}",
 					obligation.getJsonObligation().toString());
