@@ -30,9 +30,9 @@ advice
    { "type" : "sendEmail",
      "recipient" : "supervisor@example.org",
      "subject" : "Attending Doctor was changed",
-     "message" : subject.name + " has changed the attending Doctor of " + resource.name
+     "message" : subject.name + " has changed an attending Doctor"
    }  
-   
+ 
    
 policy "permit_nurse_update_attending_nurse"
 permit
@@ -44,7 +44,7 @@ advice
    { "type" : "sendEmail",
      "recipient" : "supervisor@example.org",
      "subject" : "Attending Nurse was changed",
-     "message" : subject.name + " has changed the attending Nurse of " + resource.name
+     "message" : subject.name + " has changed an attending Nurse"
    }  
 
 
