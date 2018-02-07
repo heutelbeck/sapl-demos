@@ -5,6 +5,14 @@ import java.util.List;
 
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
+import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
+import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
+import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
+import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
+import io.sapl.demo.shared.pip.ApplicationContextProvider;
+import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
+import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,6 +80,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 		};
 	}
+
+	@Bean
+	public ApplicationContextProvider applicationContextProvider(){
+		return new ApplicationContextProvider();
+	}
+	
+	@Bean
+	public SimpleObligationHandlerService getObligationHandlers() {
+		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+		sohs.register(new EmailObligationHandler());
+		sohs.register(new CoffeeObligationHandler());
+		sohs.register(new SimpleLoggingObligationHandler());
+		return sohs;
+	}
+	
+	@Bean
+	public SimpleAdviceHandlerService setAdviceHandlers() {
+		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+		sahs.register(new EmailAdviceHandler());
+		sahs.register(new SimpleLoggingAdviceHandler());
+		return sahs;
+	}
+
 
 
 }

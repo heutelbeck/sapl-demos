@@ -133,7 +133,7 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
         this.saplAuthorizer = saplAuthorizer;
     }
 
-    @Override //(1.) (2.)
+    @Override //(1.) 
     public boolean hasPermission(Authentication authentication, Object targetDomainObject,
                                   Object permission) {
         return authorize(authentication, permission, targetDomainObject); 
@@ -169,12 +169,13 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
 1. In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
 
-2. `SAPLPermissionEvaluator` basically accepts only following _soft-wired_ expression: 
+2. `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
    `hasPermission(#request, #request)`.
    
-3. If you want to use other _hard-wired_   `hasPermission` expressions you have to customize them to match the method  of `runPolicyCheck` from
-    [StandardSAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java)
-    (which is  enabled as Bean in [PDPAutoConfiguration](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring-boot-starter/src/main/java/io/sapl/springboot/starter/PDPAutoConfiguration.java)).
+3. You can also use  _hard-wired_   expressions  like `hasPermission('someResource', 'someAction')`.
+
+
+
 
 
 An example for securing the `DELETE` method from
@@ -197,4 +198,100 @@ permit
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
+```
+
+
+
+## Policy Information Point
+
+A Policy Information Point (PIP) can provide further information to evaluate a policy, in case that the request doesn't contain all necessary information. To implement a PIP, the class has to be annotated with `@PolicyInformationPoint`.
+Here you can see the [PatientPIP](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/PatientPIP.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
+
+
+```java
+@PolicyInformationPoint(name="patient", description="retrieves information about patients")
+public class PatientPIP {
+
+	private Optional<RelationRepo> relationRepo = Optional.empty();
+
+	private final ObjectMapper om = new ObjectMapper();
+
+	private RelationRepo getRelationRepo(){
+		LOGGER.debug("GetRelationRepo...");
+		if(!relationRepo.isPresent()){
+			LOGGER.debug("RelRepo not present...");
+			ApplicationContext context =
+			      ApplicationContextProvider.getApplicationContext();
+			LOGGER.debug("Context found: {}", context);
+			relationRepo = 
+Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); (1.)
+		}
+		LOGGER.debug("Found required instance of RelationRepo: {}",
+		              relationRepo.isPresent());
+		return relationRepo.get();
+	}
+
+	@Attribute(name="related")  (2.)
+	public JsonNode getRelations (JsonNode value, Map<String, JsonNode> variables) {
+		List<String> returnList = new ArrayList<>();
+		try{
+			int id = Integer.parseInt(value.asText());
+			LOGGER.debug("Entering getRelations. ID: {}", id);
+
+			returnList.addAll(getRelationRepo().findByPatientid(id).stream()
+                      .map(Relation::getUsername)
+                      .collect(Collectors.toList()));
+
+		}catch(NumberFormatException e){
+			LOGGER.debug("getRelations couldn't parse the value to Int", e);
+		}
+		JsonNode result = om.convertValue(returnList, JsonNode.class);
+		LOGGER.debug("Result: {}", result);
+		return result;
+	}
+}
+
+```
+
+1. The CrudRepository `RelationRepo` has not  been provided as bean at the time if  we want to access it via the PIP.
+    Therefore we use _lazy initialization_ to load it.
+    On the other  hand the [ApplicationContextProvider](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java)
+    has to be loaded as  bean in submodule `sapl-demo-permeval`
+    as you can see in [SecurityConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/config/SecurityConfig.java) :
+
+        @Bean
+        public ApplicationContextProvider applicationContextProvider(){
+            return new ApplicationContextProvider();
+        }
+
+2. The method annotated with `@Attribute` gives back a list of users who are related to a patient. The corresponding policy looks like this:
+
+        policy "permit_relative_see_room_number"
+        permit
+           action.method == "viewRoomNumber"
+        where
+          subject.name in resource.id.<patient.related>;
+
+
+
+
+
+The PIP also has to be imported into the policy set with:
+
+```
+    import io.sapl.demo.shared.pip.PatientPIP as patient
+
+```
+
+
+
+Furthermore, the name of the PIP has to be notated in the _attributeFinders_ entry of the `pdp.json` as follows:
+
+```json
+{
+    "algorithm": "DENY_UNLESS_PERMIT",
+    "variables": {},
+    "attributeFinders": ["patient"],
+    "libraries": []
+}
 ```
