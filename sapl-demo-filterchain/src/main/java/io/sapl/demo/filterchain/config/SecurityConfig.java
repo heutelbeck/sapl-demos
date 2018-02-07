@@ -3,6 +3,7 @@ package io.sapl.demo.filterchain.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +17,6 @@ import io.sapl.demo.filterchain.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.filterchain.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.demo.repository.UserRepo;
 import io.sapl.spring.PolicyEnforcementFilter;
-import io.sapl.spring.StandardSAPLAuthorizator;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,20 +26,21 @@ import lombok.extern.slf4j.Slf4j;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+	/**
+	 * Lazy initialization is needed to prevent circular dependency problem
+	 * caused by the {@link #configure(HttpSecurity)}-method that needs this
+	 * field reference early in startup
+	 */
+	@Lazy
 	@Autowired
-	StandardSAPLAuthorizator saplAuthorizer;
+	private PolicyEnforcementFilter policyEnforcementFilter;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		LOGGER.trace("start configuring...");
-		http.addFilterAfter(policyEnforcementFilter(), FilterSecurityInterceptor.class).authorizeRequests().anyRequest()
+		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests().anyRequest()
 				.authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
 				.logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
-	}
-
-	@Bean
-	public PolicyEnforcementFilter policyEnforcementFilter() {
-		return new PolicyEnforcementFilter(saplAuthorizer);
 	}
 
 	@Bean
