@@ -1,4 +1,4 @@
-# Submodule  sapl-demo-permeval
+# Submodule  sapl-demo-permissionevaluator
 
 This submodule  makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
 The most important features of 'sapl-demo-permeval' are given below.
@@ -59,7 +59,7 @@ Successfully implemented features are presented below:
 
 A loginPage, logoutPage is implemented. There is a secured  REST Service. Each request needs authentication.
 
-Example from a class [SecurityConfig.java](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/config/SecurityConfig.java):
+Example from a class [SecurityConfig.java](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/config/SecurityConfig.java):
 
 
 ``` java
@@ -179,7 +179,7 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
 
 An example for securing the `DELETE` method from
-the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/controller/RestService.java) is listed below:
+the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/controller/RestService.java) is listed below:
 
 ```java
 	@DeleteMapping("{id}")
@@ -189,7 +189,7 @@ the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo
 	}
 ```
 
-The corresponding SAPL policy can be found in <https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/resources/policies/httpPolicy.sapl>  and is implemented as follows:
+The corresponding SAPL policy can be found in <https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/resources/policies/httpPolicy.sapl>  and is implemented as follows:
 
 ```
 policy "permit_doctor_delete_person"
@@ -257,7 +257,7 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
     Therefore we use _lazy initialization_ to load it.
     On the other  hand the [ApplicationContextProvider](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java)
     has to be loaded as  bean in submodule `sapl-demo-permeval`
-    as you can see in [SecurityConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/src/main/java/io/sapl/peembedded/config/SecurityConfig.java) :
+    as you can see in [SecurityConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/config/SecurityConfig.java) :
 
         @Bean
         public ApplicationContextProvider applicationContextProvider(){
