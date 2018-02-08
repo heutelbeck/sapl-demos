@@ -24,7 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.jwt.annotations.PdpAuthorizeJwt;
+import io.sapl.spring.annotation.PdpAuthorizeJwt;
 
 @RestController
 @RequestMapping("/person/")

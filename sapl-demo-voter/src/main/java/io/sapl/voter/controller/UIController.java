@@ -3,7 +3,6 @@ package io.sapl.voter.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -58,7 +57,6 @@ public class UIController {
 	}
 
 	@PostMapping("/profiles")
-	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies: DOCTOR
 	public String createProfile(@ModelAttribute(value = "newPatient") Patient newPatient, HttpServletRequest request) {
 		if (patientenRepo.existsById(newPatient.getId())) {
 			throw new IllegalArgumentException("Profile at this Id already exists");
@@ -122,7 +120,6 @@ public class UIController {
 	}
 
 	@DeleteMapping("/patient")
-	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies
 	public String delete(@RequestParam("id") int id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
@@ -149,7 +146,6 @@ public class UIController {
 	}
 
 	@PutMapping("/patient")
-	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies
 	public String updatePatient(@ModelAttribute("updatePatient") Patient updatePatient, Authentication authentication,
 			HttpServletRequest request) {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
