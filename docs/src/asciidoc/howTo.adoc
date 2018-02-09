@@ -31,7 +31,7 @@ import the whole project into your favorite IDE (checked with _Eclipse_, _Intell
 * Build the project at the root level with `mvn install`.
 
 * Go to  submodules like sapl-demo-annotation, sapl-demo-filterchain, sapl-demo-jwt, sapl-demo-permissionevaluator, sapl-demo-pip, sapl-demo-voter and start the application with `mvn spring-boot:run`. +
-  In your favorite IDE you  run as SpringBootApp or run the main class of the submodule.
+  In your favorite IDE  run as SpringBootApp or run the main class of the submodule.
 
 
 == Domain Model
