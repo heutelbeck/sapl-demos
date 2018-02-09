@@ -1,6 +1,18 @@
 # Submodule  sapl-demo-permissionevaluator
 
-This submodule  makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
+**Contents**
+
+* [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter)
+* [sapl-spring](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring)
+* [Spring Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-features)
+* [Spring Security Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-security-features)
+* [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator)
+* [Policy Information Point](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#policy-information-point)
+* [Best Practice](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#best-practice)
+
+
+
+The submodule sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
 The most important features of 'sapl-demo-permeval' are given below.
 
 ## sapl-spring-boot-starter
@@ -291,3 +303,11 @@ Furthermore, the name of the PIP has to be notated in the _attributeFinders_ ent
     "libraries": []
 }
 ```
+
+## Best Practice
+
+* Implement a Web Application with Spring Boot.
+* Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#http-security) from Spring Security.
+* Write [SAPL Policies](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator/src/main/resources/policies).
+* Add [@Pre and @Post Annotations ](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#pre-and-post-annotations) using `hasPermission()` expressions 
+from [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator) .

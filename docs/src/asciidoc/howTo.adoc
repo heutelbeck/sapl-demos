@@ -19,14 +19,14 @@ to webpages and REST services.
 * Prerequisites:
 **  Installation of  Java 8 JDK
 ** Installation of Maven 3
-** Installation of your favorite IDE (everything works with _Eclipse_, _IntelliJIDEA_)
-**  Installation of Project Lombok. +
+** For IDE user: Installation of your favorite IDE (everything works with _Eclipse_, _IntelliJIDEA_)
+**  For IDE user: Installation of Project Lombok. +
    Some of our submodules make extensive use of https://projectlombok.org/download.html. Download lombok.jar run it as a Java application and follow the instructions. If this is not installed and you are working with a Project using Lombok you will end up with a lot of error messages within _Eclipse_, even if the maven build works just fine. +
    For _IntelliJIDEA_ : Install Project https://plugins.jetbrains.com/plugin/6317-lombok-plugin[Lombok Plugin] from the settings or manually.
-** Installation of the Spring IDE plugins.
+** For IDE user: Installation of the Spring IDE plugins.
 
 * Clone or download https://github.com/heutelbeck/sapl-demos, or +
-import the whole project into your favorite IDE (checked with _Eclipse_, _IntelliJIDEA_)  as Maven Project from Version Control.
+import the whole project into your favorite IDE (everything works with _Eclipse_, _IntelliJIDEA_)  as Maven Project from Version Control.
 
 * Build the project at the root level with `mvn install`.
 
@@ -142,7 +142,7 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain/READM
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator['sapl-demo-permissionevaluator']
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permeval/README.md
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip['sapl-demo-pip']
 
