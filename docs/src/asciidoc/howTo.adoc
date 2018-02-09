@@ -25,11 +25,13 @@ to webpages and REST services.
    For _IntelliJIDEA_ : Install Project https://plugins.jetbrains.com/plugin/6317-lombok-plugin[Lombok Plugin] from the settings or manually.
 ** Installation of the Spring IDE plugins.
 
-* Import the whole project into your favorite IDE (checked with _Eclipse_, _IntelliJIDEA_)  as Maven Project from Version Control.
+* Clone or download https://github.com/heutelbeck/sapl-demos, or +
+import the whole project into your favorite IDE (checked with _Eclipse_, _IntelliJIDEA_)  as Maven Project from Version Control.
 
-* Build the project at the root level.
+* Build the project at the root level with `mvn install`.
 
-* Go to  submodules like sapl-demo-annotation, sapl-demo-filterchain, sapl-demo-permissionevaluator, sapl-demo-pip, sapl-demo-voter and start the application from the main class.
+* Go to  submodules like sapl-demo-annotation, sapl-demo-filterchain, sapl-demo-jwt, sapl-demo-permissionevaluator, sapl-demo-pip, sapl-demo-voter and start the application with `mvn spring-boot:run`. +
+  In your favorite IDE you  run as SpringBootApp or run the main class of the submodule.
 
 
 == Domain Model
