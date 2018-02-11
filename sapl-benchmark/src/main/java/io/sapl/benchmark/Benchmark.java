@@ -272,14 +272,17 @@ public class Benchmark {
 		List<XlsRecord> results = new LinkedList<>();
 
 		try {
-			EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file://" + path + subfolder);
+			EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+
+			Request request = generator.createRequestObject();
+			Response response = pdp.decide(request);
 
 			for (int i = 0; i < RUNS; i++) {
 
-				Request request = generator.createRequestObject();
+				request = generator.createRequestObject();
 
 				long start = System.nanoTime();
-				Response response = pdp.decide(request);
+				response = pdp.decide(request);
 				long end = System.nanoTime();
 
 				double diff = nanoToMs(end - start);
