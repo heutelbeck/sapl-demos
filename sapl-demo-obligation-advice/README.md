@@ -14,6 +14,9 @@ First of all you need to include the `sapl-spring-boot-starter` in your maven pr
 </dependency>
 ```
 
+### Obligation Handlers
+
+
 Next you need to write your own Obligation Handler. In this tutorial we want to write an Obligation Handler for this policy:
 
 ```java
@@ -84,3 +87,68 @@ Last but not least you have to register your Obligation Handler to an `Obligatio
 	}
 ```
 Here various Obligation Handlers are registered to a `SimpleObligationHandlerService`, which can be imported from the `sapl-spring` module. If you want to write your own ObligationHandlerService be sure that it implements the Interface `ObligationHandlerService`.
+
+### Advice Handlers
+
+The use of Advice Handlers is similar to that of the Obligation Handlers. The only difference is, that we don't throw an Exception if the advice couldn't be handled, because the handling of an advice isn't mandatory. Here you can see the code for an Advice Handler:
+
+Policy:
+
+```java
+policy "permit_attending_doctor_see_diagnosis"
+permit
+   action.method == "readDiagnosis"
+where
+   subject.name == resource.attendingDoctor;
+advice
+   { "type" : "simpleLogging",
+     "message" : subject.name + " has looked up the diagnosis of " + resource.name
+   }
+```
+
+Advice Handler:
+
+```java
+@Slf4j
+public class SimpleLoggingAdviceHandler implements AdviceHandler {
+	
+	@Override
+	public void handleAdvice(Advice advice) {
+		JsonNode adNode = advice.getJsonAdvice();
+		if (adNode.has("message")) {
+			LOGGER.info(advice.getJsonAdvice().findValue("message").asText());
+		}
+
+	}
+
+	@Override
+	public boolean canHandle(Advice advice) {
+		JsonNode adNode = advice.getJsonAdvice();
+		if (adNode.has("type")) {
+			String type = adNode.findValue("type").asText();
+			if ("simpleLogging".equals(type)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+}
+```
+
+Registration:
+
+```java
+@Bean
+public SimpleAdviceHandlerService setAdviceHandlers() {
+	SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+	sahs.register(new EmailAdviceHandler());
+	sahs.register(new SimpleLoggingAdviceHandler());
+	return sahs;
+	
+```
+
+If you want to write your own AdviceHandlerService, implement the interface `AdviceHandlerService`.
+
+
+
