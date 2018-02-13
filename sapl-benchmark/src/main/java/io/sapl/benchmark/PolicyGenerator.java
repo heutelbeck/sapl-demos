@@ -70,9 +70,9 @@ public class PolicyGenerator {
 			}
 			if (j < numberOfConnectors) {
 				if (roll() <= conjunctionChance) {
-					statement.append(" && ");
+					statement.append(" & ");
 				} else {
-					statement.append(" || ");
+					statement.append(" | ");
 				}
 			}
 		}
