@@ -25,7 +25,7 @@ import org.springframework.security.web.access.expression.WebExpressionVoter;
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
 import io.sapl.spring.SaplBasedVoter;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import io.sapl.voter.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.voter.obligationhandlers.EmailObligationHandler;
@@ -41,7 +41,7 @@ public class SecurityConfig {
 	private UserRepo userRepo;
 
 	@Autowired
-	StandardSAPLAuthorizator saplAuthorizer;
+	SAPLAuthorizator saplAuthorizer;
 
 	@Bean
 	WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
