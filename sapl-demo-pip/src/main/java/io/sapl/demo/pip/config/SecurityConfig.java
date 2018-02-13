@@ -1,5 +1,8 @@
 package io.sapl.demo.pip.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +15,9 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 import io.sapl.demo.pip.AuthManager;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.spring.PIPProvider;
 import io.sapl.spring.PolicyEnforcementFilter;
+import io.sapl.spring.SimplePIPProvider;
 import io.sapl.spring.StandardSAPLAuthorizator;
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,5 +47,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
 	}
-
+	
+/*	@Bean
+	public PIPProvider getInformationPoints() {
+		Collection<Class<? extends Object>> pipList = new ArrayList<Class<? extends Object>>();
+		pipList.add(*.class);
+		return new SimplePIPProvider(pipList);
+	}
+*/
 }
