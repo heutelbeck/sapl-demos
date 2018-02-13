@@ -1,6 +1,6 @@
 package io.sapl.sapldemoannotation;
 
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorizeAspect;
 import io.sapl.spring.annotation.PdpAuthorizeHttpAspect;
 import org.springframework.context.annotation.Bean;
@@ -29,12 +29,12 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	PdpAuthorizeAspect pdpAuthorizeAspect(StandardSAPLAuthorizator pep){
+	PdpAuthorizeAspect pdpAuthorizeAspect(SAPLAuthorizator pep){
 		return new PdpAuthorizeAspect(pep);
 	}
 
 	@Bean
-	PdpAuthorizeHttpAspect pdpAuthorizeHttpAspect(StandardSAPLAuthorizator pep){
+	PdpAuthorizeHttpAspect pdpAuthorizeHttpAspect(SAPLAuthorizator pep){
 		return new PdpAuthorizeHttpAspect(pep);
 	}
 

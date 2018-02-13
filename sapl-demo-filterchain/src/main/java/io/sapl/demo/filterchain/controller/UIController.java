@@ -19,7 +19,7 @@ import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
 import io.sapl.spring.marshall.action.HttpAction;
@@ -36,12 +36,12 @@ public class UIController {
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 
-	private StandardSAPLAuthorizator pep;
+	private SAPLAuthorizator pep;
 
 	private PatientenRepo patientenRepo;
 
 	@Autowired
-	public UIController(StandardSAPLAuthorizator pep, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator pep, PatientenRepo patientenRepo) {
 		this.pep = pep;
 		this.patientenRepo = patientenRepo;
 		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})",

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
 import io.sapl.spring.marshall.action.SimpleAction;
@@ -23,12 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class UIController {
 
-	private StandardSAPLAuthorizator sapl;
+	private SAPLAuthorizator sapl;
 
 	private PatientenRepo patientenRepo;
 
 	@Autowired
-	public UIController(StandardSAPLAuthorizator sapl, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})",

@@ -18,7 +18,7 @@ import io.sapl.demo.repository.UserRepo;
 import io.sapl.spring.PIPProvider;
 import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.SimplePIPProvider;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
-	StandardSAPLAuthorizator saplAuthorizer;
+	SAPLAuthorizator saplAuthorizer;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {

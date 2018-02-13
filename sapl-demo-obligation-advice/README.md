@@ -14,6 +14,8 @@ First of all you need to include the `sapl-spring-boot-starter` in your maven pr
 </dependency>
 ```
 
+Please note that if you are using your own `SAPLAuthorizator` and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
+
 ### Obligation Handlers
 
 

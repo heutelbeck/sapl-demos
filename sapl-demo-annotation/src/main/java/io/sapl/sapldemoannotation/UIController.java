@@ -19,7 +19,7 @@ import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorize;
 import io.sapl.spring.annotation.PdpAuthorizeHttp;
 import io.sapl.spring.marshall.Resource;
@@ -37,12 +37,12 @@ public class UIController {
 	private static final String UPDATE = "update";
 
 	@Autowired
-	private StandardSAPLAuthorizator pep;
+	private SAPLAuthorizator pep;
 
 	private PatientenRepo patientenRepo;
 
 	@Autowired
-	public UIController(StandardSAPLAuthorizator pep, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator pep, PatientenRepo patientenRepo) {
 		this.pep = pep;
 		this.patientenRepo = patientenRepo;
 	}

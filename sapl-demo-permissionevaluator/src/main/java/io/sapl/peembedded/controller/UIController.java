@@ -6,7 +6,7 @@ import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.StandardSAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
 import io.sapl.spring.marshall.action.HttpAction;
@@ -37,14 +37,14 @@ public class UIController {
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 	
-	private StandardSAPLAuthorizator sapl;
+	private SAPLAuthorizator sapl;
 
 	private PatientenRepo patientenRepo;
 
 	
 	
 	@Autowired
-	public UIController(StandardSAPLAuthorizator sapl, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo; 
 		LOGGER.debug("created instancewith StandardSAPLAuthorizator (!= null:{}) and PatientenRepo (!= null:{})", sapl != null , patientenRepo != null);
