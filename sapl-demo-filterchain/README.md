@@ -17,8 +17,7 @@ Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
 </dependency>
 ```
 
-<<<<<<< HEAD
-=======
+
 ## sapl-spring
 
 
