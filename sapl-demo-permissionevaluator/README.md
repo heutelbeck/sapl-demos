@@ -213,7 +213,7 @@ where
 ## Function Library
 
 We use a custom function  providing further information to evaluate a policy. To be recognized as a function library, a class has to be annotated with `@FunctionLibrary`.
-Here you can see the [PatientFunction](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/PatientFunction.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
+Here you can see the [PatientFunction](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/functions/PatientFunction.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
 
 
 ```java
@@ -231,13 +231,13 @@ public class PatientFunction {
             LOGGER.debug("RelRepo not present...");
             ApplicationContext context = ApplicationContextProvider.getApplicationContext();
             LOGGER.debug("Context found: {}", context);
-            relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); (1.)
+(1.)        relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); 
         }
         LOGGER.debug("Found required instance of RelationRepo: {}", relationRepo.isPresent());
         return relationRepo.get();
     }
 
-    @Function(name = "related") (2.)
+    @Function(name = "related")   (2.)
     public JsonNode getRelations ( JsonNode value )  throws FunctionException {
         LOGGER.debug("Entering getRelations");
         List<String> returnList = new ArrayList<>();
