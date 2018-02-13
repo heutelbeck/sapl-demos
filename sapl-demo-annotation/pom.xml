@@ -23,17 +23,9 @@
 	</properties>
 
 	<dependencies>
-		<!--<dependency> Import dependency management from Spring Boot <groupId>org.springframework.boot</groupId> 
-			<artifactId>spring-boot-dependencies</artifactId> <version>1.5.8.RELEASE</version> 
-			<type>pom</type> <scope>import</scope> </dependency> -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-spring-boot-starter</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-spring</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

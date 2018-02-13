@@ -97,7 +97,7 @@ public class UIController {
 		model.addAttribute("updatePermission", sapl.authorize(subject,new HttpAction(RequestMethod.PUT), new HttpResource("/patient") ));
 		model.addAttribute("deletePermission", sapl.authorize(subject,new HttpAction(RequestMethod.DELETE), new HttpResource("/patient")));
 		// next line only works if PatientPIP is integrated into SAPL Policies
-		model.addAttribute("viewRoomNumberPermission", sapl.authorize(subject,new SimpleAction("viewRoomNumber"), patientResource));
+		model.addAttribute("viewRoomNumberPermission", sapl.authorize(subject,new SimpleAction("viewRoomNumberFunction"), patientResource));
 		
 		
 		boolean permissionBlackenedHRN = sapl.authorize(subject, new SimpleAction("getBlackenAndObligation"),new StringResource("anything"));

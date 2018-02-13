@@ -274,8 +274,8 @@ public class Benchmark {
 		try {
 			EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
 
-			Request request = generator.createRequestObject();
-			Response response = pdp.decide(request);
+			Request request ;
+			Response response ;
 
 			for (int i = 0; i < RUNS; i++) {
 

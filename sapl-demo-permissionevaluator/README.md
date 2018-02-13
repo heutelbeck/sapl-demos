@@ -7,7 +7,7 @@
 * [Spring Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-features)
 * [Spring Security Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-security-features)
 * [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator)
-* [Policy Information Point](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#policy-information-point)
+* [Function Library](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#function-library)
 * [Best Practice](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#best-practice)
 
 
@@ -210,58 +210,57 @@ where
 
 
 
-## Policy Information Point
+## Function Library
 
-A Policy Information Point (PIP) can provide further information to evaluate a policy, in case that the request doesn't contain all necessary information. To implement a PIP, the class has to be annotated with `@PolicyInformationPoint`.
-Here you can see the [PatientPIP](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/PatientPIP.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
+We use a custom function  providing further information to evaluate a policy. To be recognized as a function library, a class has to be annotated with `@FunctionLibrary`.
+Here you can see the [PatientFunction](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/functions/PatientFunction.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
 
 
 ```java
-@PolicyInformationPoint(name="patient", description="retrieves information about patients")
-public class PatientPIP {
+@FunctionLibrary(name = "patientfunction", description = "")
+public class PatientFunction {
 
-	private Optional<RelationRepo> relationRepo = Optional.empty();
 
-	private final ObjectMapper om = new ObjectMapper();
+    private Optional<RelationRepo> relationRepo = Optional.empty();
 
-	private RelationRepo getRelationRepo(){
-		LOGGER.debug("GetRelationRepo...");
-		if(!relationRepo.isPresent()){
-			LOGGER.debug("RelRepo not present...");
-			ApplicationContext context =
-			      ApplicationContextProvider.getApplicationContext();
-			LOGGER.debug("Context found: {}", context);
-			relationRepo = 
-Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); (1.)
-		}
-		LOGGER.debug("Found required instance of RelationRepo: {}",
-		              relationRepo.isPresent());
-		return relationRepo.get();
-	}
+    private final ObjectMapper om = new ObjectMapper();
 
-	@Attribute(name="related")  (2.)
-	public JsonNode getRelations (JsonNode value, Map<String, JsonNode> variables) {
-		List<String> returnList = new ArrayList<>();
-		try{
-			int id = Integer.parseInt(value.asText());
-			LOGGER.debug("Entering getRelations. ID: {}", id);
+    private RelationRepo getRelationRepo(){
+        LOGGER.debug("GetRelationRepo...");
+        if(!relationRepo.isPresent()){
+            LOGGER.debug("RelRepo not present...");
+            ApplicationContext context = ApplicationContextProvider.getApplicationContext();
+            LOGGER.debug("Context found: {}", context);
+(1.)        relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class)); 
+        }
+        LOGGER.debug("Found required instance of RelationRepo: {}", relationRepo.isPresent());
+        return relationRepo.get();
+    }
 
-			returnList.addAll(getRelationRepo().findByPatientid(id).stream()
-                      .map(Relation::getUsername)
-                      .collect(Collectors.toList()));
+    @Function(name = "related")   (2.)
+    public JsonNode getRelations ( JsonNode value )  throws FunctionException {
+        LOGGER.debug("Entering getRelations");
+        List<String> returnList = new ArrayList<>();
+        try{
+            int id = Integer.parseInt(value.asText());
+            LOGGER.debug("Entering getRelations. ID: {}", id);
 
-		}catch(NumberFormatException e){
-			LOGGER.debug("getRelations couldn't parse the value to Int", e);
-		}
-		JsonNode result = om.convertValue(returnList, JsonNode.class);
-		LOGGER.debug("Result: {}", result);
-		return result;
-	}
+            returnList.addAll(getRelationRepo().findByPatientid(id).stream()
+                    .map(Relation::getUsername)
+                    .collect(Collectors.toList()));
+
+        }catch(NumberFormatException e){
+            LOGGER.debug("getRelations couldn't parse the value to Int", e);
+        }
+        JsonNode result = om.convertValue(returnList, JsonNode.class);
+        LOGGER.debug("Result: {}", result);
+        return result;
+    }
 }
 
 ```
 
-1. The CrudRepository `RelationRepo` has not  been provided as bean at the time if  we want to access it via the PIP.
+1. The CrudRepository `RelationRepo` has not  been provided as bean at the time if  we want to access it via the Function Library.
     Therefore we use _lazy initialization_ to load it.
     On the other  hand the [ApplicationContextProvider](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java)
     has to be loaded as  bean in submodule `sapl-demo-permeval`
@@ -272,35 +271,35 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
             return new ApplicationContextProvider();
         }
 
-2. The method annotated with `@Attribute` gives back a list of users who are related to a patient. The corresponding policy looks like this:
-
-        policy "permit_relative_see_room_number"
+2. The method annotated with `@Function` gives back a list of users who are related to a patient. The corresponding policy looks like this:
+         
+        policy "permit_relative_see_room_number_with_function"
         permit
-           action.method == "viewRoomNumber"
+         action.method == "viewRoomNumberFunction"
         where
-          subject.name in resource.id.<patient.related>;
+         subject.name in patientfunction.related(resource.id);
 
 
 
 
 
-The PIP also has to be imported into the policy set with:
-
-```
-    import io.sapl.demo.shared.pip.PatientPIP as patient
+The Function Library also has to be imported into the policy set with:
 
 ```
+import io.sapl.demo.shared.functions.PatientFunction as patientfunction
+
+```
 
 
 
-Furthermore, the name of the PIP has to be notated in the _attributeFinders_ entry of the `pdp.json` as follows:
+Furthermore, the name of the Function Library has to be notated in the _libraries_ entry of the `pdp.json` as follows:
 
 ```json
 {
-    "algorithm": "DENY_UNLESS_PERMIT",
-    "variables": {},
-    "attributeFinders": ["patient"],
-    "libraries": []
+	"algorithm": "DENY_UNLESS_PERMIT",
+	"variables": {},
+	"attributeFinders": [],
+	"libraries": ["patientfunction"]
 }
 ```
 
