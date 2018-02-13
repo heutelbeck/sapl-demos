@@ -1,4 +1,4 @@
-package io.sapl.demo.shared.pip;
+package io.sapl.demo.shared.functions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,14 +7,14 @@ import io.sapl.api.functions.FunctionException;
 import io.sapl.api.functions.FunctionLibrary;
 import io.sapl.demo.domain.Relation;
 import io.sapl.demo.repository.RelationRepo;
+import io.sapl.demo.shared.pip.ApplicationContextProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import org.springframework.context.ApplicationContext;
 
 @Slf4j
 @FunctionLibrary(name = "patientfunction", description = "")

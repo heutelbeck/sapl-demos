@@ -1,5 +1,4 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-import io.sapl.demo.shared.pip.PatientFunction as patientfunction
+import io.sapl.demo.shared.functions.PatientFunction as patientfunction
 
 set "accessPolicy"
 deny-unless-permit
