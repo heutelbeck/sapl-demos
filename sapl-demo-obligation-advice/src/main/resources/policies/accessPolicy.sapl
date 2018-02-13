@@ -112,7 +112,6 @@ where
    subject.name == resource.attendingDoctor;
 
 
-
 policy "permit_relative_see_room_number"
 permit
    action.method == "viewRoomNumber"
@@ -126,12 +125,4 @@ permit
 where
   "DOCTOR" in subject..authority;
 
-
-  
-policy "permit_doctor_Jwt"
-permit
-    action.method == "GET"
-where
-  "DOCTOR" in subject.details.authorities;
-  resource == "/jwt";
   
