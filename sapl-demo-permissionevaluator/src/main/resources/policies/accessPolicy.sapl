@@ -1,4 +1,5 @@
 import io.sapl.demo.shared.pip.PatientPIP as patient
+import io.sapl.demo.shared.pip.PatientFunction as patientfunction
 
 set "accessPolicy"
 deny-unless-permit
@@ -119,7 +120,15 @@ permit
 where
   subject.name in resource.id.<patient.related>;
 
-  
+
+
+policy "permit_relative_see_room_number_with_function"
+permit
+ action.method == "viewRoomNumberFunction"
+where
+ subject.name in patientfunction.related(resource.id);
+
+
 policy "permit_doctor_create_patient_profiles"
 permit
     action.method == "createPatientProfile"
