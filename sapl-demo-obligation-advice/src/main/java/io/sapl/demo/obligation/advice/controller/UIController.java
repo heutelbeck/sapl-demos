@@ -38,7 +38,8 @@ public class UIController {
 
 	@Autowired
 	private SAPLAuthorizator sapl;
-
+	
+	@Autowired
 	private PatientenRepo patientenRepo;
 
 	@Autowired
