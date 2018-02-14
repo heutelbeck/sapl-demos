@@ -1,4 +1,4 @@
-package io.sapl.sapldemoannotation;
+package io.sapl.sapldemoauthorizationaspects;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

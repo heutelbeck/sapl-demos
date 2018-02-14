@@ -1,4 +1,4 @@
-package io.sapl.sapldemoannotation;
+package io.sapl.sapldemoauthorizationaspects;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;

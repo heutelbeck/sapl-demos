@@ -1,4 +1,4 @@
-package io.sapl.sapldemoannotation;
+package io.sapl.sapldemoauthorizationaspects;
 
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorizeAspect;

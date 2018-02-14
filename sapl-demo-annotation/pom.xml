@@ -10,7 +10,7 @@
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
 
-	<artifactId>sapl-demo-annotation</artifactId>
+	<artifactId>sapl-demo-authorizationaspects</artifactId>
 	<packaging>jar</packaging>
 
 	<name>sapl-demo-annotation</name>

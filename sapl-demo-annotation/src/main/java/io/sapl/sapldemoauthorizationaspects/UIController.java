@@ -1,4 +1,4 @@
-package io.sapl.sapldemoannotation;
+package io.sapl.sapldemoauthorizationaspects;
 
 import javax.servlet.http.HttpServletRequest;
 

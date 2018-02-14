@@ -1,4 +1,4 @@
-package io.sapl.sapldemoannotation;
+package io.sapl.sapldemoauthorizationaspects;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootApplication
 @EnableJpaRepositories("io.sapl.demo.repository")
 @EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
-public class SaplDemoAnnotationApplication {
+public class SaplDemoAuthorizationAspectsApplication {
 
 	private static final String HRN1 = "123456";
 	private static final String HRN2 = "4711";
@@ -54,7 +54,7 @@ public class SaplDemoAnnotationApplication {
 		// } catch (SQLException e) {
 		// LOGGER.info("SQLException while creating H2embedded Server", e);
 		// }
-		SpringApplication.run(SaplDemoAnnotationApplication.class, args);
+		SpringApplication.run(SaplDemoAuthorizationAspectsApplication.class, args);
 	}
 
 	@Bean

@@ -1,4 +1,4 @@
-# Submodule  sapl-demo-annotation
+# Submodule  sapl-demo-authorizationaspects
 
 This demo shows how to use the annotations `@PdpAuthorize` and `@PdpAuthorizeHttp`. 
 
@@ -43,7 +43,7 @@ General spring features in this submodule are:
 
 The `@PdpAuthorize` annotation is used to regulate the execution of a method based on the response of a SAPL-policy check. The annotation is located [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorize.java). The corresponding aspect that performs the policy check can be found [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorizeAspect.java).
 
-An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-annotation/src/main/java/io/sapl/sapldemoannotation/UIController) of this demo:
+An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
 
 ```java
 	@GetMapping("/patient/{id}/update")
@@ -68,7 +68,7 @@ If the response to the request is `DENY`, the execution of the annotated method 
 
 The `@PdpAuthorizeHttp` annotation is used to regulate the execution of a method based on the response of a SAPL-policy check. The annotation is located [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorizeHttp.java). The corresponding aspect that performs the policy check can be found [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorizeHttpAspect.java).
 
-An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-annotation/src/main/java/io/sapl/sapldemoannotation/UIController) of this demo:
+An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
 
 ```java
 	@PdpAuthorizeHttp
