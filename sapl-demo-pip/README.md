@@ -63,6 +63,8 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
         public ApplicationContextProvider applicationContextProvider(){
             return new ApplicationContextProvider();
         }
+ 
+     Note: `ApplicationContext` doesn't support `getBean(RelationRepo.class)` if you work with `spring-boot-devtools`.
 
 2. The method annotated with `@Attribute` gives back a list of users who are related to a patient. The corresponding policy looks like this:
 

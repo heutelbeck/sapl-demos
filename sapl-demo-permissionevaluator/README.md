@@ -271,6 +271,8 @@ public class PatientFunction {
             return new ApplicationContextProvider();
         }
 
+    Note: `ApplicationContext` doesn't support `getBean(RelationRepo.class)` if you work with `spring-boot-devtools`.
+    
 2. The method annotated with `@Function` gives back a list of users who are related to a patient. The corresponding policy looks like this:
          
         policy "permit_relative_see_room_number_with_function"

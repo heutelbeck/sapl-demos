@@ -28,7 +28,6 @@ The submodule [sapl-spring](https://github.com/heutelbeck/sapl-policy-engine/tre
 and itself is loaded as dependency within the dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-filterchain#sapl-spring-boot-starter).
 
 
->>>>>>> branch 'master' of https://github.com/heutelbeck/sapl-demos
 ## Spring Features
 
 General spring features in this submodule are:
