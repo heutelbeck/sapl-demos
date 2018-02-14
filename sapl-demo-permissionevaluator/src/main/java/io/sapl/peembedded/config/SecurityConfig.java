@@ -85,7 +85,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public ApplicationContextProvider applicationContextProvider(){
 		return new ApplicationContextProvider();
 	}
-	
+
 	@Bean
 	public SimpleObligationHandlerService getObligationHandlers() {
 		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
