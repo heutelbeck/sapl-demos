@@ -13,8 +13,8 @@
 	<artifactId>sapl-demo-authorizationaspects</artifactId>
 	<packaging>jar</packaging>
 
-	<name>sapl-demo-annotation</name>
-	<description>Sapl Demo Annotation</description>
+	<name>sapl-demo-authorizationaspects</name>
+	<description>Sapl Demo Authorization Aspects</description>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
