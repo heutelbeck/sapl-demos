@@ -46,6 +46,7 @@
         <module>sapl-demo-pip</module>
 		<module>sapl-demo-voter</module>
 		<module>sapl-demo-annotation</module>
+		<module>sapl-demo-obligation-advice</module>
     </modules>
 
 	<distributionManagement>

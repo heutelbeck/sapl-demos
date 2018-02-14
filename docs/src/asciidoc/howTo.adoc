@@ -152,6 +152,6 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-annotation/README.md
 
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
 
-
-
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md
