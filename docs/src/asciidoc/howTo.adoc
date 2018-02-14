@@ -148,9 +148,9 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluat
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-annotation['sapl-demo-annotation']
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-annotation/README.md
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
 
