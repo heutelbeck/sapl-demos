@@ -1,6 +1,6 @@
 # Submodule sapl-demo-obligation-advice
 
-This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the `ObligationHandlerService` or the `AdviceHandlerService` will be given afterwards.
+This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the `ObligationHandlerService` or the `AdviceHandlerService` and about what you have to know when implementing your own `SAPLAuthorizator` will be given afterwards. 
 
 ## Tutorial for using Obligation and Advice Handlers
 
@@ -151,6 +151,12 @@ public SimpleAdviceHandlerService setAdviceHandlers() {
 ```
 
 If you want to write your own AdviceHandlerService, implement the interface `AdviceHandlerService`.
+
+
+
+## Advanced Customization: ObligationHandlerService, AdviceHandlerService and SAPLAuthorizator
+
+### 
 
 
 
