@@ -30,7 +30,15 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 * Build the project at the root level with `mvn install`.
 
-* Go to  submodules like sapl-demo-annotation, sapl-demo-filterchain, sapl-demo-jwt, sapl-demo-permissionevaluator, sapl-demo-pip, sapl-demo-voter and start the application with `mvn spring-boot:run`. +
+* Go to  submodules like +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter[sapl-demo-voter] +
+ and start the application with `mvn spring-boot:run`. +
   In your favorite IDE  run as SpringBootApp or run the main class of the submodule.
 
 
@@ -135,10 +143,21 @@ The following table gives an overview of all current user rights:
 |Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain['sapl-demo-filterchain']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain/README.md
+
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt['sapl-demo-jwt']
+
+
+
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator['sapl-demo-permissionevaluator']
 
@@ -148,10 +167,10 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluat
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
+== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter['sapl-demo-voter']
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md
+
+
+
