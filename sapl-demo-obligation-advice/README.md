@@ -1,6 +1,7 @@
 # Submodule sapl-demo-obligation-advice
 
-This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the `ObligationHandlerService` or the `AdviceHandlerService` and about what you have to know when implementing your own `SAPLAuthorizator` will be given afterwards. 
+This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the `ObligationHandlerService` or the `AdviceHandlerService` and about what you have to know when implementing your own `SAPLAuthorizator` will be given afterwards.
+Please note that we are using Lombok logging for all Demo Projects.
 
 ## Tutorial for using Obligation and Advice Handlers
 
@@ -15,6 +16,7 @@ First of all you need to include the `sapl-spring-boot-starter` in your maven pr
 ```
 
 Please note that if you are using your own `SAPLAuthorizator` and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
+
 
 ### Obligation Handlers
 
@@ -156,7 +158,282 @@ If you want to write your own AdviceHandlerService, implement the interface `Adv
 
 ## Advanced Customization: ObligationHandlerService, AdviceHandlerService and SAPLAuthorizator
 
-### 
+### A closer look on ObligationHandlerService and AdviceHandlerService
 
+If you want to change the way, your Obligation Handlers are called, you should implement the interface `ObligationHandlerService`:
+
+```java
+public interface ObligationHandlerService {
+
+	/**
+	 * register a new obligationHandler
+	 * 
+	 * @param obligationHandler
+	 *            - the obligation to register
+	 */
+	void register(ObligationHandler obligationHandler);
+
+	/**
+	 * unregister an ObligationHandler
+	 * 
+	 * @param obligationHandler
+	 *            - the obligation to register
+	 */
+	void unregister(ObligationHandler obligationHandler);
+
+	/**
+	 * unregister all ObligationHandlers
+	 */
+	void unregisterAll();
+
+	/**
+	 * 
+	 * @return List of all registered handlers
+	 */
+	List<ObligationHandler> registeredHandlers();
+
+	/**
+	 * How to handle the case, where no suitable handler for an obligation is
+	 * available
+	 */
+	default void onNoHandlerAvailable() throws ObligationFailed {
+		throw new ObligationFailed("no suitable handler registered in service");
+	}
+
+	/**
+	 * implements strategy to choose the handler from the registered. <br/>
+	 * Should especially cover cases, where more than one handler is suitable for an
+	 * obligation
+	 * 
+	 * @param obligation
+	 *            - the obligation
+	 * @return Optional of the handler to use for the obligation. Empty, if none
+	 *         found
+	 */
+	default Optional<ObligationHandler> chooseHandler(Obligation obligation) {
+		Optional<ObligationHandler> returnHandler = registeredHandlers().stream()
+				.filter(handler -> handler.canHandle(obligation)).findAny();
+		return returnHandler;
+	}
+
+	/**
+	 * Handle an Obligations
+	 * 
+	 * @param obligation
+	 *            - the obligation to handle
+	 * @throws ObligationFailed
+	 *             - maybe thrown by the used {@link ObligationHandler}
+	 */
+	default void handle(Obligation obligation) throws ObligationFailed {
+		Optional<ObligationHandler> handler = chooseHandler(obligation);
+		if (handler.isPresent()) {
+			handler.get().handleObligation(obligation);
+		} else {
+			onNoHandlerAvailable();
+		}
+	}
+
+}
+```
+
+An easy example how to do it can be found in the `SimpleObligationHandlerService`:
+
+```java
+public class SimpleObligationHandlerService implements ObligationHandlerService {
+
+	private final List<ObligationHandler> handlers = new LinkedList<>();
+
+	@Override
+	public void register(ObligationHandler obligationHandler) {
+		handlers.add(obligationHandler);
+	}
+
+	@Override
+	public void unregister(ObligationHandler obligationHandler) {
+		handlers.remove(obligationHandler);
+	}
+
+	@Override
+	public List<ObligationHandler> registeredHandlers() {
+		return Collections.unmodifiableList(handlers);
+	}
+
+	@Override
+	public void unregisterAll() {
+		handlers.clear();
+	}
+
+}
+```
+
+The interface `AdviceHandlerService` is quite similar to the above:
+
+```java
+public interface AdviceHandlerService {
+
+	/**
+	 * register a new AdviceHandler
+	 * 
+	 * @param AdviceHandler
+	 *            - the AdviceHandler to register
+	 */
+	void register(AdviceHandler adviceHandler);
+
+	/**
+	 * unregister an AdviceHandler
+	 * 
+	 * @param AdviceHandler
+	 *            - the AdviceHandler to register
+	 */
+	void unregister(AdviceHandler adviceHandler);
+
+	/**
+	 * unregister all AdviceHandlers
+	 */
+	void unregisterAll();
+
+	/**
+	 * 
+	 * @return List of all registered handlers
+	 */
+	List<AdviceHandler> registeredHandlers();
+
+	/**
+	 * implements strategy to choose the handler from the registered. <br/>
+	 * Should especially cover cases, where more than one handler is suitable for an
+	 * advice
+	 * 
+	 * @param advice
+	 *            - the advice
+	 * @return Optional of the handler to use for the advice. Empty, if none found
+	 */
+	default Optional<AdviceHandler> chooseHandler(Advice advice) {
+		Optional<AdviceHandler> returnHandler = registeredHandlers().stream()
+				.filter(handler -> handler.canHandle(advice)).findAny();
+		return returnHandler;
+	}
+
+	/**
+	 * Handle an Advice
+	 * 
+	 * @param advice
+	 *            - the advice to handle
+	 */
+	default void handle(Advice advice) {
+		Optional<AdviceHandler> handler = chooseHandler(advice);
+		if (handler.isPresent()) {
+			handler.get().handleAdvice(advice);
+		}
+	}
+
+}
+```
+
+The `SimpleAdviceHandlerService`, which is used by default:
+
+```java
+public class SimpleAdviceHandlerService implements AdviceHandlerService {
+
+	private final List<AdviceHandler> handlers = new LinkedList<>();
+
+	@Override
+	public void register(AdviceHandler adviceHandler) {
+		handlers.add(adviceHandler);
+	}
+
+	@Override
+	public void unregister(AdviceHandler adviceHandler) {
+		handlers.remove(adviceHandler);
+	}
+
+	@Override
+	public List<AdviceHandler> registeredHandlers() {
+		return Collections.unmodifiableList(handlers);
+	}
+
+	@Override
+	public void unregisterAll() {
+		handlers.clear();
+	}
+
+}
+```
+
+
+### Obligation and Advice in the SAPLAuthorizator
+
+Obligations and advice are handled through the `SAPLAuthorizator`. Therefore if you don't use this `SAPLAuthorizator` in your Application, you have to find another way to handle them. Here you can have a look at how this works inside the `SAPLAuthorizator`:
+
+```java
+
+@Slf4j
+public class SAPLAuthorizator {
+
+	protected final PolicyDecisionPoint pdp;
+
+	protected final ObligationHandlerService obs;
+	
+	protected final AdviceHandlerService ahs;
+
+	@Autowired
+	public SAPLAuthorizator(PolicyDecisionPoint pdp, ObligationHandlerService obs, AdviceHandlerService ahs) {
+		this.pdp = pdp;
+		this.obs = obs;
+		this.ahs = ahs;
+	}
+
+	public boolean authorize(Subject subject, Action action, Resource resource) {
+		LOGGER.trace("Entering hasPermission(Subject subject, Action action, Resource resource)...");
+		Response response = runPolicyCheck(subject.getAsJson(), action.getAsJson(), resource.getAsJson());
+		LOGGER.debug("Response decision ist: {}", response.getDecision());
+		return response.getDecision() == Decision.PERMIT;
+	}
+
+	public Response getResponse(Subject subject, Action action, Resource resource) {
+		LOGGER.trace("Entering getResponse...");
+		Response response = runPolicyCheck(subject.getAsJson(), action.getAsJson(), resource.getAsJson());
+		return response;
+	}
+
+	protected Response runPolicyCheck(Object subject, Object action, Object resource) {
+		LOGGER.trace("Entering runPolicyCheck...");
+		LOGGER.debug("These are the parameters: \n  subject:{} \n  action:{} \n  resource:{}", subject, action,
+				resource);
+
+		Response response = pdp.decide(subject, action, resource);
+
+		LOGGER.debug("Here comes the response: {}", response);
+		if (response.getObligation().orElse(null) != null) {
+
+			List<Obligation> obligationsList = Obligation.fromJson(response.getObligation().get());
+			LOGGER.debug("Start handling obligations {}", obligationsList);
+			try {
+				for (Obligation o : obligationsList) {
+					LOGGER.debug("Handling now {}", o);
+					obs.handle(o);
+				}
+			} catch (ObligationFailed e) {
+				response = new Response(Decision.DENY, null, null, null);
+			}
+		}
+		
+		if (response.getAdvice().orElse(null) != null) {
+			
+			List<Advice> adviceList = Advice.fromJson(response.getAdvice().get());
+			
+			LOGGER.debug("Start handling advices {}", adviceList);
+
+			for (Advice a : adviceList) {
+				LOGGER.debug("Handling now {}", a);
+				ahs.handle(a);
+			}
+
+		}
+
+		return response;
+	}
+
+}
+```
 
 
