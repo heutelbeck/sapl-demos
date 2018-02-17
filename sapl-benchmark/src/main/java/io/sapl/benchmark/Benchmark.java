@@ -61,7 +61,7 @@ public class Benchmark {
 
 	private static final String ERROR_WRITING_BITMAP = "Error writing bitmap";
 
-	private static final String EXPORT_PROPERTIES = "number, name, duration, request, response";
+	private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
 
 	private static final String DEFAULT_PATH = "C:/sapl/";
 
@@ -71,7 +71,9 @@ public class Benchmark {
 	private static final String PATH = "path";
 	private static final String PATH_DOC = "path for output files";
 
-	private static final int RUNS = 300;
+	private static final int ITERATIONS = 10;
+	private static final int RUNS = 30;
+
 	private static final double MILLION = 1000000.0D;
 
 	private static double nanoToMs(long nanoseconds) {
@@ -79,7 +81,8 @@ public class Benchmark {
 	}
 
 	private static List<String> getExportHeader() {
-		return Arrays.asList("Iteration", "Test Case", "Execution Time (ms)", "Request String", "Response String (ms)");
+		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
+				"Response String (ms)");
 	}
 
 	private static double extractMin(List<XlsRecord> data) {
@@ -272,24 +275,25 @@ public class Benchmark {
 		List<XlsRecord> results = new LinkedList<>();
 
 		try {
-			EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+			for (int i = 0; i < ITERATIONS; i++) {
+				long begin = System.nanoTime();
+				EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+				double prep = nanoToMs(System.nanoTime() - begin);
 
-			Request request ;
-			Response response ;
+				for (int j = 0; j < RUNS; j++) {
+					Request request = generator.createRequestObject();
 
-			for (int i = 0; i < RUNS; i++) {
+					long start = System.nanoTime();
+					Response response = pdp.decide(request);
+					long end = System.nanoTime();
 
-				request = generator.createRequestObject();
+					double diff = nanoToMs(end - start);
 
-				long start = System.nanoTime();
-				response = pdp.decide(request);
-				long end = System.nanoTime();
+					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
+							response.toString()));
 
-				double diff = nanoToMs(end - start);
-
-				results.add(new XlsRecord(i, config.getName(), diff, request.toString(), response.toString()));
-
-				log.info("Total : {}ms", diff);
+					log.info("Total : {}ms", diff);
+				}
 			}
 		} catch (IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
 			log.error("Error running test", e);
