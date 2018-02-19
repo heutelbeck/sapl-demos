@@ -13,7 +13,7 @@
 
 
 The submodule sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
-The most important features of 'sapl-demo-permeval' are given below.
+The most important features are given below. Please note that we are using Lombok logging for all Demo Projects.
 
 ## sapl-spring-boot-starter
 
