@@ -41,7 +41,7 @@
 			"flipCoordinates": true
 		},
 	    "trustServer": "http://www.mariusmueller.info/public/trustedLocations.kml",
-	    "pmdTracking": {
+	    "deviceTracking": {
 	    	"serverUrl": "http://localhost:8082/api/",
 	    	"credentials": "YWRtaW46YWRtaW4=",
 	    	"posValidityTimespan": 200 
@@ -49,6 +49,7 @@
 	    "param": {
 	    	"maxDistFromAc": 100,
 	    	"minAccuracy": 0.04,
+	    	"airportBuffer": 5000,
 	    	"minTrust": 1,
 	    	"operationalStatus": "ACTIVE",
 	    	"meta": 0,
