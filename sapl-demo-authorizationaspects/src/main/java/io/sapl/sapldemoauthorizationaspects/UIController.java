@@ -21,7 +21,6 @@ import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorize;
-import io.sapl.spring.annotation.PdpAuthorizeHttp;
 import io.sapl.spring.marshall.Resource;
 import io.sapl.spring.marshall.Subject;
 import io.sapl.spring.marshall.action.HttpAction;
@@ -47,7 +46,7 @@ public class UIController {
 		this.patientenRepo = patientenRepo;
 	}
 
-	@PdpAuthorizeHttp
+	@PdpAuthorize
 	@GetMapping("/profiles")
 	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
 		model.addAttribute("profiles", patientenRepo.findAll());
@@ -56,7 +55,7 @@ public class UIController {
 		return "profiles";
 	}
 
-	@PdpAuthorizeHttp
+	@PdpAuthorize
 	@PostMapping("/profiles")
 	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {
 		if (patientenRepo.existsById(newPatient.getId())) {
@@ -128,9 +127,9 @@ public class UIController {
 		return "patient";
 	}
 
-	@PdpAuthorizeHttp
+	@PdpAuthorize
 	@DeleteMapping("/patient")
-	public String delete(HttpServletRequest request, @RequestParam("id") int id) {
+	public String delete(@RequestParam("id") int id) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
 	}
@@ -156,9 +155,9 @@ public class UIController {
 		return "updatePatient";
 	}
 
-	@PdpAuthorizeHttp
+	@PdpAuthorize
 	@PutMapping("/patient")
-	public String updatePatient(HttpServletRequest request, @ModelAttribute("updatePatient") Patient updatePatient,
+	public String updatePatient(@ModelAttribute("updatePatient") Patient updatePatient,
 			Authentication authentication) {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
 			throw new IllegalArgumentException("not found");
@@ -187,5 +186,5 @@ public class UIController {
 
 		return REDIRECT_PROFILES;
 	}
-
+		
 }

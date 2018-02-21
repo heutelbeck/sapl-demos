@@ -112,13 +112,3 @@ permit
     action.method == "createPatientProfile"
 where
   "DOCTOR" in subject..authority;
-
-
-  
-policy "permit_doctor_Jwt"
-permit
-    action.method == "GET"
-where
-  "DOCTOR" in subject.details.authorities;
-  resource == "/jwt";
-  

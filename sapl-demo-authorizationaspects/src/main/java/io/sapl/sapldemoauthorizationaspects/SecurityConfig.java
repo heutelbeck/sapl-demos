@@ -2,12 +2,14 @@ package io.sapl.sapldemoauthorizationaspects;
 
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorizeAspect;
-import io.sapl.spring.annotation.PdpAuthorizeHttpAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.demo.repository.UserRepo;
 
@@ -34,9 +36,16 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	PdpAuthorizeHttpAspect pdpAuthorizeHttpAspect(SAPLAuthorizator pep){
-		return new PdpAuthorizeHttpAspect(pep);
+	public TokenStore tokenStore() {
+		return new JwtTokenStore(accessTokenConverter());
 	}
 
-
+	@Bean
+	public JwtAccessTokenConverter accessTokenConverter() {
+		//LOGGER.info("Initializing JWT with public key:\n{}", publicKey);
+		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+		//converter.setSigningKey(privateKey);
+		//converter.setVerifierKey(publicKey);
+		return converter;
+	}
 }
