@@ -1,11 +1,11 @@
 # Submodule sapl-demo-obligation-advice
 
-This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the `ObligationHandlerService` or the `AdviceHandlerService` and about what you have to know when implementing your own `SAPLAuthorizator` will be given afterwards.
+This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java) or the [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) and about what you have to know when implementing your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) will be given afterwards.
 Please note that we are using Lombok logging for all Demo Projects.
 
 ## Tutorial for using Obligation and Advice Handlers
 
-First of all you need to include the `sapl-spring-boot-starter` in your maven project. To do so, add the following dependency:
+First of all you need to include the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) in your maven project. To do so, add the following dependency:
 
 ```java
 <dependency>
@@ -15,7 +15,7 @@ First of all you need to include the `sapl-spring-boot-starter` in your maven pr
 </dependency>
 ```
 
-Please note that if you are using your own `SAPLAuthorizator` and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
+Please note that if you are using your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java)  and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
 
 
 ### Obligation Handlers
@@ -160,7 +160,7 @@ If you want to write your own AdviceHandlerService, implement the interface `Adv
 
 ### A closer look on ObligationHandlerService and AdviceHandlerService
 
-If you want to change the way, your Obligation Handlers are called, you should implement the interface `ObligationHandlerService`:
+If you want to change the way, your Obligation Handlers are called, you should implement the interface [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java):
 
 ```java
 public interface ObligationHandlerService {
@@ -266,7 +266,7 @@ public class SimpleObligationHandlerService implements ObligationHandlerService 
 }
 ```
 
-The interface `AdviceHandlerService` is quite similar to the above:
+The interface [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) is quite similar to the above:
 
 ```java
 public interface AdviceHandlerService {
@@ -362,7 +362,7 @@ public class SimpleAdviceHandlerService implements AdviceHandlerService {
 
 ### Obligation and Advice in the SAPLAuthorizator
 
-Obligations and advice are handled through the `SAPLAuthorizator`. Therefore if you don't use this `SAPLAuthorizator` in your Application, you have to find another way to handle them. Here you can have a look at how this works inside the `SAPLAuthorizator`:
+Obligations and advice are handled through the [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) . Therefore if you don't use this `SAPLAuthorizator` in your Application, you have to find another way to handle them. Here you can have a look at how this works inside the `SAPLAuthorizator`:
 
 ```java
 
