@@ -169,7 +169,7 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 
 == Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter['sapl-demo-voter']
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter/README.md
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter/Readme.MD
 
 
 
