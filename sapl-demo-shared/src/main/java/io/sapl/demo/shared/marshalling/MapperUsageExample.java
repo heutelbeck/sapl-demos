@@ -1,9 +1,7 @@
 package io.sapl.demo.shared.marshalling;
 
-
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import org.springframework.context.annotation.Bean;
-
 
 public class MapperUsageExample {
 
