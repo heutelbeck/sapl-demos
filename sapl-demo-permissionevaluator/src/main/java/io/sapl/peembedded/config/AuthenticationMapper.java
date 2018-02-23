@@ -1,5 +1,6 @@
-package io.sapl.demo.shared.marshalling;
+package io.sapl.peembedded.config;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import io.sapl.spring.marshall.mapper.SaplClassMapper;
@@ -15,7 +16,12 @@ public class AuthenticationMapper implements SaplClassMapper {
 
 	@Override
 	public String getMappedClass() {
-		return Authentication.class.toString();
+		return UsernamePasswordAuthenticationToken.class.toString();
+	}
+	
+	@Override
+	public boolean canMap(Object objectToMap) {
+		return objectToMap.getClass().toString().equals(getMappedClass());
 	}
 	
 	
