@@ -2,8 +2,12 @@
 sudo: required
 services:
   - docker
-# setup environment for java
-language: java
+# setup environment for java/android
+language: android
+android:
+  components:
+     - android-26
+     - build-tools-26.0.2
 jdk:
   - oraclejdk8
 # skip "mvn install -skipTexts=true" before building
