@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>sapl-demo-geo-app</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0.0-SNAPSHOT</version>
+	<name>SAPL Demo Geo (Android App)</name>
+	<url>http://maven.apache.org</url>
+	<properties>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<version.gradlemaven>1.0.8</version.gradlemaven>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.fortasoft</groupId>
+				<artifactId>gradle-maven-plugin</artifactId>
+				<version>${version.gradlemaven}</version>
+				<configuration>
+					<gradleVersion>4.2.1</gradleVersion>
+					<tasks>
+						<task>build</task>
+					</tasks>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<!-- goal must be "invoke" -->
+							<goal>invoke</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<gradleVersion>4.2.1</gradleVersion>
+						<tasks>
+							<task>build</task>
+						</tasks>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.fortasoft</groupId>
+										<artifactId>gradle-maven-plugin</artifactId>
+										<versionRange>[1.0.0,)</versionRange>
+										<goals>
+											<goal>invoke</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+	<distributionManagement>
+		<repository>
+			<id>openconjurer</id>
+			<name>OpenConjurer Nexus Maven Release Repository</name>
+			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>openconjurer-snapshots</id>
+			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
+			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>openconjurer-snapshots</id>
+			<name>OpenConjurer Nexus Maven Repository</name>
+			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<parent>
+		<version>1.0.0-SNAPSHOT</version>
+		<artifactId>sapl-demos</artifactId>
+		<groupId>io.sapl</groupId>
+	</parent>
+</project>
