@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class FlightSelectionActivity extends AppCompatActivity implements AsyncResponse {
     public static final String PIL_DATA = "PIL_DATA";
-    public static final String PEP_SERVER = "saplgeo.mariusmueller.info";
+    public static final String PEP_SERVER = "saplgeo.pepserver.info"; // adopt for PEP server URL
 
     private static final int META = 0;
     private static final int RESTRICTED = 1;

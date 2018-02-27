@@ -20,6 +20,7 @@ import javax.net.ssl.SSLSocket;
 public class RequestSender extends AsyncTask<Void, Void, String> {
     private static final String SSL_HANDSHAKE_FAIL = "Expected %s but found %s";
     private static final String UNABLE_REACH_SERVER = "Unable to reach PEP-Server.";
+    private static final int PORT = 5699;
     private AsyncResponse delegate = null;
     private final String url;
     private final String request;
@@ -37,7 +38,7 @@ public class RequestSender extends AsyncTask<Void, Void, String> {
         try {
             SSLContext context = SSLContext.getInstance("TLS");
             context.init(certificateManager.getKeyManager(), certificateManager.getTrustManager(), null);
-            try (SSLSocket socket = (SSLSocket) context.getSocketFactory().createSocket(url, 5699)) {
+            try (SSLSocket socket = (SSLSocket) context.getSocketFactory().createSocket(url, PORT)) {
                 HostnameVerifier hv = HttpsURLConnection.getDefaultHostnameVerifier();
                 SSLSession s = socket.getSession();
 
