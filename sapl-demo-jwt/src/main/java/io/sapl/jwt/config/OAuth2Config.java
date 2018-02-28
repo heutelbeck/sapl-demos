@@ -28,8 +28,6 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
-import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.annotation.PdpAuthorizeAspect;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -53,10 +51,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	@Autowired
 	private UserRepo userRepo;
 
-	@Bean
-	PdpAuthorizeAspect pdpAuthorizeAspect(SAPLAuthorizator pep) {
-		return new PdpAuthorizeAspect(pep);
-	}
 
 	private static final String ROLE_CLIENT = "ROLE_CLIENT";
 

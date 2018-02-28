@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,6 +29,7 @@ import io.sapl.spring.annotation.PdpAuthorize;
 
 @RestController
 @RequestMapping("/person/")
+@ComponentScan("io.sapl.spring.annotation")
 public class RestService {
 
 	private static final String PHONENUMBER = "phoneNumber";

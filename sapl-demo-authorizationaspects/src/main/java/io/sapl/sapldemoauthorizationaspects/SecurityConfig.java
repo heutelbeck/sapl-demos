@@ -1,7 +1,5 @@
 package io.sapl.sapldemoauthorizationaspects;
 
-import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.annotation.PdpAuthorizeAspect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -24,11 +22,6 @@ public class SecurityConfig {
 	@Bean
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
-	}
-
-	@Bean
-	PdpAuthorizeAspect pdpAuthorizeAspect(SAPLAuthorizator pep){
-		return new PdpAuthorizeAspect(pep);
 	}
 
 	

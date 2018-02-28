@@ -3,6 +3,7 @@ package io.sapl.sapldemoauthorizationaspects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +31,7 @@ import io.sapl.spring.marshall.resource.StringResource;
 import io.sapl.spring.marshall.subject.AuthenticationSubject;
 
 @Controller
+@ComponentScan("io.sapl.spring.annotation")
 public class UIController {
 
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
