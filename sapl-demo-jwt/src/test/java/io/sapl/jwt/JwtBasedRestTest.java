@@ -2,6 +2,7 @@ package io.sapl.jwt;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -41,10 +42,17 @@ public class JwtBasedRestTest {
 	}
 
 	@Test
-	public void callAspectMethodSucceeds() throws Exception {
-		String accessToken = obtainAccessToken("Julia", "password");
+	public void callDiagnosisMethodSucceeds() throws Exception {
+		String accessToken = obtainAccessToken("Thomas", "password");
 		mockMvc.perform(get("/person/readDiag/1").header("Authorization", "Bearer " + accessToken)
 				.accept("application/json;charset=UTF-8")).andExpect(status().isOk());
+	}
+
+	@Test
+	public void callDeleteMethodSucceeds() throws Exception {
+		String accessToken = obtainAccessToken("Thomas", "password");
+		mockMvc.perform(delete("/person/1").header("Authorization", "Bearer " + accessToken)
+				.accept("application/json;charset=UTF-8")).andExpect(status().isForbidden());
 	}
 
 	private String obtainAccessToken(String username, String password) throws Exception {

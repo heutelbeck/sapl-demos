@@ -24,7 +24,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.spring.annotation.PdpAuthorizeJwt;
+import io.sapl.spring.annotation.PdpAuthorize;
 
 @RestController
 @RequestMapping("/person/")
@@ -45,7 +45,7 @@ public class RestService {
 	}
 
 	@GetMapping("readAll/{id}")
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
@@ -61,7 +61,7 @@ public class RestService {
 	}
 
 	@GetMapping("readDiag/{id}")
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
@@ -102,7 +102,7 @@ public class RestService {
 	}
 
 	@PostMapping
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public ResponseEntity<Void> createPerson(@RequestBody Patient person, UriComponentsBuilder uriComponentsBuilder,
 			HttpServletRequest request) {
 		patientenRepo.save(person);
@@ -111,7 +111,7 @@ public class RestService {
 	}
 
 	@PutMapping("putALL/{id}")
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
 			throw new IllegalArgumentException("not found");
@@ -120,7 +120,7 @@ public class RestService {
 	}
 
 	@PutMapping("{id}")
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
 			HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
@@ -148,7 +148,7 @@ public class RestService {
 	}
 
 	@DeleteMapping("{id}")
-	@PdpAuthorizeJwt
+	@PdpAuthorize
 	public void delete(@PathVariable int id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);
 	}
