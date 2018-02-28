@@ -55,7 +55,7 @@ where
 
 policy "permit_doctor_get_create_form"
 permit
-    action.method == "GET"
+    action.method == "viewProfileCreationForm"
 where
   "DOCTOR" in subject..authority;
   resource == "/profiles/new";
@@ -63,7 +63,7 @@ where
   
 policy "permit_doctor_get_update_form"
 permit
-    action.method == "GET"
+    action.method == "viewPatientUpdateForm"
 where
   "DOCTOR" in subject..authority;
   resource == "/patient/id/update";  
@@ -71,7 +71,7 @@ where
 
 policy "permit_nurse_get_update_form"
 permit
-    action.method == "GET"
+    action.method == "viewPatientUpdateForm"
 where
   "NURSE" in subject..authority;
   resource =~ "/patient/id/update";     

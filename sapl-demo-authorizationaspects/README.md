@@ -64,30 +64,6 @@ resource: the name of the class the method is located in. <br>
 
 If the response to the request is `DENY`, the execution of the annotated method will be prevented and an `AccessDeniedException` will be thrown. Otherwise the method will be executed normally.
 
-## The @PdpAuthorizeHttp Annotation
-
-The `@PdpAuthorizeHttp` annotation is used to regulate the execution of a method based on the response of a SAPL-policy check. The annotation is located [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorizeHttp.java). The corresponding aspect that performs the policy check can be found [here](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/annotation/PdpAuthorizeHttpAspect.java).
-
-An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
-
-```java
-	@PdpAuthorizeHttp
-	@DeleteMapping("/patient")
-	public String delete(HttpServletRequest request, @RequestParam("id") int id) {
-		
-		...
-		
-		return REDIRECT_PROFILES;
-	}
-```
-
-The annotation has no attributes. If an annotated method is about to be executed, the `PdpAuthorizeHttpAspect` will perform a SAPL request using the `HttpServletRequest` parameter of the method to extract the necessary values. These are as follows:
-
-subject: the authentication provided by the Spring Security `SecurityContextHolder`, <br>
-action: the request method (i.e. GET, POST, etc.), <br>
-resource: the requested URL. <br>
-
-If the response to the request is `DENY`, the execution of the annotated method will be prevented and an `AccessDeniedException` will be thrown. Otherwise the method will be executed normally.
 
 
 

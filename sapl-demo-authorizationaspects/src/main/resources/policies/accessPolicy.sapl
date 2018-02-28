@@ -74,25 +74,6 @@ obligation
    }
    
 
-/* 
-   This is an example to demonstrate a failing obligation. There is no recipient for
-   the email, so the EmailObligationHandler will throw an Exception an the  response 
-   will be changed to DENY
-*/   
-policy "permit_nurse_see_diagnosis"
-permit
-   action.method == "readDiagnosis"
-where
-   !(subject.name == resource.attendingNurse) &&
-   "NURSE" in subject..authority;
-obligation
-   { "type" : "sendEmail",
-     "subject" : "Diagnosis access by nurse",
-     "message" : subject.name + " has looked up the diagnosis of " + resource.name
-   }
-
-
-
 policy "permit_attending_doctor_update_diagnosis"
 permit
    action.method == "updateDiagnosis"

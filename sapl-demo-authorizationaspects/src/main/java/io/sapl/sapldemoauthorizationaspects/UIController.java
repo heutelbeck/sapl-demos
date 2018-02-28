@@ -66,7 +66,7 @@ public class UIController {
 	}
 
 	@GetMapping("/profiles/new")
-	@PdpAuthorize(action = "GET", resource = "/profiles/new")
+	@PdpAuthorize(action = "viewProfileCreationForm", resource = "/profiles/new")
 	public String linkNew(Model model) {
 		Patient newPatient = new Patient();
 		model.addAttribute("newPatient", newPatient);
@@ -135,7 +135,7 @@ public class UIController {
 	}
 
 	@GetMapping("/patient/{id}/update")
-	@PdpAuthorize(action = "GET", resource = "/patient/id/update")
+	@PdpAuthorize(action = "viewPatientUpdateForm", resource = "/patient/id/update")
 	public String linkUpdate(@PathVariable int id, Model model, Authentication authentication) {
 
 		Patient patient = patientenRepo.findById(id)

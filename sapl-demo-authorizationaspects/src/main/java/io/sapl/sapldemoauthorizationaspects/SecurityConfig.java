@@ -7,10 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
 import io.sapl.demo.repository.UserRepo;
 
 @EnableWebSecurity(debug = false)
@@ -35,17 +31,5 @@ public class SecurityConfig {
 		return new PdpAuthorizeAspect(pep);
 	}
 
-	@Bean
-	public TokenStore tokenStore() {
-		return new JwtTokenStore(accessTokenConverter());
-	}
-
-	@Bean
-	public JwtAccessTokenConverter accessTokenConverter() {
-		//LOGGER.info("Initializing JWT with public key:\n{}", publicKey);
-		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-		//converter.setSigningKey(privateKey);
-		//converter.setVerifierKey(publicKey);
-		return converter;
-	}
+	
 }
