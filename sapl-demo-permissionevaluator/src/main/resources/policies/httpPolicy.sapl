@@ -6,7 +6,7 @@ deny-unless-permit
   
 policy "permit_doctor_post_profiles"
 permit
-    action.method == "POST"
+    action == "POST"
 where
   "DOCTOR" in subject..authority;
   resource.uriLowerCased == "/profiles";
@@ -14,7 +14,7 @@ where
 
 policy "permit_nurse_put_patient"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "NURSE" in subject..authority;
   resource.uri =~ "/patient/*";
@@ -22,14 +22,14 @@ where
 
 policy "permit_doctor_put_patient"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/patient/*";
 
 policy "permit_doctor_delete_patient"
 permit
-    action.method == "DELETE"
+    action == "DELETE"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/patient/*";
@@ -38,14 +38,14 @@ where
 
 policy "permit_get_person"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   resource.uri =~ "/person/[0-9]+";
 
 
 policy "permit_get_personAllDoc"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/readAll/[0-9]+";
@@ -53,7 +53,7 @@ where
 
 policy "permit_get_personDiagDoc"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/readDiag/[0-9]+";
@@ -62,7 +62,7 @@ where
 
 policy "permit_get_personDiagNurse"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "NURSE" in subject..authority;
   resource.uri =~ "/person/readDiag/[0-9]+";
@@ -71,14 +71,14 @@ where
 
 policy "permit_list_person"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   resource.uri =~ "/person/list";
 
 
 policy "permit_doctor_post_person"
 permit
-    action.method == "POST"
+    action == "POST"
 where
   "DOCTOR" in subject..authority;
   resource.uri == "/person/";
@@ -88,7 +88,7 @@ where
 
 policy "permit_nurse_put_person"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "NURSE" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
@@ -96,7 +96,7 @@ where
 
 policy "permit_doctor_put_person"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
@@ -105,7 +105,7 @@ where
 
 policy "permit_doctor_put_personAll"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/putALL/[0-9]+";
@@ -114,7 +114,7 @@ where
 
 policy "permit_doctor_delete_person"
 permit
-  action.method == "DELETE"
+  action == "DELETE"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";

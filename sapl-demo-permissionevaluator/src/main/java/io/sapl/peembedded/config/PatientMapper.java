@@ -1,21 +1,24 @@
 package io.sapl.peembedded.config;
 
 import io.sapl.demo.domain.Patient;
+import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.spring.marshall.mapper.SaplClassMapper;
-import io.sapl.spring.marshall.mapper.SaplRequestType;
+import io.sapl.spring.marshall.mapper.SaplRequestElement;
 
 public class PatientMapper implements SaplClassMapper {
 
 	@Override
-	public Object map(Object objectToMap, SaplRequestType type) {
+	public Object map(Object objectToMap, SaplRequestElement type) {
 		
+		Patient patient = (Patient) objectToMap;
+		return new PatientResource(patient);
 
-		return null;
+
 	}
 
 	@Override
-	public String getMappedClass() {
-		return Patient.class.toString();
+	public Class<?> getMappedClass() {
+		return Patient.class;
 	}
 
 }
