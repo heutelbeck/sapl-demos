@@ -1,4 +1,4 @@
-package io.sapl.peembedded.config;
+package io.sapl.demo.shared.marshalling;
 
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.resource.PatientResource;

@@ -1,4 +1,4 @@
-package io.sapl.peembedded.config;
+package io.sapl.demo.shared.marshalling;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
