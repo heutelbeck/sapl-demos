@@ -1,6 +1,5 @@
 package io.sapl.demo.shared.marshalling;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
 import io.sapl.spring.marshall.mapper.SaplClassMapper;

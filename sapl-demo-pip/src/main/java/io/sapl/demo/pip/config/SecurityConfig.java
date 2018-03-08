@@ -12,8 +12,13 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 import io.sapl.demo.pip.AuthManager;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.spring.marshall.mapper.SaplMapper;
+import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -41,6 +46,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
+	}
+	
+	@Bean
+	public SaplMapper getSaplMapper() {
+		SaplMapper saplMapper = new SimpleSaplMapper();
+		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
+		saplMapper.register(new PatientMapper());
+		return saplMapper;
 	}
 	
 }

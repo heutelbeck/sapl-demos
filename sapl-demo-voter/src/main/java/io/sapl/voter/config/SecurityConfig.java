@@ -24,8 +24,13 @@ import org.springframework.security.web.access.expression.WebExpressionVoter;
 
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
 import io.sapl.spring.SaplBasedVoter;
 import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.spring.marshall.mapper.SaplMapper;
+import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import io.sapl.voter.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.voter.obligationhandlers.EmailObligationHandler;
@@ -117,5 +122,14 @@ public class SecurityConfig {
 		sohs.register(new CoffeeObligationHandler());
 		sohs.register(new SimpleLoggingObligationHandler());
 		return sohs;
+	}
+	
+	@Bean
+	public SaplMapper getSaplMapper() {
+		SaplMapper saplMapper = new SimpleSaplMapper();
+		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
+		saplMapper.register(new PatientMapper());
+		return saplMapper;
 	}
 }

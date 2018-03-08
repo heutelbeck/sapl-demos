@@ -1,7 +1,6 @@
 package io.sapl.demo.shared.marshalling;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 
 import io.sapl.spring.marshall.action.HttpAction;
 import io.sapl.spring.marshall.mapper.SaplClassMapper;
