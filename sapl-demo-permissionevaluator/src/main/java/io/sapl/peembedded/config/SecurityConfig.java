@@ -110,6 +110,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();
 		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
 		return saplMapper;
 		
 	}
