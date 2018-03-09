@@ -10,13 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.marshall.Resource;
-import io.sapl.spring.marshall.Subject;
-import io.sapl.spring.marshall.action.SimpleAction;
-import io.sapl.spring.marshall.subject.AuthenticationSubject;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -53,10 +48,8 @@ public class UIController {
 
 		model.addAttribute("patient", patient);
 
-		Subject subject = new AuthenticationSubject(authentication);
-		Resource patientResource = new PatientResource(patient);
 		model.addAttribute("viewRoomNumberPermission",
-				sapl.authorize(subject, new SimpleAction("viewRoomNumber"), patientResource));
+				sapl.authorize(authentication, "viewRoomNumber", patient));
 		return "patient";
 	}
 

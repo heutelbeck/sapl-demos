@@ -6,8 +6,6 @@ import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.marshall.action.HttpAction;
-import io.sapl.spring.marshall.resource.HttpResource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

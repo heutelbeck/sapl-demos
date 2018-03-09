@@ -18,17 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.domain.resource.PatientResource;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorize;
-import io.sapl.spring.marshall.Resource;
-import io.sapl.spring.marshall.Subject;
-import io.sapl.spring.marshall.action.HttpAction;
-import io.sapl.spring.marshall.action.SimpleAction;
-import io.sapl.spring.marshall.resource.HttpResource;
-import io.sapl.spring.marshall.resource.StringResource;
-import io.sapl.spring.marshall.subject.AuthenticationSubject;
 
 @Controller
 @ComponentScan("io.sapl.spring.annotation")
@@ -38,13 +30,13 @@ public class UIController {
 	private static final String UPDATE = "update";
 
 	@Autowired
-	private SAPLAuthorizator pep;
+	private SAPLAuthorizator sapl;
 
 	private PatientenRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator pep, PatientenRepo patientenRepo) {
-		this.pep = pep;
+	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
+		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 	}
 
@@ -52,8 +44,8 @@ public class UIController {
 	@GetMapping("/profiles")
 	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
 		model.addAttribute("profiles", patientenRepo.findAll());
-		model.addAttribute("createPermission", pep.authorize(new AuthenticationSubject(authentication),
-				new HttpAction(RequestMethod.POST), new HttpResource(request)));
+		model.addAttribute("createPermission", sapl.authorize(authentication,
+				RequestMethod.POST, request));
 		return "profiles";
 	}
 
@@ -85,45 +77,28 @@ public class UIController {
 
 		model.addAttribute("patient", patient);
 
-		Subject subject = new AuthenticationSubject(authentication);
-		Resource patientResource = new PatientResource(patient);
+		
 		model.addAttribute("viewDiagnosisPermission",
-				pep.authorize(subject, new SimpleAction("readDiagnosis"), patientResource));
+				sapl.authorize(authentication, "readDiagnosis", patient));
 		model.addAttribute("viewHRNPermission",
-				pep.authorize(subject, new SimpleAction("read"), new StringResource("HRN")));
+				sapl.authorize(authentication, "read", "HRN"));
 		model.addAttribute("updatePermission",
-				pep.authorize(subject, new HttpAction(RequestMethod.PUT), new HttpResource("/patient")));
+				sapl.authorize(authentication, RequestMethod.PUT, "/patient"));
 		model.addAttribute("deletePermission",
-				pep.authorize(subject, new HttpAction(RequestMethod.DELETE), new HttpResource("/patient")));
+				sapl.authorize(authentication, RequestMethod.DELETE, "/patient"));
 		model.addAttribute("viewRoomNumberPermission",
-				pep.authorize(subject, new SimpleAction("viewRoomNumber"), patientResource));
+				sapl.authorize(authentication, "viewRoomNumber", patient));
 
-		boolean permissionBlackenedHRN = pep.authorize(subject, new SimpleAction("getBlackenAndObligation"),
-				new StringResource("anything"));
+		boolean permissionBlackenedHRN = sapl.authorize(authentication, "getBlackenAndObligation",
+				"anything");
 		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
 
 		if (permissionBlackenedHRN) {
 			String hRN = patient.getHealthRecordNumber();
-			Response response = pep.getResponse(subject, new SimpleAction("getBlackenAndObligation"),
-					new StringResource(hRN));
-			model.addAttribute("blackenedHRN", response.getResource().get().asText()); // use
-																						// only
-																						// together
-																						// with
-																						// "permissionBlackenedHRN":
-																						// only
-																						// for
-																						// NURSE
-			model.addAttribute("obligation", response.getObligation().get().findValue("key1").asText()); // findValue("key1").asText());
-																											// //
-																											// use
-																											// only
-																											// together
-																											// with
-																											// "permissionBlackenedHRN":
-																											// only
-																											// for
-																											// NURSE
+			Response response = sapl.getResponse(authentication, "getBlackenAndObligation",
+					hRN);
+			model.addAttribute("blackenedHRN", response.getResource().get().asText()); 
+			model.addAttribute("obligation", response.getObligation().get().findValue("key1").asText()); 
 			model.addAttribute("message", "Congratulations, you have fullfilled the obligation");
 		}
 		return "patient";
@@ -144,16 +119,15 @@ public class UIController {
 				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
 		model.addAttribute("updatePatient", patient);
 
-		Subject subject = new AuthenticationSubject(authentication);
-		Resource patientResource = new PatientResource(patient);
+		
 		model.addAttribute("updateDiagnosisPermission",
-				pep.authorize(subject, new SimpleAction("updateDiagnosis"), patientResource));
+				sapl.authorize(authentication, "updateDiagnosis", patient));
 		model.addAttribute("updateHRNPermission",
-				pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("HRN")));
+				sapl.authorize(authentication, UPDATE, "HRN"));
 		model.addAttribute("updateDoctorPermission",
-				pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("doctor")));
+				sapl.authorize(authentication, UPDATE, "doctor"));
 		model.addAttribute("updateNursePermission",
-				pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("nurse")));
+				sapl.authorize(authentication, UPDATE, "nurse"));
 		return "updatePatient";
 	}
 
@@ -165,22 +139,21 @@ public class UIController {
 			throw new IllegalArgumentException("not found");
 		}
 
-		Subject subject = new AuthenticationSubject(authentication);
-		Resource patientResource = new PatientResource(updatePatient);
+		
 
 		Patient savePatient = patientenRepo.findById(updatePatient.getId()).get();
 		savePatient.setName(updatePatient.getName());
-		if (pep.authorize(subject, new SimpleAction("updateDiagnosis"), patientResource)) {
+		if (sapl.authorize(authentication, "updateDiagnosis", updatePatient)) {
 			savePatient.setDiagnosis(updatePatient.getDiagnosis());
 		}
-		if (pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("HRN"))) {
+		if (sapl.authorize(authentication, UPDATE, "HRN")) {
 			savePatient.setHealthRecordNumber(updatePatient.getHealthRecordNumber());
 		}
 		savePatient.setPhoneNumber(updatePatient.getPhoneNumber());
-		if (pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("doctor"))) {
+		if (sapl.authorize(authentication, UPDATE, "doctor")) {
 			savePatient.setAttendingDoctor(updatePatient.getAttendingDoctor());
 		}
-		if (pep.authorize(subject, new SimpleAction(UPDATE), new StringResource("nurse"))) {
+		if (sapl.authorize(authentication, UPDATE, "nurse")) {
 			savePatient.setAttendingNurse(updatePatient.getAttendingNurse());
 		}
 
