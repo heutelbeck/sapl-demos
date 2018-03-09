@@ -10,7 +10,6 @@ import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
-//import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
