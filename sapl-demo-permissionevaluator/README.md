@@ -118,55 +118,61 @@ from submodule [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-pol
 Here is an excerpt of the [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLPermissionEvaluator.java):
 
 ```java
+@Component
 public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
-    private SAPLAuthorizator saplAuthorizer;
+	private SAPLAuthorizator sapl;
 
-    @Autowired
-    public SAPLPermissionEvaluator(SAPLAuthorizator saplAuthorizer) {
-        this.saplAuthorizer = saplAuthorizer;
-    }
+	@Autowired
+	public SAPLPermissionEvaluator(SAPLAuthorizator saplAuthorizer) {
+		this.sapl = saplAuthorizer;
+	}
 
-    @Override //(1.) 
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject,
-                                  Object permission) {
-        return authorize(authentication, permission, targetDomainObject); 
-   }
+	@Override
+	public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+		return sapl.authorize(authentication, permission, targetDomainObject);
 
-    @Override //(1.)
-    public boolean hasPermission(Authentication authentication, Serializable targetId,
-                                  String targetType, Object permissionText) {
-        return false;
-    }
+	}
 
-    public boolean authorize(Object subject, Object action, Object resource) { 
-        LOGGER.trace(
-                "Entering hasPermission (Object subject, Object action,
-                 Object resource) \n subject: {} \n action {} \n resource: {}",
-                subject.getClass(), action.getClass(), resource.getClass());
-        if (Authentication.class.isInstance(subject)
-              && HttpServletRequest.class.isInstance(action)) {
-            Authentication auth = (Authentication) subject;
-            Subject authSubject = new AuthenticationSubject(auth);
-            HttpServletRequest request = (HttpServletRequest) action;
-            Action httpAction = new HttpAction(RequestMethod.valueOf(request.getMethod()));
-            Resource httpResource = new HttpResource(request);
-            return saplAuthorizer.authorize(authSubject, httpAction, httpResource);//(2.)
-        }
-        Response response = saplAuthorizer.runPolicyCheck(subject, action, resource); 
-        return response.getDecision() == Decision.PERMIT; //(3.)
-    }
+	@Override
+	public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType,
+			Object permissionText) {
+		return false;
+	}
 
 }
 ```
 
 
-1. In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
+* In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
 
-2. `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
+* `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
    `hasPermission(#request, #request)`.
    
-3. You can also write  _hard-wired_   expressions like `hasPermission('someResource', 'someAction')`. For example `hasPermission('HRN', 'read')` can be used with following policy:
+   An example for securing the `DELETE` method from
+the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/controller/RestService.java) is listed below:
+
+    ```java
+        @DeleteMapping("{id}")
+        @PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
+        public void delete(@PathVariable int id, HttpServletRequest request) {
+            patientenRepo.deleteById(id);
+        }
+    ```
+
+    The corresponding SAPL policy can be found in <https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/resources/policies/httpPolicy.sapl>  and is implemented as follows:
+
+    ```
+    policy "permit_doctor_delete_person"
+    permit
+      action == "DELETE"
+    where
+      "DOCTOR" in subject..authority;
+      resource.uri =~ "/person/[0-9]+";
+    ```
+
+
+* You can also write  _hard-wired_   expressions like `hasPermission('someResource', 'someAction')`. For example `hasPermission('HRN', 'read')` can be used with following policy:
 
         policy "permit_doctor_read_HRN"
         permit
@@ -175,31 +181,7 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
           "DOCTOR" in subject..authority;
           resource == "HRN";
     
-    This policy gives permission to the authority `DOCTOR`.   
-
-
-An example for securing the `DELETE` method from
-the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/controller/RestService.java) is listed below:
-
-```java
-	@DeleteMapping("{id}")
-	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public void delete(@PathVariable int id, HttpServletRequest request) {
-		patientenRepo.deleteById(id);
-	}
-```
-
-The corresponding SAPL policy can be found in <https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/resources/policies/httpPolicy.sapl>  and is implemented as follows:
-
-```
-policy "permit_doctor_delete_person"
-permit
-  action == "DELETE"
-where
-  "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
-```
-
+    This policy gives permission to the authority `DOCTOR`. 
 
 
 ## Function Library
