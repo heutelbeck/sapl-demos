@@ -1,51 +1,98 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
 set "httpPolicy"
 deny-unless-permit
 
-  
+
+
 policy "permit_doctor_post_profiles"
 permit
-    action == "POST"
+    action== "POST"
 where
   "DOCTOR" in subject..authority;
-  resource.uriLowerCased == "/profiles";
+  resource == "/profiles";
+
+
+
+policy "permit_doctor_post_profiles_permeval"
+permit
+    action.method== "POST"
+where
+  "DOCTOR" in subject..authority;
+  resource.uri == "/profiles";
+
+
+
 
 
 policy "permit_nurse_put_patient"
 permit
-    action == "PUT"
+    action== "PUT"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
+
+
+
+policy "permit_nurse_put_patient_permeval"
+permit
+  action.method== "PUT"
+where
+  "NURSE" in subject..authority;
+   resource.uri =~ "/patient/*";
+
+
+
 
 
 policy "permit_doctor_put_patient"
 permit
-    action == "PUT"
+    action== "PUT"
+where
+  "DOCTOR" in subject..authority;
+  resource =~ "/patient/*";
+
+
+
+policy "permit_doctor_put_patient_permeval"
+permit
+    action.method== "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/patient/*";
 
+
+
+
+
 policy "permit_doctor_delete_patient"
 permit
-    action == "DELETE"
+    action== "DELETE"
+where
+  "DOCTOR" in subject..authority;
+  resource =~ "/patient/*";
+
+
+
+policy "permit_doctor_delete_patient_permeval"
+permit
+    action.method== "DELETE"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/patient/*";
+
+
 
 
 
 policy "permit_get_person"
 permit
-    action == "GET"
+    action.method == "GET"
 where
   resource.uri =~ "/person/[0-9]+";
 
 
 policy "permit_get_personAllDoc"
 permit
-    action == "GET"
+    action.method == "GET"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/readAll/[0-9]+";
@@ -53,7 +100,7 @@ where
 
 policy "permit_get_personDiagDoc"
 permit
-    action == "GET"
+    action.method == "GET"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/readDiag/[0-9]+";
@@ -62,7 +109,7 @@ where
 
 policy "permit_get_personDiagNurse"
 permit
-    action == "GET"
+    action.method == "GET"
 where
   "NURSE" in subject..authority;
   resource.uri =~ "/person/readDiag/[0-9]+";
@@ -71,14 +118,14 @@ where
 
 policy "permit_list_person"
 permit
-    action == "GET"
+    action.method == "GET"
 where
   resource.uri =~ "/person/list";
 
 
 policy "permit_doctor_post_person"
 permit
-    action == "POST"
+    action.method == "POST"
 where
   "DOCTOR" in subject..authority;
   resource.uri == "/person/";
@@ -88,7 +135,7 @@ where
 
 policy "permit_nurse_put_person"
 permit
-    action == "PUT"
+    action.method == "PUT"
 where
   "NURSE" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
@@ -96,7 +143,7 @@ where
 
 policy "permit_doctor_put_person"
 permit
-    action == "PUT"
+    action.method == "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
@@ -105,7 +152,7 @@ where
 
 policy "permit_doctor_put_personAll"
 permit
-    action == "PUT"
+    action.method == "PUT"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/putALL/[0-9]+";
@@ -114,7 +161,7 @@ where
 
 policy "permit_doctor_delete_person"
 permit
-  action == "DELETE"
+  action.method == "DELETE"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
