@@ -35,7 +35,7 @@ Add a maven dependency to integrate remote or embedded `PDP` into a Spring Boot 
 
 In conjunction with SAPL requests we need a [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java), information about an authenticated user, objects of the domain model,
 the system environment, HttpServletRequest parameters, the requested URI, et cetera,  and last but not least we need a customized
-PermissionEvaluator, the [SAPLPermissionEvaluator].
+PermissionEvaluator, the [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator).
 The submodule [sapl-spring](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring) from <https://github.com/heutelbeck/sapl-policy-engine> provides these interfaces and classes
 and itself is loaded as dependency within the dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#sapl-spring-boot-starter).
 
