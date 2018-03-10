@@ -165,7 +165,7 @@ the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo
     ```
     policy "permit_doctor_delete_person"
     permit
-      action == "DELETE"
+      action.method == "DELETE"
     where
       "DOCTOR" in subject..authority;
       resource.uri =~ "/person/[0-9]+";
