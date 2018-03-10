@@ -26,7 +26,7 @@ Next you need to write your own Obligation Handler. In this tutorial we want to 
 ```java
 policy "permit_attending_nurse_see_diagnosis"
 permit
-   action.method == "readDiagnosis"
+   action == "readDiagnosis"
 where
    subject.name == resource.attendingNurse;
 obligation
@@ -101,7 +101,7 @@ Policy:
 ```java
 policy "permit_attending_doctor_see_diagnosis"
 permit
-   action.method == "readDiagnosis"
+   action == "readDiagnosis"
 where
    subject.name == resource.attendingDoctor;
 advice
