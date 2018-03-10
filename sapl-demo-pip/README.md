@@ -70,7 +70,7 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
 
         policy "permit_relative_see_room_number"
         permit
-           action.method == "viewRoomNumber"
+           action == "viewRoomNumber"
         where
           subject.name in resource.id.<patient.related>;
 
