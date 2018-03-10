@@ -1,4 +1,4 @@
-# Submodule  sapl-demo-voter
+# Tutorial  sapl-demo-voter
 
 This demo shows how to vote for or against incoming Requests with a SAPL based voter that uses Sapl Policies. 
 

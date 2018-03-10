@@ -1,4 +1,4 @@
-# Submodule sapl-demo-obligation-advice
+# Tutorial sapl-demo-obligation-advice
 
 This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java) or the [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) and about what you have to know when implementing your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) will be given afterwards.
 Please note that we are using Lombok logging for all Demo Projects.

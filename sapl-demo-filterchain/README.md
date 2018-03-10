@@ -1,4 +1,4 @@
-# Submodule  sapl-demo-filterchain
+# Tutorial  sapl-demo-filterchain
 
 This demo shows how to filter incoming Requests with a Policy Enforcement Filter that uses Sapl Policies. 
 

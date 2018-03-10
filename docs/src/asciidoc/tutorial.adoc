@@ -1,4 +1,4 @@
-= HowTo: Best Practices to Integrate SAPL with Spring Security Standard Mechanisms
+= Best Practices to Integrate SAPL with Spring Security Standard Mechanisms
 :toc:
 :toc-title:
 :linkattrs:
@@ -9,8 +9,7 @@
 
 == Introduction
 
-Many approaches to secure web applications have been developed. Well-known frameworks
-bring along built-in components. Here we use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
+In this tutorial we show how to use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
 inside a https://projects.spring.io/spring-boot/[Spring Boot] Application with https://maven.apache.org/[Maven] to implement user rights
 to webpages and REST services.
 
@@ -21,7 +20,7 @@ to webpages and REST services.
 ** Installation of Maven 3
 ** For IDE user: Installation of your favorite IDE (everything works with _Eclipse_, _IntelliJIDEA_)
 **  For IDE user: Installation of Project Lombok. +
-   Some of our submodules make extensive use of https://projectlombok.org/download.html. Download lombok.jar run it as a Java application and follow the instructions. If this is not installed and you are working with a Project using Lombok you will end up with a lot of error messages within _Eclipse_, even if the maven build works just fine. +
+   Some of our modules make extensive use of https://projectlombok.org/download.html. Download lombok.jar run it as a Java application and follow the instructions. If this is not installed and you are working with a Project using Lombok you will end up with a lot of error messages within _Eclipse_, even if the maven build works just fine. +
    For _IntelliJIDEA_ : Install Project https://plugins.jetbrains.com/plugin/6317-lombok-plugin[Lombok Plugin] from the settings or manually.
 ** For IDE user: Installation of the Spring IDE plugins.
 
@@ -30,7 +29,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 * Build the project at the root level with `mvn install`.
 
-* Go to  submodules like +
+* Go to  +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects], +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt], +
@@ -44,7 +43,11 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 == Domain Model
 
-Our domain model is implemented in the submodule https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-domain[sapl-demo-domain]
+All below-mentioned tutorials, each representing one specific technique securing a web application with SAPL, share the same domain model. +
+We are using terms from the medical field and healthcare to illustrate how a user (doctor, nurse, vistor, admin) is allowed to get access to patient data.
+
+
+Our domain model is implemented in the module https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-domain[sapl-demo-domain]
 and kept simple for the sake of clarity. +
 We have patients:
 
@@ -143,31 +146,44 @@ The following table gives an overview of all current user rights:
 |Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
+== Spring Features
+General spring features in all tutorials  are:
+
+* https://projects.spring.io/spring-boot/[Spring Boot]
+* Standard SQL database: http://www.h2database.com[H2] (In-Memory), programmable via JPA
+* http://hibernate.org/[Hibernate]
+* web interfaces (Rest, UI) with Spring MVC
+* model classes (Patient, User, Relation), CrudRepositories in JPA
+* https://projects.spring.io/spring-security/[Spring Security]
+* https://www.thymeleaf.org/[Thymeleaf]
+
+== Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain['sapl-demo-filterchain']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain['sapl-demo-filterchain']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt['sapl-demo-jwt']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt['sapl-demo-jwt']
 
 
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator['sapl-demo-permissionevaluator']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator['sapl-demo-permissionevaluator']
+This tutorial makes extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface]
+from https://projects.spring.io/spring-security/[Spring Security]. +
+Go to
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md .
 
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md
-
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip['sapl-demo-pip']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip['sapl-demo-pip']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 
-== Submodule https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter['sapl-demo-voter']
+== Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter['sapl-demo-voter']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter/Readme.MD
 

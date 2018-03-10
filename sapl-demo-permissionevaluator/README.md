@@ -1,10 +1,9 @@
-# Submodule  sapl-demo-permissionevaluator
+# Tutorial  sapl-demo-permissionevaluator
 
 **Contents**
 
 * [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter)
 * [sapl-spring](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring)
-* [Spring Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-features)
 * [Spring Security Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-security-features)
 * [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator)
 * [Function Library](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#function-library)
@@ -12,7 +11,7 @@
 
 
 
-The submodule sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
+The module sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
 The most important features are given below. Please note that we are using Lombok logging for all Demo Projects.
 
 ## sapl-spring-boot-starter
@@ -20,7 +19,7 @@ The most important features are given below. Please note that we are using Lombo
 Obtaining a decision from SAPL Policies we need a `PolicyDecisionPoint`(`PDP`). A `PDP` as a `bean`  is  available as dependency for
 a Spring Boot Starter Project, configured in the submodule [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter)
 from project <https://github.com/heutelbeck/sapl-policy-engine> .
-Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
+Add a maven dependency to integrate remote or embedded `PDP` into a Spring Boot Project with:
 
 ```java
 <dependency>
@@ -41,20 +40,6 @@ The submodule [sapl-spring](https://github.com/heutelbeck/sapl-policy-engine/tre
 and itself is loaded as dependency within the dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#sapl-spring-boot-starter).
 
 
-
-
-
-## Spring Features
-
-General spring features in this submodule are:
-
-* [Spring Boot](https://projects.spring.io/spring-boot/)
-* Standard SQL database: [H2](http://www.h2database.com) (In-Memory), programmable via JPA
-* [Hibernate](http://hibernate.org/)
-* web interfaces (Rest, UI) with Spring MVC
-* model classes (Patient, User, Relation), CrudRepositories in JPA
-* [Spring Security](https://projects.spring.io/spring-security/)
-* Thymeleaf
 
 ## Spring Security Features
 
@@ -181,10 +166,16 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 2. `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
    `hasPermission(#request, #request)`.
    
-3. You can also use  _hard-wired_   expressions  like `hasPermission('someResource', 'someAction')`.
+3. You can also write  _hard-wired_   expressions like `hasPermission('someResource', 'someAction')`. For example `hasPermission('HRN', 'read')` can be used with following policy:
 
-
-
+        policy "permit_doctor_read_HRN"
+        permit
+            action == "read"
+        where
+          "DOCTOR" in subject..authority;
+          resource == "HRN";
+    
+    This policy gives permission to the authority `DOCTOR`.   
 
 
 An example for securing the `DELETE` method from
@@ -203,7 +194,7 @@ The corresponding SAPL policy can be found in <https://github.com/heutelbeck/sap
 ```
 policy "permit_doctor_delete_person"
 permit
-  action.method == "DELETE"
+  action == "DELETE"
 where
   "DOCTOR" in subject..authority;
   resource.uri =~ "/person/[0-9]+";
@@ -278,7 +269,7 @@ public class PatientFunction {
          
         policy "permit_relative_see_room_number_with_function"
         permit
-         action.method == "viewRoomNumberFunction"
+         action == "viewRoomNumberFunction"
         where
          subject.name in patientfunction.related(resource.id);
 
@@ -309,7 +300,7 @@ Furthermore, the name of the Function Library has to be notated in the _librarie
 ## Best Practice
 
 * Add Maven dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter).
-* Implement a Web Application with Spring Boot (cf. [Spring Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-features)).
+* Implement a Web Application with Spring Boot.
 * Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#http-security) from Spring Security.
 * Write [SAPL Policies](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator/src/main/resources/policies) matching your purposes, which requires basic understanding of [SAPL](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc) .
 * Add [@Pre and @Post Annotations ](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#pre-and-post-annotations) using `hasPermission()` expressions 

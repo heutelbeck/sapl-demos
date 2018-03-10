@@ -1,4 +1,4 @@
-# Submodule  sapl-demo-pip
+# Tutorial  sapl-demo-pip
 
 This demo demonstrates the usage of a Policy Information Point (PIP).  When evaluating a Sapl Policy a PIP may be used to provide  Information that is not included in the Request.
 
