@@ -9,9 +9,9 @@
 
 == Introduction
 
-In this tutorial we show how to use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
+We want to show how to use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
 inside a https://projects.spring.io/spring-boot/[Spring Boot] Application with https://maven.apache.org/[Maven] to implement user rights
-to webpages and REST services.
+to webpages and REST services. Each of the below-mentioned tutorials represents one specific technique of securing a web application with SAPL.
 
 == Installation
 
@@ -43,7 +43,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 == Domain Model
 
-All below-mentioned tutorials, each representing one specific technique securing a web application with SAPL, share the same domain model. +
+All below-mentioned tutorials  share the same domain model.
 We are using terms from the medical field and healthcare to illustrate how a user (doctor, nurse, vistor, admin) is allowed to get access to patient data.
 
 
