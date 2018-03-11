@@ -14,12 +14,12 @@ public class HttpServletRequestMapper implements SaplClassMapper {
 		
 		HttpServletRequest request = (HttpServletRequest) objectToMap;
 		
-		if(type.equals(SaplRequestElement.ACTION)) {
-			return new HttpAction(request);
+		if(type == (SaplRequestElement.ACTION)) {
+			return new HttpAction(request).getMethod();
 		}
 		
-		if(type.equals(SaplRequestElement.RESOURCE)) {
-			return new HttpResource(request);
+		if(type == (SaplRequestElement.RESOURCE)) {
+			return new HttpResource(request).getUri();
 		}
 		
 		return objectToMap;
