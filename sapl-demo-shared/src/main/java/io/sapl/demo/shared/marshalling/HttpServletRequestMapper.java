@@ -10,15 +10,15 @@ import io.sapl.spring.marshall.resource.HttpResource;
 public class HttpServletRequestMapper implements SaplClassMapper {
 
 	@Override
-	public Object map(Object objectToMap, SaplRequestElement type) {
+	public Object map(Object objectToMap, SaplRequestElement element) {
 		
 		HttpServletRequest request = (HttpServletRequest) objectToMap;
 		
-		if(type == (SaplRequestElement.ACTION)) {
+		if(element == (SaplRequestElement.ACTION)) {
 			return new HttpAction(request).getMethod();
 		}
 		
-		if(type == (SaplRequestElement.RESOURCE)) {
+		if(element == (SaplRequestElement.RESOURCE)) {
 			return new HttpResource(request).getUri();
 		}
 		

@@ -157,6 +157,33 @@ General spring features in all tutorials  are:
 * https://projects.spring.io/spring-security/[Spring Security]
 * https://www.thymeleaf.org/[Thymeleaf]
 
+== Getting started
+In this section you will find elements of the Sapl Spring Integration which are used in all sub projects.
+
+=== The Sapl Mapper
+With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
+
+[source, java]
+---
+
+public class AuthenticationMapper implements SaplClassMapper {
+
+	@Override
+	public Object map(Object objectToMap, SaplRequestElement element) {
+		Authentication authentication = (Authentication) objectToMap;
+		return new AuthenticationSubject(authentication);
+	}
+
+	@Override
+	public Class<?> getMappedClass() {
+		return Authentication.class;
+	}
+}
+
+---
+
+If you want to do different mapping in the case, you 
+
 == Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md

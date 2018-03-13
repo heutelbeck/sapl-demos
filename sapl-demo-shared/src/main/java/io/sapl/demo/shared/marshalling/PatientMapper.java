@@ -8,7 +8,7 @@ import io.sapl.spring.marshall.mapper.SaplRequestElement;
 public class PatientMapper implements SaplClassMapper {
 
 	@Override
-	public Object map(Object objectToMap, SaplRequestElement type) {
+	public Object map(Object objectToMap, SaplRequestElement element) {
 		
 		Patient patient = (Patient) objectToMap;
 		return new PatientResource(patient);
