@@ -163,9 +163,7 @@ In this section you will find elements of the Sapl Spring Integration which are 
 === The Sapl Mapper
 With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
 
-[source, java]
----
-
+```java
 public class AuthenticationMapper implements SaplClassMapper {
 
 	@Override
@@ -180,12 +178,11 @@ public class AuthenticationMapper implements SaplClassMapper {
 	}
 }
 
----
+```
 
 If you want to do different mapping for `SUBJECT`, `ACTION`, `RESOURCE` and `ENVIRONMENT` you can check the `SaplRequestElement`, which tells the mapper on which place the Object that should be mapped is in the Sapl Request. In the following example you can see a mapper, that does different mapping for `ACTION` and `RESOURCE`.
 
-[source, java]
----
+```java
 public class HttpServletRequestMapper implements SaplClassMapper {
 
 	@Override
@@ -211,12 +208,11 @@ public class HttpServletRequestMapper implements SaplClassMapper {
 	}
 
 }
----
+```
 
 You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean:
 
-[source, java]
----
+```java
    @Bean
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();
@@ -225,7 +221,7 @@ You can provide all your mappers to your application by registering them to a `S
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
 	}
----
+```
 
 == Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
