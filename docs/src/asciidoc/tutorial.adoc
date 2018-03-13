@@ -182,7 +182,50 @@ public class AuthenticationMapper implements SaplClassMapper {
 
 ---
 
-If you want to do different mapping in the case, you 
+If you want to do different mapping for `SUBJECT`, `ACTION`, `RESOURCE` and `ENVIRONMENT` you can check the `SaplRequestElement`, which tells the mapper on which place the Object that should be mapped is in the Sapl Request. In the following example you can see a mapper, that does different mapping for `ACTION` and `RESOURCE`.
+
+[source, java]
+---
+public class HttpServletRequestMapper implements SaplClassMapper {
+
+	@Override
+	public Object map(Object objectToMap, SaplRequestElement element) {
+		
+		HttpServletRequest request = (HttpServletRequest) objectToMap;
+		
+		if(element == (SaplRequestElement.ACTION)) {
+			return new HttpAction(request).getMethod();
+		}
+		
+		if(element == (SaplRequestElement.RESOURCE)) {
+			return new HttpResource(request).getUri();
+		}
+		
+		return objectToMap;
+	}
+
+
+	@Override
+	public Class<?> getMappedClass() {
+		return HttpServletRequest.class;
+	}
+
+}
+---
+
+You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean:
+
+[source, java]
+---
+   @Bean
+	public SaplMapper getSaplMapper() {
+		SaplMapper saplMapper = new SimpleSaplMapper();
+		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
+		saplMapper.register(new PatientMapper());
+		return saplMapper;
+	}
+---
 
 == Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
