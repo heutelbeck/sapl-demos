@@ -210,7 +210,7 @@ public class HttpServletRequestMapper implements SaplClassMapper {
 }
 ```
 
-You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean:
+You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean: 
 
 ```java
    @Bean
@@ -222,6 +222,8 @@ You can provide all your mappers to your application by registering them to a `S
 		return saplMapper;
 	}
 ```
+
+The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
 
 == Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
