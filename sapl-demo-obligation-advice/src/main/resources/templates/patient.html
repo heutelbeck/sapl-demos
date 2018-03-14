@@ -5,11 +5,62 @@
       
     <head>
         <title>Spring Security Example </title>
+        <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
+    
     </head>
     <body>
     	<h3 th:text="${patient.name}">Heading</h3>
     	<div th:object="${patient}">
-    		<p>ID: <span th:text="*{id}">text</span></p>
+    		<table>
+    			
+    		<tbody>
+				<tr>
+					<td>ID:</td>
+					<td th:text="*{id}"></td>
+				</tr>
+				<tr>
+					<td>Name:</td>
+					<td th:text="*{name}"></td>
+				</tr>
+				<tr th:if="${viewDiagnosisPermission}">
+					<td>Diagnosis:</td>
+					<td  th:text="*{diagnosis}"></td>
+				</tr>
+				<tr th:if="${viewHRNPermission}">
+					<td>HRN:</td>
+					<td  th:text="*{healthRecordNumber}"></td>
+				</tr>
+				<tr th:if="${permissionBlackenedHRN}">
+					<td>HRN(blackened):</td>
+					<td th:text="${blackenedHRN}"></td>
+				</tr>
+				<tr>
+					<td>Phone:</td>
+					<td th:text="*{phoneNumber}"></td>
+				</tr>
+				<tr>
+					<td>Attending Doctor:</td>
+					<td  th:text="*{attendingDoctor}"></td>
+				</tr>
+				<tr> 
+					<td>Attending Nurse:</td>
+					<td th:text="*{attendingNurse}"></td>
+				</tr>
+				<tr th:if="${viewRoomNumberPermission}">
+					<td>Room Number:</td>
+					<td th:text="*{roomNumber}"></td>
+				</tr>
+				<tr  th:if="${permissionBlackenedHRN}">
+					<td>Obligation:</td>
+					<td>
+						<span th:text="${obligation}">text</span>  <br />
+						<button th:onclick="'alert(\'' + ${message} + '\');'">I will seriously fulfill the obligation</button>
+				
+					</td>
+				</tr>
+			</tbody>
+    		</table>
+<!--     		<p>ID: <span th:text="*{id}">text</span></p>
     		<p>Name: <span th:text="*{name}">text</span></p>
 
     		<p th:if="${viewDiagnosisPermission}">
@@ -34,9 +85,8 @@
 				<button th:onclick="'alert(\'' + ${message} + '\');'">I will seriously fulfill the obligation</button>
 				<p></p>
 			</div>
-
-    	</div>
-
+-->
+    	
     		
     	<form th:if="${deletePermission}" th:action="@{/patient(id=${patient.id})}" th:method="delete">
     		<button type= "submit">Delete Profile</button>
@@ -49,7 +99,7 @@
 		<form action="/home">
 			<input type="submit" value="Back to Home" />
 		</form>
-
+     </div>
     	
     </body>
 </html>
