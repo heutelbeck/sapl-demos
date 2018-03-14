@@ -1,6 +1,6 @@
 # Tutorial  sapl-demo-filterchain
 
-This demo shows how to filter incoming Requests with a Policy Enforcement Filter that uses Sapl Policies. 
+This demo shows how to filter incoming Requests with a Policy Enforcement Filter (PEF) that uses Sapl Policies. If you use the Policy Enforcement Filter, it is a Policy Enforcement Point (PEP) of your Application. The PFE sends first creates a request for the `SAPLAuthorizator`, which gets a `Response` from the Policy Decision Point (PDP) and then does the advice and obligation handling and the mapping.
 
 ## Tutorial for using the Policy Enforcement Filter
 
@@ -44,11 +44,10 @@ Furthermore, you need to provide the PolicyEnforcementFilter to the application:
 Now you can filter incoming Requests using Sapl Policies. In the Policy Enforcement Filter the following pattern is used:
 
 ```java
-boolean permission = sapl.authorize(new AuthenticationSubject(authentication), new HttpAction(req),
-					new HttpResource(req));
+boolean permission = sapl.authorize(authentication, request, request);
 ```
 
-Therefore a request could be transformed to something like this:
+The `Authentication` represents the authenticated user, while the request is the `HttpServletRequest` that runs through the filterchain. It is recommended to use Sapl Mapping to map `Authentication` and `HttpServletRequest` to seomthing you can provide to your policies. You can find more information on Sapl Mapping in the [Introduction](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc). With the mappers used in this example a request could be transformed to something like this:
 
 ```json
   subject:{"name":"Julia","authorities":[{"authority":"DOCTOR"}],"details":null} 
