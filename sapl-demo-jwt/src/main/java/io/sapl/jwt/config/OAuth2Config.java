@@ -28,6 +28,11 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.spring.marshall.mapper.SaplMapper;
+import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -96,6 +101,16 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
 		return converter;
+	}
+	
+	@Bean
+	public SaplMapper getSaplMapper() {
+		SaplMapper saplMapper = new SimpleSaplMapper();
+		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
+		saplMapper.register(new PatientMapper());
+		return saplMapper;
+		
 	}
 
 	@Override
