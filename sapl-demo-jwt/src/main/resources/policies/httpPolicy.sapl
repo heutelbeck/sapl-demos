@@ -6,56 +6,56 @@ deny-unless-permit
 
 policy "permit_basic_access"
 permit
-    action.method == "GET"
+    action == "GET"
 where
-    resource.uri == "/";
+    resource == "/";
 
     
 policy "permit_login"
 permit
-    action.method == "GET"
+    action == "GET"
 where
-    resource.uri == "/login";
+    resource == "/login";
 
 
 policy "permit_getting_profiles"
 permit
-    action.method == "GET"
+    action == "GET"
 where 
-    resource.uri == "/profiles";
+    resource == "/profiles";
 
     
 policy "permit_getting_error"
 permit
-    action.method == "GET"
+    action == "GET"
 where 
-    resource.uri =~ "/error";
+    resource =~ "/error";
 
     
 policy "permit_posting_error"
 permit
-    action.method == "POST"
+    action == "POST"
 where 
-    resource.uri =~ "/error";
+    resource =~ "/error";
     
     
 policy "permit_loading_homepage"
 permit
-    action.method == "GET"
+    action == "GET"
 where 
-    resource.uri =~ "/home";
+    resource =~ "/home";
 
 
 policy "permit_seeing_patient_details"
 permit
-    action.method == "GET"
+    action == "GET"
 where
-  resource.uri =~ "/patient";
+  resource =~ "/patient";
 
 
 policy "permit_doctor_get_create_form"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
   resource == "/profiles/new";
@@ -63,7 +63,7 @@ where
   
 policy "permit_doctor_get_update_form"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
   resource == "/patient/id/update";  
@@ -71,7 +71,7 @@ where
 
 policy "permit_nurse_get_update_form"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "NURSE" in subject..authority;
   resource =~ "/patient/id/update";     
@@ -79,117 +79,117 @@ where
   
 policy "permit_doctor_post_profiles"
 permit
-    action.method == "POST"
+    action == "POST"
 where
   "DOCTOR" in subject..authority;
-  resource.uriLowerCased == "/profiles";
+  resource == "/profiles";
 
 
 policy "permit_nurse_put_patient"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 
 policy "permit_doctor_put_patient"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 policy "permit_doctor_delete_patient"
 permit
-    action.method == "DELETE"
+    action == "DELETE"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 
 
 policy "permit_get_person"
 permit
-    action.method == "GET"
+    action == "GET"
 where
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 policy "permit_get_personAllDoc"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/readAll/[0-9]+";
+  resource =~ "/person/readAll/[0-9]+";
 
 
 policy "permit_get_personDiagDoc"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/readDiag/[0-9]+";
+  resource =~ "/person/readDiag/[0-9]+";
 
 
 
 policy "permit_get_personDiagNurse"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/person/readDiag/[0-9]+";
+  resource =~ "/person/readDiag/[0-9]+";
 
 
 
 policy "permit_list_person"
 permit
-    action.method == "GET"
+    action == "GET"
 where
-  resource.uri =~ "/person/list";
+  resource =~ "/person/list";
 
 
 policy "permit_doctor_post_person"
 permit
-    action.method == "POST"
+    action == "POST"
 where
   "DOCTOR" in subject..authority;
-  resource.uri == "/person/";
+  resource == "/person/";
 
 
 
 
 policy "permit_nurse_put_person"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 policy "permit_doctor_put_person"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 
 policy "permit_doctor_put_personAll"
 permit
-    action.method == "PUT"
+    action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/putALL/[0-9]+";
+  resource =~ "/person/putALL/[0-9]+";
 
 
 
 policy "permit_doctor_delete_person"
 permit
-  action.method == "DELETE"
+  action == "DELETE"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 

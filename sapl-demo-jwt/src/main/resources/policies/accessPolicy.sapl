@@ -7,14 +7,14 @@ deny-unless-permit
 
 policy "permit_doctor_read_HRN"
 permit
-    action.method == "read"
+    action == "read"
 where
   "DOCTOR" in subject..authority;
   resource == "HRN";
 
 policy "permit_doctor_update_HRN"
 permit
-   action.method == "update"
+   action == "update"
 where
    "DOCTOR" in subject..authority;
    resource == "HRN";
@@ -22,7 +22,7 @@ where
    
 policy "permit_doctor_update_attending_doctor"
 permit
-   action.method == "update"
+   action == "update"
 where
    "DOCTOR" in subject..authority;
    resource == "doctor";
@@ -30,7 +30,7 @@ where
    
 policy "permit_nurse_update_attending_nurse"
 permit
-   action.method == "update"
+   action == "update"
 where
    "NURSE" in subject..authority;
    resource == "nurse";
@@ -38,7 +38,7 @@ where
 
 policy "get_blacken_and_obligation_test"
 permit
-    action.method == "getBlackenAndObligation"
+    action == "getBlackenAndObligation"
 where
     "NURSE" in subject..authority;
 obligation
@@ -52,7 +52,7 @@ transform
 
 policy "permit_attending_doctor_see_diagnosis"
 permit
-   action.method == "readDiagnosis"
+   action == "readDiagnosis"
 where
    subject.name == resource.attendingDoctor;
 advice
@@ -63,7 +63,7 @@ advice
 
 policy "permit_attending_nurse_see_diagnosis"
 permit
-   action.method == "readDiagnosis"
+   action == "readDiagnosis"
 where
    subject.name == resource.attendingNurse;
 obligation
@@ -81,7 +81,7 @@ obligation
 */   
 policy "permit_nurse_see_diagnosis"
 permit
-   action.method == "readDiagnosis"
+   action == "readDiagnosis"
 where
    !(subject.name == resource.attendingNurse) &&
    "NURSE" in subject..authority;
@@ -95,21 +95,21 @@ obligation
 
 policy "permit_attending_doctor_update_diagnosis"
 permit
-   action.method == "updateDiagnosis"
+   action == "updateDiagnosis"
 where
    subject.name == resource.attendingDoctor;
    
 
 policy "permit_relative_see_room_number"
 permit
-   action.method == "viewRoomNumber"
+   action == "viewRoomNumber"
 where
   subject.name in resource.id.<patient.related>;
 
   
 policy "permit_doctor_create_patient_profiles"
 permit
-    action.method == "createPatientProfile"
+    action == "createPatientProfile"
 where
   "DOCTOR" in subject..authority;
 
@@ -117,7 +117,7 @@ where
   
 policy "permit_doctor_Jwt"
 permit
-    action.method == "GET"
+    action == "GET"
 where
   "DOCTOR" in subject.details.authorities;
   resource == "/jwt";
