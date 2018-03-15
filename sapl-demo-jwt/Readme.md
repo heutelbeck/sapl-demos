@@ -18,7 +18,7 @@ Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
 ```
 
 
-When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , an annotation `PDPAuthorize` will be automatically provided. You can use it right after adding the dependency.
+When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , an annotation `PdpAuthorize` will be automatically provided. You can use it right after adding the dependency.
 
 The only thing you need to provide is the TokenStore, which is needed to decrypt the token header:
 
@@ -30,7 +30,6 @@ The only thing you need to provide is the TokenStore, which is needed to decrypt
 
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
-		LOGGER.info("Initializing JWT with public key:\n{}", publicKey);
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 		converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
@@ -38,4 +37,18 @@ The only thing you need to provide is the TokenStore, which is needed to decrypt
 	}
 ```
 
+The usage is pretty straight forward:
+```java
+	
+	import io.sapl.spring.annotation.PdpAuthorize;
+	...
+	
+	@PdpAuthorize
+	@GetMapping("{id}")
+	public ResponseType myMethod(@PathVariable int id) {
+		...
+	}
+
+
+```
 Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizator`, which can help you write your policies.
