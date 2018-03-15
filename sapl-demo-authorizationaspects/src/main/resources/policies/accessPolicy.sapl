@@ -41,11 +41,6 @@ permit
     action == "getBlackenAndObligation"
 where
     "NURSE" in subject..authority;
-obligation
-    { "type" : "coffee",
-      "key1": "Refill Coffee!",
-      "coffeeAddiction": "seriously"
-    }
 transform 
 	resource |- filter.blacken(1,0,"\u2588")
 
@@ -55,23 +50,13 @@ permit
    action == "readDiagnosis"
 where
    subject.name == resource.attendingDoctor;
-advice
-   { "type" : "simpleLogging",
-     "message" : subject.name + " has looked up the diagnosis of " + resource.name
-   }
-   
 
+   
 policy "permit_attending_nurse_see_diagnosis"
 permit
    action == "readDiagnosis"
 where
    subject.name == resource.attendingNurse;
-obligation
-   { "type" : "sendEmail",
-     "recipient" : "supervisor@example.org",
-     "subject" : "Diagnosis access by nurse",
-     "message" : subject.name + " has looked up the diagnosis of " + resource.name
-   }
    
 
 policy "permit_attending_doctor_update_diagnosis"

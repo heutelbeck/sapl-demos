@@ -6,19 +6,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
-import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
-import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.demo.repository.UserRepo;
-import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
-import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -45,24 +38,5 @@ public class SecurityConfig {
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
 	}
-	
-	@Bean
-	public SimpleObligationHandlerService getObligationHandlers() {
-		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
-		sohs.register(new EmailObligationHandler());
-		sohs.register(new CoffeeObligationHandler());
-		sohs.register(new SimpleLoggingObligationHandler());
-		return sohs;
-	
-	}
-
-	@Bean
-	public SimpleAdviceHandlerService setAdviceHandlers() {
-		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
-		sahs.register(new EmailAdviceHandler());
-		sahs.register(new SimpleLoggingAdviceHandler());
-		return sahs;
-	}
-
 	
 }

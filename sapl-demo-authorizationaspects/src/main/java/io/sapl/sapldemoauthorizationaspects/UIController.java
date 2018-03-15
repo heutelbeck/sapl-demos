@@ -3,7 +3,6 @@ package io.sapl.sapldemoauthorizationaspects;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,8 +21,8 @@ import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorize;
 
+
 @Controller
-@ComponentScan("io.sapl.spring.annotation")
 public class UIController {
 
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
@@ -37,12 +36,12 @@ public class UIController {
 	@Autowired
 	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
 		this.sapl = sapl;
-		this.patientenRepo = patientenRepo;
+		this.patientenRepo = patientenRepo;		
 	}
 
-	@PdpAuthorize
+	@PdpAuthorize(subject = "user", action = "getProfiles", resource = "profiles")
 	@GetMapping("/profiles")
-	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
+	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {		
 		model.addAttribute("profiles", patientenRepo.findAll());
 		model.addAttribute("createPermission", sapl.authorize(authentication,
 				RequestMethod.POST, request));
@@ -51,7 +50,7 @@ public class UIController {
 
 	@PdpAuthorize
 	@PostMapping("/profiles")
-	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {
+	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {		
 		if (patientenRepo.existsById(newPatient.getId())) {
 			throw new IllegalArgumentException("Profile at this Id already exists");
 		}
@@ -69,12 +68,11 @@ public class UIController {
 
 	@GetMapping("/patient")
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
-
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
 			throw new IllegalArgumentException();
 		}
-
+		
 		model.addAttribute("patient", patient);
 
 		
@@ -98,8 +96,6 @@ public class UIController {
 			Response response = sapl.getResponse(authentication, "getBlackenAndObligation",
 					hRN);
 			model.addAttribute("blackenedHRN", response.getResource().get().asText()); 
-			model.addAttribute("obligation", response.getObligation().get().findValue("key1").asText()); 
-			model.addAttribute("message", "Congratulations, you have fullfilled the obligation");
 		}
 		return "patient";
 	}
@@ -139,7 +135,6 @@ public class UIController {
 			throw new IllegalArgumentException("not found");
 		}
 
-		
 
 		Patient savePatient = patientenRepo.findById(updatePatient.getId()).get();
 		savePatient.setName(updatePatient.getName());
@@ -161,5 +156,5 @@ public class UIController {
 
 		return REDIRECT_PROFILES;
 	}
-		
+			
 }

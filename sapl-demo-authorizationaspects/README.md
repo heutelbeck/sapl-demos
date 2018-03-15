@@ -25,8 +25,8 @@ The annotation has 3 attributes: `subject`, `action` and `resource`. If an annot
 An exemplary use can be found in the [UI-Controller](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
 
 ```java
-	@PdpAuthorize(subject = "user", action = "getProfiles", resource = "profiles")
 	@GetMapping("/profiles")
+	@PdpAuthorize(subject = "user", action = "getProfiles", resource = "profiles")	
 	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
 		
 		...
@@ -56,7 +56,7 @@ resource: HttpServletRequest (i.e. URI).
 Another example from the UI-Controller, without manual inputs:
 
 ```java
-@PdpAuthorize
+	@PdpAuthorize
 	@PostMapping("/profiles")
 	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {
 		
@@ -103,19 +103,6 @@ Add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-eng
 ```
 
 ### Step 2:
-The aspect needs to be loaded into the Spring `ApplicationContext` in order to work properly. There are two ways to achieve that:
-
-Option A: Add the aspect as bean.
-
-Option B (recommended): Annotate the class that utilizes the `@PdpAuthorize` annotation with
-
-```java
-@ComponentScan("io.sapl.spring.annotation")
-```
-
-The aspect itself is annotated with `@Component`. However, the automatic component scan performed by a `@SpringBootApplication` only covers the package it is in and any sub-packages. To detect the aspect as component, a manual component scan of its package is required.
-
-### Step 3:
 Annotate the method you wish to secure and write the necessary SAPL policy/policies.
 
 Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that show you the parameters that are used by the aspect and provided to the `SAPLAuthorizator`, which can help you write your policies.

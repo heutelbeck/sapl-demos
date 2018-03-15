@@ -28,12 +28,6 @@
     		
     		<p th:if="${viewRoomNumberPermission}" >
 				Room Number: <span th:text="*{roomNumber}">text</span></p>
-    		
-    		<div th:if="${permissionBlackenedHRN}">
-				<p>Obligation: <span th:text="${obligation}">text</span>  </p>
-				<button th:onclick="'alert(\'' + ${message} + '\');'">I will seriously fulfill the obligation</button>
-				<p></p>
-			</div>
     	</div>
 
     		
