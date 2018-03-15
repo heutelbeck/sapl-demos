@@ -40,6 +40,12 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
  and start the application with `mvn spring-boot:run`. +
   In your favorite IDE  run as SpringBootApp or run the main class of the submodule.
 
+* default usernames of vistors  are :   Dominik +
+  default usernames of doctors  are :   Julia, Peter, Alina, Horst +
+  default usernames of nurses  are : Thomas, Brigitte, Janosch, Janina +
+  default password of all user is:  password
+
+
 
 == Domain Model
 
@@ -159,6 +165,29 @@ General spring features in all tutorials  are:
 
 == Getting started
 In this section you will find elements of the Sapl Spring Integration which are used in all sub projects.
+
+=== sapl-spring-boot-starter
+
+Obtaining a decision from SAPL Policies we need a `PolicyDecisionPoint`(`PDP`). A `PDP` as a `bean`  is  available as dependency for
+a Spring Boot Starter Project, configured in the module https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter]
+from project <https://github.com/heutelbeck/sapl-policy-engine> .
+Add a maven dependency to integrate remote or embedded `PDP` into a Spring Boot Project with:
+
+```java
+<dependency>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-spring-boot-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+=== sapl-spring
+
+
+
+In conjunction with SAPL requests we need a  https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java[SAPLAuthorizator], mapper classes, etc. .
+The module https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] from <https://github.com/heutelbeck/sapl-policy-engine> provides marshalling
+and itself is loaded as dependency within the dependency to https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#sapl-spring-boot-starter[sapl-spring-boot-starter].
 
 === The Sapl Mapper
 With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:

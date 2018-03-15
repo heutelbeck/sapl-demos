@@ -2,8 +2,7 @@
 
 **Contents**
 
-* [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter)
-* [sapl-spring](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring)
+
 * [Spring Security Features](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#spring-security-features)
 * [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator)
 * [Function Library](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#function-library)
@@ -14,29 +13,6 @@
 The module sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
 The most important features are given below. Please note that we are using Lombok logging for all Demo Projects.
 
-## sapl-spring-boot-starter
-
-Obtaining a decision from SAPL Policies we need a `PolicyDecisionPoint`(`PDP`). A `PDP` as a `bean`  is  available as dependency for
-a Spring Boot Starter Project, configured in the submodule [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter)
-from project <https://github.com/heutelbeck/sapl-policy-engine> .
-Add a maven dependency to integrate remote or embedded `PDP` into a Spring Boot Project with:
-
-```java
-<dependency>
-        <groupId>io.sapl</groupId>
-        <artifactId>sapl-spring-boot-starter</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-</dependency>
-```
-
-## sapl-spring
-
-
-
-In conjunction with SAPL requests we need a [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java)  and  a customized
-PermissionEvaluator, the [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator).
-The submodule [sapl-spring](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring) from <https://github.com/heutelbeck/sapl-policy-engine> provides these classes
-and itself is loaded as dependency within the dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#sapl-spring-boot-starter).
 
 
 
@@ -62,6 +38,7 @@ protected void configure(HttpSecurity http) throws Exception {
     http
             .authorizeRequests()
             .anyRequest().authenticated()
+            .antMatchers("/css/**/*.css").permitAll()
             .and()
             .formLogin()
             .loginPage("/login").permitAll()
@@ -146,7 +123,7 @@ public class SAPLPermissionEvaluator implements PermissionEvaluator {
 * In a customized PermissionEvaluator always two `hasPermission` methods have to be implemented.
 
 * `SAPLPermissionEvaluator`  accepts  following _soft-wired_ expression: 
-   `hasPermission(#request, #request)`.
+   `hasPermission(#request, #request)`. A `HttpServletRequest` object is mapped  as `action` and `resource` (cf. [The Sapl Mapper](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#the-sapl-mapper)).
    
    An example for securing the `DELETE` method from
 the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/controller/RestService.java) is listed below:
@@ -282,7 +259,7 @@ Furthermore, the name of the Function Library has to be notated in the _librarie
 
 * Add Maven dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter).
 * Implement a Web Application with Spring Boot.
-* Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#http-security) from Spring Security.
+* Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#http-security) from Spring Security.
 * Write [SAPL Policies](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator/src/main/resources/policies) matching your purposes, which requires basic understanding of [SAPL](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc) .
 * Add [@Pre and @Post Annotations ](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#pre-and-post-annotations) using `hasPermission()` expressions 
 from [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator) .
