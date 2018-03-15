@@ -44,6 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		LOGGER.debug("start configuring...");
 		http
 				.authorizeRequests()
+				.antMatchers("/css/**/*.css").permitAll()
 				.anyRequest().authenticated()
 				.and()
 				.formLogin()
