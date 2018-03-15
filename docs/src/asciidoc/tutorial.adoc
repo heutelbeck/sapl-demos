@@ -264,17 +264,15 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain/READM
 
 == Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt['sapl-demo-jwt']
 
-
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt/Readme.md
 
 == Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice['sapl-demo-obligation-advice']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md
 
 == Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator['sapl-demo-permissionevaluator']
-This tutorial makes extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface]
-from https://projects.spring.io/spring-security/[Spring Security]. +
-Go to
-https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md .
+
+https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md
 
 == Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip['sapl-demo-pip']
 
