@@ -50,7 +50,6 @@ When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-pol
 		return new UnanimousBased(decisionVoters);
 	}
 ```
-
 Furthermore, you need to provide the SaplBasedVoter to the application:
 
 ```java	
@@ -59,7 +58,31 @@ Furthermore, you need to provide the SaplBasedVoter to the application:
 		return new SaplBasedVoter(saplAuthorizer);
 	}
 ```
+You need to utilize this AccessDecisionManager then for your authentication (and authorization):
 
+```java
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		LOGGER.trace("start configuring...");
+		http
+				.httpBasic().and()
+				.authorizeRequests()
+					.anyRequest().fullyAuthenticated()
+					//this is the access decision manager 
+					//that we created including our voter
+					.accessDecisionManager(adm)
+				.and()
+				.formLogin()
+					.loginPage("/login").permitAll()
+				.and()
+					.logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll()
+				.and()
+					.httpBasic()
+				.and()
+					.csrf().disable()
+				;
+	}
+```
 Now you can filter incoming Requests using Sapl Policies. In the SaplBasedVoter the following pattern is used:
 
 ```java
