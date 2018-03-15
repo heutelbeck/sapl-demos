@@ -3,7 +3,11 @@ import org.openconjurer.saplintegration.pip.PatientPIP as patient
 set "accessPolicy"
 deny-unless-permit
 
-
+policy "login_allow_all"
+permit
+    action == "GET"
+where
+  resource == "/login";
 
 policy "permit_doctor_read_HRN"
 permit
