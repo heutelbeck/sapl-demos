@@ -257,9 +257,9 @@ Furthermore, the name of the Function Library has to be notated in the _librarie
 
 ## Best Practice
 
-* Add Maven dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#sapl-spring-boot-starter).
+* Add Maven dependency to [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#sapl-spring-boot-starter).
 * Implement a Web Application with Spring Boot.
-* Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#http-security) from Spring Security.
+* Add  basic access to all URLs with [Http Security](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#http-security) from Spring Security.
 * Write [SAPL Policies](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator/src/main/resources/policies) matching your purposes, which requires basic understanding of [SAPL](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc) .
 * Add [@Pre and @Post Annotations ](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-permissionevaluator#pre-and-post-annotations) using `hasPermission()` expressions 
 from [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/README.md#saplpermissionevaluator) .
