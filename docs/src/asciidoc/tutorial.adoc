@@ -86,7 +86,7 @@ public Patient(String name, String diagnosis, String healthRecordNumber, String 
 }
 
 ```
-There are users:
+There are user:
 
 ```java
 public class User implements Serializable {
@@ -106,7 +106,7 @@ public class User implements Serializable {
 
 
 
-Relations are modeled between patients and users:
+Relations are modeled between patients and user:
 
 ```java
 public class Relation {
