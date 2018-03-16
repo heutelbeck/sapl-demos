@@ -11,7 +11,10 @@
 
 We want to show how to use https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
 inside a https://projects.spring.io/spring-boot/[Spring Boot] Application with https://maven.apache.org/[Maven] to implement user rights
-to webpages and REST services. Each of the below-mentioned tutorials represents one specific technique of securing a web application with SAPL.
+to webpages and REST services. We use different techniques of https://projects.spring.io/spring-security/[Spring Security] to secure a web application with https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] as follows:
+
+* In the subproject https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
+we make  extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from https://projects.spring.io/spring-security/[Spring Security] .
 
 == Installation
 
@@ -254,6 +257,8 @@ You can provide all your mappers to your application by registering them to a `S
 
 The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
 
+
+////
 == Tutorial  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects['sapl-demo-authorizationaspects']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/README.md
@@ -281,6 +286,8 @@ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip/README.md
 == Tutorial https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter['sapl-demo-voter']
 
 https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter/Readme.MD
+////
+
 
 
 
