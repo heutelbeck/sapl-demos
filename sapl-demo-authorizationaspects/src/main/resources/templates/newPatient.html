@@ -3,18 +3,25 @@
       xmlns:sec="http://www.springframework.org/security/tags">
     <head>
         <title>Spring Security Example </title>
+   	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
     </head>
     <body>
-        <h3>New Profile</h3>
-        <form th:action="@{/profiles}" th:object="${newPatient}" method="post">
-            <div><label> Name : <input type="text" th:field="*{name}"/> </label></div>
-            <div><label> Diagnosis : <input type="text" th:field="*{diagnosis}"/> </label></div>
-            <div><label> HRN : <input type="text" th:field="*{healthRecordNumber}"/> </label></div>
-            <div><label> Phone : <input type="text" th:field="*{phoneNumber}"/> </label></div>
-            <div><label> Attending Doctor : <input type="text" th:field="*{attendingDoctor}"/> </label></div>
-            <div><label> Attending Nurse : <input type="text" th:field="*{attendingNurse}"/> </label></div>
-            <div><label> Room Number : <input type="text" th:field="*{roomNumber}"/> </label></div>
+        <h3>Create a new patient profile</h3>
+        <form id="newPatientForm" th:action="@{/profiles}" th:object="${newPatient}" method="post">
+            <div><label> Name : </label><input type="text" th:field="*{name}"/> </div>
+            <div><label> Diagnosis : </label><input type="text" th:field="*{diagnosis}"/> </div>
+            <div><label> HRN : </label><input type="text" th:field="*{healthRecordNumber}"/> </div>
+            <div><label> Phone : </label><input type="text" th:field="*{phoneNumber}"/> </div>
+            <div><label> Attending Doctor : </label><input type="text" th:field="*{attendingDoctor}"/> </div>
+            <div><label> Attending Nurse : </label><input type="text" th:field="*{attendingNurse}"/> </div>
+            <div><label> Room Number : </label><input type="text" th:field="*{roomNumber}"/> </div>
             <div><input type="submit" value="Create"/></div>
         </form>
+        
+        
+        <form action="/home">
+			<input type="submit" value="Back to Home" />
+		</form>
+        
     </body>
 </html>

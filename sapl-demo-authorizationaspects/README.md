@@ -2,6 +2,10 @@
 
 This demo shows how to use the annotation `@PdpAuthorize`. 
 
+## Try it out
+Login with one of the users: Dominik, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
+The Password is allways "password". You can change this by providing another password in the application.properties. Not the plain value is needed but the bcrypted one (for example see https://www.dailycred.com/article/bcrypt-calculator).
+
 
 ## Spring Features
 
