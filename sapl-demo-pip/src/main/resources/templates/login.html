@@ -2,7 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
-        <title>Spring Security Example </title>
+        <title>SAPL Springsecurity Demo - PoliyInformationPoint</title>
+        <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
     </head>
     <body>
         <div th:if="${param.error}">
@@ -11,9 +12,9 @@
         <div th:if="${param.logout}">
             You have been logged out.
         </div>
-        <form th:action="@{/login}" method="post">
-            <div><label> Benutzername : <input type="text" name="username"/> </label></div>
-            <div><label> Password: <input type="password" name="password"/> </label></div>
+        <form id="loginForm" th:action="@{/login}" method="post">
+            <div><label for="username"> User: </label><input type="text" placeholder="your username" id="username" name="username"/> </div>
+            <div><label for="password"> Password: </label><input type="password" placeholder="password" id="password" name="password"/> </div>
             <div><input type="submit" value="Sign In"/></div>
         </form>
     </body>

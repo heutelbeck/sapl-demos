@@ -5,21 +5,51 @@
       
     <head>
         <title>Spring Security Example </title>
+        <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
+  
     </head>
     <body>
     	<h3 th:text="${patient.name}">Heading</h3>
+    	
+    	
+    	
     	<div th:object="${patient}">
-    		<p>ID: <span th:text="*{id}">text</span></p>
-    		<p>Name: <span th:text="*{name}">text</span></p>
+    	
+    	    		<table>
+    			
+    		<tbody>
+				<tr>
+					<td>ID:</td>
+					<td th:text="*{id}"></td>
+				</tr>
+				<tr>
+					<td>Name:</td>
+					<td th:text="*{name}"></td>
+				</tr>
+				<tr th:if="${viewDiagnosisPermission}">
+					<td>Diagnosis:</td>
+					<td  th:text="*{diagnosis}"></td>
+				</tr>
+				<tr>
+					<td>Phone:</td>
+					<td th:text="*{phoneNumber}"></td>
+				</tr>
+				<tr>
+					<td>Attending Doctor:</td>
+					<td  th:text="*{attendingDoctor}"></td>
+				</tr>
+				<tr> 
+					<td>Attending Nurse:</td>
+					<td th:text="*{attendingNurse}"></td>
+				</tr>
+				<tr th:if="${viewRoomNumberPermission}">
+					<td>Room Number:</td>
+					<td th:text="*{roomNumber}"></td>
+				</tr>
+				
+			</tbody>
+    		</table>
 
-    		<p>Phone: <span th:text="*{phoneNumber}">text</span></p>
-    		
-    		<p>Attending Doctor: <span th:text="*{attendingDoctor}">text</span></p>
-    		
-    		<p>Attending Nurse: <span th:text="*{attendingNurse}">text</span></p>
-    		
-    		<p th:if="${viewRoomNumberPermission}" >
-				Room Number: <span th:text="*{roomNumber}">text</span></p>
     	</div>
 
 		<form action="/home">

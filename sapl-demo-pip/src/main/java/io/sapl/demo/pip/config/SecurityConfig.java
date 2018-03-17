@@ -33,9 +33,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		LOGGER.trace("start configuring...");
-		http.addFilterAfter(policyEnforcementFilter(), FilterSecurityInterceptor.class).authorizeRequests().anyRequest()
-				.authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
-				.logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
+		http.addFilterAfter(policyEnforcementFilter(), FilterSecurityInterceptor.class).authorizeRequests()
+				.antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
+				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()
+				.httpBasic().and().csrf().disable();
+
 	}
 
 	@Bean
@@ -47,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
 	}
-	
+
 	@Bean
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();
@@ -56,5 +58,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
 	}
-	
+
 }
