@@ -10,7 +10,7 @@
 
 
 
-The module sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
+The sub-project sapl-demo-permissionevaluator makes extensive use of the [PermissionEvaluator Interface](https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator) from [Spring Security](https://projects.spring.io/spring-security/).
 The most important features are given below. Please note that we are using Lombok logging for all Demo Projects.
 
 
@@ -83,7 +83,7 @@ We refer to the documentation of the  [PermissionEvaluator Interface](https://do
 
 The `PermissionEvaluator` interface is implemented in the [SAPLPermissionEvaluator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLPermissionEvaluator.java), which again is enabled  as bean
 in the class [PDPAutoConfiguration](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring-boot-starter/src/main/java/io/sapl/springboot/starter/PDPAutoConfiguration.java)
-from submodule [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter).
+from module [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter).
 
 
 
@@ -163,7 +163,7 @@ the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo
 ## Function Library
 
 We use a custom function  providing further information to evaluate a policy. To be recognized as a function library, a class has to be annotated with `@FunctionLibrary`.
-Here you can see the [PatientFunction](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/functions/PatientFunction.java) from submodule <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
+Here you can see the [PatientFunction](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/functions/PatientFunction.java) from module <https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared>.
 
 
 ```java
@@ -213,7 +213,7 @@ public class PatientFunction {
 1. The CrudRepository `RelationRepo` has not  been provided as bean at the time if  we want to access it via the Function Library.
     Therefore we use _lazy initialization_ to load it.
     On the other  hand the [ApplicationContextProvider](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared/pip/ApplicationContextProvider.java)
-    has to be loaded as  bean in submodule `sapl-demo-permeval`
+    has to be loaded as  bean in this sub-project 
     as you can see in [SecurityConfig](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator/src/main/java/io/sapl/peembedded/config/SecurityConfig.java) :
 
         @Bean

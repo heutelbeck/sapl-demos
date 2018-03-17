@@ -11,9 +11,9 @@
 
 We want to show how to implement  user rights to webpages and REST services with https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
 inside a https://projects.spring.io/spring-boot/[Spring Boot] Application.
-Different techniques from https://projects.spring.io/spring-security/[Spring Security]  are included in following subprojects:
+Different techniques from https://projects.spring.io/spring-security/[Spring Security]  are included in following sub-projects:
 
-* In the subproject https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
 we make  extensive use of the https://docs.spring.io/spring-security/site/docs/5.0.2.BUILD-SNAPSHOT/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from https://projects.spring.io/spring-security/[Spring Security] .
 
 
@@ -33,7 +33,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 * Build the project at the root level with `mvn install`.
 
-* Go to  +
+* Go to sub-projects like +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects], +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt], +
@@ -42,7 +42,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip], +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter[sapl-demo-voter] +
  and start the application with `mvn spring-boot:run`. +
-  In your favorite IDE  run as SpringBootApp or run the main class of the submodule.
+  In your favorite IDE  run as SpringBootApp or run the main class of the sub-project.
 
 * default usernames of vistors  are :   Dominik +
   default usernames of doctors  are :   Julia, Peter, Alina, Horst +
@@ -53,7 +53,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 == Domain Model
 
-All subprojects  share the same domain model.
+All sub-projects  share the same domain model.
 We are using terms from the medical field and healthcare to illustrate how a user (doctor, nurse, vistor, admin) is allowed to get access to patient data.
 
 
@@ -157,7 +157,7 @@ The following table gives an overview of all current user rights:
 |=============================================================================================================================================================
 
 == Spring Features
-General spring features in all tutorials  are:
+Spring features in all sub-projects  are:
 
 * https://projects.spring.io/spring-boot/[Spring Boot]
 * Standard SQL database: http://www.h2database.com[H2] (In-Memory), programmable via JPA
@@ -168,7 +168,7 @@ General spring features in all tutorials  are:
 * https://www.thymeleaf.org/[Thymeleaf]
 
 == Getting started
-In this section you will find elements of the Sapl Spring Integration which are used in all sub projects.
+In this section you will find elements of the Sapl Spring Integration which are used in all sub-projects.
 
 === sapl-spring-boot-starter
 
