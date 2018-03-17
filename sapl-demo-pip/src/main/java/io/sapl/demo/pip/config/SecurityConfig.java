@@ -3,6 +3,7 @@ package io.sapl.demo.pip.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +17,6 @@ import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
-import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -27,22 +27,23 @@ import lombok.extern.slf4j.Slf4j;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+	/**
+	 * Lazy initialization is needed to prevent circular dependency problem
+	 * caused by the {@link #configure(HttpSecurity)}-method that needs this
+	 * field reference early in startup
+	 */
+	@Lazy
 	@Autowired
-	SAPLAuthorizator saplAuthorizer;
+	private PolicyEnforcementFilter policyEnforcementFilter;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		LOGGER.trace("start configuring...");
-		http.addFilterAfter(policyEnforcementFilter(), FilterSecurityInterceptor.class).authorizeRequests()
+		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests()
 				.antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
 				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()
 				.httpBasic().and().csrf().disable();
 
-	}
-
-	@Bean
-	public PolicyEnforcementFilter policyEnforcementFilter() {
-		return new PolicyEnforcementFilter(saplAuthorizer);
 	}
 
 	@Bean
