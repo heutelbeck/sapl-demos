@@ -23,7 +23,7 @@ Please note that if you are using your own [SAPLAuthorizator](https://github.com
 ### Obligation Handlers
 
 
-Next you need to write your own Obligation Handler. In this tutorial we want to write an Obligation Handler for this policy:
+Next you need to write your own Obligation Handler. In this tutorial we will use an Obligation Handler for this policy:
 
 ```java
 policy "permit_attending_nurse_see_diagnosis"
@@ -40,6 +40,8 @@ obligation
 ```
 
 Please note that an obligation is simply the written form of a Json Object. To handle this obligation we can now use the following obligation handler:
+
+(All ObligationHandler and AdviceHandler used in this project are imported from the sapl-demo-shared-Project)
 
 ```java
 @Slf4j
