@@ -2,6 +2,27 @@
 
 This demo demonstrates the usage of a Policy Information Point (PIP).  When evaluating a Sapl Policy a PIP may be used to provide  Information that is not included in the Request.
 
+## Use Case
+In these example use case, we will implement the rule: user may only see the patients room number, if they are one of its related persons.
+
+These rule is expressed through these policy (see pipPolicy.sapl):
+
+```java
+policy "permit_relative_see_room_number"
+permit
+   action == "viewRoomNumber"
+where
+  subject.name in resource.id.<patient.related>;
+  
+```
+
+We provide two Patients, Lenny and Karl. Lenny has one relative registered in our system, it is Dominik. Karl has three, it´s Julia, Alina and Janosch. Only these 
+accounts are able to see the room number of their respective relative.
+
+## Try it out
+Login with one of the users: Dominik, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
+The Password is allways "password". You can change this by providing another password in the application.properties. Not the plain value is needed but the bcrypted one (for example see https://www.dailycred.com/article/bcrypt-calculator).
+
 ## Policy Information Point
 
 To implement a PIP, the class has to be annotated with `@PolicyInformationPoint`.
