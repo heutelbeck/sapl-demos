@@ -78,7 +78,7 @@ Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationR
 
 
 
-The PIP also has to be imported into the policy set with:
+The PIP also has to be imported into the policy (the .sapl-Files) set with:
 
 ```
     import io.sapl.demo.shared.pip.PatientPIP as patient
