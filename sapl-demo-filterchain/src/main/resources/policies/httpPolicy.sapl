@@ -9,6 +9,12 @@ permit
     action == "GET"
 where
     resource == "/";
+    
+policy "permit_css"
+permit
+    action == "GET"
+where
+    resource == "/css/saplDemoMain.css";
 
     
 policy "permit_login"
