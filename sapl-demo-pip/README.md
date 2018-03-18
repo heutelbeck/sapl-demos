@@ -127,6 +127,6 @@ As this is a functional interface, a bean declaration could simply look like
 ```
 @Bean
 	PIPProvider myCustomPIPProvider(){
-		return () -> Arrays.asList(MyPIPProvider1.class, MyPIPProvider2.class);
+		return () -> Arrays.asList(MyPIP1.class, MyPIP2.class);
 	}
 ```
