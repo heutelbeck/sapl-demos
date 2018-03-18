@@ -16,7 +16,7 @@ body > div {
 	
 }
 
-#loginForm label {
+#loginForm label, form label {
 	min-width: 10em;
 	display: inline-block;
 }
