@@ -118,3 +118,15 @@ Furthermore, the name of the PIP has to be notated in the _attributeFinders_ ent
     "libraries": []
 }
 ```
+
+## Howto wire a PolicyInformationPoint?
+The PIP (PolicyInformationPoint) in this example is automatically wired to the embedded PDP (PolicyDecisionPoint), as it lies in the default scan package `io.sapl`.
+If you want to use your own PDP, you have to provide a Bean of interface type `io.sapl.spring.PIPProvider`. 
+As this is a functional interface, a bean declaration could simply look like
+
+```
+@Bean
+	PIPProvider myCustomPIPProvider(){
+		return () -> Arrays.asList(MyPIPProvider1.class, MyPIPProvider2.class);
+	}
+```
