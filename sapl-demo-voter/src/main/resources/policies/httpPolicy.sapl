@@ -8,49 +8,56 @@ policy "permit_basic_access"
 permit
     action == "GET"
 where
-    resource.uri == "/";
+    resource == "/";
+    
+    
+policy "permit_css"
+permit
+    action == "GET"
+where
+    resource == "/css/saplDemoMain.css";
 
     
 policy "permit_login"
 permit
     action == "GET"
 where
-    resource.uri == "/login";
+    resource == "/login";
 
 
 policy "permit_getting_profiles"
 permit
     action == "GET"
 where 
-    resource.uri == "/profiles";
+    resource == "/profiles";
 
     
 policy "permit_getting_error"
 permit
     action == "GET"
 where 
-    resource.uri =~ "/error";
+    resource =~ "/error";
 
     
 policy "permit_posting_error"
 permit
     action == "POST"
 where 
-    resource.uri =~ "/error";
+    resource =~ "/error";
     
     
 policy "permit_loading_homepage"
 permit
     action == "GET"
 where 
-    resource.uri =~ "/home";
+    resource =~ "/home";
 
 
 policy "permit_seeing_patient_details"
 permit
     action == "GET"
 where
-  resource.uri =~ "/patient";
+  resource =~ "/patient";
 
 
 policy "permit_doctor_get_create_form"
@@ -82,7 +89,7 @@ permit
     action == "POST"
 where
   "DOCTOR" in subject..authority;
-  resource.uriLowerCased == "/profiles";
+  resource == "/profiles";
 
 
 policy "permit_nurse_put_patient"
@@ -90,7 +97,7 @@ permit
     action == "PUT"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 
 policy "permit_doctor_put_patient"
@@ -98,14 +105,14 @@ permit
     action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 policy "permit_doctor_delete_patient"
 permit
     action == "DELETE"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/patient/*";
+  resource =~ "/patient/*";
 
 
 
@@ -113,7 +120,7 @@ policy "permit_get_person"
 permit
     action == "GET"
 where
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 policy "permit_get_personAllDoc"
@@ -121,7 +128,7 @@ permit
     action == "GET"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/readAll/[0-9]+";
+  resource =~ "/person/readAll/[0-9]+";
 
 
 policy "permit_get_personDiagDoc"
@@ -129,7 +136,7 @@ permit
     action == "GET"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/readDiag/[0-9]+";
+  resource =~ "/person/readDiag/[0-9]+";
 
 
 
@@ -138,7 +145,7 @@ permit
     action == "GET"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/person/readDiag/[0-9]+";
+  resource =~ "/person/readDiag/[0-9]+";
 
 
 
@@ -146,7 +153,7 @@ policy "permit_list_person"
 permit
     action == "GET"
 where
-  resource.uri =~ "/person/list";
+  resource =~ "/person/list";
 
 
 policy "permit_doctor_post_person"
@@ -154,7 +161,7 @@ permit
     action == "POST"
 where
   "DOCTOR" in subject..authority;
-  resource.uri == "/person/";
+  resource == "/person/";
 
 
 
@@ -164,7 +171,7 @@ permit
     action == "PUT"
 where
   "NURSE" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 policy "permit_doctor_put_person"
@@ -172,7 +179,7 @@ permit
     action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
 
@@ -181,7 +188,7 @@ permit
     action == "PUT"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/putALL/[0-9]+";
+  resource =~ "/person/putALL/[0-9]+";
 
 
 
@@ -190,6 +197,6 @@ permit
   action == "DELETE"
 where
   "DOCTOR" in subject..authority;
-  resource.uri =~ "/person/[0-9]+";
+  resource =~ "/person/[0-9]+";
 
 
