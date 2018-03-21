@@ -100,6 +100,26 @@ Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sa
 
 The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java[SAPLAuthorizator] receives `SaplRequest`, does the mapping and sends the request to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling. For more information about the mapping, see below. For more information about `Obligation` and `Advice` handling have a look at the https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md[tutorial] .
 
+The `SAPLAuthorizator` provides four methods to evaluate responses. With `authorize` you receive a `boolean` that is true if the decision was `permit` and false if it was `deny`. With `getResponse` you can get the complete PDP response. This is useful if you need an element of the response like for example a blackened resource. Both of this methods can be called with or without `environment`. This piece of code shows all options: 
+
+```java
+
+@Autowired
+SAPLAuthorizator sapl
+
+sapl.authorize(subject, action, resource)
+
+sapl.getResponse(subject, action, resource)
+
+sapl.authorize(subject, action, resource, environment)
+
+sapl.getResponse(subject, action, resource, environment)
+```
+
+So you can call it in your code, but the `SAPLAuthorizator` is also used by all of the features presented in this demo repository like the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, etc.
+
+
+
 === The Sapl Mapper
 With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
 
