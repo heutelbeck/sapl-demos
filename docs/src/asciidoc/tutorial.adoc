@@ -12,7 +12,7 @@
 We want to show how to implement user authorization to applications like webpages and REST services with https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-documentation/src/asciidoc/sapl-reference.adoc[SAPL] (Structure and Agency Policy Language)
 inside a https://projects.spring.io/spring-boot/[Spring Boot] Application.
 
-===Why spring?
+=== Why spring?
 Spring(boot) with its subproject https://projects.spring.io/spring-security/[Spring Security] seems to us as a (if not the) leading framework to implement
 modern java-based applications. SAPL is developed with no concrete framework in mind to include its features.
 One of the targets developing SAPL is to provide interfaces to implement the technology in any kind of modern
@@ -67,6 +67,103 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
   default usernames of doctors  are :   Julia, Peter, Alina, Horst +
   default usernames of nurses  are : Thomas, Brigitte, Janosch, Janina +
   default password of all user is:  password
+
+
+== Getting started
+In this section you will find elements of the Sapl Spring Integration which are used in all sub-projects. You also will obtain knowledge about using this API when integrating Sapl into your own Spring Project. 
+The basic things you have to understand first is how to add the `sapl-spring-boot-starter` to your project and how to use the `SAPLAuthorizator` and the `SaplMapper`.
+
+=== sapl-spring-boot-starter
+
+The https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] automatically provides all Beans you need to use the Sapl Spring Integration API. It also adds a dependency to the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] module, which lets includes all features of this API.
+
+Add the following maven dependency to integrate the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] into a Spring Boot Project:
+
+```java
+<dependency>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-spring-boot-starter</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+First of all, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] adds a `Policy Decision Point` (`PDP`) to your application. You can configure the `PDP` in your `application.properties`. Here is a simple example for the configuration of an embedded PDP:
+
+```java
+pdp.type=EMBEDDED
+pdp.embedded.policyPath=classpath:policies
+```
+
+Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] allows you to use all features that are presented in the demo projects of this repository like the `SAPLAuthorizator`, the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, the `SAPLPermissionEvaluator` and the `SaplBasedVoter`. For more information on these features just have a look at the corresponding demo projects.
+
+=== The SAPLAuthorizator
+
+The [SAPLAuthorizator]https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java receives `SaplRequest`, does the `mapping` and sends the request to the `PDP`. After receiving the `response`, it also cares about the `Obligation` and `Advice` handling. For more information about the `mapping`, see below. For more information about `Obligation` and `Advice` handling have a look at the [tutorial]https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md .
+
+=== The Sapl Mapper
+With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
+
+```java
+public class AuthenticationMapper implements SaplClassMapper {
+
+	@Override
+	public Object map(Object objectToMap, SaplRequestElement element) {
+		Authentication authentication = (Authentication) objectToMap;
+		return new AuthenticationSubject(authentication);
+	}
+
+	@Override
+	public Class<?> getMappedClass() {
+		return Authentication.class;
+	}
+}
+
+```
+
+If you want to do different mapping for `SUBJECT`, `ACTION`, `RESOURCE` and `ENVIRONMENT` you can check the `SaplRequestElement`, which tells the mapper on which place the Object that should be mapped is in the Sapl Request. In the following example you can see a mapper, that does different mapping for `ACTION` and `RESOURCE`.
+
+```java
+public class HttpServletRequestMapper implements SaplClassMapper {
+
+	@Override
+	public Object map(Object objectToMap, SaplRequestElement element) {
+		
+		HttpServletRequest request = (HttpServletRequest) objectToMap;
+		
+		if(element == (SaplRequestElement.ACTION)) {
+			return new HttpAction(request).getMethod();
+		}
+		
+		if(element == (SaplRequestElement.RESOURCE)) {
+			return new HttpResource(request).getUri();
+		}
+		
+		return objectToMap;
+	}
+
+
+	@Override
+	public Class<?> getMappedClass() {
+		return HttpServletRequest.class;
+	}
+
+}
+```
+
+You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean: 
+
+```java
+   @Bean
+	public SaplMapper getSaplMapper() {
+		SaplMapper saplMapper = new SimpleSaplMapper();
+		saplMapper.register(new AuthenticationMapper());
+		saplMapper.register(new HttpServletRequestMapper());
+		saplMapper.register(new PatientMapper());
+		return saplMapper;
+	}
+```
+
+The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
 
 
 
@@ -185,102 +282,4 @@ Spring features in all sub-projects  are:
 * model classes (Patient, User, Relation), CrudRepositories in JPA
 * https://projects.spring.io/spring-security/[Spring Security]
 * https://www.thymeleaf.org/[Thymeleaf]
-
-== Getting started
-In this section you will find elements of the Sapl Spring Integration which are used in all sub-projects.
-
-=== sapl-spring-boot-starter
-
-Obtaining a decision from SAPL Policies we need a `PolicyDecisionPoint`(`PDP`). A `PDP` as a `bean`  is  available as dependency for
-a Spring Boot Starter Project, configured in the module https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter]
-from project <https://github.com/heutelbeck/sapl-policy-engine> .
-Add a maven dependency to integrate remote or embedded `PDP` into a Spring Boot Project with:
-
-```java
-<dependency>
-        <groupId>io.sapl</groupId>
-        <artifactId>sapl-spring-boot-starter</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-</dependency>
-```
-
-=== sapl-spring
-
-
-
-In conjunction with SAPL requests we need a  https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java[SAPLAuthorizator], mapper classes, etc. .
-The module https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] from <https://github.com/heutelbeck/sapl-policy-engine> provides marshalling
-and itself is loaded as dependency within the dependency to https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc#sapl-spring-boot-starter[sapl-spring-boot-starter].
-
-=== The Sapl Mapper
-With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
-
-```java
-public class AuthenticationMapper implements SaplClassMapper {
-
-	@Override
-	public Object map(Object objectToMap, SaplRequestElement element) {
-		Authentication authentication = (Authentication) objectToMap;
-		return new AuthenticationSubject(authentication);
-	}
-
-	@Override
-	public Class<?> getMappedClass() {
-		return Authentication.class;
-	}
-}
-
-```
-
-If you want to do different mapping for `SUBJECT`, `ACTION`, `RESOURCE` and `ENVIRONMENT` you can check the `SaplRequestElement`, which tells the mapper on which place the Object that should be mapped is in the Sapl Request. In the following example you can see a mapper, that does different mapping for `ACTION` and `RESOURCE`.
-
-```java
-public class HttpServletRequestMapper implements SaplClassMapper {
-
-	@Override
-	public Object map(Object objectToMap, SaplRequestElement element) {
-		
-		HttpServletRequest request = (HttpServletRequest) objectToMap;
-		
-		if(element == (SaplRequestElement.ACTION)) {
-			return new HttpAction(request).getMethod();
-		}
-		
-		if(element == (SaplRequestElement.RESOURCE)) {
-			return new HttpResource(request).getUri();
-		}
-		
-		return objectToMap;
-	}
-
-
-	@Override
-	public Class<?> getMappedClass() {
-		return HttpServletRequest.class;
-	}
-
-}
-```
-
-You can provide all your mappers to your application by registering them to a `SaplMapper` and by returning this `SaplMapper` in a Bean: 
-
-```java
-   @Bean
-	public SaplMapper getSaplMapper() {
-		SaplMapper saplMapper = new SimpleSaplMapper();
-		saplMapper.register(new AuthenticationMapper());
-		saplMapper.register(new HttpServletRequestMapper());
-		saplMapper.register(new PatientMapper());
-		return saplMapper;
-	}
-```
-
-The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
-
-
-
-
-
-
-
 
