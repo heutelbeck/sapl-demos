@@ -22,16 +22,16 @@ We tried not to reinvent the wheel and respect as far as possible the opinionate
 
 Therefore inspecting the framework we found several starting-points to integrate SAPL with springsecurity:
 
-* In the sub-project sapl-demo-authorizationaspects you find two ways to use SAPL.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects] you find two ways to use SAPL.
 The direct way of calling the SAPLAuthorizator-Bean (e.g. in a MVC-Controller, writing the response in 
 the model). And the perhaps a little bit more sophisticated way of using aspects and SAPL-specific annotations.  
-* In the sub-project sapl-demo-filterchain we inject a SAPL-specific filter into the springsecurity-Filterchain. The filter protects a classic MVC-controller as well as a ReST-Controller.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] we inject a SAPL-specific filter into the springsecurity-Filterchain. The filter protects a classic MVC-controller as well as a ReST-Controller.
 The demo also uses the direct way of calling the SAPLAuthorizator-Bean.
-* In the sub-project sapl-demo-jwt
-* In the sub-project sapl-demo-obligation-advice we show an approach to work with SAPL-obligations and -advices
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt] we show how to use JSON Web tokens together with an annotation that uses Sapl Policies.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice] we show an approach to work with SAPL-obligations and -advices.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
-we make  extensive use of the https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from https://projects.spring.io/spring-security/[Spring Security] .
-* In the sub-project we show how to use a SAPL-PolicyInformationPoint to gain additional information required by some policies to make an authorization decision.
+we make  extensive use of the https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from Spring Security.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip] we show how to use a SAPL-PolicyInformationPoint to gain additional information required by some policies to make an authorization decision.
 
 All these demos make use of SAPL-specific features provided by the project sapl-spring. In particular every project makes use of a spring-fashioned auto-starter that offers default SAPL-functionality in form of beans and the like. The functionality is kept configurable and overridable as possible to support various use cases. 
 
@@ -70,12 +70,12 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 
 == Getting started
-In this section you will find elements of the Sapl Spring Integration which are used in all sub-projects. You also will obtain knowledge about using this API when integrating Sapl into your own Spring Project. 
+In this section you will find elements of the SAPL Spring Integration which are used in all sub-projects. You also will obtain knowledge about using this API when integrating SAPL into your own Spring Project.
 The basic things you have to understand first is how to add the `sapl-spring-boot-starter` to your project and how to use the `SAPLAuthorizator` and the `SaplMapper`.
 
 === sapl-spring-boot-starter
 
-The https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] automatically provides all Beans you need to use the Sapl Spring Integration API. It also adds a dependency to the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] module, which lets includes all features of this API.
+The https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] automatically provides all Beans you need to use the SAPL Spring Integration API. It also adds a dependency to the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring[sapl-spring] module, which lets include all features of this API.
 
 Add the following maven dependency to integrate the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] into a Spring Boot Project:
 
@@ -98,7 +98,7 @@ Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sa
 
 === The SAPLAuthorizator
 
-The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java[SAPLAuthorizator] receives `SaplRequest`, does the mapping and sends the request to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling. For more information about the mapping, see below. For more information about `Obligation` and `Advice` handling have a look at the https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md[tutorial] .
+The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java[SAPLAuthorizator] receives `SaplRequest`, does the mapping and sends the request to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling. For more information about the mapping, see below. For more information about `Obligation` and `Advice` handling have a look at  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md[sapl-demo-obligation-advice] .
 
 The `SAPLAuthorizator` provides four methods to evaluate responses. With `authorize` you receive a `boolean` that is true if the decision was `permit` and false if it was `deny`. With `getResponse` you can get the complete PDP response. This is useful if you need an element of the response like for example a blackened resource. Both of this methods can be called with or without `environment`. This piece of code shows all options: 
 
@@ -116,7 +116,7 @@ sapl.authorize(subject, action, resource, environment)
 sapl.getResponse(subject, action, resource, environment)
 ```
 
-So you can call it in your code, but the `SAPLAuthorizator` is also used by all of the features presented in this demo repository like the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, etc.
+You can call these methods in your code, but the `SAPLAuthorizator` is also used by all  features presented in this demo repository like the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, etc.
 
 
 

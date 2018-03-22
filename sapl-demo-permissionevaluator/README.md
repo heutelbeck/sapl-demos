@@ -146,8 +146,8 @@ the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo
       "DOCTOR" in subject..authority;
       resource =~ "/person/[0-9]+";
     ```
-
-
+    This policy  gives permission to the authority `DOCTOR`.
+    
 * You can also write  _hard-wired_   expressions like `hasPermission('someResource', 'someAction')`. For example `hasPermission('HRN', 'read')` can be used with following policy:
 
         policy "permit_doctor_read_HRN"
@@ -157,7 +157,7 @@ the [RestService](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo
           "DOCTOR" in subject..authority;
           resource == "HRN";
     
-    This policy gives permission to the authority `DOCTOR`. 
+    This policy also gives permission to the authority `DOCTOR`. 
 
 
 ## Function Library
@@ -221,7 +221,7 @@ public class PatientFunction {
             return new ApplicationContextProvider();
         }
 
-    Note: `ApplicationContext` doesn't support `getBean(RelationRepo.class)` if you work with `spring-boot-devtools`.
+   Tip: Try to disable  `spring-boot-devtools` if `ApplicationContext` doesn't support `getBean(RelationRepo.class)`.
     
 2. The method annotated with `@Function` gives back a list of users who are related to a patient. The corresponding policy looks like this:
          
