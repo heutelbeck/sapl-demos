@@ -32,7 +32,7 @@ The demo also uses the direct way of calling the SAPLAuthorizator-Bean.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
 we make  extensive use of the https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from Spring Security.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip] we show how to use a SAPL-PolicyInformationPoint to gain additional information required by some policies to make an authorization decision.
-* In the sub-project [sapl-demo-voter](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-voter) we show how to use a SaplVoter that can be used together with other voters in the `AccessDecisionManager` of Spring Security.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-voter[sapl-demo-voter] we show how to use a SaplVoter that can be used together with other voters in the `AccessDecisionManager` of Spring Security.
 
 All these demos make use of SAPL-specific features provided by the project sapl-spring. In particular every project makes use of a spring-fashioned auto-starter that offers default SAPL-functionality in form of beans and the like. The functionality is kept configurable and overridable as possible to support various use cases. 
 
