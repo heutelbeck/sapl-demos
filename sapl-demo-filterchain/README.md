@@ -30,7 +30,7 @@ Then you can configure your `HttpSecurity` to use the `PEF`. Here you can see an
 Furthermore, you need to add the following line to your `application.properties`:
 
 ```java
-	pdp.policyEnforcementFilter=true
+pdp.policyEnforcementFilter=true
 ```
 
 Now you can filter incoming Requests using Sapl Policies. In the Policy Enforcement Filter the following pattern is used:
