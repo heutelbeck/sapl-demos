@@ -1,31 +1,32 @@
 # Tutorial sapl-demo-obligation-advice
 
 This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java) or the [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) and about what you have to know when implementing your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) will be given afterwards.
+
+This demo project makes use of the `@PdpAuthorize` annotation. For more information on how this works and how requests are evaluated have a look at the [aspects-tutorial](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-authorizationaspects).
+
 Please note that we are using Lombok logging for all Demo Projects.
-
-
 
 ## Tutorial for using Obligation and Advice Handlers
 
-First of all you need to include the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) in your maven project. To do so, add the following dependency:
-
-```java
-<dependency>
-        <groupId>io.sapl</groupId>
-        <artifactId>sapl-spring-boot-starter</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-</dependency>
-```
+First of all you need to include the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) as described in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
 Please note that if you are using your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java)  and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
 
+### Obligation and Advice Handling in this example
+The policies that use obligation and advice in this example are all directly evaluated by the `SAPLAuthorizator`. For more information about the `SAPLAuthorizator` please check the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
-### Obligation Handlers
-
-
-Next you need to write your own Obligation Handler. In this tutorial we will use an Obligation Handler for this policy:
+We also use Thymeleaf to add certain elements to a webpage depending on the Sapl Policy Evaluation. Therefore a typical line of code were we consult a policy with an obligation could look like this:
 
 ```java
+model.addAttribute("viewDiagnosisPermission",
+				sapl.authorize(authentication, "readDiagnosis", patient));
+```
+
+In this case we pass the `Authentication`, which represents the authenticated user, a `String` and a `Patient`. More information about the domain model can be found in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
+
+In this readme we will talk about the following policy:
+
+```json
 policy "permit_attending_nurse_see_diagnosis"
 permit
    action == "readDiagnosis"
@@ -39,9 +40,17 @@ obligation
    }
 ```
 
-Please note that an obligation is simply the written form of a Json Object. To handle this obligation we can now use the following obligation handler:
+As the pattern for calling the `SAPLAuthorizator` is `sapl.authorize(subject, action, resource)`, in this case our subject would be the `authentication`, the action is the `String` "readDiagnosis" and the resource is the `patient`. Now the policy evaluates to `permit` if the name of the authenticated user equals the name of the patient's attending nurse (in our domain each user name is unique).
 
-(All ObligationHandler and AdviceHandler used in this project are imported from the sapl-demo-shared-Project)
+In Sapl Policies obligations always have to be fulfilled. If an obligation cannot be fulfilled for any reason, the response has to be changed to `deny`.
+
+### Obligation Handlers
+
+Now we want to write an obligation handler for this policy.
+
+Please note that an obligation is simply the written form of a Json Object. To handle this obligation we can now use the following obligation handler (all ObligationHandler and AdviceHandler used in this project are imported from the [sapl-demo-shared](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-shared/src/main/java/io/sapl/demo/shared)-project):
+
+
 
 ```java
 @Slf4j
