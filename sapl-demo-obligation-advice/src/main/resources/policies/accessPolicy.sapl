@@ -29,8 +29,8 @@ where
 advice
    { "type" : "sendEmail",
      "recipient" : "supervisor@example.org",
-     "subject" : "Attending Doctor was changed",
-     "message" : subject.name + " has changed an attending Doctor"
+     "subject" : "Doctor has updated profile",
+     "message" : subject.name + " has changed something"
    }  
  
    
@@ -43,8 +43,8 @@ where
 advice
    { "type" : "sendEmail",
      "recipient" : "supervisor@example.org",
-     "subject" : "Attending Nurse was changed",
-     "message" : subject.name + " has changed an attending Nurse"
+     "subject" : "Nurse has updated profile",
+     "message" : subject.name + " has changed something"
    }  
 
 
