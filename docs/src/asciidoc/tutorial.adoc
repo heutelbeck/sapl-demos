@@ -184,7 +184,7 @@ You can provide all your mappers to your application by registering them to a `S
 	}
 ```
 
-The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
+The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/mapper/SimpleSaplMapper.java[SimpleSaplMapper] is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/mapper/SaplMapper.java[SaplMapper].
 
 
 
