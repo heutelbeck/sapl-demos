@@ -56,7 +56,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	@Autowired
 	private UserRepo userRepo;
 
-
 	private static final String ROLE_CLIENT = "ROLE_CLIENT";
 
 	@Autowired
@@ -102,7 +101,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		converter.setVerifierKey(publicKey);
 		return converter;
 	}
-	
+
 	@Bean
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();
@@ -110,7 +109,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		saplMapper.register(new HttpServletRequestMapper());
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
-		
+
 	}
 
 	@Override
@@ -134,5 +133,4 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 				.authorities(ROLE_CLIENT, "ROLE_TRUSTED_CLIENT").additionalInformation(claims).scopes("read", "write")
 				.secret(secret);
 	}
-
 }

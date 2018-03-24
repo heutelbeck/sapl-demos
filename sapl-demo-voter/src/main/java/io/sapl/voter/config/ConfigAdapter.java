@@ -16,7 +16,7 @@ public class ConfigAdapter extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		LOGGER.trace("start configuring...");
-		http.httpBasic().and().authorizeRequests().antMatchers("/css/**/*.css").permitAll().anyRequest().authenticated()
+		http.authorizeRequests().antMatchers("/css/**/*.css").permitAll().anyRequest().authenticated()
 				.accessDecisionManager(adm).and().formLogin().loginPage("/login").permitAll().and().logout()
 				.logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
 	}
