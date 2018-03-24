@@ -28,11 +28,18 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
+import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
+import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
+import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
+import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
+import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -110,6 +117,23 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
 
+	}
+
+	@Bean
+	public SimpleObligationHandlerService getObligationHandlers() {
+		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+		sohs.register(new EmailObligationHandler());
+		sohs.register(new CoffeeObligationHandler());
+		sohs.register(new SimpleLoggingObligationHandler());
+		return sohs;
+	}
+
+	@Bean
+	public SimpleAdviceHandlerService setAdviceHandlers() {
+		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+		sahs.register(new EmailAdviceHandler());
+		sahs.register(new SimpleLoggingAdviceHandler());
+		return sahs;
 	}
 
 	@Override

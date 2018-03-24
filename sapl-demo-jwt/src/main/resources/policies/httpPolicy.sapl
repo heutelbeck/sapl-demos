@@ -139,9 +139,11 @@ permit
 where
   "NURSE" in subject..authority;
   resource =~ "/person/readDiag/[0-9]+";
-
-
-
+advice
+   { "type" : "simpleLogging",
+     "message" : subject.name + " has looked up the diagnosis of a patient by requesting " + resource
+   }
+   
 policy "permit_list_person"
 permit
     action == "GET"

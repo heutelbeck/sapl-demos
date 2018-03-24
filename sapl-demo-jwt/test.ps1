@@ -1,6 +1,6 @@
 ﻿$clientId = "testingClient"
 $clientSecret = "secret"
-$user="Julia"
+$user="Thomas"
 $password="password"
 try {
         $base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $clientId,$clientSecret)))
@@ -25,7 +25,7 @@ try {
             $result2 = Invoke-RestMethod "http://localhost:8081/person/readDiag/1" `
             -Headers @{Authorization=("Bearer {0}" -f $result.access_token)} `
             -Method Get`
-            write-host $result2        
+            write-host ("Successfully requested with response '{0}'" -f $result2)        
          }
          catch
          {
