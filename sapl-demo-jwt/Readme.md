@@ -57,7 +57,7 @@ Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.prop
 
 To use this demo, there is a specific workflow that needs to be done to use it. This is needed for every token based security.
 
-1) Obtain a token
+1) Obtain a token<br>
 	To do this, you need to use a client that is allowed to interact with the system. For the demo project, the client "testingClient" with its secret "secret" is allowed to do a password based attempt.
 	This could be done using the tool of your choice. 
 	
@@ -66,12 +66,38 @@ To use this demo, there is a specific workflow that needs to be done to use it. 
 	curl -X POST -u testingClient:secret -F "grant_type=password" -F "client_id=testingClient" ↩
 	-F "username=[USERNAME]" -F "password=[PASSWORD]" http://localhost:8081/oauth/token
 	```
+	You can also use powershell (3+) to achieve the same result:
+	```powershell
+	$clientId = "testingClient"
+	$clientSecret = "secret"
+	$user="Julia"
+	$password="password"
+	$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $clientId,$clientSecret)))
+	$result = Invoke-RestMethod "http://localhost:8081/oauth/token" `
+	-Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} `
+	-Method Post -ContentType "application/x-www-form-urlencoded"`
+	-Body @{client_id=$clientId; 
+	   client_secret=$clientSecret; 
+	   grant_type="password"; 
+	   username=$user;
+	   password=$password} -ErrorAction STOP
+	write-host $result
+	```
 	If you prefer Postman, use the client and secret combo as Basic Auth and fill in the other variables as body of type form-data.
-2) Use the obtained token to access a restricted method
+	
+2) Use the obtained token to access a restricted method<br>
 	For this, you could for example use the user ```Julia``` which is doctor and has the password ```password```. She is allowed to access the diagnosis of patient with id ```1``` by calling ```http://localhost:8081/person/readDiag/1```
 	With CURL this could look like this:
 	```
 	curl -X GET --header "Authorization: Bearer [TOKEN_HERE]" http://localhost:8081/person/readDiag/1
+	```
+	The same can be done in powershell (3+):
+	```powershell
+	$methodInvocation = Invoke-RestMethod "http://localhost:8081/person/readDiag/1" `
+		#The "$result" object here is the one from step one
+		-Headers @{Authorization=("Bearer {0}" -f $result.access_token)} `
+		-Method Get`
+	write-host $methodInvocation   
 	```
 	Using Postman, you just take the token value and use it as header ```Authorization``` with value ```Bearer [TOKEN_HERE]``` whereas you replace [TOKEN_HERE] with the obtained token.
 	
@@ -91,4 +117,42 @@ curl -X $httpVerb --header "Authorization: Bearer $(curl -X POST -u $client:$sec
 -F "client_id=$client" -F "username=$userName" -F "password=$password" $baseAddress/oauth/token ↩
 | grep -Po '"access_token":(.*?[^\\])"' | grep -shoP ':"\K([^"]*)')" $baseAddress/$request
 ```
-	
+And a script for Windows users utilizing Powershell:<br>
+test.ps1
+```powershell
+$clientId = "testingClient"
+$clientSecret = "secret"
+$user="Julia"
+$password="password"
+try {
+	$base64AuthInfo = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(("{0}:{1}" -f $clientId,$clientSecret)))
+	$result = Invoke-RestMethod "http://localhost:8081/oauth/token" `
+	-Headers @{Authorization=("Basic {0}" -f $base64AuthInfo)} `
+	-Method Post -ContentType "application/x-www-form-urlencoded"`
+	-Body @{client_id=$clientId; 
+	   client_secret=$clientSecret; 
+	   grant_type="password"; 
+	   username=$user;
+	   password=$password} -ErrorAction STOP
+	$success = $true
+}
+catch
+{
+	write-host ("Error while getting token:{0}" -f  $_)
+}
+if ($success)
+{
+	 try
+	 {
+		$result2 = Invoke-RestMethod "http://localhost:8081/person/readDiag/1" `
+		-Headers @{Authorization=("Bearer {0}" -f $result.access_token)} `
+		-Method Get`
+		write-host $result2        
+	 }
+	 catch
+	 {
+	    	write-host ("Error while calling method:{0}" -f  $_)
+	 }
+}
+```
+If there is an issue with ```Invoke-RestMethod``` not found, then your version of powershell is too low (need 3+)
