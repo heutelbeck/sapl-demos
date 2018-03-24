@@ -2,11 +2,10 @@ set "httpGetPolicy"
 deny-unless-permit
 
   
-policy "permit_doctor_see_profiles"
+policy "permit_see_profiles"
 permit
     action == "GET"
 where
-  "DOCTOR" in subject..authority;
   resource == "/profiles";
 
 

@@ -24,14 +24,15 @@ Therefore inspecting the framework we found several starting-points to integrate
 
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects] you find two ways to use SAPL.
 The direct way of calling the SAPLAuthorizator-Bean (e.g. in a MVC-Controller, writing the response in 
-the model). And the perhaps a little bit more sophisticated way of using aspects and SAPL-specific annotations.  
+the model). And the perhaps a little bit more sophisticated way of using aspects and SAPL-specific annotations.
+* The sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice] is based on the authorizationaspects-project and shows how to use obligation and advice handlers.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] we inject a SAPL-specific filter into the springsecurity-Filterchain. The filter protects a classic MVC-controller as well as a ReST-Controller.
 The demo also uses the direct way of calling the SAPLAuthorizator-Bean.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt] we show how to use JSON Web tokens together with an annotation that uses Sapl Policies.
-* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice] we show an approach to work with SAPL-obligations and -advices.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
 we make  extensive use of the https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from Spring Security.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip] we show how to use a SAPL-PolicyInformationPoint to gain additional information required by some policies to make an authorization decision.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-voter[sapl-demo-voter] we show how to use a SaplVoter that can be used together with other voters in the `AccessDecisionManager` of Spring Security.
 
 All these demos make use of SAPL-specific features provided by the project sapl-spring. In particular every project makes use of a spring-fashioned auto-starter that offers default SAPL-functionality in form of beans and the like. The functionality is kept configurable and overridable as possible to support various use cases. 
 
@@ -183,7 +184,7 @@ You can provide all your mappers to your application by registering them to a `S
 	}
 ```
 
-The `SimpleSaplMapper` is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface `SaplMapper`.
+The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/mapper/SimpleSaplMapper.java[SimpleSaplMapper] is an easy option for getting started. If you want more customization, you can create your own SaplMapper by implementing the interface https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/mapper/SaplMapper.java[SaplMapper].
 
 
 
