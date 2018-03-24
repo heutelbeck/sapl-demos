@@ -52,3 +52,43 @@ The usage is pretty straight forward:
 
 ```
 Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizator`, which can help you write your policies.
+
+## How to use the demo
+
+To use this demo, there is a specific workflow that needs to be done to use it. This is needed for every token based security.
+
+1) Obtain a token
+	To do this, you need to use a client that is allowed to interact with the system. For the demo project, the client "testingClient" with its secret "secret" is allowed to do a password based attempt.
+	This could be done using the tool of your choice. 
+	
+	With CURL this could look like this:
+	```
+	curl -X POST -u testingClient:secret -F "grant_type=password" -F "client_id=testingClient" ↩
+	-F "username=[USERNAME]" -F "password=[PASSWORD]" http://localhost:8081/oauth/token
+	```
+	If you prefer Postman, use the client and secret combo as Basic Auth and fill in the other variables as body of type form-data.
+2) Use the obtained token to access a restricted method
+	For this, you could for example use the user ```Julia``` which is doctor and has the password ```password```. She is allowed to access the diagnosis of patient with id ```1``` by calling ```http://localhost:8081/person/readDiag/1```
+	With CURL this could look like this:
+	```
+	curl -X GET --header "Authorization: Bearer [TOKEN_HERE]" http://localhost:8081/person/readDiag/1
+	```
+	Using Postman, you just take the token value and use it as header ```Authorization``` with value ```Bearer [TOKEN_HERE]``` whereas you replace [TOKEN_HERE] with the obtained token.
+	
+## Scripts to see it work
+As a comfort feature, two scripts were tinkered, which do all the work.<br>
+A script for Linux users utilizing CURL:<br>
+test.sh
+```sh
+client="testingClient"
+secret="secret"
+userName="Julia"
+password="password"
+baseAddress="http://localhost:8081"
+request="person/readDiag/1"
+httpVerb="GET"
+curl -X $httpVerb --header "Authorization: Bearer $(curl -X POST -u $client:$secret -F "grant_type=password" ↩
+-F "client_id=$client" -F "username=$userName" -F "password=$password" $baseAddress/oauth/token ↩
+| grep -Po '"access_token":(.*?[^\\])"' | grep -shoP ':"\K([^"]*)')" $baseAddress/$request
+```
+	
