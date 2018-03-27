@@ -1,4 +1,4 @@
-package io.sapl.demo.geo;
+package io.sapl.demo.geo.marshall;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -53,7 +53,7 @@ public class HttpServletRequestMapper implements SaplClassMapper {
 		return HttpServletRequest.class;
 	}
 
-	private Object stringToType(String string) {
+	private static Object stringToType(String string) {
 		if (StringUtils.isNumeric(string)) {
 			return Integer.valueOf(string);
 		} else {

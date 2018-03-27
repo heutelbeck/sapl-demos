@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Controller
 public class PilController {
 	private static final String UNABLE_TO_GENERATE_PIL = "Unable to generate PIL";
+	private static final String RECURRENT = "recurrent";
 	private static final String HTTP_OK = "200";
 	private static final int MIN_PASSENGER = 166;
 
@@ -21,9 +22,9 @@ public class PilController {
 	public String retrievePil(@RequestParam("dep") String dep, @RequestParam("dest") String dest,
 			@RequestParam("fltNo") String fltNo, @RequestParam("date") String date,
 			@RequestParam("classification") int classification,
-			@RequestParam(value = "recurrent", required = false) boolean recurrent) {
+			@RequestParam(value = "type", required = false) String type) {
 
-		if (recurrent) {
+		if (type.equals(RECURRENT)) {
 			return HTTP_OK;
 		} else {
 			try {

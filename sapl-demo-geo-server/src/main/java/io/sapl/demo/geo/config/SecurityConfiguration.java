@@ -10,10 +10,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-import io.sapl.demo.geo.HttpServletRequestMapper;
+import io.sapl.demo.geo.AuthManager;
 import io.sapl.demo.geo.domain.CrewRepo;
-import io.sapl.demo.geo.marshall.AuthManager;
 import io.sapl.demo.geo.marshall.AuthenticationMapper;
+import io.sapl.demo.geo.marshall.HttpServletRequestMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;

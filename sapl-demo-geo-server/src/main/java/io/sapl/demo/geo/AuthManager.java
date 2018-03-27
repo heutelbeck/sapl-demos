@@ -1,4 +1,4 @@
-package io.sapl.demo.geo.marshall;
+package io.sapl.demo.geo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,6 @@ public class AuthManager implements AuthenticationManager {
 	@Override
 	public Authentication authenticate(Authentication authentication) {
 		String username = authentication.getPrincipal().toString();
-		String rawPassword = authentication.getCredentials().toString();
 
 		CrewMember flightAttendant = crewRepo.findById(username)
 				.orElseThrow(() -> new BadCredentialsException(NO_VALID_USER));
@@ -39,6 +38,7 @@ public class AuthManager implements AuthenticationManager {
 			throw new DisabledException(USER_INACTIVE);
 		}
 
+		String rawPassword = authentication.getCredentials().toString();
 		if (!passwdEncoder.matches(rawPassword, flightAttendant.getPassword())) {
 			throw new BadCredentialsException(INVALID_PW);
 		}
