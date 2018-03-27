@@ -26,4 +26,4 @@ The parameters are the following:
 - `fltNo`	Flight number
 - `date`	Date of flight
 - `classification` 	Access level (0: meta, 1: restricted, 2: confidential), see video above for an explanation
-
+- `type` (optional) If set to "recurrent", server will just answer with the decision instead of a generated PIL

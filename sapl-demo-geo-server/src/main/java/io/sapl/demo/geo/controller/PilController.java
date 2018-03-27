@@ -24,7 +24,7 @@ public class PilController {
 			@RequestParam("classification") int classification,
 			@RequestParam(value = "type", required = false) String type) {
 
-		if (type.equals(RECURRENT)) {
+		if (RECURRENT.equals(type)) {
 			return HTTP_OK;
 		} else {
 			try {
