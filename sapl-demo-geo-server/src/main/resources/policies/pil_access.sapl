@@ -1,0 +1,42 @@
+import geo.*
+
+set "PIL_access_control"
+deny-overrides
+var deviceTrack = { "deviceID": subject.name, "url": deviceTracking.serverUrl, "credentials": deviceTracking.credentials, "posValidityTimespan": deviceTracking.posValidityTimespan};
+var trackedDevice = deviceTrack.<io.sapl.pip.geo.traccar>;
+
+	policy "basic_authorization"
+	permit action.httpMethod == "GET" & action.httpUri == "/pil"
+	where
+	  "CREW" in subject..authority;
+	  isValid(trackedDevice.position);
+
+	policy "restrict_meta_data"
+	deny action.httpMethod == "GET" & action.httpUri == "/pil" & resource.classification >= param.meta
+	where
+		!(trackedDevice.accuracy <= param.minAccuracy);
+		!(trackedDevice.trust < param.minTrust);
+		var trustedGeofence = resToGeometryBag(trustServer.<io.sapl.pip.geo.kml>.geofences.*);
+		!within(trackedDevice.position, trustedGeofence);
+		
+		
+	policy "restrict_restricted_data"
+	deny action.httpMethod == "GET" & action.httpUri == "/pil" & resource.classification >= param.restricted
+	where
+		var stations = stationsDB.<io.sapl.pip.geo.postgis>.geofences;
+		var airports = airportsDB.<io.sapl.pip.geo.postgis>.geofences;
+		var proj = getProjection(param.wgs84, param.webMercator);
+		var invProj = getProjection(param.webMercator, param.wgs84);
+		var airportArea = project(buffer(project(airports[(resource.dep)], proj), param.airportBuffer), invProj);
+		
+		var allowedArea = union(airportArea, stations[(resource.dep)]);
+		!contains(allowedArea, trackedDevice.position);
+		print(trackedDevice.position);
+			
+	
+	policy "restrict_confidential_data"
+	deny action.httpMethod == "GET" & action.httpUri == "/pil" & resource.classification >= param.confidential
+	where
+		var trackedAC = aircraftTracking.<io.sapl.pip.geo.postgis>.geofences;
+		!isWithinGeoDistance(trackedAC[(resource.acReg)], trackedDevice.position, param.maxDistFromAc);
+	
