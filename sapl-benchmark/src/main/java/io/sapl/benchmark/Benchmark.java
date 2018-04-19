@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017-2018 Dominic Heutelbeck (dheutelbeck@ftk.de)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -144,7 +144,7 @@ public class Benchmark {
 				runBenchmark(path);
 			}
 		} catch (ParseException e) {
-			log.info("encountered an error running the demo: {}", e.getMessage(), e);
+			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 	}
@@ -155,7 +155,7 @@ public class Benchmark {
 		try {
 			suite = mapper.readValue(Resources.getResource("tests.json"), TestSuite.class);
 		} catch (IOException e) {
-			log.error(ERROR_READING_TEST_CONFIGURATION, e);
+			LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
 			System.exit(1);
 		}
 
@@ -189,7 +189,7 @@ public class Benchmark {
 		try {
 			results = runTest(config, path);
 		} catch (IOException e) {
-			log.error("Error running test", e);
+			LOGGER.error("Error running test", e);
 			System.exit(1);
 		}
 		double[] times = new double[results.size()];
@@ -208,7 +208,7 @@ public class Benchmark {
 		try {
 			BitmapEncoder.saveBitmap(details, path + config.getName().replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
 		} catch (IOException e) {
-			log.error(ERROR_WRITING_BITMAP, e);
+			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
 
@@ -228,7 +228,7 @@ public class Benchmark {
 		try {
 			BitmapEncoder.saveBitmap(chart, path + "overview", BitmapFormat.PNG);
 		} catch (IOException e) {
-			log.error(ERROR_WRITING_BITMAP, e);
+			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
 	}
@@ -247,7 +247,7 @@ public class Benchmark {
 		try {
 			BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
 		} catch (IOException e) {
-			log.error(ERROR_WRITING_BITMAP, e);
+			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
 	}
@@ -258,7 +258,7 @@ public class Benchmark {
 			SimpleExporter exp = new SimpleExporter();
 			exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
 		} catch (IOException e) {
-			log.error("Error writing XLS", e);
+			LOGGER.error("Error writing XLS", e);
 			System.exit(1);
 		}
 	}
@@ -292,11 +292,11 @@ public class Benchmark {
 					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
 							response.toString()));
 
-					log.info("Total : {}ms", diff);
+					LOGGER.info("Total : {}ms", diff);
 				}
 			}
 		} catch (IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
-			log.error("Error running test", e);
+			LOGGER.error("Error running test", e);
 		}
 
 		return results;

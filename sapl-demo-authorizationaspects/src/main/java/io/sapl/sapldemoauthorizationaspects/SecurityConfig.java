@@ -17,9 +17,6 @@ import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-
-
-
 	@Bean
 	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
 		return new ConfigAdapter();
@@ -29,7 +26,7 @@ public class SecurityConfig {
 	AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
 	}
-	
+
 	@Bean
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();
@@ -38,5 +35,5 @@ public class SecurityConfig {
 		saplMapper.register(new PatientMapper());
 		return saplMapper;
 	}
-	
+
 }

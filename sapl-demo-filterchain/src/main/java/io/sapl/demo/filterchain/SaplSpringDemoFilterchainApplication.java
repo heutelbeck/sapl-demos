@@ -18,9 +18,7 @@ import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.demo.repository.RelationRepo;
 import io.sapl.demo.repository.UserRepo;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SpringBootApplication
 @EnableJpaRepositories("io.sapl.demo.repository")
 @EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
@@ -56,46 +54,33 @@ public class SaplSpringDemoFilterchainApplication {
 			ApplicationContext ctx) {
 		return args -> {
 			userRepo.save(
-					new User(NAME_DOMINIK, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_VISITOR))));
+					new User(NAME_DOMINIK, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
 			userRepo.save(
-					new User(NAME_JULIA, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_DOCTOR))));
+					new User(NAME_JULIA, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(
-					new User(NAME_PETER, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_DOCTOR))));
+					new User(NAME_PETER, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(
-					new User(NAME_ALINA, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_DOCTOR))));
+					new User(NAME_ALINA, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(
-					new User(NAME_THOMAS, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_NURSE))));
+					new User(NAME_THOMAS, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 			userRepo.save(
-					new User(NAME_BRIGITTE, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_NURSE))));
+					new User(NAME_BRIGITTE, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 			userRepo.save(
-					new User(NAME_JANOSCH, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_NURSE))));
+					new User(NAME_JANOSCH, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 			userRepo.save(
-					new User(NAME_JANINA, defaultPassword, false, new ArrayList<String>(Arrays.asList(ROLE_NURSE))));
+					new User(NAME_JANINA, defaultPassword, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 
 			userRepo.save(new User(NAME_HORST, defaultPassword, false,
-					new ArrayList<String>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
-
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("initialized userRepo with this Users:");
-				userRepo.findAll().forEach(user -> LOGGER.debug("{}", user));
-			}
+					new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
 
 			personsRepo.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS,
 					"H264"));
 			personsRepo.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("initialized personsRepo with this Users:");
-				personsRepo.findAll().forEach(person -> LOGGER.debug("{}", person));
-			}
 
 			relationRepo.save(new Relation(NAME_DOMINIK, personsRepo.findByName(NAME_LENNY).getId()));
 			relationRepo.save(new Relation(NAME_JULIA, personsRepo.findByName(NAME_KARL).getId()));
 			relationRepo.save(new Relation(NAME_ALINA, personsRepo.findByName(NAME_KARL).getId()));
 			relationRepo.save(new Relation(NAME_JANOSCH, personsRepo.findByName(NAME_KARL).getId()));
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("initialized relationRepo with this Relations:");
-				relationRepo.findAll().forEach(relation -> LOGGER.debug("{}", relation));
-			}
 		};
 	}
 }

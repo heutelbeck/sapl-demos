@@ -19,9 +19,7 @@ import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 public class UIController {
 
@@ -36,16 +34,12 @@ public class UIController {
 	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
-		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})",
-				sapl != null, patientenRepo != null);
 	}
 
 	@GetMapping("/profiles")
 	public String profileList(Model model, Authentication authentication, HttpServletRequest request) {
-		LOGGER.debug("Entering /profiles");
 		model.addAttribute("profiles", patientenRepo.findAll());
-		model.addAttribute("createPermission", sapl.authorize(authentication,
-				RequestMethod.POST, request));
+		model.addAttribute("createPermission", sapl.authorize(authentication, RequestMethod.POST, request));
 		return "profiles";
 	}
 
@@ -74,27 +68,18 @@ public class UIController {
 		}
 
 		model.addAttribute("patient", patient);
+		model.addAttribute("viewDiagnosisPermission", sapl.authorize(authentication, "readDiagnosis", patient));
+		model.addAttribute("viewHRNPermission", sapl.authorize(authentication, "read", "HRN"));
+		model.addAttribute("updatePermission", sapl.authorize(authentication, RequestMethod.PUT, "/patient"));
+		model.addAttribute("deletePermission", sapl.authorize(authentication, RequestMethod.DELETE, "/patient"));
+		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumber", patient));
 
-		
-		model.addAttribute("viewDiagnosisPermission",
-				sapl.authorize(authentication, "readDiagnosis", patient));
-		model.addAttribute("viewHRNPermission",
-				sapl.authorize(authentication, "read", "HRN"));
-		model.addAttribute("updatePermission",
-				sapl.authorize(authentication, RequestMethod.PUT, "/patient"));
-		model.addAttribute("deletePermission",
-				sapl.authorize(authentication, RequestMethod.DELETE, "/patient"));
-		model.addAttribute("viewRoomNumberPermission",
-				sapl.authorize(authentication, "viewRoomNumber", patient));
-
-		boolean permissionBlackenedHRN = sapl.authorize(authentication, "getBlackenAndObligation",
-				"anything");
+		boolean permissionBlackenedHRN = sapl.authorize(authentication, "getBlackenAndObligation", "anything");
 		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
 
 		if (permissionBlackenedHRN) {
 			String hRN = patient.getHealthRecordNumber();
-			Response response = sapl.getResponse(authentication, "getBlackenAndObligation",
-					hRN);
+			Response response = sapl.getResponse(authentication, "getBlackenAndObligation", hRN);
 			model.addAttribute("blackenedHRN", response.getResource().get().asText()); // use only together with
 																						// "permissionBlackenedHRN":
 																						// only for NURSE
@@ -124,15 +109,10 @@ public class UIController {
 				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
 		model.addAttribute("updatePatient", patient);
 
-		
-		model.addAttribute("updateDiagnosisPermission",
-				sapl.authorize(authentication, "updateDiagnosis", patient));
-		model.addAttribute("updateHRNPermission",
-				sapl.authorize(authentication, UPDATE, "HRN"));
-		model.addAttribute("updateDoctorPermission",
-				sapl.authorize(authentication, UPDATE, "doctor"));
-		model.addAttribute("updateNursePermission",
-				sapl.authorize(authentication, UPDATE, "nurse"));
+		model.addAttribute("updateDiagnosisPermission", sapl.authorize(authentication, "updateDiagnosis", patient));
+		model.addAttribute("updateHRNPermission", sapl.authorize(authentication, UPDATE, "HRN"));
+		model.addAttribute("updateDoctorPermission", sapl.authorize(authentication, UPDATE, "doctor"));
+		model.addAttribute("updateNursePermission", sapl.authorize(authentication, UPDATE, "nurse"));
 		return "updatePatient";
 	}
 
@@ -142,8 +122,6 @@ public class UIController {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
 			throw new IllegalArgumentException("not found");
 		}
-
-		
 
 		Patient savePatient = patientenRepo.findById(updatePatient.getId()).get();
 		savePatient.setName(updatePatient.getName());

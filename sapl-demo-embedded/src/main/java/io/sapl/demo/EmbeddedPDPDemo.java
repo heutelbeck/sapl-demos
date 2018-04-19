@@ -33,7 +33,7 @@ import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 
 public class EmbeddedPDPDemo {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
 	private static final String USAGE = "java -jar sapl-demo-embedded-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
 	private static final String HELP_DOC = "print this message";
@@ -72,7 +72,7 @@ public class EmbeddedPDPDemo {
 				runDemo(cmd.getOptionValue(POLICYPATH));
 			}
 		} catch (ParseException | IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
-			LOG.info("encountered an error running the demo: {}", e.getMessage(), e);
+			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 
@@ -87,12 +87,12 @@ public class EmbeddedPDPDemo {
 			// log.info("response: " + response.toString());
 		}
 		long end = System.nanoTime();
-		LOG.info("Start : {}", start);
-		LOG.info("End   : {}", end);
-		LOG.info("Runs  : {}", RUNS);
-		LOG.info("Total : {}s", nanoToS((double) end - start));
+		LOGGER.info("Start : {}", start);
+		LOGGER.info("End   : {}", end);
+		LOGGER.info("Runs  : {}", RUNS);
+		LOGGER.info("Total : {}s", nanoToS((double) end - start));
 
-		LOG.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
 
 }

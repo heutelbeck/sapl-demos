@@ -27,17 +27,15 @@ import io.sapl.demo.repository.UserRepo;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.SaplBasedVoter;
 import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.spring.SaplBasedVoter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import io.sapl.voter.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.voter.obligationhandlers.EmailObligationHandler;
 import io.sapl.voter.obligationhandlers.SimpleLoggingObligationHandler;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -57,27 +55,21 @@ public class SecurityConfig {
 	@Bean
 	AuthenticationManager authManager() {
 		return authentication -> {
-			LOGGER.trace("enter authentication manager");
 			String username = authentication.getPrincipal().toString();
 
 			User user = userRepo.findById(username).orElseThrow(() -> {
-				LOGGER.debug("user {} not found in repo", username);
 				return new BadCredentialsException("no valid user name provided");
 			});
 			if (user.isDisabled()) {
-				LOGGER.debug("user is disabled");
 				throw new DisabledException("user disabled");
 			}
 			String password = authentication.getCredentials().toString();
 			if (!password.equals(user.getPassword())) {
-				LOGGER.debug("password does not match");
 				throw new BadCredentialsException("user and/or password do not match");
 			}
-			LOGGER.trace("user successfully authenticated, will create UsernamePasswordAuthenticationToken...");
 			List<GrantedAuthority> userAuthorities = new ArrayList<>();
 			user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
 			return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
-
 		};
 	}
 
@@ -123,7 +115,7 @@ public class SecurityConfig {
 		sohs.register(new SimpleLoggingObligationHandler());
 		return sohs;
 	}
-	
+
 	@Bean
 	public SaplMapper getSaplMapper() {
 		SaplMapper saplMapper = new SimpleSaplMapper();

@@ -31,7 +31,7 @@ public class PilController {
 				PilDataConstructor pil = new PilDataConstructor(classification, dep, dest, fltNo, date, MIN_PASSENGER);
 				return pil.getData();
 			} catch (IOException e) {
-				log.error(e.getMessage());
+				LOGGER.error(e.getMessage());
 				return UNABLE_TO_GENERATE_PIL;
 			}
 		}

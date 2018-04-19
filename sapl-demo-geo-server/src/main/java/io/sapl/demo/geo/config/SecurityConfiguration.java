@@ -18,8 +18,8 @@ import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Lazy

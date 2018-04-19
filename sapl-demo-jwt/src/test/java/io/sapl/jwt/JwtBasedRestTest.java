@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.common.util.JacksonJsonParser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,10 +25,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-@RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class JwtBasedRestTest {
+
 	@LocalServerPort
 	private int port;
 
@@ -45,28 +47,26 @@ public class JwtBasedRestTest {
 	public void callDiagnosisMethodSucceeds() throws Exception {
 		String accessToken = obtainAccessToken("Thomas", "password");
 		mockMvc.perform(get("/person/readDiag/1").header("Authorization", "Bearer " + accessToken)
-				.accept("application/json;charset=UTF-8")).andExpect(status().isOk());
+				.accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isOk());
 	}
 
 	@Test
 	public void callDeleteMethodSucceeds() throws Exception {
 		String accessToken = obtainAccessToken("Thomas", "password");
 		mockMvc.perform(delete("/person/1").header("Authorization", "Bearer " + accessToken)
-				.accept("application/json;charset=UTF-8")).andExpect(status().isForbidden());
+				.accept(MediaType.APPLICATION_JSON_UTF8)).andExpect(status().isForbidden());
 	}
 
 	private String obtainAccessToken(String username, String password) throws Exception {
-
 		MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
 		params.add("grant_type", "password");
 		params.add("client_id", "testingClient");
 		params.add("username", username);
 		params.add("password", password);
-
 		ResultActions result = mockMvc
 				.perform(post("/oauth/token").params(params).with(httpBasic("testingClient", "secret"))
-						.accept("application/json;charset=UTF-8"))
-				.andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8"));
+						.accept(MediaType.APPLICATION_JSON_UTF8))
+				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8));
 
 		String resultString = result.andReturn().getResponse().getContentAsString();
 

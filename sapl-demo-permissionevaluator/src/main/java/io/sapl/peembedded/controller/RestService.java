@@ -1,9 +1,13 @@
- package io.sapl.peembedded.controller;
+package io.sapl.peembedded.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.sapl.demo.domain.Patient;
-import io.sapl.demo.repository.PatientenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,25 +23,22 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ArrayList;
+import io.sapl.demo.domain.Patient;
+import io.sapl.demo.repository.PatientenRepo;
 
 @RestController
 @RequestMapping("/person/")
 public class RestService {
-	
+
 	private static final String PHONENUMBER = "phoneNumber";
 
 	@Autowired
 	private PatientenRepo patientenRepo;
-	
+
 	@GetMapping("{id}")
-	public ResponseEntity<Patient> loadPerson(@PathVariable int id){
+	public ResponseEntity<Patient> loadPerson(@PathVariable int id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
-		if(patient.isPresent()){
+		if (patient.isPresent()) {
 			return new ResponseEntity<>(patient.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -102,16 +103,16 @@ public class RestService {
 
 	@PostMapping
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public ResponseEntity<Void> createPerson(@RequestBody Patient person, UriComponentsBuilder uriComponentsBuilder, HttpServletRequest request) {
+	public ResponseEntity<Void> createPerson(@RequestBody Patient person, UriComponentsBuilder uriComponentsBuilder,
+			HttpServletRequest request) {
 		patientenRepo.save(person);
 		UriComponents uriComponents = uriComponentsBuilder.path("/person/" + person.getId()).build();
 		return ResponseEntity.created(uriComponents.toUri()).build();
 	}
 
-
 	@PutMapping("putALL/{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public Patient update(@PathVariable int id, @RequestBody Patient person , HttpServletRequest request) {
+	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
 			throw new IllegalArgumentException("not found");
 		}
@@ -120,7 +121,8 @@ public class RestService {
 
 	@PutMapping("{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR, NURSE
-	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
+	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
+			HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
 			throw new IllegalArgumentException("not found");
 		}
@@ -150,5 +152,5 @@ public class RestService {
 	public void delete(@PathVariable int id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);
 	}
-	
+
 }

@@ -23,14 +23,12 @@
 		<version.apache.commons>3.6</version.apache.commons>
 		<version.apache.commons-validator>1.6</version.apache.commons-validator>
 		<version.junit>4.12</version.junit>
-		<version.springboot>2.0.0.M5</version.springboot>
-		<version.axon>3.0.6</version.axon>
+		<version.springboot>2.0.1.RELEASE</version.springboot>
 		<version.maven-source-plugin>3.0.1</version.maven-source-plugin>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<version.powermock>1.7.3</version.powermock>
-		<version.lombok>1.16.18</version.lombok>
-		<version.vaadin>8.1.5</version.vaadin>
+		<version.lombok>1.16.20</version.lombok>
 	</properties>
 
 	<dependencyManagement>

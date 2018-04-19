@@ -13,8 +13,8 @@ import io.sapl.demo.geo.domain.CrewMember;
 import io.sapl.demo.geo.domain.CrewRepo;
 
 @SpringBootApplication
-@EnableJpaRepositories("io.sapl.demo.geo.domain")
 @EntityScan("io.sapl.demo.geo.domain")
+@EnableJpaRepositories("io.sapl.demo.geo.domain")
 public class DemoGeoServerApplication {
 
 	private static final String CREW1 = "a12345";

@@ -46,8 +46,8 @@ public class RestService {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@GetMapping("readAll/{id}")
 	@PdpAuthorize
+	@GetMapping("readAll/{id}")
 	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
@@ -62,8 +62,8 @@ public class RestService {
 		return map;
 	}
 
-	@GetMapping("readDiag/{id}")
 	@PdpAuthorize
+	@GetMapping("readDiag/{id}")
 	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
@@ -112,8 +112,8 @@ public class RestService {
 		return ResponseEntity.created(uriComponents.toUri()).build();
 	}
 
-	@PutMapping("putALL/{id}")
 	@PdpAuthorize
+	@PutMapping("putALL/{id}")
 	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
 			throw new IllegalArgumentException("not found");
@@ -121,8 +121,8 @@ public class RestService {
 		return patientenRepo.save(person);
 	}
 
-	@PutMapping("{id}")
 	@PdpAuthorize
+	@PutMapping("{id}")
 	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
 			HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
@@ -149,8 +149,8 @@ public class RestService {
 
 	}
 
-	@DeleteMapping("{id}")
 	@PdpAuthorize
+	@DeleteMapping("{id}")
 	public void delete(@PathVariable int id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);
 	}

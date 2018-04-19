@@ -6,6 +6,8 @@
 	<name>SAPL Demo Geo (Android App)</name>
 	<url>http://maven.apache.org</url>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>1.7</maven.compiler.source>
 		<maven.compiler.target>1.7</maven.compiler.target>
 		<version.gradlemaven>1.0.8</version.gradlemaven>

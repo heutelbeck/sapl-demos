@@ -9,11 +9,8 @@ public class PatientMapper implements SaplClassMapper {
 
 	@Override
 	public Object map(Object objectToMap, SaplRequestElement element) {
-		
 		Patient patient = (Patient) objectToMap;
 		return new PatientResource(patient);
-
-
 	}
 
 	@Override

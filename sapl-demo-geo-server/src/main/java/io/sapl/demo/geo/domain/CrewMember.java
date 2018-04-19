@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class CrewMember implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Id

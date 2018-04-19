@@ -26,18 +26,16 @@ import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Configuration
-@EnableWebSecurity // (debug = true)
+@EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/**
-	 * Lazy initialization is needed to prevent circular dependency problem
-	 * caused by the {@link #configure(HttpSecurity)}-method that needs this
-	 * field reference early in startup
+	 * Lazy initialization is needed to prevent circular dependency problem caused
+	 * by the {@link #configure(HttpSecurity)}-method that needs this field
+	 * reference early in startup
 	 */
 	@Lazy
 	@Autowired
@@ -45,7 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		LOGGER.trace("start configuring...");
 		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests()
 				.antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
 				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()

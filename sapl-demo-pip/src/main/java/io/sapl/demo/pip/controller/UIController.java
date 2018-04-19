@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.spring.SAPLAuthorizator;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
 public class UIController {
 
@@ -26,17 +24,13 @@ public class UIController {
 	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
-		LOGGER.debug("created instancewith PolicyEnforcementPoint (!= null:{}) and PatientenRepo (!= null:{})",
-				sapl != null, patientenRepo != null);
 	}
 
 	@GetMapping("/profiles")
 	public String profileList(Model model, Authentication authentication, HttpServletRequest request) {
-		LOGGER.debug("Entering /profiles");
 		model.addAttribute("profiles", patientenRepo.findAll());
 		return "profiles";
 	}
-
 
 	@GetMapping("/patient")
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
@@ -48,11 +42,8 @@ public class UIController {
 
 		model.addAttribute("patient", patient);
 
-		model.addAttribute("viewRoomNumberPermission",
-				sapl.authorize(authentication, "viewRoomNumber", patient));
+		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumber", patient));
 		return "patient";
 	}
-
-
 
 }

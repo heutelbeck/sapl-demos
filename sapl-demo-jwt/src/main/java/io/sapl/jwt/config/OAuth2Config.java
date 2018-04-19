@@ -16,6 +16,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -40,12 +41,11 @@ import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Configuration
-@EnableAuthorizationServer
 @EnableResourceServer
+@EnableAuthorizationServer
+@SuppressWarnings("deprecation")
 public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	// @Value("${encryptet.testpwd}")
@@ -71,23 +71,18 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	@Bean
 	AuthenticationManager authManager() {
 		return authentication -> {
-			LOGGER.trace("enter authentication manager");
 			String username = authentication.getPrincipal().toString();
 
 			User user = userRepo.findById(username).orElseThrow(() -> {
-				LOGGER.debug("user {} not found in repo", username);
 				return new BadCredentialsException("no valid user name provided");
 			});
 			if (user.isDisabled()) {
-				LOGGER.debug("user is disabled");
 				throw new DisabledException("user disabled");
 			}
 			String password = authentication.getCredentials().toString();
 			if (!password.equals(user.getPassword())) {
-				LOGGER.debug("password does not match");
 				throw new BadCredentialsException("user and/or password do not match");
 			}
-			LOGGER.trace("user successfully authenticated, will create UsernamePasswordAuthenticationToken...");
 			List<GrantedAuthority> userAuthorities = new ArrayList<>();
 			user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
 			return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
@@ -102,7 +97,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	@Bean
 	public JwtAccessTokenConverter accessTokenConverter() {
-		LOGGER.info("Initializing JWT with public key:\n{}", publicKey);
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 		converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
@@ -139,7 +133,8 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
 		oauthServer.tokenKeyAccess("isAnonymous() || hasAuthority('ROLE_TRUSTED_CLIENT')")
-				.checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')");
+				.checkTokenAccess("hasAuthority('ROLE_TRUSTED_CLIENT')")
+				.passwordEncoder(NoOpPasswordEncoder.getInstance());
 	}
 
 	@Override

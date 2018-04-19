@@ -9,8 +9,6 @@ import io.sapl.spring.marshall.obligation.Obligation;
 import io.sapl.spring.marshall.obligation.ObligationFailed;
 import io.sapl.spring.marshall.obligation.ObligationHandler;
 
-//import lombok.experimental.ExtensionMethod;
-//@ExtensionMethod(JsonHelper.class)
 public class SimpleLoggingObligationHandler implements ObligationHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleLoggingObligationHandler.class);
@@ -18,8 +16,6 @@ public class SimpleLoggingObligationHandler implements ObligationHandler {
 	@Override
 	public void handleObligation(Obligation obligation) throws ObligationFailed {
 		JsonNode obNode = obligation.getJsonObligation();
-		// String value = obNode.tryGetValue("message").orElseThrow(new
-		// ObligationFailed());
 		if (obNode.has("message")) {
 			LOGGER.info(obligation.getJsonObligation().findValue("message").asText());
 		} else

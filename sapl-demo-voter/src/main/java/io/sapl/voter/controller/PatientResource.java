@@ -17,7 +17,6 @@ public class PatientResource implements Resource {
 		name = patient.getName();
 		attendingNurse = patient.getAttendingNurse();
 		attendingDoctor = patient.getAttendingDoctor();
-
 	}
 
 }

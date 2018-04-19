@@ -19,18 +19,16 @@ import io.sapl.demo.shared.marshalling.PatientMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Configuration
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/**
-	 * Lazy initialization is needed to prevent circular dependency problem
-	 * caused by the {@link #configure(HttpSecurity)}-method that needs this
-	 * field reference early in startup
+	 * Lazy initialization is needed to prevent circular dependency problem caused
+	 * by the {@link #configure(HttpSecurity)}-method that needs this field
+	 * reference early in startup
 	 */
 	@Lazy
 	@Autowired
@@ -38,7 +36,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		LOGGER.trace("start configuring...");
 		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests()
 				.antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
 				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()

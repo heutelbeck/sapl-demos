@@ -14,7 +14,6 @@ public class CoffeeObligationHandler implements ObligationHandler {
 		if (!obNode.has("coffeeAddiction")) {
 			throw new ObligationFailed();
 		}
-
 	}
 
 	@Override
