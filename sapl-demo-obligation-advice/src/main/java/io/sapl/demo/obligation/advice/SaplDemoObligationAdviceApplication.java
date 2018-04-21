@@ -17,9 +17,7 @@ import io.sapl.demo.domain.User;
 import io.sapl.demo.repository.PatientenRepo;
 import io.sapl.demo.repository.RelationRepo;
 import io.sapl.demo.repository.UserRepo;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @SpringBootApplication
 @EnableJpaRepositories("io.sapl.demo.repository")
 @EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
@@ -52,20 +50,17 @@ public class SaplDemoObligationAdviceApplication {
 	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
 		return args -> {
-			userRepo.save(
-					new User(NAME_DOMINIK, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
+			userRepo.save(new User(NAME_DOMINIK, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
 			userRepo.save(new User(NAME_JULIA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(new User(NAME_PETER, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(new User(NAME_ALINA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
 			userRepo.save(new User(NAME_THOMAS, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-			userRepo.save(
-					new User(NAME_BRIGITTE, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-			userRepo.save(
-					new User(NAME_JANOSCH, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+			userRepo.save(new User(NAME_BRIGITTE, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+			userRepo.save(new User(NAME_JANOSCH, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 			userRepo.save(new User(NAME_JANINA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
 
-			userRepo.save(new User(NAME_HORST, DEFAULT_PASS, false,
-					new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
+			userRepo.save(
+					new User(NAME_HORST, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
 
 			personsRepo.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS,
 					"H264"));
