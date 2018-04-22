@@ -1,4 +1,4 @@
-package io.sapl.jwt.config;
+package io.sapl.demo;
 
 import java.util.ArrayList;
 import java.util.Arrays;

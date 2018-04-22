@@ -1,4 +1,4 @@
-package io.sapl.jwt;
+package io.sapl.demo;
 
 import static org.junit.Assert.assertEquals;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;

@@ -1,4 +1,4 @@
-package io.sapl.jwt.controller;
+package io.sapl.demo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import io.sapl.spring.annotation.PdpAuthorize;
 @RestController
 @RequestMapping("/person/")
 @ComponentScan("io.sapl.spring.annotation")
-public class RestService {
+public class PersonController {
 
 	private static final String PHONENUMBER = "phoneNumber";
 

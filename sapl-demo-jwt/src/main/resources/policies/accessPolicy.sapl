@@ -3,8 +3,6 @@ import org.openconjurer.saplintegration.pip.PatientPIP as patient
 set "accessPolicy"
 deny-unless-permit
 
-
-
 policy "permit_doctor_read_HRN"
 permit
     action == "read"
