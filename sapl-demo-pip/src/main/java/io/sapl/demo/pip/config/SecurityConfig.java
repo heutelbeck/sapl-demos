@@ -11,8 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.pip.AuthManager;
-import io.sapl.demo.repository.UserRepo;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;

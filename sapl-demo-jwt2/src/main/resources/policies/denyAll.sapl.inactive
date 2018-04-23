@@ -1,0 +1,5 @@
+/*
+ * This policy denies access to all resources
+ */
+policy "denyAll"
+deny

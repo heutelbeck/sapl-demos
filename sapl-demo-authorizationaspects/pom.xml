@@ -71,7 +71,7 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity4</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-demo-domain</artifactId>
@@ -87,18 +87,16 @@
 			<artifactId>spring-boot-devtools</artifactId>
 		</dependency>
 	</dependencies>
-	
+
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>1.5.10.RELEASE</version>
+				<version>2.0.1.RELEASE</version>
 			</plugin>
 		</plugins>
 	</build>
-
-
 
 </project>

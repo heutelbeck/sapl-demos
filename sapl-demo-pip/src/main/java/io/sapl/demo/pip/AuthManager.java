@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import io.sapl.demo.domain.User;
-import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.domain.UserRepo;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.demo.domain.Relation;
-import io.sapl.demo.repository.RelationRepo;
+import io.sapl.demo.domain.RelationRepo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

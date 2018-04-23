@@ -3,7 +3,8 @@
 import javax.servlet.http.HttpServletRequest;
 
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.repository.PatientenRepo;
+import io.sapl.demo.domain.PatientRepo;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class RestService {
 	private static final String PHONENUMBER = "phoneNumber";
 
 	@Autowired
-	private PatientenRepo patientenRepo;
+	private PatientRepo patientenRepo;
 	
 	@GetMapping("{id}")
 	public ResponseEntity<Patient> loadPerson(@PathVariable int id){

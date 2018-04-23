@@ -12,7 +12,7 @@ import io.sapl.api.functions.Function;
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.functions.FunctionLibrary;
 import io.sapl.demo.domain.Relation;
-import io.sapl.demo.repository.RelationRepo;
+import io.sapl.demo.domain.RelationRepo;
 import io.sapl.demo.shared.pip.ApplicationContextProvider;
 import lombok.extern.slf4j.Slf4j;
 

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.repository.PatientenRepo;
+import io.sapl.demo.domain.PatientRepo;
 import io.sapl.spring.SAPLAuthorizator;
 import io.sapl.spring.annotation.PdpAuthorize;
 
@@ -31,10 +31,10 @@ public class UIController {
 	private SAPLAuthorizator sapl;
 	
 	@Autowired
-	private PatientenRepo patientenRepo;
+	private PatientRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator sapl, PatientRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 	}

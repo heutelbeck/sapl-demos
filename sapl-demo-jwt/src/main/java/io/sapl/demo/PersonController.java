@@ -24,7 +24,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.repository.PatientenRepo;
+import io.sapl.demo.domain.PatientRepo;
 import io.sapl.spring.annotation.PdpAuthorize;
 
 @RestController
@@ -35,7 +35,7 @@ public class PersonController {
 	private static final String PHONENUMBER = "phoneNumber";
 
 	@Autowired
-	private PatientenRepo patientenRepo;
+	private PatientRepo patientenRepo;
 
 	@GetMapping("{id}")
 	public ResponseEntity<Patient> loadPerson(@PathVariable int id) {

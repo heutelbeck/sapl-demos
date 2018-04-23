@@ -28,7 +28,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.demo.domain.User;
-import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
 import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;

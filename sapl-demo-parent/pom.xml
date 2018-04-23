@@ -82,28 +82,10 @@
 			<url>https://repo.spring.io/release</url>
 		</repository>
 		<repository>
-			<id>spring-milestone</id>
-			<name>Spring Milestone Repository</name>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-		<repository>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<id>spring-snapshot</id>
-			<name>Spring Snapshot Repository</name>
-			<url>https://repo.spring.io/snapshot</url>
-		</repository>
-		<repository>
-			<id>projectlombok.org</id>
-			<url>http://projectlombok.org/mavenrepo</url>
-		</repository>
-		<repository>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
-
 			<id>openconjurer-snapshots</id>
 			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>

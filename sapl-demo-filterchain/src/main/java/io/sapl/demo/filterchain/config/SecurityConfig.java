@@ -11,11 +11,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.filterchain.AuthManager;
 import io.sapl.demo.filterchain.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.filterchain.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.filterchain.obligationhandlers.SimpleLoggingObligationHandler;
-import io.sapl.demo.repository.UserRepo;
 import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
 import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;

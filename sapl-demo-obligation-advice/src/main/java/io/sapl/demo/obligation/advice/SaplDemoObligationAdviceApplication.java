@@ -8,10 +8,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import io.sapl.demo.data.DemoData;
-import io.sapl.demo.repository.PatientenRepo;
-import io.sapl.demo.repository.RelationRepo;
-import io.sapl.demo.repository.UserRepo;
+import io.sapl.demo.domain.DemoData;
+import io.sapl.demo.domain.PatientRepo;
+import io.sapl.demo.domain.RelationRepo;
+import io.sapl.demo.domain.UserRepo;
 
 @SpringBootApplication
 @EnableJpaRepositories("io.sapl.demo.repository")
@@ -23,7 +23,7 @@ public class SaplDemoObligationAdviceApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demoData(UserRepo userRepo, PatientenRepo personsRepo, RelationRepo relationRepo,
+	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo personsRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
 		return args -> {
 			DemoData.loadDemoDataset(userRepo, personsRepo, relationRepo);

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.demo.domain.Patient;
-import io.sapl.demo.repository.PatientenRepo;
+import io.sapl.demo.domain.PatientRepo;
 import io.sapl.spring.SAPLAuthorizator;
 
 @Controller
@@ -18,10 +18,10 @@ public class UIController {
 
 	private SAPLAuthorizator sapl;
 
-	private PatientenRepo patientenRepo;
+	private PatientRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator sapl, PatientenRepo patientenRepo) {
+	public UIController(SAPLAuthorizator sapl, PatientRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 	}
