@@ -7,8 +7,8 @@
     <string name="login_id">Personal ID</string>
     <string name="login_std_id">a12345</string>
     <string name="login_pw">Password</string>
-    <string name="login_std_pw">admin</string>
-    <string name="login_button">LOGIN</string>
+    <string name="login_std_pw">password</string>
+    <string name="login_button">CONTINUE</string>
 
     <!-- flight selection screen //-->
     <string name="fs_dep">DEP</string>

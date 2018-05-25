@@ -19,8 +19,15 @@ import java.util.Locale;
 import java.util.Map;
 
 public class FlightSelectionActivity extends AppCompatActivity implements AsyncResponse {
+    private static final String ACCESS_DENIED = "Not allowed, %s";
     public static final String PIL_DATA = "PIL_DATA";
-    public static final String PEP_SERVER = "saplgeo.pepserver.info"; // adopt for PEP server URL
+    static final String DEP_AP = "dep";
+    static final String ARR_AP = "dest";
+    static final String FLT_NO = "fltNo";
+    static final String DATE = "date";
+    static final String CLASSIFICATION = "classification";
+    static final String RECURRENT = "recurrent";
+    static final String TYPE = "type";
 
     private static final int META = 0;
     private static final int RESTRICTED = 1;
@@ -28,10 +35,8 @@ public class FlightSelectionActivity extends AppCompatActivity implements AsyncR
     private static final String DATE_PICKER = "datePicker";
 
     private final Calendar myCalendar = Calendar.getInstance();
-    private Map<String, Object> subject = new HashMap<>();
-    private Map<String, Object> environment = new HashMap<>();
     private String username;
-    private CertificateManager certManager;
+    private String base64EncodedCredentials;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +44,10 @@ public class FlightSelectionActivity extends AppCompatActivity implements AsyncR
         setContentView(R.layout.activity_flight_selection);
         Intent intent = getIntent();
 
-        // Load certificates
-        certManager = new CertificateManager(getResources().openRawResource(R.raw.saplgeo_client), getResources().openRawResource(R.raw.saplgeo_server));
-
         // User-ID in bottomline
         username = intent.getStringExtra(LoginActivity.USERNAME);
+        base64EncodedCredentials = intent.getStringExtra(LoginActivity.CREDENTIALS);
         ((TextView) findViewById(R.id.userDisplay)).setText(username);
-        subject.put(SAPLRequest.PERS_ID, username);
-        subject.put(SAPLRequest.OPS_STATUS, SAPLRequest.STD_STATUS);
 
         // current date
         TextView dateView = findViewById(R.id.selDate);
@@ -62,32 +63,28 @@ public class FlightSelectionActivity extends AppCompatActivity implements AsyncR
     }
 
     public void showMetaPil(View view) {
-        SAPLRequest req = new SAPLRequest(subject, SAPLRequest.PIL_RETRIEVE, getResourceMap(META), environment);
-        new RequestSender(PEP_SERVER, req.toJsonNode(), certManager, this).execute();
+        new RestRequestSender(getRequestParameter(META), base64EncodedCredentials, this).execute();
         setButtonState(false);
     }
 
     public void showReducedPil(View view) {
-        SAPLRequest req = new SAPLRequest(subject, SAPLRequest.PIL_RETRIEVE, getResourceMap(RESTRICTED), environment);
-        new RequestSender(PEP_SERVER, req.toJsonNode(), certManager, this).execute();
+        new RestRequestSender(getRequestParameter(RESTRICTED), base64EncodedCredentials, this).execute();
         setButtonState(false);
     }
 
     public void showFullPil(View view) throws IOException {
-        SAPLRequest req = new SAPLRequest(subject, SAPLRequest.PIL_RETRIEVE, getResourceMap(CONFIDENTIAL), environment);
-        new RequestSender(PEP_SERVER, req.toJsonNode(), certManager, this).execute();
+        new RestRequestSender(getRequestParameter(CONFIDENTIAL), base64EncodedCredentials, this).execute();
         setButtonState(false);
     }
 
-    private Map<String, Object> getResourceMap(int classification) {
-        Map<String, Object> resource = new HashMap<>();
-        resource.put(SAPLRequest.FLT_NO, ((EditText) findViewById(R.id.selFltNo)).getText().toString());
-        resource.put(SAPLRequest.DEP_AP, ((EditText) findViewById(R.id.selDepAp)).getText().toString());
-        resource.put(SAPLRequest.ARR_AP, ((EditText) findViewById(R.id.selArrAp)).getText().toString());
-        resource.put(SAPLRequest.DATE, ((EditText) findViewById(R.id.selDate)).getText().toString());
-        resource.put(SAPLRequest.AC_REG, SAPLRequest.STD_AC);
-        resource.put(SAPLRequest.CLASSIFICATION, classification);
-        return resource;
+    private Map<String, String> getRequestParameter(int classification) {
+        Map<String, String> param = new HashMap<>();
+        param.put(FLT_NO, ((EditText) findViewById(R.id.selFltNo)).getText().toString());
+        param.put(DEP_AP, ((EditText) findViewById(R.id.selDepAp)).getText().toString());
+        param.put(ARR_AP, ((EditText) findViewById(R.id.selArrAp)).getText().toString());
+        param.put(DATE, ((EditText) findViewById(R.id.selDate)).getText().toString());
+        param.put(CLASSIFICATION, String.valueOf(classification));
+        return param;
     }
 
     private void setButtonState(boolean state) {
@@ -105,10 +102,11 @@ public class FlightSelectionActivity extends AppCompatActivity implements AsyncR
             PilData data = mapper.readValue(output, PilData.class);
             Intent intent = new Intent(this, PilDisplayActivity.class);
             intent.putExtra(PIL_DATA, data);
+            intent.putExtra(LoginActivity.CREDENTIALS, base64EncodedCredentials);
             intent.putExtra(LoginActivity.USERNAME, username);
             startActivity(intent);
         } catch (IOException e) {
-            Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), String.format(ACCESS_DENIED, output), Toast.LENGTH_LONG).show();
         }
     }
 }

@@ -23,12 +23,11 @@ import lombok.Setter;
 
 public class PilDisplayActivity extends AppCompatActivity implements AsyncResponse {
     private static final long PERMISSION_VALIDITY_PERIOD = 20000;
-    private static final String PERMIT = "PERMIT";
+    private static final String HTTP_OK = "200";
     private static final String NOT_ALLOWED = "You are not allowed to view this data anymore.";
 
-    private CertificateManager certManager;
-    private String username;
-    private SAPLRequest request;
+    protected Map<String, String> requestParameter;
+    private String base64EncodedCredentials;
     private Timer timerObj;
     private PilData data;
 
@@ -41,22 +40,19 @@ public class PilDisplayActivity extends AppCompatActivity implements AsyncRespon
         }
 
         Intent intent = getIntent();
+        base64EncodedCredentials = intent.getStringExtra(LoginActivity.CREDENTIALS);
         data = (PilData) intent.getSerializableExtra(FlightSelectionActivity.PIL_DATA);
-        username = intent.getStringExtra(LoginActivity.USERNAME);
 
-        request = createRecurrentRequest();
+        requestParameter = createRecurrentRequest();
         fillMetaData();
         fillPaxData();
         fillPassengerList();
-
-        // Load certificates
-        certManager = new CertificateManager(getResources().openRawResource(R.raw.saplgeo_client), getResources().openRawResource(R.raw.saplgeo_server));
 
         // Check regularly if permission is still applicable
         timerObj = new Timer();
         TimerTask timerTaskObj = new TimerTask() {
             public void run() {
-                new RequestSender(FlightSelectionActivity.PEP_SERVER, request.toJsonNode(), certManager, PilDisplayActivity.this).execute();
+                new RestRequestSender(requestParameter, base64EncodedCredentials, PilDisplayActivity.this).execute();
             }
         };
         timerObj.schedule(timerTaskObj, PERMISSION_VALIDITY_PERIOD, PERMISSION_VALIDITY_PERIOD);
@@ -68,22 +64,16 @@ public class PilDisplayActivity extends AppCompatActivity implements AsyncRespon
         timerObj.cancel();
     }
 
-    private SAPLRequest createRecurrentRequest() {
-        Map<String, Object> subject = new HashMap<>();
-        Map<String, Object> resource = new HashMap<>();
+    private Map<String, String> createRecurrentRequest() {
+        Map<String, String> params = new HashMap<>();
+        params.put(FlightSelectionActivity.FLT_NO, data.getMetaData().getFltNo());
+        params.put(FlightSelectionActivity.DEP_AP, data.getMetaData().getDepAp());
+        params.put(FlightSelectionActivity.ARR_AP, data.getMetaData().getArrAp());
+        params.put(FlightSelectionActivity.DATE, data.getMetaData().getDate());
+        params.put(FlightSelectionActivity.CLASSIFICATION, String.valueOf(data.getMetaData().getClassification()));
+        params.put(FlightSelectionActivity.TYPE, String.valueOf(FlightSelectionActivity.RECURRENT));
 
-        subject.put(SAPLRequest.PERS_ID, username);
-        subject.put(SAPLRequest.OPS_STATUS, SAPLRequest.STD_STATUS);
-
-        resource.put(SAPLRequest.FLT_NO, data.getMetaData().getFltNo());
-        resource.put(SAPLRequest.DEP_AP, data.getMetaData().getDepAp());
-        resource.put(SAPLRequest.ARR_AP, data.getMetaData().getArrAp());
-        resource.put(SAPLRequest.DATE, data.getMetaData().getDate());
-        resource.put(SAPLRequest.AC_REG, SAPLRequest.STD_AC);
-        resource.put(SAPLRequest.CLASSIFICATION, data.getMetaData().getClassification());
-        resource.put(SAPLRequest.RECURRENT, true);
-
-        return new SAPLRequest(subject, SAPLRequest.PIL_RETRIEVE, resource, new HashMap<String, Object>());
+        return params;
     }
 
     private void fillMetaData() {
@@ -144,7 +134,7 @@ public class PilDisplayActivity extends AppCompatActivity implements AsyncRespon
 
     @Override
     public void processFinish(String output) {
-        if (!output.equals(PERMIT)) {
+        if (!output.equals(HTTP_OK)) {
             Toast.makeText(getApplicationContext(), NOT_ALLOWED, Toast.LENGTH_LONG).show();
             finish();
         }
