@@ -4,15 +4,15 @@ The SAPL Demo Geo Server implements a Spring RESTful server with the configurati
 
 An example for such an Android app to access the server can be found [here](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-geo-app).
 
-A video explaining the scenario and policy logic can be found [here](http://youtube.com).
+A video explaining the scenario and policy logic can be found [here](https://www.youtube.com/watch?v=OtSotMNmX9Y).
 
 
 ## Installation
 
-Configuration of the RESTful Server is usually not necessary. However, due to the complexity of the scenario, a few databases and services have to be installed on the server itself. For this purpose a docker script was implemented which can be found [here](http://docker.com). It basically does the following things:
-* Opens the port for the app/server connection
-* Installs and configures a Traccar server
-* Installs and configures a PostGIS DB and initializes it with some basic data
+Configuration of the RESTful Server is usually not necessary. However, due to the complexity of the scenario, a few databases and services have to be installed on the server itself:
+* Ports for the app/server connection have to be opened
+* A Traccar server has to be installed, configured and for test purposes filled with some sample data
+* A PostGIS database has to be installed and initialized with some sample data
 
 ## Sample Request
 The following shows a sample request to the SAPL Demo Geo Server. The standard username is `a12345` with the password `password`.
