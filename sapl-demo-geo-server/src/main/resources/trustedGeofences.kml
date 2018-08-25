@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml>
+   <Document>
+      <name>topp:samples</name>
+      <Placemark>
+         <name><![CDATA[MUC]]></name>
+         <description><![CDATA[Airport area around MUC]]></description>
+         <styleUrl>#GeoServerStylestates.1</styleUrl>
+         <MultiGeometry>
+            <Polygon>
+               <outerBoundaryIs>
+                  <LinearRing>
+                     <coordinates decimal="." cs="," ts=" ">48.049651,11.339813 48.415553,11.589752 48.407349,12.026459 48.067090,11.931702 48.049651,11.339813</coordinates>
+                  </LinearRing>
+               </outerBoundaryIs>
+            </Polygon>
+         </MultiGeometry>
+      </Placemark>      
+      <Placemark>
+         <name><![CDATA[FRA]]></name>
+         <description><![CDATA[Airport area around FRA]]></description>
+         <styleUrl>#GeoServerStylestates.2</styleUrl>
+         <MultiGeometry>
+            <Polygon>
+               <outerBoundaryIs>
+                  <LinearRing>
+                     <coordinates decimal="." cs="," ts=" ">49.940637,8.175751 49.943289,8.882996 50.166365,8.817078 50.155808,8.130432 49.940637,8.175751</coordinates>
+                  </LinearRing>
+               </outerBoundaryIs>
+            </Polygon>
+         </MultiGeometry>
+      </Placemark>
+   </Document>
+</kml>

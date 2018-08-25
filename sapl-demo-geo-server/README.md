@@ -9,10 +9,19 @@ A video explaining the scenario and policy logic can be found [here](https://www
 
 ## Installation
 
-Configuration of the RESTful Server is usually not necessary. However, due to the complexity of the scenario, a few databases and services have to be installed on the server itself:
-* Ports for the app/server connection have to be opened
-* A Traccar server has to be installed, configured and for test purposes filled with some sample data
-* A PostGIS database has to be installed and initialized with some sample data
+Configuration of the RESTful Server is usually not necessary. However, due to the complexity of the scenario, a few databases and services have to be made available. The easiest way to setup all of them is probably through [Docker](https://www.docker.com/).
+
+* A Traccar server has to be installed, configured and for test purposes filled with some sample data.
+
+```
+docker run -d --name traccar-server -p 5000-5150:5000-5150 -p 8082:8082 traccar/traccar
+```
+* A PostGIS database has to be installed and initialized with some sample data. You can find a preconfigured `data`-folder to be used with your database in the *src/main/resources*-folder. Within Docker you can unpack this archieve into a volume `pg_data` and mount it to a PostGIS-database with the following command.
+
+```
+docker run --name=postgis_sapl_geo -d -e POSTGRES_USER=sapl_pip -e POSTGRES_PASS=openconjurer -e POSTGRES_DBNAME=airline_backend -e ALLOW_IP_RANGE=0.0.0.0/0 -p 5432:5432 -v pg_data:/var/lib/postgresql/data --restart=always mdillon/postgis
+```
+* The KML-file in *src/main/resources/trustedGeofences.kml* has to be made available either through the file system or a web server.
 
 ## Sample Request
 The following shows a sample request to the SAPL Demo Geo Server. The standard username is `a12345` with the password `password`.
