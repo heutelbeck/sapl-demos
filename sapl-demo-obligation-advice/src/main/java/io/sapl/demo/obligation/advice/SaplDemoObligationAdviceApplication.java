@@ -14,8 +14,8 @@ import io.sapl.demo.domain.RelationRepo;
 import io.sapl.demo.domain.UserRepo;
 
 @SpringBootApplication
-@EnableJpaRepositories("io.sapl.demo.repository")
-@EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
+@EnableJpaRepositories("io.sapl.demo.domain")
+@EntityScan("io.sapl.demo.domain")
 public class SaplDemoObligationAdviceApplication {
 
 	public static void main(String[] args) {

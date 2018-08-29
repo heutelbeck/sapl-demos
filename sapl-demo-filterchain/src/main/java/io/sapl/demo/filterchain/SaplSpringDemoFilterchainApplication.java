@@ -20,8 +20,8 @@ import io.sapl.demo.domain.User;
 import io.sapl.demo.domain.UserRepo;
 
 @SpringBootApplication
-@EnableJpaRepositories("io.sapl.demo.repository")
-@EntityScan({ "io.sapl.demo.domain", "io.sapl.demo.repository" })
+@EnableJpaRepositories("io.sapl.demo.domain")
+@EntityScan("io.sapl.demo.domain")
 public class SaplSpringDemoFilterchainApplication {
 
 	private static final String HRN1 = "123456";
