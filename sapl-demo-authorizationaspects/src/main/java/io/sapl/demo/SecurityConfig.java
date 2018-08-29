@@ -23,7 +23,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	AuthenticationManager authManager(UserRepo userRepo) {
+	public AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
 	}
 

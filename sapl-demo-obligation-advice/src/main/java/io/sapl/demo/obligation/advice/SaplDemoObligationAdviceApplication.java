@@ -1,5 +1,6 @@
 package io.sapl.demo.obligation.advice;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,6 +19,9 @@ import io.sapl.demo.domain.UserRepo;
 @EntityScan("io.sapl.demo.domain")
 public class SaplDemoObligationAdviceApplication {
 
+	@Value("${encrypted.testpwd}")
+	private String defaultPassword;
+
 	public static void main(String[] args) {
 		SpringApplication.run(SaplDemoObligationAdviceApplication.class, args);
 	}
@@ -25,6 +29,6 @@ public class SaplDemoObligationAdviceApplication {
 	@Bean
 	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
-		return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
+		return args -> DemoData.loadDemoDataset(userRepo, defaultPassword, patientRepo, relationRepo);
 	}
 }

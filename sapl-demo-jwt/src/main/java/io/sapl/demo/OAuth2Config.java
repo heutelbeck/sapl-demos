@@ -48,8 +48,10 @@ import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 @SuppressWarnings("deprecation")
 public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
-	// @Value("${encryptet.testpwd}")
-	// private String defaultPassword;
+	private static final String ROLE_CLIENT = "ROLE_CLIENT";
+
+	@Value("${encrypted.testpwd}")
+	private String defaultPassword;
 
 	@Value("${jwt.secret}")
 	private String secret;
@@ -61,31 +63,11 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	private String publicKey;
 
 	@Autowired
-	private UserRepo userRepo;
-
-	private static final String ROLE_CLIENT = "ROLE_CLIENT";
-
-	@Autowired
 	private AuthenticationManager authenticationManager;
 
 	@Bean
-	AuthenticationManager authManager() {
-		return authentication -> {
-			String username = authentication.getPrincipal().toString();
-
-			User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
-			if (user.isDisabled()) {
-				throw new DisabledException("user disabled");
-			}
-			String password = authentication.getCredentials().toString();
-			if (!password.equals(user.getPassword())) {
-				throw new BadCredentialsException("user and/or password do not match");
-			}
-			List<GrantedAuthority> userAuthorities = new ArrayList<>();
-			user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
-			return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
-
-		};
+	public AuthenticationManager authManager(UserRepo userRepo) {
+		return new AuthManager(userRepo);
 	}
 
 	@Bean

@@ -7,7 +7,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class DemoData {
-	private static final String DEFAULT_PASS = "password";
+
 	private static final String HRN1 = "123456";
 	private static final String HRN2 = "4711";
 	private static final String ROLE_DOCTOR = "DOCTOR";
@@ -26,25 +26,23 @@ public class DemoData {
 	private static final String NAME_KARL = "Karl";
 	private static final String NAME_HORST = "Horst";
 
-	public static void loadDemoDataset(UserRepo userRepo, PatientRepo personsRepo, RelationRepo relationRepo) {
-		userRepo.save(new User(NAME_DOMINIK, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
-		userRepo.save(new User(NAME_JULIA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_PETER, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_ALINA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_THOMAS, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_BRIGITTE, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANOSCH, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANINA, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(
-				new User(NAME_HORST, DEFAULT_PASS, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
+	public static void loadDemoDataset(UserRepo userRepo, String password, PatientRepo patientRepo, RelationRepo relationRepo) {
+		userRepo.save(new User(NAME_DOMINIK, password, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
+		userRepo.save(new User(NAME_JULIA, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_PETER, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_ALINA, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_THOMAS, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_BRIGITTE, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_JANOSCH, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_JANINA, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_HORST, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
 
-		personsRepo.save(
-				new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));
-		personsRepo.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
+		patientRepo.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));
+		patientRepo.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
 
-		relationRepo.save(new Relation(NAME_DOMINIK, personsRepo.findByName(NAME_LENNY).getId()));
-		relationRepo.save(new Relation(NAME_JULIA, personsRepo.findByName(NAME_KARL).getId()));
-		relationRepo.save(new Relation(NAME_ALINA, personsRepo.findByName(NAME_KARL).getId()));
-		relationRepo.save(new Relation(NAME_JANOSCH, personsRepo.findByName(NAME_KARL).getId()));
+		relationRepo.save(new Relation(NAME_DOMINIK, patientRepo.findByName(NAME_LENNY).getId()));
+		relationRepo.save(new Relation(NAME_JULIA, patientRepo.findByName(NAME_KARL).getId()));
+		relationRepo.save(new Relation(NAME_ALINA, patientRepo.findByName(NAME_KARL).getId()));
+		relationRepo.save(new Relation(NAME_JANOSCH, patientRepo.findByName(NAME_KARL).getId()));
 	}
 }

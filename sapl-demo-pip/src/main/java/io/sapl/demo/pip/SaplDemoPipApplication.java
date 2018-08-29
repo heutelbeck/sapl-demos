@@ -27,6 +27,6 @@ public class SaplDemoPipApplication {
 
 	@Bean
 	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo) {
-		return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
+		return args -> DemoData.loadDemoDataset(userRepo, defaultPassword, patientRepo, relationRepo);
 	}
 }

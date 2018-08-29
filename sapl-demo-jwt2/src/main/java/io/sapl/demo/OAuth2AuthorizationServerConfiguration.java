@@ -1,21 +1,15 @@
 package io.sapl.demo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import io.sapl.demo.domain.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -25,9 +19,6 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import io.sapl.demo.domain.User;
-import io.sapl.demo.domain.UserRepo;
 
 /**
  * This configuration sets up a simple authorization server providing OAuth2 and
@@ -51,30 +42,12 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
 	@Value("${jwt.publicKey}")
 	private String publicKey;
 
-	// user repository of the demo domain model
 	@Autowired
-	private UserRepo userRepo;
+	private AuthenticationManager authenticationManager;
 
-	// Use the user repository for authentication
 	@Bean
-	AuthenticationManager authenticationManager() {
-		return authentication -> {
-			String username = authentication.getPrincipal().toString();
-
-			User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("user and/or password do not match"));
-			if (user.isDisabled()) {
-				throw new DisabledException("user disabled");
-			}
-			String password = authentication.getCredentials().toString();
-			// Plain-text passwords are used. Do not do this in production.
-			// TODO: use bcrypt in demo as well. show best practices!
-			if (!password.equals(user.getPassword())) {
-				throw new BadCredentialsException("user and/or password do not match");
-			}
-			List<GrantedAuthority> userAuthorities = new ArrayList<>();
-			user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
-			return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
-		};
+	public AuthenticationManager authenticationManager(UserRepo userRepo) {
+		return new AuthManager(userRepo);
 	}
 
 	@Bean
@@ -99,7 +72,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
 
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		endpoints.authenticationManager(authenticationManager()).accessTokenConverter(accessTokenConverter());
+		endpoints.authenticationManager(authenticationManager).accessTokenConverter(accessTokenConverter());
 	}
 
 	@Override

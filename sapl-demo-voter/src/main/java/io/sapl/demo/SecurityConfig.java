@@ -1,28 +1,8 @@
 package io.sapl.demo;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.access.AccessDecisionManager;
-import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.vote.AuthenticatedVoter;
-import org.springframework.security.access.vote.RoleVoter;
-import org.springframework.security.access.vote.UnanimousBased;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.web.access.expression.WebExpressionVoter;
-
-import io.sapl.demo.domain.User;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
@@ -32,44 +12,35 @@ import io.sapl.spring.SaplBasedVoter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.access.vote.RoleVoter;
+import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
 
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-	@Autowired
-	private UserRepo userRepo;
-
-	@Autowired
-	SAPLAuthorizator saplAuthorizer;
-
 	@Bean
-	WebSecurityConfigurerAdapter webSecurityConfigurerAdapter() {
-		return new ConfigAdapter(getAccessDecisionManager(saplBasedVoter()));
+	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter(AccessDecisionManager accessDecisionManager) {
+		return new ConfigAdapter(accessDecisionManager);
 
 	}
 
 	@Bean
-	AuthenticationManager authManager() {
-		return authentication -> {
-			String username = authentication.getPrincipal().toString();
-
-			User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
-			if (user.isDisabled()) {
-				throw new DisabledException("user disabled");
-			}
-			String password = authentication.getCredentials().toString();
-			if (!password.equals(user.getPassword())) {
-				throw new BadCredentialsException("user and/or password do not match");
-			}
-			List<GrantedAuthority> userAuthorities = new ArrayList<>();
-			user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
-			return new UsernamePasswordAuthenticationToken(username, password, userAuthorities);
-		};
+	public AuthenticationManager authManager(UserRepo userRepo) {
+		return new AuthManager(userRepo);
 	}
 
 	@Bean
-	public SaplBasedVoter saplBasedVoter() {
+	public SaplBasedVoter saplBasedVoter(SAPLAuthorizator saplAuthorizer) {
 		return new SaplBasedVoter(saplAuthorizer);
 	}
 

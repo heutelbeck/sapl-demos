@@ -1,8 +1,11 @@
-package io.sapl.demo.pip;
+package io.sapl.demo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.sapl.demo.domain.User;
+import io.sapl.demo.domain.UserRepo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -11,10 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import io.sapl.demo.domain.User;
-import io.sapl.demo.domain.UserRepo;
-import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public class AuthManager implements AuthenticationManager {

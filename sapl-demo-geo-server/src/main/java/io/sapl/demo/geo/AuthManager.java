@@ -22,6 +22,7 @@ public class AuthManager implements AuthenticationManager {
 	private static final String NO_VALID_USER = "No valid user name provided.";
 	private static final String USER_INACTIVE = "User is not active.";
 	private static final String INVALID_PW = "User and/or password do not match.";
+
 	private final BCryptPasswordEncoder passwdEncoder = new BCryptPasswordEncoder();
 	private final CrewRepo crewRepo;
 
@@ -31,9 +32,7 @@ public class AuthManager implements AuthenticationManager {
 
 		CrewMember flightAttendant = crewRepo.findById(username)
 				.orElseThrow(() -> new BadCredentialsException(NO_VALID_USER));
-		if (flightAttendant == null) {
-			throw new BadCredentialsException(NO_VALID_USER);
-		}
+
 		if (!flightAttendant.isActive()) {
 			throw new DisabledException(USER_INACTIVE);
 		}

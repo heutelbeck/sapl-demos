@@ -19,31 +19,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AuthManager implements AuthenticationManager {
 
-	private final BCryptPasswordEncoder passwdEncoder = new BCryptPasswordEncoder();
+	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
 	private final UserRepo userRepo;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) {
 		String username = authentication.getPrincipal().toString();
-
-		User user = userRepo.findById(username)
-				.orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
-		if (user == null) {
-			throw new BadCredentialsException("no user name provided");
-		}
+		User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
 		if (user.isDisabled()) {
 			throw new DisabledException("user disabled");
 		}
-		String rawPassword = authentication.getCredentials().toString();
 
-		if (!passwdEncoder.matches(rawPassword, user.getPassword())) {
+		String rawPassword = authentication.getCredentials().toString();
+		if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
 			throw new BadCredentialsException("user and/or password do not match");
 		}
+
 		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
 		return new UsernamePasswordAuthenticationToken(username, user.getPassword(), userAuthorities);
-
 	}
 
 }
