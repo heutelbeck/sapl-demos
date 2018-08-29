@@ -54,9 +54,7 @@ public class SecurityConfig {
 		return authentication -> {
 			String username = authentication.getPrincipal().toString();
 
-			User user = userRepo.findById(username).orElseThrow(() -> {
-				return new BadCredentialsException("no valid user name provided");
-			});
+			User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
 			if (user.isDisabled()) {
 				throw new DisabledException("user disabled");
 			}

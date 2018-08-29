@@ -61,9 +61,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
 		return authentication -> {
 			String username = authentication.getPrincipal().toString();
 
-			User user = userRepo.findById(username).orElseThrow(() -> {
-				return new BadCredentialsException("user and/or password do not match");
-			});
+			User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("user and/or password do not match"));
 			if (user.isDisabled()) {
 				throw new DisabledException("user disabled");
 			}

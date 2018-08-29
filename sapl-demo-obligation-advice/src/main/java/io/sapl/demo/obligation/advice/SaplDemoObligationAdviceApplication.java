@@ -23,10 +23,8 @@ public class SaplDemoObligationAdviceApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo personsRepo, RelationRepo relationRepo,
+	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo,
 			ApplicationContext ctx) {
-		return args -> {
-			DemoData.loadDemoDataset(userRepo, personsRepo, relationRepo);
-		};
+		return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
 	}
 }

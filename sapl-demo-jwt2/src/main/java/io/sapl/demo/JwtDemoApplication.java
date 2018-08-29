@@ -28,16 +28,14 @@ public class JwtDemoApplication {
 	 *
 	 * @param userRepo
 	 *            the user repository
-	 * @param personsRepo
+	 * @param patientRepo
 	 *            the patient repository
 	 * @param relationRepo
 	 *            the relation repository
 	 * @return initialization routine
 	 */
 	@Bean
-	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo personsRepo, RelationRepo relationRepo) {
-		return args -> {
-			DemoData.loadDemoDataset(userRepo, personsRepo, relationRepo);
-		};
+	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo) {
+		return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
 	}
 }
