@@ -17,6 +17,11 @@ package io.sapl.demo;
 
 import java.io.IOException;
 
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.Response;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -25,11 +30,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import reactor.core.publisher.Mono;
 
 public class EmbeddedPDPDemo {
 
@@ -47,18 +48,8 @@ public class EmbeddedPDPDemo {
 	private static final double BILLION = 1000000000.0D;
 	private static final double MILLION = 1000000.0D;
 
-	private static double nanoToMs(double nanoseconds) {
-		return nanoseconds / MILLION;
-	}
-
-	private static double nanoToS(double nanoseconds) {
-		return nanoseconds / BILLION;
-	}
-
 	public static void main(String[] args) {
-
 		Options options = new Options();
-
 		options.addOption(POLICYPATH, true, POLICYPATH_DOC);
 		options.addOption(HELP, false, HELP_DOC);
 
@@ -69,7 +60,7 @@ public class EmbeddedPDPDemo {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(USAGE, options);
 			} else {
-				runDemo(cmd.getOptionValue(POLICYPATH));
+				new EmbeddedPDPDemo().runDemo(cmd.getOptionValue(POLICYPATH));
 			}
 		} catch (ParseException | IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
@@ -78,21 +69,73 @@ public class EmbeddedPDPDemo {
 
 	}
 
-	private static void runDemo(String path)
-			throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
-		EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
+	public void runDemo(String path) throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
+		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
+		useBlockingDecide(pdp);
+		useReactiveDecide(pdp);
+
+		runBlockingPerformanceDemo(pdp);
+		runReactivePerformanceDemo(pdp);
+	}
+
+	private void useBlockingDecide(EmbeddedPolicyDecisionPoint pdp) {
+		LOGGER.info("Blocking...");
+		final Response readResponse = pdp.decide("willi", "read", "something");
+		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
+		final Response writeResponse = pdp.decide("willi", "write", "something");
+		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
+	}
+
+	private void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
+		LOGGER.info("Reactive...");
+		final Mono<Response> readResponse = pdp.reactiveDecide("willi", "read", "something");
+		readResponse.subscribe(response -> handleResponse("read", response));
+		final Mono<Response> writeResponse = pdp.reactiveDecide("willi", "write", "something");
+		writeResponse.subscribe(response -> handleResponse("write", response));
+	}
+
+	private void handleResponse(String action, Response response) {
+		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
+	}
+
+	private void runBlockingPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+		LOGGER.info("Blocking...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide("willi", "read", "something");
-			// log.info("response: " + response.toString());
+			pdp.decide("willi", "write", "something");
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);
 		LOGGER.info("End   : {}", end);
 		LOGGER.info("Runs  : {}", RUNS);
 		LOGGER.info("Total : {}s", nanoToS((double) end - start));
-
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+	}
+
+	private void runReactivePerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+		LOGGER.info("Reactive...");
+		long start = System.nanoTime();
+		for (int i = 0; i < RUNS; i++) {
+			final Mono<Response> readResponse = pdp.reactiveDecide("willi", "read", "something");
+			readResponse.subscribe();
+			final Mono<Response> writeResponse = pdp.reactiveDecide("willi", "write", "something");
+			writeResponse.subscribe();
+		}
+		long end = System.nanoTime();
+		LOGGER.info("Start : {}", start);
+		LOGGER.info("End   : {}", end);
+		LOGGER.info("Runs  : {}", RUNS);
+		LOGGER.info("Total : {}s", nanoToS((double) end - start));
+		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+	}
+
+	private double nanoToMs(double nanoseconds) {
+		return nanoseconds / MILLION;
+	}
+
+	private double nanoToS(double nanoseconds) {
+		return nanoseconds / BILLION;
 	}
 
 }
