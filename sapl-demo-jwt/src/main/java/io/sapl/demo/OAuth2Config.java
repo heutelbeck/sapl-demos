@@ -41,9 +41,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 
 	private static final String ROLE_CLIENT = "ROLE_CLIENT";
 
-	@Value("${encrypted.testpwd}")
-	private String defaultPassword;
-
 	@Value("${jwt.secret}")
 	private String secret;
 
