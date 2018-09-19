@@ -44,6 +44,12 @@ public class EmbeddedPDPDemo {
 			+ "The default path is 'classpath:policies'. The pattern will be extended by '/*.sapl' by the PDP/PRP. "
 			+ "So all files with the '.sapl' suffix will be loaded.";
 
+
+	private static final String SUBJECT = "willi";
+	private static final String ACTION_READ = "read";
+	private static final String ACTION_WRITE = "write";
+	private static final String RESOURCE = "something";
+
 	private static final int RUNS = 100000;
 	private static final double BILLION = 1000000000.0D;
 	private static final double MILLION = 1000000.0D;
@@ -60,7 +66,7 @@ public class EmbeddedPDPDemo {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(USAGE, options);
 			} else {
-				new EmbeddedPDPDemo().runDemo(cmd.getOptionValue(POLICYPATH));
+				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
 		} catch (ParseException | IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
@@ -69,8 +75,9 @@ public class EmbeddedPDPDemo {
 
 	}
 
-	public void runDemo(String path) throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
+	public static void runDemo(String path) throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
 		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
+
 		useBlockingDecide(pdp);
 		useReactiveDecide(pdp);
 
@@ -78,32 +85,32 @@ public class EmbeddedPDPDemo {
 		runReactivePerformanceDemo(pdp);
 	}
 
-	private void useBlockingDecide(EmbeddedPolicyDecisionPoint pdp) {
+	private static void useBlockingDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final Response readResponse = pdp.decide("willi", "read", "something");
+		final Response readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
-		final Response writeResponse = pdp.decide("willi", "write", "something");
+		final Response writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
-	private void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
+	private static void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Mono<Response> readResponse = pdp.reactiveDecide("willi", "read", "something");
-		readResponse.subscribe(response -> handleResponse("read", response));
-		final Mono<Response> writeResponse = pdp.reactiveDecide("willi", "write", "something");
-		writeResponse.subscribe(response -> handleResponse("write", response));
+		final Mono<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
+		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
+		final Mono<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
+		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
-	private void handleResponse(String action, Response response) {
+	private static void handleResponse(String action, Response response) {
 		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
 	}
 
-	private void runBlockingPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+	private static void runBlockingPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide("willi", "read", "something");
-			pdp.decide("willi", "write", "something");
+			pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+			pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);
@@ -113,13 +120,13 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
 
-	private void runReactivePerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+	private static void runReactivePerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			final Mono<Response> readResponse = pdp.reactiveDecide("willi", "read", "something");
+			final Mono<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
 			readResponse.subscribe();
-			final Mono<Response> writeResponse = pdp.reactiveDecide("willi", "write", "something");
+			final Mono<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
 			writeResponse.subscribe();
 		}
 		long end = System.nanoTime();
@@ -130,11 +137,11 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
 
-	private double nanoToMs(double nanoseconds) {
+	private static double nanoToMs(double nanoseconds) {
 		return nanoseconds / MILLION;
 	}
 
-	private double nanoToS(double nanoseconds) {
+	private static double nanoToS(double nanoseconds) {
 		return nanoseconds / BILLION;
 	}
 
