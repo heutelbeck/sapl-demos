@@ -30,7 +30,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 public class EmbeddedPDPDemo {
 
@@ -95,9 +95,9 @@ public class EmbeddedPDPDemo {
 
 	private static void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Mono<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
+		final Flux<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Mono<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Flux<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
@@ -124,9 +124,9 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Reactive...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			final Mono<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
+			final Flux<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
 			readResponse.subscribe();
-			final Mono<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
+			final Flux<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
 			writeResponse.subscribe();
 		}
 		long end = System.nanoTime();
