@@ -8,6 +8,12 @@ permit
 where
   resource == "/profiles";
 
+policy "permit_see_patient_details"
+permit
+    action == "GET"
+where
+  resource =~ "/patient";
+
 
 policy "permit_nurse_and_doctor_see_update_patient"
 permit
