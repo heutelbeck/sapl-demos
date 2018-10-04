@@ -65,6 +65,7 @@ public class UIController {
 		return "newPatient";
 	}
 
+	@PdpAuthorize
 	@GetMapping("/patient")
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
 
