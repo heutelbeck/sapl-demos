@@ -25,6 +25,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.pdp.Request;
+import io.sapl.api.pdp.Response;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -36,19 +46,6 @@ import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.XYChart;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
-
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.Request;
-import io.sapl.api.pdp.Response;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Benchmark {
@@ -295,7 +292,7 @@ public class Benchmark {
 					LOGGER.info("Total : {}ms", diff);
 				}
 			}
-		} catch (IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
+		} catch (IOException | AttributeException | FunctionException e) {
 			LOGGER.error("Error running test", e);
 		}
 
