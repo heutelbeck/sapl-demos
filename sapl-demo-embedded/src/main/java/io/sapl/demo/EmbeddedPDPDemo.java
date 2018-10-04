@@ -18,7 +18,6 @@ package io.sapl.demo;
 import java.io.IOException;
 
 import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
@@ -68,14 +67,14 @@ public class EmbeddedPDPDemo {
 			} else {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
-		} catch (ParseException | IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
+		} catch (ParseException | IOException | AttributeException | FunctionException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 
 	}
 
-	public static void runDemo(String path) throws IOException, PolicyEvaluationException, AttributeException, FunctionException {
+	public static void runDemo(String path) throws IOException, AttributeException, FunctionException {
 		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
 
 		useBlockingDecide(pdp);
