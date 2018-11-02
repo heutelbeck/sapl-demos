@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.PatientRepo;
-import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizer;
 
 @Controller
 public class UIController {
 
-	private SAPLAuthorizator sapl;
+	private SAPLAuthorizer sapl;
 
 	private PatientRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator sapl, PatientRepo patientenRepo) {
+	public UIController(SAPLAuthorizer sapl, PatientRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 	}
@@ -34,14 +34,12 @@ public class UIController {
 
 	@GetMapping("/patient")
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
-
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
 			throw new IllegalArgumentException();
 		}
 
 		model.addAttribute("patient", patient);
-
 		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumber", patient));
 		return "patient";
 	}

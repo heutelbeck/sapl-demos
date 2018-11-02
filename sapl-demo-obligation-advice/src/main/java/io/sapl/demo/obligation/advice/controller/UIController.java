@@ -2,6 +2,11 @@ package io.sapl.demo.obligation.advice.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.sapl.api.pdp.Response;
+import io.sapl.demo.domain.Patient;
+import io.sapl.demo.domain.PatientRepo;
+import io.sapl.spring.SAPLAuthorizer;
+import io.sapl.spring.annotation.PdpAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -15,40 +20,32 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import io.sapl.api.pdp.Response;
-import io.sapl.demo.domain.Patient;
-import io.sapl.demo.domain.PatientRepo;
-import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.annotation.PdpAuthorize;
-
 @Controller
 public class UIController {
 
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 
-	@Autowired
-	private SAPLAuthorizator sapl;
-	
-	@Autowired
+	private SAPLAuthorizer sapl;
+
 	private PatientRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator sapl, PatientRepo patientenRepo) {
+	public UIController(SAPLAuthorizer sapl, PatientRepo patientenRepo) {
 		this.sapl = sapl;
 		this.patientenRepo = patientenRepo;
 	}
 
-	@PdpAuthorize
 	@GetMapping("/profiles")
+	@PdpAuthorize
 	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
 		model.addAttribute("profiles", patientenRepo.findAll());
-		model.addAttribute("createPermission", sapl.authorize(authentication, RequestMethod.POST, request));
+		model.addAttribute("createPermission", sapl.wouldAuthorize(authentication, RequestMethod.POST, request));
 		return "profiles";
 	}
 
-	@PdpAuthorize
 	@PostMapping("/profiles")
+	@PdpAuthorize
 	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {
 		if (patientenRepo.existsById(newPatient.getId())) {
 			throw new IllegalArgumentException("Profile at this Id already exists");
@@ -65,10 +62,9 @@ public class UIController {
 		return "newPatient";
 	}
 
-	@PdpAuthorize
 	@GetMapping("/patient")
+	@PdpAuthorize
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
-
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
 			throw new IllegalArgumentException();
@@ -76,18 +72,13 @@ public class UIController {
 
 		model.addAttribute("patient", patient);
 
-		model.addAttribute("viewDiagnosisPermission",
-				sapl.authorize(authentication, "readDiagnosis", patient));
-		model.addAttribute("viewHRNPermission",
-				sapl.authorize(authentication, "read", "HRN"));
-		model.addAttribute("updatePermission",
-				sapl.authorize(authentication, RequestMethod.PUT, "/patient"));
-		model.addAttribute("deletePermission",
-				sapl.authorize(authentication, RequestMethod.DELETE, "/patient"));
-		model.addAttribute("viewRoomNumberPermission",
-				sapl.authorize(authentication, "viewRoomNumber", patient));
+		model.addAttribute("viewDiagnosisPermission", sapl.authorize(authentication, "readDiagnosis", patient));
+		model.addAttribute("viewHRNPermission", sapl.authorize(authentication, "read", "HRN"));
+		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumber", patient));
+		model.addAttribute("updatePermission", sapl.wouldAuthorize(authentication, RequestMethod.PUT, "/patient"));
+		model.addAttribute("deletePermission", sapl.wouldAuthorize(authentication, RequestMethod.DELETE, "/patient"));
 
-		boolean permissionBlackenedHRN = sapl.authorize(authentication, "getBlackenAndObligation", "anything");
+		boolean permissionBlackenedHRN = sapl.wouldAuthorize(authentication, "getBlackenAndObligation", "anything");
 		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
 
 		if (permissionBlackenedHRN) {
@@ -100,9 +91,9 @@ public class UIController {
 		return "patient";
 	}
 
-	@PdpAuthorize
 	@DeleteMapping("/patient")
-	public String delete(HttpServletRequest request, @RequestParam("id") int id) {
+	@PdpAuthorize
+	public String delete(@RequestParam("id") int id) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
 	}
@@ -115,27 +106,19 @@ public class UIController {
 				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
 		model.addAttribute("updatePatient", patient);
 
-		
-		
-		model.addAttribute("updateDiagnosisPermission",
-				sapl.authorize(authentication, "updateDiagnosis", patient));
-		model.addAttribute("updateHRNPermission",
-				sapl.authorize(authentication, UPDATE, "HRN"));
-		model.addAttribute("updateDoctorPermission",
-				sapl.authorize(authentication, UPDATE, "doctor"));
-		model.addAttribute("updateNursePermission",
-				sapl.authorize(authentication, UPDATE, "nurse"));
+		model.addAttribute("updateDiagnosisPermission", sapl.wouldAuthorize(authentication, "updateDiagnosis", patient));
+		model.addAttribute("updateHRNPermission", sapl.wouldAuthorize(authentication, UPDATE, "HRN"));
+		model.addAttribute("updateDoctorPermission", sapl.wouldAuthorize(authentication, UPDATE, "doctor"));
+		model.addAttribute("updateNursePermission", sapl.wouldAuthorize(authentication, UPDATE, "nurse"));
 		return "updatePatient";
 	}
 
-	@PdpAuthorize
 	@PutMapping("/patient")
-	public String updatePatient(HttpServletRequest request, @ModelAttribute("updatePatient") Patient updatePatient,
-			Authentication authentication) {
+	@PdpAuthorize
+	public String updatePatient(@ModelAttribute("updatePatient") Patient updatePatient, Authentication authentication) {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
 			throw new IllegalArgumentException("not found");
 		}
-
 
 		Patient savePatient = patientenRepo.findById(updatePatient.getId()).get();
 		savePatient.setName(updatePatient.getName());

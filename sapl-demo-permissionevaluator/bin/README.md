@@ -21,7 +21,7 @@ Remote or embedded `PDP` can be integrated into a Spring Boot Project with:
 ## sapl-spring
 
 
-In conjunction with SAPL requests we need a [StandardSAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizator.java), information about an authenticated user, objects of the domain model,
+In conjunction with SAPL requests we need a [StandardSAPLAuthorizer](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/StandardSAPLAuthorizer.java), information about an authenticated user, objects of the domain model,
 the system environment, HttpServletRequest parameters, the requested URI, et cetera,  and last but not least we need a customized
 PermissionEvaluator, the [SAPLPermissionEvaluator].
 The submodule [sapl-spring](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring) from <https://github.com/heutelbeck/sapl-policy-engine> provides these interfaces and classes
@@ -122,10 +122,10 @@ Here is an excerpt of the [SAPLPermissionEvaluator](https://github.com/heutelbec
 ```java
 public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
-    private StandardSAPLAuthorizator saplAuthorizer;
+    private StandardSAPLAuthorizer saplAuthorizer;
 
     @Autowired
-    public SAPLPermissionEvaluator(StandardSAPLAuthorizator saplAuthorizer) {
+    public SAPLPermissionEvaluator(StandardSAPLAuthorizer saplAuthorizer) {
         this.saplAuthorizer = saplAuthorizer;
     }
 

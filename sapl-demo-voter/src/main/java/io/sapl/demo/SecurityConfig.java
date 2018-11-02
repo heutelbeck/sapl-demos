@@ -7,7 +7,7 @@ import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.spring.SAPLAuthorizer;
 import io.sapl.spring.SaplBasedVoter;
 import io.sapl.spring.marshall.mapper.SaplMapper;
 import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
@@ -31,7 +31,6 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter(AccessDecisionManager accessDecisionManager) {
 		return new ConfigAdapter(accessDecisionManager);
-
 	}
 
 	@Bean
@@ -40,7 +39,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SaplBasedVoter saplBasedVoter(SAPLAuthorizator saplAuthorizer) {
+	public SaplBasedVoter saplBasedVoter(SAPLAuthorizer saplAuthorizer) {
 		return new SaplBasedVoter(saplAuthorizer);
 	}
 

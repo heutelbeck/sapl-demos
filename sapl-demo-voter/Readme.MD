@@ -112,4 +112,4 @@ private int mapDecisionToVoteResponse(Response response) {
 		return returnValue;
 	}
 ```
-Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizator`, which can help you write your policies.
+Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizer`, which can help you write your policies.
