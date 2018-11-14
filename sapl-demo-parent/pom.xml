@@ -33,7 +33,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-
 			<!-- Testing Scope Dependencies -->
 			<dependency>
 				<groupId>junit</groupId>
@@ -72,9 +71,9 @@
 				<artifactId>lombok</artifactId>
 				<version>${version.lombok}</version>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
+
 	<repositories>
 		<repository>
 			<id>spring-repo</id>
@@ -102,6 +101,7 @@
 			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
 		</repository>
 	</repositories>
+
 	<distributionManagement>
 		<repository>
 			<id>openconjurer</id>
@@ -114,6 +114,7 @@
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
+
 	<build>
 		<plugins>
 			<plugin>

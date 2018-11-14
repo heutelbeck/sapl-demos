@@ -48,6 +48,7 @@
 		<module>sapl-demo-voter</module>
 		<module>sapl-demo-authorizationaspects</module>
 		<module>sapl-demo-obligation-advice</module>
+		<module>sapl-demo-reactive</module>
   </modules>
 
 	<distributionManagement>

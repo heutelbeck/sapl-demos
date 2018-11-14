@@ -1,0 +1,18 @@
+import io.sapl.demo.shared.pip.PatientPIP as patient
+
+set "generalPolicies"
+deny-unless-permit
+
+
+policy "permit_loading_homepage"
+permit
+    action == "get"
+where
+    resource == "home";
+
+
+policy "permit_loading_profiles"
+permit
+    action == "get"
+where
+    resource == "profiles";
