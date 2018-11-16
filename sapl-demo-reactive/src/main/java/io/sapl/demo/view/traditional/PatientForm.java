@@ -1,4 +1,4 @@
-package io.sapl.demo.view;
+package io.sapl.demo.view.traditional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.data.Binder;
@@ -20,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 class PatientForm extends FormLayout {
 
-    private final PatientView patientView;
+    private final RefreshCallback refreshCallback;
     private final PatientRepo patientRepo;
     private final SAPLAuthorizer authorizer;
 
@@ -42,8 +42,8 @@ class PatientForm extends FormLayout {
     private Patient patient;
     private boolean isNewPatient;
 
-    PatientForm(PatientView patientView, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
-        this.patientView = patientView;
+    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
+        this.refreshCallback = refreshCallback;
         this.patientRepo = patientRepo;
         this.authorizer = authorizer;
 
@@ -177,7 +177,7 @@ class PatientForm extends FormLayout {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authorizer.authorize(authentication, isNewPatient ? "create" : "update", "profile")) {
             patientRepo.save(patient);
-            patientView.refreshList();
+            refreshCallback.refresh();
         } else {
             SecurityUtils.notifyNotAuthorized();
         }
@@ -188,10 +188,16 @@ class PatientForm extends FormLayout {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authorizer.authorize(authentication, "delete", "profile")) {
             patientRepo.delete(patient);
-            patientView.refreshList();
+            refreshCallback.refresh();
         } else {
             SecurityUtils.notifyNotAuthorized();
         }
         setVisible(false);
+    }
+
+
+    @FunctionalInterface
+    public interface RefreshCallback {
+        void refresh();
     }
 }

@@ -1,10 +1,11 @@
-package io.sapl.demo.view;
+package io.sapl.demo.view.traditional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
@@ -18,7 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-@SpringView(name = "patient")
+@SpringComponent("traditionalPatientView")
+@SpringView(name = "traditional")
 public class PatientView extends VerticalLayout implements View {
 
     @Autowired
@@ -35,7 +37,7 @@ public class PatientView extends VerticalLayout implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        final PatientForm form = new PatientForm(this, patientRepo, authorizer);
+        final PatientForm form = new PatientForm(this::refresh, patientRepo, authorizer);
         form.setSizeFull();
         form.setVisible(false);
 
@@ -80,7 +82,7 @@ public class PatientView extends VerticalLayout implements View {
 
     }
 
-    void refreshList() {
+    private void refresh() {
         final List<Patient> patients = loadAllPatients();
         grid.setItems(patients);
     }

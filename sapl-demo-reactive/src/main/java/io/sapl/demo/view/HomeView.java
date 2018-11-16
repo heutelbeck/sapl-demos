@@ -7,6 +7,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import io.sapl.demo.security.SecurityUtils;
 import io.sapl.demo.service.BackendService;
 import io.sapl.spring.SAPLAuthorizer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,19 +30,40 @@ public class HomeView extends VerticalLayout implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final String username = authentication.getName();
-        final Label label = new Label("Hello " + username);
-        label.setStyleName(ValoTheme.LABEL_H1);
+        final String username = SecurityUtils.getUsername();
+        final Label label = new Label("Welcome " + username);
+        label.setStyleName(ValoTheme.LABEL_LARGE);
         addComponent(label);
 
-        final Button btn = new Button("Show Patient List",
-                click -> getUI().getNavigator().navigateTo("patient")
+        final Button traditionalBtn = new Button("Show Patient List (Traditional)",
+                click -> getUI().getNavigator().navigateTo("traditional")
         );
-        btn.setEnabled(authorizer.wouldAuthorize(authentication, "get", "profiles"));
 
-        addComponent(btn);
+        final Button multiRequestBtn = new Button("Show Patient List (Multi-Request)",
+                click -> getUI().getNavigator().navigateTo("multiRequest")
+        );
+
+        final Button reactiveBtn = new Button("Show Patient List (Reactive)",
+                click -> getUI().getNavigator().navigateTo("reactive")
+        );
+
+        final Button reactiveMultiRequestBtn = new Button("Show Patient List (Reactive Multi-Request)",
+                click -> getUI().getNavigator().navigateTo("reactiveMultiRequest")
+        );
+
+        final boolean canLoadProfiles = canLoadProfiles();
+        traditionalBtn.setEnabled(canLoadProfiles);
+        multiRequestBtn.setEnabled(canLoadProfiles);
+        reactiveBtn.setEnabled(canLoadProfiles);
+        reactiveMultiRequestBtn.setEnabled(canLoadProfiles);
+
+        addComponents(traditionalBtn, multiRequestBtn, reactiveBtn, reactiveMultiRequestBtn);
 
         backendService.demonstrateUsageOfPdpAuthorizeAnnotation();
+    }
+
+    private boolean canLoadProfiles() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authorizer.wouldAuthorize(authentication, "get", "profiles");
     }
 }

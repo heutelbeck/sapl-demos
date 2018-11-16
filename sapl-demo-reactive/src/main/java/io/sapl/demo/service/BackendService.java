@@ -1,11 +1,13 @@
 package io.sapl.demo.service;
 
+import java.io.Serializable;
+
 import com.vaadin.ui.Notification;
 import io.sapl.spring.annotation.PdpAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BackendService {
+public class BackendService implements Serializable {
 
     @PdpAuthorize(action = "get", resource = "profiles")
     public void demonstrateUsageOfPdpAuthorizeAnnotation() {

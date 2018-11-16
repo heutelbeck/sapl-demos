@@ -1,4 +1,4 @@
-package io.sapl.demo.view;
+package io.sapl.demo;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.DefaultErrorHandler;
@@ -12,11 +12,14 @@ import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import io.sapl.demo.security.SecurityUtils;
+import io.sapl.demo.view.AccessDeniedView;
+import io.sapl.demo.view.ErrorView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -67,11 +70,9 @@ public class DemoUI extends UI {
         layout.addComponent(toolbar);
 
         final Button homeBtn = new Button("Home", event -> getNavigator().navigateTo(""));
-        toolbar.addComponent(homeBtn);
-        toolbar.setComponentAlignment(homeBtn, Alignment.TOP_LEFT);
-
+        final Label username = new Label("Username: " + SecurityUtils.getUsername());
         final Button logoutBtn = new Button("Logout", event -> logout());
-        toolbar.addComponent(logoutBtn);
+        toolbar.addComponents(homeBtn, username, logoutBtn);
         toolbar.setComponentAlignment(logoutBtn, Alignment.TOP_RIGHT);
 
         final Panel viewContainer = new Panel();

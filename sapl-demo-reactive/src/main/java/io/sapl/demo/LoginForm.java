@@ -1,4 +1,4 @@
-package io.sapl.demo.view;
+package io.sapl.demo;
 
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
@@ -20,9 +20,9 @@ class LoginForm extends VerticalLayout {
         addComponent(password);
 
         Button login = new Button("Login", evt -> {
-            String pword = password.getValue();
+            String pwd = password.getValue();
             password.setValue("");
-            if (!callback.login(username.getValue(), pword)) {
+            if (!callback.login(username.getValue(), pwd)) {
                 Notification.show("Login failed");
                 username.focus();
             }

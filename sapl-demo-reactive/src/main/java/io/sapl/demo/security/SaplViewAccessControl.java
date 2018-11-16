@@ -19,7 +19,7 @@ public class SaplViewAccessControl implements ViewAccessControl {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (beanName.equals("homeView")) {
             return authorizer.authorize(authentication, "get", "home");
-        } else if (beanName.equals("patientView")) {
+        } else if (beanName.endsWith("PatientView")) {
             return authorizer.authorize(authentication, "get", "profiles");
         } else {
             return SecurityUtils.hasRole("DOCTOR");
