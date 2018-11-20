@@ -4,11 +4,18 @@ set "updatePolicies"
 deny-unless-permit
 
 
-policy "permit_admin_doctor_and_nurse_update_profile"
+policy "permit_admin_and_doctor_update_profile"
 permit
-    action == "update"
+  action == "update"
 where
-  "ADMIN" in subject..authority || "DOCTOR" in subject..authority || "NURSE" in subject..authority;
+  "ADMIN" in subject..authority || "DOCTOR" in subject..authority;
+  resource == "profile";
+
+policy "permit_nurse_update_profile"
+permit
+  action == "update"
+where
+  "NURSE" in subject..authority;
   resource == "profile";
 
 
@@ -25,6 +32,13 @@ permit
    action == "updateDiagnosis"
 where
    subject.name == resource.attendingDoctor;
+obligation
+  {
+    "type" : "sendEmail",
+    "recipient" : "supervisor@example.org",
+    "subject" : "Diagnosis update by doctor",
+    "message" : subject.name + " has updated the diagnosis of " + resource.name
+  }
 
 
 policy "permit_doctor_update_attending_doctor"

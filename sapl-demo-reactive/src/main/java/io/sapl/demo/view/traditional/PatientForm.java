@@ -1,5 +1,7 @@
 package io.sapl.demo.view.traditional;
 
+import java.util.Objects;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToIntegerConverter;
@@ -40,6 +42,7 @@ class PatientForm extends FormLayout {
     private Button deleteBtn;
 
     private Patient patient;
+    private Patient unmodifiedPatient;
     private boolean isNewPatient;
 
     PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
@@ -101,6 +104,7 @@ class PatientForm extends FormLayout {
 
     void setPatient(Patient patient, boolean isNewPatient) {
         this.patient = patient;
+        this.unmodifiedPatient = Patient.clone(patient);
         this.isNewPatient = isNewPatient;
         binder.setBean(patient);
 
@@ -176,6 +180,45 @@ class PatientForm extends FormLayout {
     private void onSave() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authorizer.authorize(authentication, isNewPatient ? "create" : "update", "profile")) {
+
+            // get the update authorization for each modified field to enforce obligation handling
+            // and reset the field if necessary
+            if (! Objects.equals(name.getValue(), unmodifiedPatient.getName())) {
+                if (! authorizer.authorize(authentication, "update", "name")) {
+                    patient.setName(unmodifiedPatient.getName());
+                }
+            }
+            if (! Objects.equals(diagnosis.getValue(), unmodifiedPatient.getDiagnosis())) {
+                if (! authorizer.authorize(authentication, "updateDiagnosis", patient)) {
+                    patient.setDiagnosis(unmodifiedPatient.getDiagnosis());
+                }
+            }
+            if (! Objects.equals(healthRecordNumber.getValue(), unmodifiedPatient.getHealthRecordNumber())) {
+                if (! authorizer.authorize(authentication, "update", "HRN")) {
+                    patient.setHealthRecordNumber(unmodifiedPatient.getHealthRecordNumber());
+                }
+            }
+            if (! Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber())) {
+                if (! authorizer.authorize(authentication, "update", "phoneNumber")) {
+                    patient.setPhoneNumber(unmodifiedPatient.getPhoneNumber());
+                }
+            }
+            if (! Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor())) {
+                if (! authorizer.authorize(authentication, "update", "attendingDoctor")) {
+                    patient.setAttendingDoctor(unmodifiedPatient.getAttendingDoctor());
+                }
+            }
+            if (! Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse())) {
+                if (! authorizer.authorize(authentication, "update", "attendingNurse")) {
+                    patient.setAttendingNurse(unmodifiedPatient.getAttendingNurse());
+                }
+            }
+            if (! Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber())) {
+                if (! authorizer.authorize(authentication, "update", "roomNumber")) {
+                    patient.setRoomNumber(unmodifiedPatient.getRoomNumber());
+                }
+            }
+
             patientRepo.save(patient);
             refreshCallback.refresh();
         } else {
