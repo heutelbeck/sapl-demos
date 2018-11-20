@@ -2,7 +2,7 @@ package io.sapl.demo.security;
 
 import com.vaadin.spring.access.ViewAccessControl;
 import com.vaadin.ui.UI;
-import io.sapl.spring.SAPLAuthorizer;
+import io.sapl.api.SAPLAuthorizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

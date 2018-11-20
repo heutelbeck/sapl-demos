@@ -1,12 +1,11 @@
 package io.sapl.demo;
 
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.mapping.SimpleSaplMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 
 /**
  * This configuration is responsible for securing the RESTful API using OAuth2.

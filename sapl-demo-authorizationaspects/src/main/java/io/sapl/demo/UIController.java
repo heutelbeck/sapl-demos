@@ -2,10 +2,10 @@ package io.sapl.demo;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.sapl.api.SAPLAuthorizer;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.PatientRepo;
-import io.sapl.spring.SAPLAuthorizer;
 import io.sapl.spring.annotation.PdpAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

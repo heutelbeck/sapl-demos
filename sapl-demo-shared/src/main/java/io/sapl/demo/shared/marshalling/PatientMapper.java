@@ -1,9 +1,9 @@
 package io.sapl.demo.shared.marshalling;
 
+import io.sapl.api.pdp.mapping.SaplClassMapper;
+import io.sapl.api.pdp.mapping.SaplRequestElement;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.shared.resource.PatientResource;
-import io.sapl.spring.marshall.mapper.SaplClassMapper;
-import io.sapl.spring.marshall.mapper.SaplRequestElement;
 
 public class PatientMapper implements SaplClassMapper {
 

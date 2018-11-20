@@ -2,10 +2,10 @@ package io.sapl.demo.filterchain.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.sapl.api.SAPLAuthorizer;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.PatientRepo;
-import io.sapl.spring.SAPLAuthorizer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

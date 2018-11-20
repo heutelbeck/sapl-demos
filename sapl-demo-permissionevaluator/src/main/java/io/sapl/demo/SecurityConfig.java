@@ -1,5 +1,9 @@
 package io.sapl.demo;
 
+import io.sapl.api.pdp.advice.SimpleAdviceHandlerService;
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.mapping.SimpleSaplMapper;
+import io.sapl.api.pdp.obligation.SimpleObligationHandlerService;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
 import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
@@ -10,10 +14,6 @@ import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.demo.shared.pip.ApplicationContextProvider;
-import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
