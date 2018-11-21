@@ -1,21 +1,18 @@
 package io.sapl.demo.view.multirequest;
 
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
+import io.sapl.api.SAPLAuthorizer;
+import io.sapl.demo.domain.PatientRepo;
+import io.sapl.demo.view.AbstractPatientForm;
+import io.sapl.demo.view.AbstractPatientView;
 
 @SpringComponent("multiRequestPatientView")
 @SpringView(name = "multiRequest")
-public class PatientView extends VerticalLayout implements View {
-
-    public PatientView() {
-        Notification.show("Not yet implemented", Notification.Type.HUMANIZED_MESSAGE);
-    }
+public class PatientView extends AbstractPatientView {
 
     @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
+    protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
+        return new PatientForm(refreshCallback, patientRepo, authorizer);
     }
 }
