@@ -1,0 +1,15 @@
+import io.sapl.pip.ClockPolicyInformationPoint as clock
+import io.sapl.functions.TemporalFunctionLibrary as time
+
+set "reactivePolicies"
+deny-unless-permit
+for action in ["readSensitiveData"]
+
+
+policy "permit_everyone_read_time_restricted_sensitive_data"
+permit
+  action == "readSensitiveData"
+where
+  var interval = 1;
+  resource == "sensitiveData";
+  time.localSecond((1).<clock.ticker>) < 30;

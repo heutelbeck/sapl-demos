@@ -1,6 +1,8 @@
 package io.sapl.demo.view.reactive;
 
-import java.time.Duration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -10,11 +12,17 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
+import io.sapl.api.SAPLAuthorizer;
+import io.sapl.api.pdp.Decision;
 import reactor.core.publisher.Flux;
 
 @SpringComponent("reactivePatientView")
 @SpringView(name = "reactive")
 public class PatientView extends VerticalLayout implements View {
+
+    @Autowired
+    private SAPLAuthorizer authorizer;
 
     private Label infoLabel;
     private Label dataLabel;
@@ -40,13 +48,20 @@ public class PatientView extends VerticalLayout implements View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
-        Flux<Boolean> responses = Flux.just(false, true, false, true, false, true, false, true)
-                .delayElements(Duration.ofSeconds(2));
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        final Flux<Decision> decisionFlux = authorizer.reactiveAuthorize(authentication, "readSensitiveData", "sensitiveData");
 
-        responses.subscribe(
-                this::updateLabel,
-                error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+        // subscribe in a separate thread to give the current thread the chance to unlock the vaadin session;
+        // otherwise getUI().access(() -> {}) within updateLabel() could not acquire the lock necessary to update the UI
+        final Thread fluxSubscriptionThread = new Thread(() ->
+                decisionFlux
+                    .map(decision -> decision == Decision.PERMIT)
+                    .subscribe(
+                        this::updateLabel,
+                        error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+                    )
         );
+        fluxSubscriptionThread.start();
     }
 
     private void updateLabel(boolean response) {
