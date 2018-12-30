@@ -2,6 +2,7 @@ import io.sapl.demo.shared.pip.PatientPIP as patient
 
 set "readPolicies"
 deny-unless-permit
+for action in ["read", "readBlackenedHRN", "readRoomNumber"]
 
 
 policy "permit_everyone_read_non_sensitive_data"

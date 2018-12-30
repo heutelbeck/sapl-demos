@@ -1,9 +1,3 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
-set "createPolicies"
-deny-unless-permit
-
-
 policy "permit_admin_create_profile"
 permit
     action == "create"

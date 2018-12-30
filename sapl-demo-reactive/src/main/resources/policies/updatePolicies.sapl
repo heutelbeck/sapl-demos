@@ -1,8 +1,6 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
 set "updatePolicies"
 deny-unless-permit
-
+for action in ["update", "updateDiagnosis"]
 
 policy "permit_admin_and_doctor_update_profile"
 permit

@@ -1,9 +1,3 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
-set "deletePolicies"
-deny-unless-permit
-
-
 policy "permit_admin_delete_profile"
 permit
     action == "delete"

@@ -1,7 +1,6 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
-
 set "generalPolicies"
 deny-unless-permit
+for action in ["get"]
 
 
 policy "permit_loading_homepage"
