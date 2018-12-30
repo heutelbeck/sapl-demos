@@ -7,11 +7,11 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 
-@SpringComponent("reactiveMultiRequestPatientView")
+@SpringComponent("reactiveMultiRequestView")
 @SpringView(name = "reactiveMultiRequest")
-public class PatientView extends VerticalLayout implements View {
+public class ReactiveMultiRequestView extends VerticalLayout implements View {
 
-    public PatientView() {
+    public ReactiveMultiRequestView() {
         Notification.show("Not yet implemented", Notification.Type.HUMANIZED_MESSAGE);
     }
 

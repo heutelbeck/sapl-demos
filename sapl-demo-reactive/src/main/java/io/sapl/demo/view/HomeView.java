@@ -1,5 +1,9 @@
 package io.sapl.demo.view;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
@@ -7,12 +11,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+
 import io.sapl.api.SAPLAuthorizer;
 import io.sapl.demo.security.SecurityUtils;
 import io.sapl.demo.service.BackendService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
@@ -43,11 +45,11 @@ public class HomeView extends VerticalLayout implements View {
                 click -> getUI().getNavigator().navigateTo("multiRequest")
         );
 
-        final Button reactiveBtn = new Button("Show Patient List (Reactive)",
+        final Button reactiveBtn = new Button("Show Reactive View",
                 click -> getUI().getNavigator().navigateTo("reactive")
         );
 
-        final Button reactiveMultiRequestBtn = new Button("Show Patient List (Reactive Multi-Request)",
+        final Button reactiveMultiRequestBtn = new Button("Show Reactive Multi-Request View",
                 click -> getUI().getNavigator().navigateTo("reactiveMultiRequest")
         );
 

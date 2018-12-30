@@ -17,9 +17,9 @@ import io.sapl.api.SAPLAuthorizer;
 import io.sapl.api.pdp.Decision;
 import reactor.core.publisher.Flux;
 
-@SpringComponent("reactivePatientView")
+@SpringComponent("reactiveView")
 @SpringView(name = "reactive")
-public class PatientView extends VerticalLayout implements View {
+public class ReactiveView extends VerticalLayout implements View {
 
     @Autowired
     private SAPLAuthorizer authorizer;
@@ -27,7 +27,7 @@ public class PatientView extends VerticalLayout implements View {
     private Label infoLabel;
     private Label dataLabel;
 
-    public PatientView() {
+    public ReactiveView() {
         setSpacing(true);
         setMargin(true);
 
