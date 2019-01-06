@@ -3,13 +3,22 @@ import io.sapl.functions.TemporalFunctionLibrary as time
 
 set "reactivePolicies"
 deny-unless-permit
-for action in ["readSensitiveData"]
+for action == "read"
 
 
-policy "permit_everyone_read_time_restricted_sensitive_data"
+policy "permit_doctor_and_nurse_read_time_restricted_heart_beat_data"
 permit
-  action == "readSensitiveData"
+  resource == "heartBeatData"
 where
+  "DOCTOR" in subject..authority || "NURSE" in subject..authority;
   var interval = 1;
-  resource == "sensitiveData";
-  time.localSecond((1).<clock.ticker>) < 30;
+  time.localSecond(interval.<clock.ticker>) > 4;
+
+
+policy "permit_doctor_and_nurse_read_time_restricted_blood_pressure_data"
+permit
+  resource == "bloodPressureData"
+where
+  "DOCTOR" in subject..authority || "NURSE" in subject..authority;
+  var interval = 1;
+  time.localSecond(interval.<clock.ticker>) < 31 || time.localSecond(interval.<clock.ticker>) > 35;
