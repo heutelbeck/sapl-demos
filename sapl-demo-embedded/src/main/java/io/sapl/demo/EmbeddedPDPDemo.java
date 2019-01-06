@@ -17,10 +17,6 @@ package io.sapl.demo;
 
 import java.io.IOException;
 
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.pdp.Response;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -29,13 +25,18 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.pdp.Response;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import reactor.core.publisher.Flux;
 
 public class EmbeddedPDPDemo {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
-	private static final String USAGE = "java -jar sapl-demo-embedded-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
+	private static final String USAGE = "java -jar sapl-demo-embedded-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
 	private static final String HELP_DOC = "print this message";
 	private static final String HELP = "help";
 	private static final String POLICYPATH = "policypath";
