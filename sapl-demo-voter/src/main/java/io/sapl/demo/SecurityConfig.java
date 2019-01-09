@@ -3,15 +3,6 @@ package io.sapl.demo;
 import java.util.Arrays;
 import java.util.List;
 
-import io.sapl.api.SAPLAuthorizer;
-import io.sapl.api.pdp.mapping.SaplMapper;
-import io.sapl.api.pdp.mapping.SimpleSaplMapper;
-import io.sapl.api.pdp.obligation.SimpleObligationHandlerService;
-import io.sapl.demo.domain.UserRepo;
-import io.sapl.demo.shared.marshalling.AuthenticationMapper;
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
-import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.SaplBasedVoter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -23,6 +14,17 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
+
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.obligation.ObligationHandlerService;
+import io.sapl.demo.domain.UserRepo;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.pep.SAPLAuthorizer;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
+import io.sapl.spring.SaplBasedVoter;
 
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -73,8 +75,8 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SimpleObligationHandlerService getObligationHandlers() {
-		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+	public ObligationHandlerService getObligationHandlers() {
+		ObligationHandlerService sohs = new SimpleObligationHandlerService();
 		sohs.register(new EmailObligationHandler());
 		sohs.register(new CoffeeObligationHandler());
 		sohs.register(new SimpleLoggingObligationHandler());

@@ -1,12 +1,5 @@
 package io.sapl.demo.geo.config;
 
-import io.sapl.api.pdp.mapping.SaplMapper;
-import io.sapl.api.pdp.mapping.SimpleSaplMapper;
-import io.sapl.demo.geo.AuthManager;
-import io.sapl.demo.geo.domain.CrewRepo;
-import io.sapl.demo.geo.marshall.AuthenticationMapper;
-import io.sapl.demo.geo.marshall.HttpServletRequestMapper;
-import io.sapl.spring.PolicyEnforcementFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +9,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.demo.geo.AuthManager;
+import io.sapl.demo.geo.domain.CrewRepo;
+import io.sapl.demo.geo.marshall.AuthenticationMapper;
+import io.sapl.demo.geo.marshall.HttpServletRequestMapper;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.spring.PolicyEnforcementFilter;
 
 @Configuration
 @EnableWebSecurity

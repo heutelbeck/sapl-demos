@@ -12,20 +12,22 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.SAPLAuthorizer;
 import io.sapl.demo.security.SecurityUtils;
 import io.sapl.demo.service.BackendService;
+import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.pep.SAPLAuthorizer;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
 
-    @Autowired
-    private SAPLAuthorizer authorizer;
-
-    @Autowired
+    private BlockingSAPLAuthorizer authorizer;
     private BackendService backendService;
 
-    public HomeView() {
+    @Autowired
+    public HomeView(SAPLAuthorizer authorizer, BackendService backendService) {
+        this.authorizer = new BlockingSAPLAuthorizer(authorizer);
+        this.backendService = backendService;
+
         setMargin(true);
         setSpacing(true);
     }

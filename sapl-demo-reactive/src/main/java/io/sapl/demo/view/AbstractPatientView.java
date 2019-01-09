@@ -3,35 +3,37 @@ package io.sapl.demo.view;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import io.sapl.api.SAPLAuthorizer;
+
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.PatientRepo;
 import io.sapl.demo.security.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.pep.SAPLAuthorizer;
 
 public abstract class AbstractPatientView extends VerticalLayout implements View {
 
-    @Autowired
-    private SAPLAuthorizer authorizer;
-
-    @Autowired
+    private BlockingSAPLAuthorizer authorizer;
     private PatientRepo patientRepo;
 
     private Grid<Patient> grid;
 
-    protected AbstractPatientView() {
+    protected AbstractPatientView(SAPLAuthorizer authorizer, PatientRepo patientRepo) {
+        this.authorizer = new BlockingSAPLAuthorizer(authorizer);
+        this.patientRepo = patientRepo;
+
         setMargin(true);
     }
 
-    protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer);
+    protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer);
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {

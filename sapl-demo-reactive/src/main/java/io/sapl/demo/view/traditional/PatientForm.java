@@ -3,23 +3,25 @@ package io.sapl.demo.view.traditional;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import io.sapl.api.SAPLAuthorizer;
+
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.PatientRepo;
 import io.sapl.demo.security.SecurityUtils;
 import io.sapl.demo.view.AbstractPatientForm;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import io.sapl.pep.BlockingSAPLAuthorizer;
 
 class PatientForm extends AbstractPatientForm {
 
     private RefreshCallback refreshCallback;
     private PatientRepo patientRepo;
-    private SAPLAuthorizer authorizer;
+    private BlockingSAPLAuthorizer authorizer;
 
-    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
+    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer) {
         this.refreshCallback = refreshCallback;
         this.patientRepo = patientRepo;
         this.authorizer = authorizer;

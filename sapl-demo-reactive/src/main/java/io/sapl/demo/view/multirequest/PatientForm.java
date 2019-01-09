@@ -9,8 +9,11 @@ import static io.sapl.api.pdp.multirequest.IdentifiableSubject.AUTHENTICATION_ID
 import java.util.Objects;
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.fasterxml.jackson.databind.JsonNode;
-import io.sapl.api.SAPLAuthorizer;
+
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pdp.multirequest.IdentifiableAction;
@@ -23,16 +26,15 @@ import io.sapl.api.pdp.multirequest.RequestElements;
 import io.sapl.demo.domain.PatientRepo;
 import io.sapl.demo.security.SecurityUtils;
 import io.sapl.demo.view.AbstractPatientForm;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import io.sapl.pep.BlockingSAPLAuthorizer;
 
 class PatientForm extends AbstractPatientForm {
 
     private RefreshCallback refreshCallback;
     private PatientRepo patientRepo;
-    private SAPLAuthorizer authorizer;
+    private BlockingSAPLAuthorizer authorizer;
 
-    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, SAPLAuthorizer authorizer) {
+    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer) {
         this.refreshCallback = refreshCallback;
         this.patientRepo = patientRepo;
         this.authorizer = authorizer;
@@ -74,13 +76,13 @@ class PatientForm extends AbstractPatientForm {
 
             final MultiDecision multiDecision = authorizer.wouldAuthorize(multiRequest);
 
-            name.setEnabled(multiDecision.getFlagForRequestWithId("updateName"));
-            diagnosis.setEnabled(multiDecision.getFlagForRequestWithId("updateDiagnosis"));
-            healthRecordNumber.setEnabled(multiDecision.getFlagForRequestWithId("updateHRN"));
-            phoneNumber.setEnabled(multiDecision.getFlagForRequestWithId("updatePhoneNumber"));
-            attendingDoctor.setEnabled(multiDecision.getFlagForRequestWithId("updateAttendingDoctor"));
-            attendingNurse.setEnabled(multiDecision.getFlagForRequestWithId("updateAttendingNurse"));
-            roomNumber.setEnabled(multiDecision.getFlagForRequestWithId("updateRoomNumber"));
+            name.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateName"));
+            diagnosis.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateDiagnosis"));
+            healthRecordNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateHRN"));
+            phoneNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updatePhoneNumber"));
+            attendingDoctor.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingDoctor"));
+            attendingNurse.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingNurse"));
+            roomNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateRoomNumber"));
         }
     }
 
@@ -121,12 +123,11 @@ class PatientForm extends AbstractPatientForm {
             multiRequest.addRequest("readRoomNumber", new RequestElements(AUTHENTICATION_ID, "readRoomNumber", "patient"));
 
             final MultiResponse responses = authorizer.getResponses(multiRequest);
-            final MultiDecision decisions = new MultiDecision(responses);
 
             id.setVisible(true);
-            name.setVisible(decisions.getFlagForRequestWithId("readName"));
-            diagnosis.setVisible(decisions.getFlagForRequestWithId("readDiagnosis"));
-            healthRecordNumber.setVisible(decisions.getFlagForRequestWithId("readHRN"));
+            name.setVisible(responses.isAccessPermittedForRequestWithId("readName"));
+            diagnosis.setVisible(responses.isAccessPermittedForRequestWithId("readDiagnosis"));
+            healthRecordNumber.setVisible(responses.isAccessPermittedForRequestWithId("readHRN"));
             final Response readBlackenedHRN = responses.getResponseForRequestWithId("readBlackenedHRN");
             if (readBlackenedHRN.getDecision() == Decision.PERMIT) {
                 final Optional<JsonNode> patientNode = readBlackenedHRN.getResource();
@@ -135,10 +136,10 @@ class PatientForm extends AbstractPatientForm {
             } else {
                 blackenedHRN.setVisible(false);
             }
-            phoneNumber.setVisible(decisions.getFlagForRequestWithId("readPhoneNumber"));
-            attendingDoctor.setVisible(decisions.getFlagForRequestWithId("readAttendingDoctor"));
-            attendingNurse.setVisible(decisions.getFlagForRequestWithId("readAttendingNurse"));
-            roomNumber.setVisible(decisions.getFlagForRequestWithId("readRoomNumber"));
+            phoneNumber.setVisible(responses.isAccessPermittedForRequestWithId("readPhoneNumber"));
+            attendingDoctor.setVisible(responses.isAccessPermittedForRequestWithId("readAttendingDoctor"));
+            attendingNurse.setVisible(responses.isAccessPermittedForRequestWithId("readAttendingNurse"));
+            roomNumber.setVisible(responses.isAccessPermittedForRequestWithId("readRoomNumber"));
         }
     }
 
@@ -161,8 +162,8 @@ class PatientForm extends AbstractPatientForm {
 
         final MultiDecision multiDecision = authorizer.wouldAuthorize(multiRequest);
 
-        saveBtn.setVisible(multiDecision.getFlagForRequestWithId("saveProfile"));
-        deleteBtn.setVisible(! isNewPatient && multiDecision.getFlagForRequestWithId("deleteProfile"));
+        saveBtn.setVisible(multiDecision.isAccessPermittedForRequestWithId("saveProfile"));
+        deleteBtn.setVisible(! isNewPatient && multiDecision.isAccessPermittedForRequestWithId("deleteProfile"));
     }
 
     protected void onSave() {

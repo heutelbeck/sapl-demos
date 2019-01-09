@@ -8,13 +8,18 @@ import org.springframework.stereotype.Component;
 import com.vaadin.spring.access.ViewAccessControl;
 import com.vaadin.ui.UI;
 
-import io.sapl.api.SAPLAuthorizer;
+import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.pep.SAPLAuthorizer;
 
 @Component
 public class SaplViewAccessControl implements ViewAccessControl {
 
+    private BlockingSAPLAuthorizer authorizer;
+
     @Autowired
-    private SAPLAuthorizer authorizer;
+    public SaplViewAccessControl(SAPLAuthorizer authorizer) {
+        this.authorizer = new BlockingSAPLAuthorizer(authorizer);
+    }
 
     @Override
     public boolean isAccessGranted(UI ui, String beanName) {

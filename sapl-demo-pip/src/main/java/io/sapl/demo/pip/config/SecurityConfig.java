@@ -1,13 +1,5 @@
 package io.sapl.demo.pip.config;
 
-import io.sapl.api.pdp.mapping.SaplMapper;
-import io.sapl.api.pdp.mapping.SimpleSaplMapper;
-import io.sapl.demo.domain.UserRepo;
-import io.sapl.demo.pip.AuthManager;
-import io.sapl.demo.shared.marshalling.AuthenticationMapper;
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
-import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.PolicyEnforcementFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +10,15 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.demo.domain.UserRepo;
+import io.sapl.demo.pip.AuthManager;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.spring.PolicyEnforcementFilter;
 
 @Configuration
 @EnableWebSecurity(debug = false)

@@ -15,10 +15,10 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.SAPLAuthorizer;
 import io.sapl.api.pdp.Decision;
 import io.sapl.demo.service.BloodPressureService;
 import io.sapl.demo.service.HeartBeatService;
+import io.sapl.pep.SAPLAuthorizer;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -27,13 +27,8 @@ import reactor.core.scheduler.Schedulers;
 @SpringView(name = "reactive")
 public class ReactiveView extends VerticalLayout implements View {
 
-    @Autowired
     private SAPLAuthorizer authorizer;
-
-    @Autowired
     private HeartBeatService heartBeatService;
-
-    @Autowired
     private BloodPressureService bloodPressureService;
 
     private Label heartBeatAccessDenied;
@@ -45,7 +40,12 @@ public class ReactiveView extends VerticalLayout implements View {
     private Thread fluxSubscriptionThread;
     private Disposable subscription;
 
-    public ReactiveView() {
+    @Autowired
+    public ReactiveView(SAPLAuthorizer authorizer, HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
+        this.authorizer = authorizer;
+        this.heartBeatService = heartBeatService;
+        this.bloodPressureService = bloodPressureService;
+
         setSpacing(true);
         setMargin(true);
 
@@ -83,9 +83,9 @@ public class ReactiveView extends VerticalLayout implements View {
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final Flux<Decision> heartBeatAccessDecisionFlux = authorizer.reactiveAuthorize(authentication, "read", "heartBeatData")
+        final Flux<Decision> heartBeatAccessDecisionFlux = authorizer.authorize(authentication, "read", "heartBeatData")
                 .subscribeOn(Schedulers.newElastic("hb-pdp"));
-        final Flux<Decision> bloodPressureAccessDecisionFlux = authorizer.reactiveAuthorize(authentication, "read", "bloodPressureData")
+        final Flux<Decision> bloodPressureAccessDecisionFlux = authorizer.authorize(authentication, "read", "bloodPressureData")
                 .subscribeOn(Schedulers.newElastic("bp-pdp"));
 
         final Flux<Integer> heartBeatDataFlux = heartBeatService.getHeartBeatData()

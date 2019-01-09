@@ -2,10 +2,6 @@ package io.sapl.demo;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.sapl.api.SAPLAuthorizer;
-import io.sapl.api.pdp.Response;
-import io.sapl.demo.domain.Patient;
-import io.sapl.demo.domain.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,19 +16,24 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import io.sapl.api.pdp.Response;
+import io.sapl.demo.domain.Patient;
+import io.sapl.demo.domain.PatientRepo;
+import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.pep.SAPLAuthorizer;
+
 @Controller
 public class UIController {
 
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 
-	private SAPLAuthorizer sapl;
-
+	private BlockingSAPLAuthorizer sapl;
 	private PatientRepo patientenRepo;
 
 	@Autowired
 	public UIController(SAPLAuthorizer sapl, PatientRepo patientenRepo) {
-		this.sapl = sapl;
+		this.sapl = new BlockingSAPLAuthorizer(sapl);
 		this.patientenRepo = patientenRepo;
 	}
 

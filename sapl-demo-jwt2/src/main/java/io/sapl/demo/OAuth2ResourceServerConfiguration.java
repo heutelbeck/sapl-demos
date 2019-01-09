@@ -1,11 +1,12 @@
 package io.sapl.demo;
 
-import io.sapl.api.pdp.mapping.SaplMapper;
-import io.sapl.api.pdp.mapping.SimpleSaplMapper;
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
+
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 
 /**
  * This configuration is responsible for securing the RESTful API using OAuth2.
@@ -32,8 +33,8 @@ public class OAuth2ResourceServerConfiguration {
 	}
 
 	// @Bean
-	// public SimpleObligationHandlerService getObligationHandlers() {
-	// SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+	// public ObligationHandlerService getObligationHandlers() {
+	// ObligationHandlerService sohs = new SimpleObligationHandlerService();
 	// sohs.register(new EmailObligationHandler());
 	// sohs.register(new CoffeeObligationHandler());
 	// sohs.register(new SimpleLoggingObligationHandler());
@@ -41,8 +42,8 @@ public class OAuth2ResourceServerConfiguration {
 	// }
 	//
 	// @Bean
-	// public SimpleAdviceHandlerService setAdviceHandlers() {
-	// SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+	// public AdviceHandlerService setAdviceHandlers() {
+	// AdviceHandlerService sahs = new SimpleAdviceHandlerService();
 	// sahs.register(new EmailAdviceHandler());
 	// sahs.register(new SimpleLoggingAdviceHandler());
 	// return sahs;
