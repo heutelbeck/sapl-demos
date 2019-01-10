@@ -10,18 +10,20 @@ import reactor.core.scheduler.Schedulers;
 @Service
 public class BloodPressureService {
 
+    private Random rnd = new Random();
+
     public Flux<Integer> getDiastolicBloodPressureData() {
         return Flux.<Integer, Integer> generate(
                 () -> 80,
                 (state, sink) -> {
-                    int diff = randomInt(10) - 5;
+                    int diff = rnd.nextInt(10) - 5;
                     if (state + diff > 130 || state + diff < 65) {
                         state = state - diff;
                     } else {
                         state = state + diff;
                     }
                     sink.next(state);
-                    simulateSomeWork(3);
+                    simulateSomeWork();
                     return state;
                 })
                 .distinctUntilChanged()
@@ -32,29 +34,25 @@ public class BloodPressureService {
         return Flux.<Integer, Integer> generate(
                 () -> 120,
                 (state, sink) -> {
-                    int diff = randomInt(10) - 4;
+                    int diff = rnd.nextInt(10) - 4;
                     if (state + diff > 180 || state + diff < 100) {
                         state = state - diff;
                     } else {
                         state = state + diff;
                     }
                     sink.next(state);
-                    simulateSomeWork(3);
+                    simulateSomeWork();
                     return state;
                 })
                 .distinctUntilChanged()
                 .subscribeOn(Schedulers.newElastic("sbp-data"));
     }
 
-    private void simulateSomeWork(int maxSeconds) {
+    private void simulateSomeWork() {
         try {
-            Thread.sleep(randomInt(maxSeconds * 1000));
+            Thread.sleep(Math.max(200, rnd.nextInt(3000)));
         } catch (InterruptedException e) {
             // ignore
         }
-    }
-
-    private Integer randomInt(int bound) {
-        return new Random().nextInt(bound);
     }
 }

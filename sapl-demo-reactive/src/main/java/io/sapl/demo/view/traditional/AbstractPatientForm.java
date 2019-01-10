@@ -1,4 +1,4 @@
-package io.sapl.demo.view;
+package io.sapl.demo.view.traditional;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.converter.StringToIntegerConverter;

@@ -1,4 +1,4 @@
-package io.sapl.demo.view;
+package io.sapl.demo.view.traditional;
 
 import java.util.ArrayList;
 import java.util.List;

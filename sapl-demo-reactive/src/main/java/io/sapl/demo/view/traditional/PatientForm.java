@@ -12,7 +12,6 @@ import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.PatientRepo;
 import io.sapl.demo.security.SecurityUtils;
-import io.sapl.demo.view.AbstractPatientForm;
 import io.sapl.pep.BlockingSAPLAuthorizer;
 
 class PatientForm extends AbstractPatientForm {
