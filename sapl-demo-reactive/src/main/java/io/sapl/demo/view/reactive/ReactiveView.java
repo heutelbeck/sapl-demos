@@ -20,9 +20,12 @@ import reactor.core.scheduler.Schedulers;
 @SpringView(name = "reactive")
 public class ReactiveView extends AbstractReactiveView {
 
+    private final SAPLAuthorizer authorizer;
+
     @Autowired
     public ReactiveView(SAPLAuthorizer authorizer, HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
-        super(authorizer, heartBeatService, bloodPressureService);
+        super(heartBeatService, bloodPressureService);
+        this.authorizer = authorizer;
     }
 
     protected Flux<Object[]> getCombinedFlux() {

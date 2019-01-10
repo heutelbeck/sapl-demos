@@ -34,11 +34,14 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
     private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
     private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
 
-    private Map<String, Decision> accessDecisions;
+    private final SAPLAuthorizer authorizer;
+
+    private final Map<String, Decision> accessDecisions;
 
     @Autowired
     public ReactiveMultiRequestView(SAPLAuthorizer authorizer, HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
-        super(authorizer, heartBeatService, bloodPressureService);
+        super(heartBeatService, bloodPressureService);
+        this.authorizer = authorizer;
 
         accessDecisions = new HashMap<>();
         accessDecisions.put(READ_HEART_BEAT_DATA_REQUEST_ID, Decision.DENY);

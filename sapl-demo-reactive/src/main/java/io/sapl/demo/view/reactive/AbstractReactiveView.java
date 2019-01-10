@@ -13,14 +13,11 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.sapl.api.pdp.Decision;
 import io.sapl.demo.service.BloodPressureService;
 import io.sapl.demo.service.HeartBeatService;
-import io.sapl.pep.SAPLAuthorizer;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
-
-    protected SAPLAuthorizer authorizer;
 
     private HeartBeatService heartBeatService;
     private BloodPressureService bloodPressureService;
@@ -34,8 +31,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
     private Thread fluxSubscriptionThread;
     private Disposable subscription;
 
-    protected AbstractReactiveView(SAPLAuthorizer authorizer, HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
-        this.authorizer = authorizer;
+    protected AbstractReactiveView(HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
         this.heartBeatService = heartBeatService;
         this.bloodPressureService = bloodPressureService;
 
