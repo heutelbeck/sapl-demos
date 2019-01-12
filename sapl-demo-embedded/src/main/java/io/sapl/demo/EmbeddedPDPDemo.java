@@ -33,6 +33,7 @@ import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 public class EmbeddedPDPDemo {
 
@@ -77,17 +78,16 @@ public class EmbeddedPDPDemo {
 
 	}
 
-	public static void runDemo(String path) throws IOException, AttributeException, FunctionException {
+	private static void runDemo(String path) throws IOException, AttributeException, FunctionException {
 		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
 
-		useBlockingDecide(pdp);
-		useReactiveDecide(pdp);
+		blockingUsageDemo(pdp);
+		reactiveUsageDecide(pdp);
 
-		runBlockingPerformanceDemo(pdp);
-		runReactivePerformanceDemo(pdp);
+		runPerformanceDemo(pdp);
 	}
 
-	private static void useBlockingDecide(EmbeddedPolicyDecisionPoint pdp) {
+	private static void blockingUsageDemo(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
 		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 		final Response readResponse = blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
@@ -96,11 +96,11 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
-	private static void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
+	private static void reactiveUsageDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE).subscribeOn(Schedulers.elastic());
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE).subscribeOn(Schedulers.elastic());
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
@@ -108,29 +108,13 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
 	}
 
-	private static void runBlockingPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
-		LOGGER.info("Blocking...");
+	private static void runPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+		LOGGER.info("Performance...");
+		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
-			pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
-		}
-		long end = System.nanoTime();
-		LOGGER.info("Start : {}", start);
-		LOGGER.info("End   : {}", end);
-		LOGGER.info("Runs  : {}", RUNS);
-		LOGGER.info("Total : {}s", nanoToS((double) end - start));
-		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
-	}
-
-	private static void runReactivePerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
-		LOGGER.info("Reactive...");
-		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
-			final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
-			readResponse.subscribe();
-			final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
-			writeResponse.subscribe();
+			blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+			blockingPdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);
