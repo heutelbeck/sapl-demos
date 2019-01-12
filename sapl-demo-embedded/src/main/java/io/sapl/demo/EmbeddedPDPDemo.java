@@ -27,9 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.sapl.api.functions.FunctionException;
+import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import reactor.core.publisher.Flux;
 
 public class EmbeddedPDPDemo {
@@ -87,17 +89,18 @@ public class EmbeddedPDPDemo {
 
 	private static void useBlockingDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final Response readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
+		final Response readResponse = blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
-		final Response writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Response writeResponse = blockingPdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
 	private static void useReactiveDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
+		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Flux<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
@@ -124,9 +127,9 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Reactive...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			final Flux<Response> readResponse = pdp.reactiveDecide(SUBJECT, ACTION_READ, RESOURCE);
+			final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 			readResponse.subscribe();
-			final Flux<Response> writeResponse = pdp.reactiveDecide(SUBJECT, ACTION_WRITE, RESOURCE);
+			final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 			writeResponse.subscribe();
 		}
 		long end = System.nanoTime();

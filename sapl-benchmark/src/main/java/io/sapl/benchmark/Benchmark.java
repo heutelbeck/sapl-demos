@@ -25,16 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
-import com.google.common.io.Files;
-import com.google.common.io.Resources;
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.pdp.Request;
-import io.sapl.api.pdp.Response;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -46,6 +36,20 @@ import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.XYChart;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.io.Files;
+import com.google.common.io.Resources;
+
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
+import io.sapl.api.pdp.Request;
+import io.sapl.api.pdp.Response;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Benchmark {
@@ -275,13 +279,14 @@ public class Benchmark {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
 				EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+				BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
 					Request request = generator.createRequestObject();
 
 					long start = System.nanoTime();
-					Response response = pdp.decide(request);
+					Response response = blockingPdp.decide(request);
 					long end = System.nanoTime();
 
 					double diff = nanoToMs(end - start);

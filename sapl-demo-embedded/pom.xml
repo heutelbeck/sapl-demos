@@ -44,6 +44,11 @@
 			<artifactId>sapl-pdp-embedded</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sapl-pep</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
