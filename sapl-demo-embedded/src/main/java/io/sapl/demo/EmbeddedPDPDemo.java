@@ -33,7 +33,6 @@ import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 public class EmbeddedPDPDemo {
 
@@ -83,8 +82,9 @@ public class EmbeddedPDPDemo {
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDecide(pdp);
-
 		runPerformanceDemo(pdp);
+
+		pdp.dispose();
 	}
 
 	private static void blockingUsageDemo(EmbeddedPolicyDecisionPoint pdp) {
@@ -98,9 +98,9 @@ public class EmbeddedPDPDemo {
 
 	private static void reactiveUsageDecide(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE).subscribeOn(Schedulers.elastic());
+		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE).subscribeOn(Schedulers.elastic());
+		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 

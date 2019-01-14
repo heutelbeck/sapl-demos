@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
@@ -85,5 +86,11 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
     private void refresh() {
         final List<Patient> patients = loadAllPatients();
         grid.setItems(patients);
+    }
+
+    @Override
+    public void beforeLeave(ViewBeforeLeaveEvent event) {
+        authorizer.dispose();
+        event.navigate();
     }
 }

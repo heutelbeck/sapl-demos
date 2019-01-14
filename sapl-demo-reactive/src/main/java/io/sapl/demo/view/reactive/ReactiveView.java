@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
@@ -54,5 +55,11 @@ public class ReactiveView extends AbstractReactiveView {
         final Integer systolic = (Integer) fluxValues[4];
 
         updateUI(heartBeatDecision, bloodPressureDecision, heartBeat, diastolic, systolic);
+    }
+
+    @Override
+    public void beforeLeave(ViewBeforeLeaveEvent event) {
+        authorizer.dispose();
+        super.beforeLeave(event);
     }
 }
