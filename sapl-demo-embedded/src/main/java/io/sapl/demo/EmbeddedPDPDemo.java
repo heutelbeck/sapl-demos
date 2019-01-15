@@ -81,7 +81,7 @@ public class EmbeddedPDPDemo {
 		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
 
 		blockingUsageDemo(pdp);
-		reactiveUsageDecide(pdp);
+		reactiveUsageDemo(pdp);
 		runPerformanceDemo(pdp);
 
 		pdp.dispose();
@@ -96,7 +96,7 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
-	private static void reactiveUsageDecide(EmbeddedPolicyDecisionPoint pdp) {
+	private static void reactiveUsageDemo(EmbeddedPolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
 		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
