@@ -49,6 +49,7 @@
 		<module>sapl-demo-authorizationaspects</module>
 		<module>sapl-demo-obligation-advice</module>
 		<module>sapl-demo-reactive</module>
+		<module>sapl-demo-reactive-server</module>
   </modules>
 
 	<distributionManagement>
