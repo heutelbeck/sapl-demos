@@ -1,4 +1,4 @@
-package io.sapl.demo.view.traditional.multirequest;
+package io.sapl.demo.view.blocking.multirequest;
 
 import static io.sapl.api.pdp.multirequest.IdentifiableAction.CREATE_ID;
 import static io.sapl.api.pdp.multirequest.IdentifiableAction.DELETE_ID;
@@ -25,7 +25,7 @@ import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.api.pdp.multirequest.RequestElements;
 import io.sapl.demo.domain.PatientRepo;
 import io.sapl.demo.security.SecurityUtils;
-import io.sapl.demo.view.traditional.AbstractPatientForm;
+import io.sapl.demo.view.blocking.AbstractPatientForm;
 import io.sapl.pep.BlockingSAPLAuthorizer;
 
 class PatientForm extends AbstractPatientForm {
