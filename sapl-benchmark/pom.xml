@@ -135,6 +135,11 @@
 
 	<repositories>
 		<repository>
+			<id>sapl</id>
+			<name>SAPL Release Repository</name>
+			<url>http://repo.sapl.io/releases</url>
+		</repository>
+		<repository>
 			<id>openconjurer-snapshots</id>
 			<name>OpenConjurer Nexus Maven Repository</name>
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
