@@ -56,7 +56,6 @@
 			</dependency>
 
 			<!-- Spring-Boot -->
-
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
@@ -81,24 +80,18 @@
 			<url>https://repo.spring.io/release</url>
 		</repository>
 		<repository>
+			<id>sapl</id>
+			<name>SAPL Release Repository</name>
+			<url>http://repo.sapl.io/releases</url>
+		</repository>
+		<repository>
+			<id>openconjurer-snapshots</id>
+			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
+			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
 			</snapshots>
-			<id>openconjurer-snapshots</id>
-			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
-			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
-		</repository>
-		<repository>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<id>openconjurer</id>
-			<name>OpenConjurer Nexus Maven Release Repository</name>
-			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
 		</repository>
 	</repositories>
 
@@ -109,7 +102,7 @@
 			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>openconjurer</id>
+			<id>openconjurer-snapshot</id>
 			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 		</snapshotRepository>
