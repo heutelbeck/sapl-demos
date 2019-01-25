@@ -5,7 +5,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -29,7 +28,7 @@ public class DemoGeoServerApplication {
 	}
 
 	@Bean
-	public CommandLineRunner demoData(CrewRepo crewRepo, ApplicationContext ctx) {
+	public CommandLineRunner demoData(CrewRepo crewRepo) {
 		// stub method to generate sample user data
 		return args -> {
 			crewRepo.save(new CrewMember(CREW1, defaultPassword, ROLE_CREW, true));
