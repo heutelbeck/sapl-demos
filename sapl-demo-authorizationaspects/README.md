@@ -109,5 +109,5 @@ Add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-eng
 ### Step 2:
 Annotate the method you wish to secure and write the necessary SAPL policy/policies.
 
-Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that show you the parameters that are used by the aspect and provided to the `SAPLAuthorizator`, which can help you write your policies.
+Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that show you the parameters that are used by the aspect and provided to the `SAPLAuthorizer`, which can help you write your policies.
 

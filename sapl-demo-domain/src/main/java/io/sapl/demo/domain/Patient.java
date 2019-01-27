@@ -37,4 +37,17 @@ public class Patient {
 		this.attendingNurse = attendingNurse;
 		this.roomNumber = roomNumber;
 	}
+
+	public static Patient clone(Patient template) {
+		final Patient copy = new Patient(
+				template.name,
+				template.diagnosis,
+				template.healthRecordNumber,
+				template.phoneNumber,
+				template.attendingDoctor,
+				template.attendingNurse,
+				template.roomNumber);
+		copy.id = template.id;
+		return copy;
+	}
 }

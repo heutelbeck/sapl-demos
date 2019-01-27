@@ -3,17 +3,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>io.sapl</groupId>
+		<artifactId>sapl-demo-parent</artifactId>
+		<version>2.0.0-SNAPSHOT</version>
+		<relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
+	</parent>
+
 	<artifactId>sapl-demo-filterchain</artifactId>
 	<packaging>jar</packaging>
 
 	<name>SAPL Demo SAPLFilterchain</name>
-
-	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-		<version>1.0.1</version>
-		<relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
-	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +25,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-spring-boot-starter</artifactId>
-			<version>1.0.0</version>
+			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -63,12 +63,12 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>io.sapl</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-demo-domain</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.sapl</groupId>
+			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-demo-shared</artifactId>
 			<version>${project.version}</version>
 		</dependency>

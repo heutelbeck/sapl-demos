@@ -2,9 +2,9 @@ package io.sapl.demo.shared.marshalling;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.sapl.api.pdp.mapping.SaplClassMapper;
+import io.sapl.api.pdp.mapping.SaplRequestElement;
 import io.sapl.spring.marshall.action.HttpAction;
-import io.sapl.spring.marshall.mapper.SaplClassMapper;
-import io.sapl.spring.marshall.mapper.SaplRequestElement;
 import io.sapl.spring.marshall.resource.HttpResource;
 
 public class HttpServletRequestMapper implements SaplClassMapper {

@@ -11,6 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+import io.sapl.api.pdp.advice.AdviceHandlerService;
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.obligation.ObligationHandlerService;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.filterchain.AuthManager;
 import io.sapl.demo.filterchain.obligationhandlers.CoffeeObligationHandler;
@@ -21,11 +24,10 @@ import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
 import io.sapl.spring.PolicyEnforcementFilter;
-import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 
 @Configuration
 @EnableWebSecurity
@@ -50,8 +52,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public SimpleObligationHandlerService getObligationHandlers() {
-		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+	public ObligationHandlerService getObligationHandlers() {
+		ObligationHandlerService sohs = new SimpleObligationHandlerService();
 		sohs.register(new EmailObligationHandler());
 		sohs.register(new CoffeeObligationHandler());
 		sohs.register(new SimpleLoggingObligationHandler());
@@ -60,8 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public SimpleAdviceHandlerService setAdviceHandlers() {
-		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+	public AdviceHandlerService setAdviceHandlers() {
+		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
 		sahs.register(new EmailAdviceHandler());
 		sahs.register(new SimpleLoggingAdviceHandler());
 		return sahs;

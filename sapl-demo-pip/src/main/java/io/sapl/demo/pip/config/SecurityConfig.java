@@ -11,14 +11,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
+import io.sapl.api.pdp.mapping.SaplMapper;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.pip.AuthManager;
 import io.sapl.demo.shared.marshalling.AuthenticationMapper;
 import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
 import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
 
 @Configuration
 @EnableWebSecurity(debug = false)

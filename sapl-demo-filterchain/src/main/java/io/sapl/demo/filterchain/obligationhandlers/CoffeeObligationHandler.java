@@ -1,10 +1,10 @@
 package io.sapl.demo.filterchain.obligationhandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.sapl.api.pdp.obligation.Obligation;
+import io.sapl.api.pdp.obligation.ObligationFailed;
+import io.sapl.api.pdp.obligation.ObligationHandler;
 
-import io.sapl.spring.marshall.obligation.Obligation;
-import io.sapl.spring.marshall.obligation.ObligationFailed;
-import io.sapl.spring.marshall.obligation.ObligationHandler;
 
 public class CoffeeObligationHandler implements ObligationHandler {
 

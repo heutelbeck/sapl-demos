@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.sapl.api.pdp.Response;
 import io.sapl.demo.domain.Patient;
 import io.sapl.demo.domain.PatientRepo;
-import io.sapl.spring.SAPLAuthorizator;
+import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.pep.SAPLAuthorizer;
 
 @Controller
 public class UIController {
@@ -27,13 +28,12 @@ public class UIController {
 	private static final String REDIRECT_PROFILES = "redirect:profiles";
 	private static final String UPDATE = "update";
 
-	private SAPLAuthorizator sapl;
-
+	private BlockingSAPLAuthorizer sapl;
 	private PatientRepo patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizator sapl, PatientRepo patientenRepo) {
-		this.sapl = sapl;
+	public UIController(SAPLAuthorizer sapl, PatientRepo patientenRepo) {
+		this.sapl = new BlockingSAPLAuthorizer(sapl);
 		this.patientenRepo = patientenRepo;
 	}
 
@@ -63,7 +63,6 @@ public class UIController {
 
 	@GetMapping("/patient")
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
-
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
 			throw new IllegalArgumentException();
@@ -73,11 +72,9 @@ public class UIController {
 
 		model.addAttribute("viewDiagnosisPermission", sapl.authorize(authentication, "readDiagnosis", patient));
 		model.addAttribute("viewHRNPermission", sapl.authorize(authentication, "read", "HRN"));
-		model.addAttribute("updatePermission", sapl.authorize(authentication, RequestMethod.PUT, "/patient"));
-		model.addAttribute("deletePermission", sapl.authorize(authentication, RequestMethod.DELETE, "/patient"));
-		// using patientfunction:
-		model.addAttribute("viewRoomNumberPermission",
-				sapl.authorize(authentication, "viewRoomNumberFunction", patient));
+		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumberFunction", patient));
+		model.addAttribute("updatePermission", sapl.wouldAuthorize(authentication, RequestMethod.PUT, "/patient"));
+		model.addAttribute("deletePermission", sapl.wouldAuthorize(authentication, RequestMethod.DELETE, "/patient"));
 
 		boolean permissionBlackenedHRN = sapl.authorize(authentication, "getBlackenAndObligation", "anything");
 		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
@@ -85,17 +82,8 @@ public class UIController {
 		if (permissionBlackenedHRN) {
 			String hRN = patient.getHealthRecordNumber();
 			Response response = sapl.getResponse(authentication, "getBlackenAndObligation", hRN);
-			model.addAttribute("blackenedHRN", response.getResource().get().asText()); // use only together with
-																						// "permissionBlackenedHRN":
-																						// only for NURSE
-			model.addAttribute("obligation", response.getObligation().get().findValue("key1").asText()); // findValue("key1").asText());
-																											// // use
-																											// only
-																											// together
-																											// with
-																											// "permissionBlackenedHRN":
-																											// only for
-																											// NURSE
+			model.addAttribute("blackenedHRN", response.getResource().get().asText());
+			model.addAttribute("obligation", response.getObligation().get().findValue("key1").asText());
 			model.addAttribute("message", "Congratulations, you have fullfilled the obligation");
 		}
 		return "patient";
@@ -115,10 +103,10 @@ public class UIController {
 				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
 		model.addAttribute("updatePatient", patient);
 
-		model.addAttribute("updateDiagnosisPermission", sapl.authorize(authentication, "updateDiagnosis", patient));
-		model.addAttribute("updateHRNPermission", sapl.authorize(authentication, UPDATE, "HRN"));
-		model.addAttribute("updateDoctorPermission", sapl.authorize(authentication, UPDATE, "doctor"));
-		model.addAttribute("updateNursePermission", sapl.authorize(authentication, UPDATE, "nurse"));
+		model.addAttribute("updateDiagnosisPermission", sapl.wouldAuthorize(authentication, "updateDiagnosis", patient));
+		model.addAttribute("updateHRNPermission", sapl.wouldAuthorize(authentication, UPDATE, "HRN"));
+		model.addAttribute("updateDoctorPermission", sapl.wouldAuthorize(authentication, UPDATE, "doctor"));
+		model.addAttribute("updateNursePermission", sapl.wouldAuthorize(authentication, UPDATE, "nurse"));
 		return "updatePatient";
 	}
 

@@ -1,9 +1,8 @@
 package io.sapl.demo.shared.advicehandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import io.sapl.spring.marshall.advice.Advice;
-import io.sapl.spring.marshall.advice.AdviceHandler;
+import io.sapl.api.pdp.advice.Advice;
+import io.sapl.api.pdp.advice.AdviceHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

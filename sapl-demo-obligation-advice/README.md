@@ -1,6 +1,6 @@
 # Tutorial sapl-demo-obligation-advice
 
-This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java) or the [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) and about what you have to know when implementing your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) will be given afterwards.
+This submodule explains how to use Obligation and Advice Handlers, which take care of the obligations and advice encountered while evaluating a SAPL policy. First there will be a tutorial on how to easily use obligation and advice handlers in your own application. More technical details about how to customize the way your Obligation and Advice Handler are called by the [ObligationHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/obligation/ObligationHandlerService.java) or the [AdviceHandlerService](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/marshall/advice/AdviceHandlerService.java) and about what you have to know when implementing your own [SAPLAuthorizer](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizer.java) will be given afterwards.
 
 This demo project makes use of the `@PdpAuthorize` annotation. For more information on how this works and how requests are evaluated have a look at the [aspects-tutorial](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-authorizationaspects).
 
@@ -10,10 +10,10 @@ Please note that we are using Lombok logging for all Demo Projects.
 
 First of all you need to include the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) as described in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
-Please note that if you are using your own [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java)  and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
+Please note that if you are using your own [SAPLAuthorizer](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizer.java)  and not the one provided by the `sapl-spring-boot-starter` you have to manually include the advice and obligation handling.
 
 ### Obligation and Advice Handling in this example
-The policies that use obligation and advice in this example are all directly evaluated by the `SAPLAuthorizator`. For more information about the `SAPLAuthorizator` please check the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
+The policies that use obligation and advice in this example are all directly evaluated by the `SAPLAuthorizer`. For more information about the `SAPLAuthorizer` please check the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
 We also use Thymeleaf to add certain elements to a webpage depending on the Sapl Policy Evaluation. Therefore a typical line of code were we consult a policy with an obligation could look like this:
 
@@ -40,7 +40,7 @@ obligation
    }
 ```
 
-As the pattern for calling the `SAPLAuthorizator` is `sapl.authorize(subject, action, resource)`, in this case our subject would be the `authentication`, the action is the `String` "readDiagnosis" and the resource is the `patient`. Now the policy evaluates to `permit` if the name of the authenticated user equals the name of the patient's attending nurse (in our domain each user name is unique).
+As the pattern for calling the `SAPLAuthorizer` is `sapl.authorize(subject, action, resource)`, in this case our subject would be the `authentication`, the action is the `String` "readDiagnosis" and the resource is the `patient`. Now the policy evaluates to `permit` if the name of the authenticated user equals the name of the patient's attending nurse (in our domain each user name is unique).
 
 In Sapl Policies obligations always have to be fulfilled. If an obligation cannot be fulfilled for any reason, the response has to be changed to `deny`.
 
@@ -169,7 +169,7 @@ If you want to write your own AdviceHandlerService, implement the interface `Adv
 
 
 
-## Advanced Customization: ObligationHandlerService, AdviceHandlerService and SAPLAuthorizator
+## Advanced Customization: ObligationHandlerService, AdviceHandlerService and SAPLAuthorizer
 
 ### A closer look on ObligationHandlerService and AdviceHandlerService
 
@@ -373,14 +373,14 @@ public class SimpleAdviceHandlerService implements AdviceHandlerService {
 ```
 
 
-### Obligation and Advice in the SAPLAuthorizator
+### Obligation and Advice in the SAPLAuthorizer
 
-Obligations and advice are handled through the [SAPLAuthorizator](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizator.java) . Therefore if you don't use this `SAPLAuthorizator` in your Application, you have to find another way to handle them. Here you can have a look at how this works inside the `SAPLAuthorizator`:
+Obligations and advice are handled through the [SAPLAuthorizer](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizer.java) . Therefore if you don't use this `SAPLAuthorizer` in your Application, you have to find another way to handle them. Here you can have a look at how this works inside the `SAPLAuthorizer`:
 
 ```java
 
 @Slf4j
-public class SAPLAuthorizator {
+public class SAPLAuthorizer {
 
 	protected final PolicyDecisionPoint pdp;
 
@@ -389,7 +389,7 @@ public class SAPLAuthorizator {
 	protected final AdviceHandlerService ahs;
 
 	@Autowired
-	public SAPLAuthorizator(PolicyDecisionPoint pdp, ObligationHandlerService obs, AdviceHandlerService ahs) {
+	public SAPLAuthorizer(PolicyDecisionPoint pdp, ObligationHandlerService obs, AdviceHandlerService ahs) {
 		this.pdp = pdp;
 		this.obs = obs;
 		this.ahs = ahs;

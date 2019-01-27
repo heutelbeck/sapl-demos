@@ -1,7 +1,7 @@
 package io.sapl.demo;
 
+import io.sapl.api.pdp.marshall.Resource;
 import io.sapl.demo.domain.Patient;
-import io.sapl.spring.marshall.Resource;
 import lombok.Value;
 
 @Value

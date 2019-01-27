@@ -12,7 +12,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demos</artifactId>
-	<version>1.0.1</version>
+	<version>2.0.0-SNAPSHOT</version>
 
 	<packaging>pom</packaging>
 
@@ -45,10 +45,12 @@
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-permissionevaluator</module>
         <module>sapl-demo-pip</module>
+		<module>sapl-demo-reactive</module>
+		<module>sapl-demo-reactive-server</module>
 		<module>sapl-demo-remote</module>
         <module>sapl-demo-shared</module>
 		<module>sapl-demo-voter</module>
-    </modules>
+  </modules>
 
 	<distributionManagement>
 		<repository>

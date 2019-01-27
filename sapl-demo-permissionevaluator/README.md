@@ -97,10 +97,10 @@ Here is an excerpt of the [SAPLPermissionEvaluator](https://github.com/heutelbec
 @Component
 public class SAPLPermissionEvaluator implements PermissionEvaluator {
 
-	private SAPLAuthorizator sapl;
+	private SAPLAuthorizer sapl;
 
 	@Autowired
-	public SAPLPermissionEvaluator(SAPLAuthorizator saplAuthorizer) {
+	public SAPLPermissionEvaluator(SAPLAuthorizer saplAuthorizer) {
 		this.sapl = saplAuthorizer;
 	}
 

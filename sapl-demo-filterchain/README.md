@@ -1,6 +1,6 @@
 # Tutorial  sapl-demo-filterchain
 
-This demo shows how to filter incoming Requests with a `Policy Enforcement Filter` (`PEF`) that uses Sapl Policies. If you use the `Policy Enforcement Filter`, it is a `Policy Enforcement Point` (`PEP`) of your Application. The `PFE` first creates a request for the `SAPLAuthorizator`, which gets a `Response` from the `Policy Decision Point` (`PDP`) and then does the advice and obligation handling and the mapping.
+This demo shows how to filter incoming Requests with a `Policy Enforcement Filter` (`PEF`) that uses Sapl Policies. If you use the `Policy Enforcement Filter`, it is a `Policy Enforcement Point` (`PEP`) of your Application. The `PFE` first creates a request for the `SAPLAuthorizer`, which gets a `Response` from the `Policy Decision Point` (`PDP`) and then does the advice and obligation handling and the mapping.
 
 ## Tutorial for using the Policy Enforcement Filter
 
@@ -58,5 +58,5 @@ where
   resource =~ "/patient/*";
 ```
 
-Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizator`, which can help you write your policies.
+Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizer`, which can help you write your policies.
 

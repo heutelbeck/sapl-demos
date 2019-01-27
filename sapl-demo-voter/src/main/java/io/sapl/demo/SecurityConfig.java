@@ -3,15 +3,6 @@ package io.sapl.demo;
 import java.util.Arrays;
 import java.util.List;
 
-import io.sapl.demo.domain.UserRepo;
-import io.sapl.demo.shared.marshalling.AuthenticationMapper;
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
-import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.spring.SAPLAuthorizator;
-import io.sapl.spring.SaplBasedVoter;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -24,6 +15,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.obligation.ObligationHandlerService;
+import io.sapl.demo.domain.UserRepo;
+import io.sapl.demo.shared.marshalling.AuthenticationMapper;
+import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
+import io.sapl.demo.shared.marshalling.PatientMapper;
+import io.sapl.pep.SAPLAuthorizer;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
+import io.sapl.spring.SaplBasedVoter;
+
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
@@ -31,7 +33,6 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter(AccessDecisionManager accessDecisionManager) {
 		return new ConfigAdapter(accessDecisionManager);
-
 	}
 
 	@Bean
@@ -40,7 +41,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SaplBasedVoter saplBasedVoter(SAPLAuthorizator saplAuthorizer) {
+	public SaplBasedVoter saplBasedVoter(SAPLAuthorizer saplAuthorizer) {
 		return new SaplBasedVoter(saplAuthorizer);
 	}
 
@@ -74,8 +75,8 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SimpleObligationHandlerService getObligationHandlers() {
-		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+	public ObligationHandlerService getObligationHandlers() {
+		ObligationHandlerService sohs = new SimpleObligationHandlerService();
 		sohs.register(new EmailObligationHandler());
 		sohs.register(new CoffeeObligationHandler());
 		sohs.register(new SimpleLoggingObligationHandler());

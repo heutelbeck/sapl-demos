@@ -2,6 +2,7 @@ package io.sapl.demo.domain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import lombok.experimental.UtilityClass;
 
@@ -27,14 +28,14 @@ public class DemoData {
 	private static final String NAME_HORST = "Horst";
 
 	public static void loadDemoDataset(UserRepo userRepo, String password, PatientRepo patientRepo, RelationRepo relationRepo) {
-		userRepo.save(new User(NAME_DOMINIK, password, false, new ArrayList<>(Arrays.asList(ROLE_VISITOR))));
-		userRepo.save(new User(NAME_JULIA, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_PETER, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_ALINA, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_THOMAS, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_BRIGITTE, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANOSCH, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANINA, password, false, new ArrayList<>(Arrays.asList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_DOMINIK, password, false, new ArrayList<>(Collections.singletonList(ROLE_VISITOR))));
+		userRepo.save(new User(NAME_JULIA, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_PETER, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_ALINA, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepo.save(new User(NAME_THOMAS, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_BRIGITTE, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_JANOSCH, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepo.save(new User(NAME_JANINA, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
 		userRepo.save(new User(NAME_HORST, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
 
 		patientRepo.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));

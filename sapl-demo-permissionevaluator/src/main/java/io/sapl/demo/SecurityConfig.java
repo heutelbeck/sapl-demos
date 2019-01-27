@@ -1,5 +1,15 @@
 package io.sapl.demo;
 
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import io.sapl.api.pdp.advice.AdviceHandlerService;
+import io.sapl.api.pdp.mapping.SaplMapper;
+import io.sapl.api.pdp.obligation.ObligationHandlerService;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
 import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
@@ -10,16 +20,9 @@ import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.demo.shared.pip.ApplicationContextProvider;
-import io.sapl.spring.marshall.advice.SimpleAdviceHandlerService;
-import io.sapl.spring.marshall.mapper.SaplMapper;
-import io.sapl.spring.marshall.mapper.SimpleSaplMapper;
-import io.sapl.spring.marshall.obligation.SimpleObligationHandlerService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
+import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
+import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -45,8 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public SimpleObligationHandlerService getObligationHandlers() {
-		SimpleObligationHandlerService sohs = new SimpleObligationHandlerService();
+	public ObligationHandlerService getObligationHandlers() {
+		ObligationHandlerService sohs = new SimpleObligationHandlerService();
 		sohs.register(new EmailObligationHandler());
 		sohs.register(new CoffeeObligationHandler());
 		sohs.register(new SimpleLoggingObligationHandler());
@@ -54,8 +57,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public SimpleAdviceHandlerService setAdviceHandlers() {
-		SimpleAdviceHandlerService sahs = new SimpleAdviceHandlerService();
+	public AdviceHandlerService setAdviceHandlers() {
+		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
 		sahs.register(new EmailAdviceHandler());
 		sahs.register(new SimpleLoggingAdviceHandler());
 		return sahs;

@@ -43,11 +43,12 @@ import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -278,13 +279,14 @@ public class Benchmark {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
 				EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+				BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
 					Request request = generator.createRequestObject();
 
 					long start = System.nanoTime();
-					Response response = pdp.decide(request);
+					Response response = blockingPdp.decide(request);
 					long end = System.nanoTime();
 
 					double diff = nanoToMs(end - start);
@@ -295,7 +297,7 @@ public class Benchmark {
 					LOGGER.info("Total : {}ms", diff);
 				}
 			}
-		} catch (IOException | PolicyEvaluationException | AttributeException | FunctionException e) {
+		} catch (IOException | AttributeException | FunctionException e) {
 			LOGGER.error("Error running test", e);
 		}
 

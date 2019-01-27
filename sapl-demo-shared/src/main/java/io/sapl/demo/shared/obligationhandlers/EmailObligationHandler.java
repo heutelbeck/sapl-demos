@@ -1,10 +1,9 @@
 package io.sapl.demo.shared.obligationhandlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
-import io.sapl.spring.marshall.obligation.Obligation;
-import io.sapl.spring.marshall.obligation.ObligationFailed;
-import io.sapl.spring.marshall.obligation.ObligationHandler;
+import io.sapl.api.pdp.obligation.Obligation;
+import io.sapl.api.pdp.obligation.ObligationFailed;
+import io.sapl.api.pdp.obligation.ObligationHandler;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
