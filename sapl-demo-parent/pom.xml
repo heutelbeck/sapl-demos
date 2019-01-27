@@ -104,7 +104,7 @@
 			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>openconjurer-snapshot</id>
+			<id>openconjurer-snapshots</id>
 			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
 			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
 		</snapshotRepository>
