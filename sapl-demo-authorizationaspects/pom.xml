@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1-SNAPSHOT</version>
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
 	</parent>
 
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-spring-boot-starter</artifactId>
-			<version>${project.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -75,12 +75,12 @@
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-demo-domain</artifactId>
-			<version>1.0.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-demo-shared</artifactId>
-			<version>1.0.0</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
