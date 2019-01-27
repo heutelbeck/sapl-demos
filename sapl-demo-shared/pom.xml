@@ -12,7 +12,7 @@
     <parent>
         <groupId>io.sapl</groupId>
         <artifactId>sapl-demo-parent</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0.1</version>
         <relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
