@@ -42,18 +42,19 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<version.sapl.policy.engine>2.0.0-SNAPSHOT</version.sapl.policy.engine>
 	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-pdp-remote</artifactId>
-			<version>${project.version}</version>
+			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-pep</artifactId>
-			<version>${project.version}</version>
+			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 
 		<dependency>
