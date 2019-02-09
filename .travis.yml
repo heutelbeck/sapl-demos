@@ -9,7 +9,7 @@ android:
      - android-26
      - build-tools-26.0.2
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 # skip "mvn install -skipTexts=true" before building
 install: true
 env:
