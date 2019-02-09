@@ -16,12 +16,6 @@
 	<name>SAPL Demo SAPLJsonWebToken</name>
 	<description>Demo project for SAPLPermissionEvaluator</description>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
@@ -71,12 +65,12 @@
 		<dependency>
 		    <groupId>org.springframework.security.oauth</groupId>
 		    <artifactId>spring-security-oauth2</artifactId>
-		    <version>2.3.2.RELEASE</version>
+		    <version>2.3.4.RELEASE</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.springframework.security</groupId>
 		    <artifactId>spring-security-jwt</artifactId>
-		    <version>1.0.9.RELEASE</version>
+		    <version>1.0.10.RELEASE</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

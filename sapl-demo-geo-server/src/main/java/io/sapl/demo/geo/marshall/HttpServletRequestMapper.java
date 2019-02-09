@@ -5,11 +5,12 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.pdp.mapping.SaplClassMapper;
 import io.sapl.api.pdp.mapping.SaplRequestElement;
-import org.apache.commons.lang.StringUtils;
 
 
 public class HttpServletRequestMapper implements SaplClassMapper {

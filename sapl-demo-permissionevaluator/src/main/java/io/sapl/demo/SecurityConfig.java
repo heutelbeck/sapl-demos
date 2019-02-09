@@ -43,11 +43,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public ApplicationContextProvider applicationContextProvider() {
-		return new ApplicationContextProvider();
-	}
-
-	@Bean
 	public ObligationHandlerService getObligationHandlers() {
 		ObligationHandlerService sohs = new SimpleObligationHandlerService();
 		sohs.register(new EmailObligationHandler());
