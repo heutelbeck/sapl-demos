@@ -1,4 +1,5 @@
-import io.sapl.demo.shared.pip.PatientPIP as patient
+//import io.sapl.demo.shared.pip.PatientPIP as patient
+import io.sapl.pip.http.HttpPolicyInformationPoint as http
 
 set "readPolicies"
 deny-unless-permit
@@ -46,4 +47,6 @@ policy "permit_admin_and_relatives_read_room_number"
 permit
   action == "readRoomNumber"
 where
-  "ADMIN" in subject..authority || subject.name in resource.id.<patient.related>;
+  var url = "http://localhost:8081/rest/patient/related/" + standard.numberToString(resource.id);
+  "ADMIN" in subject..authority || subject.name in url.<http.get>;
+//  "ADMIN" in subject..authority || subject.name in resource.id.<patient.related>;
