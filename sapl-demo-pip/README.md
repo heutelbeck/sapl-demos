@@ -16,11 +16,11 @@ where
   
 ```
 
-We provide two Patients, Lenny and Karl. Lenny has one relative registered in our system, it is Dominik. Karl has three, it´s Julia, Alina and Janosch. Only these 
+We provide two Patients, Lenny and Karl. Lenny has one relative registered in our system, it is Dominic. Karl has three, it´s Julia, Alina and Janosch. Only these 
 accounts are able to see the room number of their respective relative.
 
 ## Try it out
-Login with one of the users: Dominik, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
+Login with one of the users: Dominic, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
 The Password is allways "password". You can change this by providing another password in the application.properties. Not the plain value is needed but the bcrypted one (for example see https://www.dailycred.com/article/bcrypt-calculator).
 
 ## Policy Information Point

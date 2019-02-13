@@ -16,6 +16,8 @@
 package io.sapl.demo;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
@@ -45,7 +48,6 @@ public class EmbeddedPDPDemo {
 	private static final String POLICYPATH_DOC = "ANT style pattern providing the path to the polices. "
 			+ "The default path is 'classpath:policies'. The pattern will be extended by '/*.sapl' by the PDP/PRP. "
 			+ "So all files with the '.sapl' suffix will be loaded.";
-
 
 	private static final String SUBJECT = "willi";
 	private static final String ACTION_READ = "read";
@@ -70,15 +72,17 @@ public class EmbeddedPDPDemo {
 			} else {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
-		} catch (ParseException | IOException | AttributeException | FunctionException e) {
+		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 
 	}
 
-	private static void runDemo(String path) throws IOException, AttributeException, FunctionException {
-		final EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint(path);
+	private static void runDemo(String path)
+			throws IOException, AttributeException, FunctionException, URISyntaxException {
+		final PolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint.Builder()
+				.withFilesystemPolicyRetrievalPoint(path).build();
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
@@ -87,7 +91,7 @@ public class EmbeddedPDPDemo {
 		pdp.dispose();
 	}
 
-	private static void blockingUsageDemo(EmbeddedPolicyDecisionPoint pdp) {
+	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
 		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 		final Response readResponse = blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
@@ -96,7 +100,7 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
-	private static void reactiveUsageDemo(EmbeddedPolicyDecisionPoint pdp) {
+	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
 		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
@@ -108,7 +112,7 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
 	}
 
-	private static void runPerformanceDemo(EmbeddedPolicyDecisionPoint pdp) {
+	private static void runPerformanceDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance...");
 		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 		long start = System.nanoTime();

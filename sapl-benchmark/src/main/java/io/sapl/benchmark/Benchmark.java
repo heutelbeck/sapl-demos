@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -44,6 +45,7 @@ import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
@@ -124,7 +126,7 @@ public class Benchmark {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws URISyntaxException {
 
 		Options options = new Options();
 
@@ -150,7 +152,7 @@ public class Benchmark {
 		}
 	}
 
-	public static void runBenchmark(String path) {
+	public static void runBenchmark(String path) throws URISyntaxException {
 		ObjectMapper mapper = new ObjectMapper();
 		TestSuite suite = null;
 		try {
@@ -184,7 +186,7 @@ public class Benchmark {
 
 	private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
 			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
-			PolicyGeneratorConfiguration config) {
+			PolicyGeneratorConfiguration config) throws URISyntaxException {
 		identifier.add(config.getName());
 		List<XlsRecord> results = null;
 		try {
@@ -264,7 +266,7 @@ public class Benchmark {
 		}
 	}
 
-	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path) throws IOException {
+	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path) throws IOException, URISyntaxException {
 
 		PolicyGenerator generator = new PolicyGenerator(config);
 
@@ -278,7 +280,7 @@ public class Benchmark {
 		try {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
-				EmbeddedPolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint("file:///" + path + subfolder);
+				PolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint.Builder().withFilesystemPolicyRetrievalPoint(path + subfolder).build();
 				BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 				double prep = nanoToMs(System.nanoTime() - begin);
 
