@@ -15,7 +15,7 @@ import io.sapl.demo.domain.RelationRepo;
 import io.sapl.demo.domain.UserRepo;
 import io.sapl.springboot.autoconfig.PDPAutoConfiguration;
 
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class, PDPAutoConfiguration.class})
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class, PDPAutoConfiguration.class })
 @EnableJpaRepositories("io.sapl.demo.domain")
 @EntityScan("io.sapl.demo.domain")
 @ComponentScan({"io.sapl.demo.pipserver", "io.sapl.demo.shared.pip"})

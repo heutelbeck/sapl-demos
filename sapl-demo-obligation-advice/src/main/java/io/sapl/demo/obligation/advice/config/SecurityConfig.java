@@ -19,7 +19,6 @@ import io.sapl.demo.shared.marshalling.PatientMapper;
 import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
 import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
-import io.sapl.demo.shared.pip.ApplicationContextProvider;
 import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
 import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
@@ -39,11 +38,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public AuthenticationManager authManager(UserRepo userRepo) {
 		return new AuthManager(userRepo);
-	}
-
-	@Bean
-	public ApplicationContextProvider applicationContextProvider() {
-		return new ApplicationContextProvider();
 	}
 
 	@Bean
