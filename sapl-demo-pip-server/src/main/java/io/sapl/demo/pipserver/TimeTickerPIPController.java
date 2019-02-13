@@ -15,7 +15,7 @@ import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping("rest/time")
-public class TimeController {
+public class TimeTickerPIPController {
 
     @GetMapping(value = "ticker", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
     public Flux<JsonNode> getTimeTicker() {

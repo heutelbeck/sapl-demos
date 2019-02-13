@@ -10,11 +10,11 @@
         <relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
     </parent>
 
-    <artifactId>sapl-demo-reactive-server</artifactId>
+    <artifactId>sapl-demo-pip-server</artifactId>
     <packaging>jar</packaging>
 
-    <name>sapl-demo-reactive-server</name>
-    <description>Sapl Demo Reactive PIP Server</description>
+    <name>sapl-demo-pip-server</name>
+    <description>Sapl demo PIP server with reactive and non reactive PIP endpoints</description>
 
     <properties>
         <jetty.plugin.version>9.3.9.v20160517</jetty.plugin.version>

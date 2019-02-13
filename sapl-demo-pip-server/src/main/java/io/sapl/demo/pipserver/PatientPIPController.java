@@ -13,7 +13,7 @@ import io.sapl.demo.shared.pip.PatientPIP;
 
 @RestController
 @RequestMapping("rest/patient")
-public class PatientController {
+public class PatientPIPController {
 
     @GetMapping(value = "related/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getRelations(@PathVariable String id) {
