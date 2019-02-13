@@ -2,8 +2,9 @@ package io.sapl.demo.shared.functions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,23 +14,18 @@ import io.sapl.api.functions.FunctionException;
 import io.sapl.api.functions.FunctionLibrary;
 import io.sapl.demo.domain.Relation;
 import io.sapl.demo.domain.RelationRepo;
-import io.sapl.demo.shared.pip.ApplicationContextProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Service
+@RequiredArgsConstructor
 @FunctionLibrary(name = "patientfunction", description = "")
 public class PatientFunction {
 
-	private Optional<RelationRepo> relationRepo = Optional.empty();
+	private final RelationRepo relationRepo;
 
 	private final ObjectMapper om = new ObjectMapper();
-
-	private RelationRepo getRelationRepo() {
-		if (!relationRepo.isPresent()) {
-			relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class));
-		}
-		return relationRepo.get();
-	}
 
 	@Function(name = "related")
 	public JsonNode getRelations(JsonNode value) throws FunctionException {
@@ -37,8 +33,8 @@ public class PatientFunction {
 		try {
 			int id = Integer.parseInt(value.asText());
 
-			returnList.addAll(getRelationRepo().findByPatientid(id).stream().map(Relation::getUsername)
-					.collect(Collectors.toList()));
+			returnList.addAll(
+					relationRepo.findByPatientid(id).stream().map(Relation::getUsername).collect(Collectors.toList()));
 
 		} catch (NumberFormatException e) {
 			LOGGER.error("getRelations couldn't parse the value to Int", e);

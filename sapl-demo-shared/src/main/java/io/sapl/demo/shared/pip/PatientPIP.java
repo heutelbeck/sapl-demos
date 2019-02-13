@@ -3,8 +3,9 @@ package io.sapl.demo.shared.pip;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,22 +14,18 @@ import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.demo.domain.Relation;
 import io.sapl.demo.domain.RelationRepo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Service
+@RequiredArgsConstructor
 @PolicyInformationPoint(name = "patient", description = "retrieves information about patients")
 public class PatientPIP {
 
-	private Optional<RelationRepo> relationRepo = Optional.empty();
+	private final RelationRepo relationRepo;
 
 	private final ObjectMapper om = new ObjectMapper();
-
-	private RelationRepo getRelationRepo() {
-		if (!relationRepo.isPresent()) {
-			relationRepo = Optional.of(ApplicationContextProvider.getApplicationContext().getBean(RelationRepo.class));
-		}
-		return relationRepo.get();
-	}
 
 	@Attribute(name = "related")
 	public JsonNode getRelations(JsonNode value, Map<String, JsonNode> variables) {
@@ -36,8 +33,8 @@ public class PatientPIP {
 		try {
 			int id = Integer.parseInt(value.asText());
 
-			returnList.addAll(getRelationRepo().findByPatientid(id).stream().map(Relation::getUsername)
-					.collect(Collectors.toList()));
+			returnList.addAll(
+					relationRepo.findByPatientid(id).stream().map(Relation::getUsername).collect(Collectors.toList()));
 
 		} catch (NumberFormatException e) {
 			LOGGER.error("getRelations couldn't parse the value to Int", e);
