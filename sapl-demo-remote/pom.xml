@@ -22,7 +22,7 @@
 		<name>Dominic Heutelbeck</name>
 	</organization>
 
-	<inceptionYear>2017</inceptionYear>
+	<inceptionYear>2019</inceptionYear>
 
 	<licenses>
 		<license>
@@ -42,7 +42,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-pdp-remote</artifactId>
+			<artifactId>sapl-pdp-client</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>

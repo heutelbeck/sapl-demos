@@ -48,7 +48,7 @@ public class RemotePDPDemo {
     private static final String PORT = "port";
     private static final String HOST = "host";
 
-    private static final int RUNS = 100;
+    private static final int RUNS = 1;
     private static final double BILLION = 1_000_000_000.0D;
     private static final double MILLION = 1_000_000.0D;
 
@@ -106,7 +106,7 @@ public class RemotePDPDemo {
     }
 
     private static void runDemo(String host, int port, String key, String secret) {
-        RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
+        RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port);
         final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 
         long start = System.nanoTime();
