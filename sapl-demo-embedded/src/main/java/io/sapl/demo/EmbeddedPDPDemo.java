@@ -16,7 +16,6 @@
 package io.sapl.demo;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.cli.CommandLine;
@@ -29,11 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.sapl.api.functions.FunctionException;
+import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
 import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import reactor.core.publisher.Flux;
 
@@ -72,7 +73,8 @@ public class EmbeddedPDPDemo {
 			} else {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
-		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException e) {
+		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
+				| PolicyEvaluationException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
@@ -80,9 +82,12 @@ public class EmbeddedPDPDemo {
 	}
 
 	private static void runDemo(String path)
-			throws IOException, AttributeException, FunctionException, URISyntaxException {
-		final PolicyDecisionPoint pdp = new EmbeddedPolicyDecisionPoint.Builder()
-				.withFilesystemPolicyRetrievalPoint(path).build();
+			throws IOException, AttributeException, FunctionException, URISyntaxException, PolicyEvaluationException {
+		Builder builder = EmbeddedPolicyDecisionPoint.builder();
+		if (path != null) {
+			builder = builder.withFilesystemPolicyRetrievalPoint(path);
+		}
+		final PolicyDecisionPoint pdp = builder.build();
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
