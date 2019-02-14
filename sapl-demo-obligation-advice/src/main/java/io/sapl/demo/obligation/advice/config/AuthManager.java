@@ -3,9 +3,10 @@ package io.sapl.demo.obligation.advice.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.sapl.demo.domain.User;
-import io.sapl.demo.domain.UserRepo;
 import lombok.RequiredArgsConstructor;
+
+import org.demo.domain.User;
+import org.demo.domain.UserRepo;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;

@@ -2,6 +2,8 @@ package io.sapl.demo.obligation.advice.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.demo.domain.Patient;
+import org.demo.domain.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -16,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.api.pdp.Response;
-import io.sapl.demo.domain.Patient;
-import io.sapl.demo.domain.PatientRepo;
 import io.sapl.pep.BlockingSAPLAuthorizer;
 import io.sapl.pep.SAPLAuthorizer;
 import io.sapl.spring.annotation.PdpAuthorize;

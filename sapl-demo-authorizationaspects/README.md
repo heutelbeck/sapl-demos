@@ -1,8 +1,17 @@
-# Tutorial  sapl-demo-authorizationaspects
+# Demo: Aspect Oriented Policy Enforcement
 
-This demo shows how to use the annotation `@PdpAuthorize`. 
+This demo application how to use the Spring aspect oriented programming model to easily establish policy enforcement points in your application code by using the   `@PdpAuthorize` annotation. 
 
+## What does it do?
+
+The demo consists of a full stack Spring MVC application, where the controllers establish policy enforcement points using the `@PdpAuthorize` annotation.
+
+
+  
 ## Try it
+
+Run the application: `mvn spring-boot:run`. The demo application will be accessible under [http:\\localhost:8080](http:\\localhost:8080).
+
 Login with one of the users: Dominic, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
 The Password is always "password". You can change this by providing another password in the application.properties. Not the plain value is needed but the bcrypted one (for example see https://www.dailycred.com/article/bcrypt-calculator ) .
 
@@ -14,7 +23,7 @@ General spring features in this submodule are:
 * [Spring Boot](https://projects.spring.io/spring-boot/)
 * Standard SQL database: [H2](http://www.h2database.com) (In-Memory), programmable via JPA
 * [Hibernate](http://hibernate.org/)
-* web interfaces (Rest, UI) with Spring MVC
+* web interfaces (REST, UI) with Spring MVC
 * model classes (Patient, User, Relation), CrudRepositories in JPA
 * [Spring Security](https://projects.spring.io/spring-security/)
 * Thymeleaf

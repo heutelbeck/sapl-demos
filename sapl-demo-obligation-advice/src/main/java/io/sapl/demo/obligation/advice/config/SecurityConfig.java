@@ -1,5 +1,14 @@
 package io.sapl.demo.obligation.advice.config;
 
+import org.demo.domain.UserRepo;
+import org.demo.shared.advicehandlers.EmailAdviceHandler;
+import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
+import org.demo.shared.marshalling.AuthenticationMapper;
+import org.demo.shared.marshalling.HttpServletRequestMapper;
+import org.demo.shared.marshalling.PatientMapper;
+import org.demo.shared.obligationhandlers.CoffeeObligationHandler;
+import org.demo.shared.obligationhandlers.EmailObligationHandler;
+import org.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -10,15 +19,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import io.sapl.api.pdp.advice.AdviceHandlerService;
 import io.sapl.api.pdp.mapping.SaplMapper;
 import io.sapl.api.pdp.obligation.ObligationHandlerService;
-import io.sapl.demo.domain.UserRepo;
-import io.sapl.demo.shared.advicehandlers.EmailAdviceHandler;
-import io.sapl.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
-import io.sapl.demo.shared.marshalling.AuthenticationMapper;
-import io.sapl.demo.shared.marshalling.HttpServletRequestMapper;
-import io.sapl.demo.shared.marshalling.PatientMapper;
-import io.sapl.demo.shared.obligationhandlers.CoffeeObligationHandler;
-import io.sapl.demo.shared.obligationhandlers.EmailObligationHandler;
-import io.sapl.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
 import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;

@@ -1,0 +1,44 @@
+package org.demo;
+
+import org.demo.domain.DemoData;
+import org.demo.domain.PatientRepo;
+import org.demo.domain.RelationRepo;
+import org.demo.domain.UserRepo;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+@SpringBootApplication
+public class JwtDemoApplication {
+
+	@Value("${encrypted.testpwd}")
+	private String defaultPassword;
+
+	/**
+	 * Startup the application.
+	 *
+	 * @param args
+	 *            command line arguments
+	 */
+	public static void main(String[] args) {
+		SpringApplication.run(JwtDemoApplication.class, args);
+	}
+
+	/**
+	 * Initializes the demo database with contents as defined in the demo domain.
+	 *
+	 * @param userRepo
+	 *            the user repository
+	 * @param patientRepo
+	 *            the patient repository
+	 * @param relationRepo
+	 *            the relation repository
+	 * @return initialization routine
+	 */
+	@Bean
+	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo) {
+		return args -> DemoData.loadDemoDataset(userRepo, defaultPassword, patientRepo, relationRepo);
+	}
+}
