@@ -13,12 +13,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import io.sapl.springboot.autoconfig.PDPAutoConfiguration;
-
-@SpringBootApplication(exclude = { SecurityAutoConfiguration.class, PDPAutoConfiguration.class })
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 @EnableJpaRepositories("io.sapl.demo.domain")
 @EntityScan("io.sapl.demo.domain")
-@ComponentScan({"io.sapl.demo.pipserver", "io.sapl.demo.shared.pip"})
+@ComponentScan({"org.demo.pipserver", "io.sapl.demo.shared.pip"})
 public class PipServerApplication {
 
     public static void main(String[] args) {

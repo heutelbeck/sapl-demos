@@ -42,6 +42,7 @@
         <!--<groupId>org.springframework.boot</groupId>-->
         <!--<artifactId>spring-boot-devtools</artifactId>-->
         <!--</dependency>-->
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sapl-demo-domain</artifactId>
@@ -51,6 +52,12 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>sapl-demo-shared</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.sapl</groupId>
+                    <artifactId>sapl-spring-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
