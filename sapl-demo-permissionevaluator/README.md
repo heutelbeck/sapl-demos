@@ -238,7 +238,7 @@ public class PatientFunction {
 The Function Library also has to be imported into the policy set with:
 
 ```
-import io.sapl.demo.shared.functions.PatientFunction as patientfunction
+import org.demo.shared.functions.PatientFunction as patientfunction
 
 ```
 

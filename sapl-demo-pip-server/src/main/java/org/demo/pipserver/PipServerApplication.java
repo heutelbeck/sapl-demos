@@ -14,9 +14,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
-@EnableJpaRepositories("io.sapl.demo.domain")
-@EntityScan("io.sapl.demo.domain")
-@ComponentScan({"org.demo.pipserver", "io.sapl.demo.shared.pip"})
+@EnableJpaRepositories("org.demo.domain")
+@EntityScan("org.demo.domain")
+@ComponentScan({"org.demo.pipserver", "org.demo.shared.pip"})
 public class PipServerApplication {
 
     public static void main(String[] args) {

@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories("io.sapl.demo.domain")
-@EntityScan("io.sapl.demo.domain")
+@EnableJpaRepositories("org.demo.domain")
+@EntityScan("org.demo.domain")
 public class SaplDemoPipApplication {
 
 	@Value("${encrypted.testpwd}")

@@ -1,4 +1,4 @@
-import io.sapl.demo.shared.functions.PatientFunction as patientfunction
+import org.demo.shared.functions.PatientFunction as patientfunction
 
 set "accessPolicy"
 deny-unless-permit

@@ -1,4 +1,4 @@
-//import io.sapl.demo.shared.pip.PatientPIP as patient
+//import org.demo.shared.pip.PatientPIP as patient
 import io.sapl.pip.http.HttpPolicyInformationPoint as http
 
 set "readPolicies"

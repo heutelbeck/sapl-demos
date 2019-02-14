@@ -82,7 +82,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>io.sapl.demo.EmbeddedPDPDemo</mainClass>
+							<mainClass>org.demo.EmbeddedPDPDemo</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

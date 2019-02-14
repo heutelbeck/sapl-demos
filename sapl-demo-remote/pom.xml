@@ -99,7 +99,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>io.sapl.demo.RemotePDPDemo</mainClass>
+							<mainClass>org.demo.RemotePDPDemo</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
