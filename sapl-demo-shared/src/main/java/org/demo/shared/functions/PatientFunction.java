@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.demo.domain.Relation;
-import org.demo.domain.RelationRepo;
+import org.demo.domain.RelationRepository;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @FunctionLibrary(name = "patientfunction", description = "")
 public class PatientFunction {
 
-	private final RelationRepo relationRepo;
+	private final RelationRepository relationRepo;
 
 	private final ObjectMapper om = new ObjectMapper();
 

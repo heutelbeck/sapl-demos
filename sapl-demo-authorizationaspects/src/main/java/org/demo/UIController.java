@@ -3,7 +3,7 @@ package org.demo;
 import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +29,7 @@ public class UIController {
 	private static final String UPDATE = "update";
 
 	private final BlockingSAPLAuthorizer sapl;
-	private final PatientRepo patientenRepo;
+	private final PatientRepository patientenRepo;
 
 	@GetMapping("/profiles")
 	@PdpAuthorize(subject = "user", action = "getProfiles", resource = "profiles")

@@ -13,7 +13,7 @@ The demo consists of a full stack Spring MVC application, where the controllers 
 Run the application: `mvn spring-boot:run`. The demo application will be accessible under [http:\\localhost:8080](http:\\localhost:8080).
 
 Login with one of the users: Dominic, Julia, Peter, Alina, Thomas, Brigitte, Janosch, Janina or Horst. 
-The Password is always "password". You can change this by providing another password in the application.properties. Not the plain value is needed but the bcrypted one (for example see https://www.dailycred.com/article/bcrypt-calculator ) .
+The Password is always "password".
 
 
 ## Spring Features

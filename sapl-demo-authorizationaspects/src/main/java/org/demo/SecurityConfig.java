@@ -1,6 +1,6 @@
 package org.demo;
 
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.demo.shared.marshalling.AuthenticationMapper;
 import org.demo.shared.marshalling.HttpServletRequestMapper;
 import org.demo.shared.marshalling.PatientMapper;
@@ -23,8 +23,8 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public AuthenticationManager authManager(UserRepo userRepo) {
-		return new AuthManager(userRepo);
+	public AuthenticationManager authManager(UserRepository userRepo) {
+		return new AuthnManager(userRepo);
 	}
 
 	@Bean

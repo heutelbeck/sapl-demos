@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.demo.shared.advicehandlers.EmailAdviceHandler;
 import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import org.demo.shared.marshalling.AuthenticationMapper;
@@ -57,7 +57,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	private AuthenticationManager authenticationManager;
 
 	@Bean
-	public AuthenticationManager authManager(UserRepo userRepo) {
+	public AuthenticationManager authManager(UserRepository userRepo) {
 		return new AuthManager(userRepo);
 	}
 

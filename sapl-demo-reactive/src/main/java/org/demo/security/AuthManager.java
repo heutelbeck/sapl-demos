@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.demo.domain.User;
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -23,7 +23,7 @@ public class AuthManager implements AuthenticationManager {
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private UserRepo userRepo;
+	private UserRepository userRepo;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) {
@@ -34,13 +34,13 @@ public class AuthManager implements AuthenticationManager {
 		}
 
 		String rawPassword = authentication.getCredentials().toString();
-		if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+		if (!passwordEncoder.matches(rawPassword, user.getEncodedPassword())) {
 			throw new BadCredentialsException("user and/or password do not match");
 		}
 
 		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
-		return new UsernamePasswordAuthenticationToken(username, user.getPassword(), userAuthorities);
+		return new UsernamePasswordAuthenticationToken(username, user.getEncodedPassword(), userAuthorities);
 	}
 
 }

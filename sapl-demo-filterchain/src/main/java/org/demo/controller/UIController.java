@@ -3,7 +3,7 @@ package org.demo.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -30,10 +30,10 @@ public class UIController {
 	private static final String UPDATE = "update";
 
 	private BlockingSAPLAuthorizer sapl;
-	private PatientRepo patientenRepo;
+	private PatientRepository patientenRepo;
 
 	@Autowired
-	public UIController(SAPLAuthorizer sapl, PatientRepo patientenRepo) {
+	public UIController(SAPLAuthorizer sapl, PatientRepository patientenRepo) {
 		this.sapl = new BlockingSAPLAuthorizer(sapl);
 		this.patientenRepo = patientenRepo;
 	}

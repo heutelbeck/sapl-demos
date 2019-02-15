@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.demo.security.SecurityUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,18 +23,18 @@ import io.sapl.pep.SAPLAuthorizer;
 public abstract class AbstractPatientView extends VerticalLayout implements View {
 
     private BlockingSAPLAuthorizer authorizer;
-    private PatientRepo patientRepo;
+    private PatientRepository patientRepo;
 
     private Grid<Patient> grid;
 
-    protected AbstractPatientView(SAPLAuthorizer authorizer, PatientRepo patientRepo) {
+    protected AbstractPatientView(SAPLAuthorizer authorizer, PatientRepository patientRepo) {
         this.authorizer = new BlockingSAPLAuthorizer(authorizer);
         this.patientRepo = patientRepo;
 
         setMargin(true);
     }
 
-    protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer);
+    protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer);
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent event) {

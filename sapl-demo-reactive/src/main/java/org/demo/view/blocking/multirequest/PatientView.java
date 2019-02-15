@@ -1,6 +1,6 @@
 package org.demo.view.blocking.multirequest;
 
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.demo.view.blocking.AbstractPatientForm;
 import org.demo.view.blocking.AbstractPatientView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +16,12 @@ import io.sapl.pep.SAPLAuthorizer;
 public class PatientView extends AbstractPatientView {
 
     @Autowired
-    public PatientView(SAPLAuthorizer authorizer, PatientRepo patientRepo) {
+    public PatientView(SAPLAuthorizer authorizer, PatientRepository patientRepo) {
         super(authorizer, patientRepo);
     }
 
     @Override
-    protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer) {
+    protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer) {
         return new PatientForm(refreshCallback, patientRepo, authorizer);
     }
 }

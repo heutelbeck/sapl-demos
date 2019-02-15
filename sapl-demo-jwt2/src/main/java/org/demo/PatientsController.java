@@ -3,7 +3,7 @@ package org.demo;
 import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,7 +20,7 @@ import io.sapl.spring.annotation.PdpAuthorize;
 public class PatientsController {
 
 	@Autowired
-	private PatientRepo patientRepo;
+	private PatientRepository patientRepo;
 
 	@GetMapping // permission to all users: VISITOR, DOCTOR, NURSE, ADMIN
 	public Iterable<Patient> readPatientsList() {

@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface PatientRepo extends CrudRepository<Patient, Integer> {
+public interface PatientRepository extends CrudRepository<Patient, Integer> {
 
 	default Integer randomPatientIdNotInRepo() {
 		SecureRandom random = new SecureRandom();

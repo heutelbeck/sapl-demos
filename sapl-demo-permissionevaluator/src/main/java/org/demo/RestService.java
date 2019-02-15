@@ -9,7 +9,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class RestService {
 	private static final String PHONENUMBER = "phoneNumber";
 
 	@Autowired
-	private PatientRepo patientenRepo;
+	private PatientRepository patientenRepo;
 
 	@GetMapping("{id}")
 	public ResponseEntity<Patient> loadPerson(@PathVariable int id) {

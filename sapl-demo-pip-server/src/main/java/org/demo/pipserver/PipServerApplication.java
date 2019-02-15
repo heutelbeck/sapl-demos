@@ -1,9 +1,9 @@
 package org.demo.pipserver;
 
 import org.demo.domain.DemoData;
-import org.demo.domain.PatientRepo;
-import org.demo.domain.RelationRepo;
-import org.demo.domain.UserRepo;
+import org.demo.domain.PatientRepository;
+import org.demo.domain.RelationRepository;
+import org.demo.domain.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -24,7 +24,7 @@ public class PipServerApplication {
     }
 
     @Bean
-    public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo) {
-        return args -> DemoData.loadDemoDataset(userRepo, "", patientRepo, relationRepo);
+    public CommandLineRunner demoData(UserRepository userRepo, PatientRepository patientRepo, RelationRepository relationRepo) {
+        return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
     }
 }

@@ -1,7 +1,7 @@
 package org.demo.config;
 
 import org.demo.AuthManager;
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.demo.obligationhandlers.CoffeeObligationHandler;
 import org.demo.obligationhandlers.EmailObligationHandler;
 import org.demo.obligationhandlers.SimpleLoggingObligationHandler;
@@ -80,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public AuthenticationManager authManager(UserRepo userRepo) {
+	public AuthenticationManager authManager(UserRepository userRepo) {
 		return new AuthManager(userRepo);
 	}
 

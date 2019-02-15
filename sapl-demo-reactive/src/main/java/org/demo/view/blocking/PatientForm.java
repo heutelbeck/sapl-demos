@@ -3,7 +3,7 @@ package org.demo.view.blocking;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.demo.security.SecurityUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,10 +17,10 @@ import io.sapl.pep.BlockingSAPLAuthorizer;
 class PatientForm extends AbstractPatientForm {
 
     private RefreshCallback refreshCallback;
-    private PatientRepo patientRepo;
+    private PatientRepository patientRepo;
     private BlockingSAPLAuthorizer authorizer;
 
-    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer) {
+    PatientForm(RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer) {
         this.refreshCallback = refreshCallback;
         this.patientRepo = patientRepo;
         this.authorizer = authorizer;

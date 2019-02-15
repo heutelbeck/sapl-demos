@@ -21,7 +21,7 @@ public class User implements Serializable {
 	@Id
 	String name;
 
-	String password;
+	String encodedPassword;
 	boolean disabled;
 
 	ArrayList<String> functions; // DOCTOR , NURSE , VISITOR, ADMIN

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -26,24 +28,33 @@ public class DemoData {
 	private static final String NAME_LENNY = "Lenny";
 	private static final String NAME_KARL = "Karl";
 	private static final String NAME_HORST = "Horst";
+	private static final String DEFAULT_RAW_PASSWORD = "password";
+	
+	public static void loadDemoDataset(UserRepository userRepository, PatientRepository patientRepository, RelationRepository relationRepository) {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	public static void loadDemoDataset(UserRepo userRepo, String password, PatientRepo patientRepo, RelationRepo relationRepo) {
-		userRepo.save(new User(NAME_DOMINIC, password, false, new ArrayList<>(Collections.singletonList(ROLE_VISITOR))));
-		userRepo.save(new User(NAME_JULIA, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_PETER, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_ALINA, password, false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
-		userRepo.save(new User(NAME_THOMAS, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_BRIGITTE, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANOSCH, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_JANINA, password, false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
-		userRepo.save(new User(NAME_HORST, password, false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
+		// Create users
+		
+		userRepository.save(new User(NAME_DOMINIC, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_VISITOR))));
+		userRepository.save(new User(NAME_JULIA, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepository.save(new User(NAME_PETER, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepository.save(new User(NAME_ALINA, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_DOCTOR))));
+		userRepository.save(new User(NAME_THOMAS, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepository.save(new User(NAME_BRIGITTE, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepository.save(new User(NAME_JANOSCH, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepository.save(new User(NAME_JANINA, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
+		userRepository.save(new User(NAME_HORST, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false, new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
 
-		patientRepo.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));
-		patientRepo.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
+		// Create patients
+		
+		patientRepository.save(new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));
+		patientRepository.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
 
-		relationRepo.save(new Relation(NAME_DOMINIC, patientRepo.findByName(NAME_LENNY).getId()));
-		relationRepo.save(new Relation(NAME_JULIA, patientRepo.findByName(NAME_KARL).getId()));
-		relationRepo.save(new Relation(NAME_ALINA, patientRepo.findByName(NAME_KARL).getId()));
-		relationRepo.save(new Relation(NAME_JANOSCH, patientRepo.findByName(NAME_KARL).getId()));
+		// Establish relations between users and patients
+		
+		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).getId()));
+		relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).getId()));
+		relationRepository.save(new Relation(NAME_ALINA, patientRepository.findByName(NAME_KARL).getId()));
+		relationRepository.save(new Relation(NAME_JANOSCH, patientRepository.findByName(NAME_KARL).getId()));
 	}
 }

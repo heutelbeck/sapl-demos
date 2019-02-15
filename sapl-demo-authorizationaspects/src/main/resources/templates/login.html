@@ -2,10 +2,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
-        <title>Spring Security Example </title>
+        <title>SAPL Spring Security Demo </title>
    	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
     </head>
     <body>
+    	<p>This demo is based on a healthcare scenario, where doctors, nurses and family access health records of patients.</p>
+    	<p>You can access the system as one of the following users (the password is always 'password'):
+    		<ul>
+    		<li><b>Dominic</b>: This user is a visitor and is related to the patient Lenny</li>
+    		<li><b>Peter</b>: This user is a doctor.</li>
+    		<li><b>Alina</b>: This user is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Karl.</li>
+    		<li><b>Julia</b>: This user is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Lenny.</li>
+    		<li><b>Horst</b>: This user is a doctor and system administrator.</li>
+    		<li><b>Brigitte</b>: This user is a nurse.</li>
+    		<li><b>Janosch</b>: This user is a nurse and is related to the patient Karl.</li>
+    		<li><b>Janina</b>: This user is a nurse. Ans she is the attending nurse of the patient Karl.</li>
+    		<li><b>Brigitte</b>: This user is a nurse.</li>
+    	    </ul>
+    	</p>
         <div th:if="${param.error}">
             Invalid username and password.
         </div>

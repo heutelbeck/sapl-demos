@@ -6,7 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 import org.demo.domain.User;
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -21,24 +21,25 @@ public class AuthManager implements AuthenticationManager {
 
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	private final UserRepo userRepo;
+	private final UserRepository userRepo;
 
 	@Override
 	public Authentication authenticate(Authentication authentication) {
 		String username = authentication.getPrincipal().toString();
-		User user = userRepo.findById(username).orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
+		User user = userRepo.findById(username)
+				.orElseThrow(() -> new BadCredentialsException("no valid user name provided"));
 		if (user.isDisabled()) {
 			throw new DisabledException("user disabled");
 		}
 
 		String rawPassword = authentication.getCredentials().toString();
-		if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+		if (!passwordEncoder.matches(rawPassword, user.getEncodedPassword())) {
 			throw new BadCredentialsException("user and/or password do not match");
 		}
 
 		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		user.getFunctions().forEach(function -> userAuthorities.add(new SimpleGrantedAuthority(function)));
-		return new UsernamePasswordAuthenticationToken(username, user.getPassword(), userAuthorities);
+		return new UsernamePasswordAuthenticationToken(username, user.getEncodedPassword(), userAuthorities);
 	}
 
 }

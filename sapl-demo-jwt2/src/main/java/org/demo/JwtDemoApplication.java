@@ -1,10 +1,9 @@
 package org.demo;
 
 import org.demo.domain.DemoData;
-import org.demo.domain.PatientRepo;
-import org.demo.domain.RelationRepo;
-import org.demo.domain.UserRepo;
-import org.springframework.beans.factory.annotation.Value;
+import org.demo.domain.PatientRepository;
+import org.demo.domain.RelationRepository;
+import org.demo.domain.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,9 +11,6 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class JwtDemoApplication {
-
-	@Value("${encrypted.testpwd}")
-	private String defaultPassword;
 
 	/**
 	 * Startup the application.
@@ -38,7 +34,7 @@ public class JwtDemoApplication {
 	 * @return initialization routine
 	 */
 	@Bean
-	public CommandLineRunner demoData(UserRepo userRepo, PatientRepo patientRepo, RelationRepo relationRepo) {
-		return args -> DemoData.loadDemoDataset(userRepo, defaultPassword, patientRepo, relationRepo);
+	public CommandLineRunner demoData(UserRepository userRepo, PatientRepository patientRepo, RelationRepository relationRepo) {
+		return args -> DemoData.loadDemoDataset(userRepo, patientRepo, relationRepo);
 	}
 }

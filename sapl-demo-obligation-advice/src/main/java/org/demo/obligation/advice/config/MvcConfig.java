@@ -1,4 +1,4 @@
-package io.sapl.demo.obligation.advice.config;
+package org.demo.obligation.advice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;

@@ -9,7 +9,7 @@ import static io.sapl.api.pdp.multirequest.IdentifiableSubject.AUTHENTICATION_ID
 import java.util.Objects;
 import java.util.Optional;
 
-import org.demo.domain.PatientRepo;
+import org.demo.domain.PatientRepository;
 import org.demo.security.SecurityUtils;
 import org.demo.view.blocking.AbstractPatientForm;
 import org.springframework.security.core.Authentication;
@@ -31,10 +31,10 @@ import io.sapl.pep.BlockingSAPLAuthorizer;
 class PatientForm extends AbstractPatientForm {
 
     private RefreshCallback refreshCallback;
-    private PatientRepo patientRepo;
+    private PatientRepository patientRepo;
     private BlockingSAPLAuthorizer authorizer;
 
-    PatientForm(RefreshCallback refreshCallback, PatientRepo patientRepo, BlockingSAPLAuthorizer authorizer) {
+    PatientForm(RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer) {
         this.refreshCallback = refreshCallback;
         this.patientRepo = patientRepo;
         this.authorizer = authorizer;

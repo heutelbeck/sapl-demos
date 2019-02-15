@@ -1,6 +1,6 @@
 package org.demo;
 
-import org.demo.domain.UserRepo;
+import org.demo.domain.UserRepository;
 import org.demo.shared.advicehandlers.EmailAdviceHandler;
 import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import org.demo.shared.marshalling.AuthenticationMapper;
@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 
 	@Bean
-	public AuthenticationManager authManager(UserRepo userRepo) {
+	public AuthenticationManager authManager(UserRepository userRepo) {
 		return new AuthManager(userRepo);
 	}
 

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
     <head>
-        <title>Spring Security Example </title>
+        <title>Patients - SAPL Spring Security Demo</title>
    	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
     </head>
     <body>
-    	<h3>List of Profiles</h3>
+    	<h3>List of Patients</h3>
     	<table>
     	<tr>
     		<th>ID</th>
@@ -18,7 +18,7 @@
         </table>
 
         <form th:if="${createPermission}" action="/profiles/new">
-            <input type="submit" value="Create New Profile" />
+            <input type="submit" value="Create New Patient" />
         </form>
         <p></p>
 
