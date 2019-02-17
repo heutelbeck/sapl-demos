@@ -25,7 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sapl-spring-boot-starter</artifactId>
+            <artifactId>sapl-spring</artifactId>
             <version>${version.sapl.policy.engine}</version>
         </dependency>
         <dependency>
