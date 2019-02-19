@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.sapl.spring.annotation.PdpAuthorize;
+import io.sapl.spring.annotation.EnforcePolicies;
 
 @RestController
 @RequestMapping("/patients")
@@ -27,7 +27,7 @@ public class PatientsController {
 		return patientRepo.findAll();
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@GetMapping("{id}")
 	public Patient readPatient(@PathVariable int id) {
 		return patientRepo.findById(id).orElseThrow(PersonNotFound::new);

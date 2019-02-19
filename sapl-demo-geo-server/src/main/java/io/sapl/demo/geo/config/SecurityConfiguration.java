@@ -10,12 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-import io.sapl.api.pdp.mapping.SaplMapper;
 import io.sapl.demo.geo.AuthManager;
 import io.sapl.demo.geo.domain.CrewRepo;
-import io.sapl.demo.geo.marshall.AuthenticationMapper;
-import io.sapl.demo.geo.marshall.HttpServletRequestMapper;
-import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.spring.PolicyEnforcementFilter;
 
 @Configuration
@@ -38,11 +34,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		return new AuthManager(crewRepo);
 	}
 
-	@Bean
-	public SaplMapper getSaplMapper() {
-		SaplMapper saplMapper = new SimpleSaplMapper();
-		saplMapper.register(new AuthenticationMapper());
-		saplMapper.register(new HttpServletRequestMapper());
-		return saplMapper;
-	}
 }

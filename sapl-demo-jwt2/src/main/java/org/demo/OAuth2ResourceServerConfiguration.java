@@ -1,12 +1,7 @@
 package org.demo;
 
-import org.demo.shared.marshalling.HttpServletRequestMapper;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-
-import io.sapl.api.pdp.mapping.SaplMapper;
-import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 
 /**
  * This configuration is responsible for securing the RESTful API using OAuth2.
@@ -21,16 +16,6 @@ import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 @Configuration
 @EnableResourceServer
 public class OAuth2ResourceServerConfiguration {
-
-	@Bean
-	public SaplMapper getSaplMapper() {
-		SaplMapper saplMapper = new SimpleSaplMapper();
-		// saplMapper.register(new AuthenticationMapper());
-		saplMapper.register(new HttpServletRequestMapper());
-		// saplMapper.register(new PatientMapper());
-		return saplMapper;
-
-	}
 
 	// @Bean
 	// public ObligationHandlerService getObligationHandlers() {

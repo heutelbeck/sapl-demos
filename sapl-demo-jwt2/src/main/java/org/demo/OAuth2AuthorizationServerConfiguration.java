@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.demo.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,11 +43,6 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-
-	@Bean
-	public AuthenticationManager authenticationManager(UserRepository userRepo) {
-		return new AuthManager(userRepo);
-	}
 
 	@Bean
 	public TokenStore tokenStore() {

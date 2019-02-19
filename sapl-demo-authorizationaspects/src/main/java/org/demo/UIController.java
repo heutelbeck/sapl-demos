@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import io.sapl.api.pdp.Response;
 import io.sapl.pep.BlockingSAPLAuthorizer;
-import io.sapl.spring.annotation.PdpAuthorize;
+import io.sapl.spring.annotation.EnforcePolicies;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class UIController {
@@ -31,34 +33,57 @@ public class UIController {
 	private final BlockingSAPLAuthorizer sapl;
 	private final PatientRepository patientenRepo;
 
-	@GetMapping("/profiles")
-	@PdpAuthorize(subject = "user", action = "getProfiles", resource = "profiles")
-	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
-		model.addAttribute("profiles", patientenRepo.findAll());
-		model.addAttribute("createPermission", sapl.wouldAuthorize(authentication, RequestMethod.POST, request));
-		return "profiles";
+	/**
+	 * This controller is responsible for retrieving the list of patients for an
+	 * overview table.
+	 * 
+	 * This controller contains two applications of the SAPL policy engine.
+	 * 
+	 * 1. A policy enforcement point for accessing the Model for the view is
+	 * established by the @EnforcePolicies annotation. The subject is the current
+	 * "user", the action is "getProfiles" and the resource are the "profiles". This
+	 * policy enforcement point is automatically invoked whenever the controller is
+	 * accessed and before entering this method.
+	 * 
+	 * 2. While not a directly enforcing a policy, the BlockingSAPLAuthorizer is
+	 * used to check if the current user would have the permission to create new
+	 * profiles, allowing the view (thymeleaf template) to decide if it would like
+	 * to render the button for creating a new patient.
+	 * 
+	 * @param request        The HTTP request
+	 * @param model          The model part of the MVC Setup for the patient list
+	 * @param authentication The Authentication of the current user
+	 * @return The identifier for this MVC view.
+	 */
+	@EnforcePolicies
+	@GetMapping("/patients")
+	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
+		LOGGER.info("Entering: {}", Thread.currentThread().getStackTrace()[1].getMethodName());
+		model.addAttribute("patients", patientenRepo.findAll());
+		model.addAttribute("createPermitted", sapl.wouldAuthorize(authentication, RequestMethod.POST, request));
+		return "patients";
 	}
 
+	@EnforcePolicies
 	@PostMapping("/profiles")
-	@PdpAuthorize
 	public String createProfile(@ModelAttribute(value = "newPatient") Patient newPatient) {
 		if (patientenRepo.existsById(newPatient.getId())) {
-			throw new IllegalArgumentException("Profile at this Id already exists");
+			throw new IllegalArgumentException("Patient with this Id already exists");
 		}
 		patientenRepo.save(newPatient);
 		return REDIRECT_PROFILES;
 	}
 
 	@GetMapping("/profiles/new")
-	@PdpAuthorize(action = "viewProfileCreationForm", resource = "/profiles/new")
+	@EnforcePolicies(action = "viewProfileCreationForm", resource = "/profiles/new")
 	public String linkNew(Model model) {
 		Patient newPatient = new Patient();
 		model.addAttribute("newPatient", newPatient);
 		return "newPatient";
 	}
 
+	@EnforcePolicies
 	@GetMapping("/patient")
-	@PdpAuthorize
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
@@ -84,15 +109,15 @@ public class UIController {
 		return "patient";
 	}
 
+	@EnforcePolicies
 	@DeleteMapping("/patient")
-	@PdpAuthorize
 	public String delete(@RequestParam("id") int id) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
 	}
 
 	@GetMapping("/patient/{id}/update")
-	@PdpAuthorize(action = "viewPatientUpdateForm", resource = "/patient/id/update")
+	@EnforcePolicies(action = "viewPatientUpdateForm", resource = "/patient/id/update")
 	public String linkUpdate(@PathVariable int id, Model model, Authentication authentication) {
 		Patient patient = patientenRepo.findById(id)
 				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
@@ -105,8 +130,8 @@ public class UIController {
 		return "updatePatient";
 	}
 
+	@EnforcePolicies
 	@PutMapping("/patient")
-	@PdpAuthorize
 	public String updatePatient(@ModelAttribute("updatePatient") Patient updatePatient, Authentication authentication) {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
 			throw new IllegalArgumentException("not found");

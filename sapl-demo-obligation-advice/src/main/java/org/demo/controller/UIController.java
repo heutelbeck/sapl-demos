@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import io.sapl.api.pdp.Response;
 import io.sapl.pep.BlockingSAPLAuthorizer;
 import io.sapl.pep.SAPLAuthorizer;
-import io.sapl.spring.annotation.PdpAuthorize;
+import io.sapl.spring.annotation.EnforcePolicies;
 
 @Controller
 public class UIController {
@@ -38,7 +38,7 @@ public class UIController {
 	}
 
 	@GetMapping("/profiles")
-	@PdpAuthorize
+	@EnforcePolicies
 	public String profileList(HttpServletRequest request, Model model, Authentication authentication) {
 		model.addAttribute("profiles", patientenRepo.findAll());
 		model.addAttribute("createPermission", sapl.wouldAuthorize(authentication, RequestMethod.POST, request));
@@ -46,7 +46,7 @@ public class UIController {
 	}
 
 	@PostMapping("/profiles")
-	@PdpAuthorize
+	@EnforcePolicies
 	public String createProfile(HttpServletRequest request, @ModelAttribute(value = "newPatient") Patient newPatient) {
 		if (patientenRepo.existsById(newPatient.getId())) {
 			throw new IllegalArgumentException("Profile at this Id already exists");
@@ -56,7 +56,7 @@ public class UIController {
 	}
 
 	@GetMapping("/profiles/new")
-	@PdpAuthorize(action = "GET", resource = "/profiles/new")
+	@EnforcePolicies(action = "GET", resource = "/profiles/new")
 	public String linkNew(Model model) {
 		Patient newPatient = new Patient();
 		model.addAttribute("newPatient", newPatient);
@@ -64,7 +64,7 @@ public class UIController {
 	}
 
 	@GetMapping("/patient")
-	@PdpAuthorize
+	@EnforcePolicies
 	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
 		Patient patient = patientenRepo.findById(id).orElse(null);
 		if (patient == null) {
@@ -93,14 +93,14 @@ public class UIController {
 	}
 
 	@DeleteMapping("/patient")
-	@PdpAuthorize
+	@EnforcePolicies
 	public String delete(@RequestParam("id") int id) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PROFILES;
 	}
 
 	@GetMapping("/patient/{id}/update")
-	@PdpAuthorize(action = "GET", resource = "/patient/id/update")
+	@EnforcePolicies(action = "GET", resource = "/patient/id/update")
 	public String linkUpdate(@PathVariable int id, Model model, Authentication authentication) {
 
 		Patient patient = patientenRepo.findById(id)
@@ -115,7 +115,7 @@ public class UIController {
 	}
 
 	@PutMapping("/patient")
-	@PdpAuthorize
+	@EnforcePolicies
 	public String updatePatient(@ModelAttribute("updatePatient") Patient updatePatient, Authentication authentication) {
 		if (!patientenRepo.existsById(updatePatient.getId())) {
 			throw new IllegalArgumentException("not found");

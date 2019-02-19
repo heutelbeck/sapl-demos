@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.demo.domain.UserRepository;
-import org.demo.shared.marshalling.AuthenticationMapper;
-import org.demo.shared.marshalling.HttpServletRequestMapper;
-import org.demo.shared.marshalling.PatientMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
@@ -19,10 +16,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
-import io.sapl.api.pdp.mapping.SaplMapper;
 import io.sapl.api.pdp.obligation.ObligationHandlerService;
 import io.sapl.pep.SAPLAuthorizer;
-import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
 import io.sapl.spring.SaplBasedVoter;
 
@@ -33,11 +28,6 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityConfigurerAdapter webSecurityConfigurerAdapter(AccessDecisionManager accessDecisionManager) {
 		return new ConfigAdapter(accessDecisionManager);
-	}
-
-	@Bean
-	public AuthenticationManager authManager(UserRepository userRepo) {
-		return new AuthManager(userRepo);
 	}
 
 	@Bean
@@ -83,12 +73,4 @@ public class SecurityConfig {
 		return sohs;
 	}
 
-	@Bean
-	public SaplMapper getSaplMapper() {
-		SaplMapper saplMapper = new SimpleSaplMapper();
-		saplMapper.register(new AuthenticationMapper());
-		saplMapper.register(new HttpServletRequestMapper());
-		saplMapper.register(new PatientMapper());
-		return saplMapper;
-	}
 }

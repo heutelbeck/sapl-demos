@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import io.sapl.spring.annotation.PdpAuthorize;
+import io.sapl.spring.annotation.EnforcePolicies;
 
 @RestController
 @RequestMapping("/person/")
@@ -46,7 +46,7 @@ public class PersonController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@GetMapping("readAll/{id}")
 	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
@@ -62,7 +62,7 @@ public class PersonController {
 		return map;
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@GetMapping("readDiag/{id}")
 	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
@@ -104,7 +104,7 @@ public class PersonController {
 	}
 
 	@PostMapping
-	@PdpAuthorize
+	@EnforcePolicies
 	public ResponseEntity<Void> createPerson(@RequestBody Patient person, UriComponentsBuilder uriComponentsBuilder,
 			HttpServletRequest request) {
 		patientenRepo.save(person);
@@ -112,7 +112,7 @@ public class PersonController {
 		return ResponseEntity.created(uriComponents.toUri()).build();
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@PutMapping("putALL/{id}")
 	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
 		if (!patientenRepo.existsById(id)) {
@@ -121,7 +121,7 @@ public class PersonController {
 		return patientenRepo.save(person);
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@PutMapping("{id}")
 	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
 			HttpServletRequest request) {
@@ -149,7 +149,7 @@ public class PersonController {
 
 	}
 
-	@PdpAuthorize
+	@EnforcePolicies
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable int id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);

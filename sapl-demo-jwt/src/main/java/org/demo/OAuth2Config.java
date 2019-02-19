@@ -4,12 +4,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.demo.domain.UserRepository;
 import org.demo.shared.advicehandlers.EmailAdviceHandler;
 import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
-import org.demo.shared.marshalling.AuthenticationMapper;
-import org.demo.shared.marshalling.HttpServletRequestMapper;
-import org.demo.shared.marshalling.PatientMapper;
 import org.demo.shared.obligationhandlers.CoffeeObligationHandler;
 import org.demo.shared.obligationhandlers.EmailObligationHandler;
 import org.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
@@ -30,10 +26,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import io.sapl.api.pdp.advice.AdviceHandlerService;
-import io.sapl.api.pdp.mapping.SaplMapper;
 import io.sapl.api.pdp.obligation.ObligationHandlerService;
 import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
-import io.sapl.pep.pdp.mapping.SimpleSaplMapper;
 import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
 
 @Configuration
@@ -57,11 +51,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	private AuthenticationManager authenticationManager;
 
 	@Bean
-	public AuthenticationManager authManager(UserRepository userRepo) {
-		return new AuthManager(userRepo);
-	}
-
-	@Bean
 	public TokenStore tokenStore() {
 		return new JwtTokenStore(accessTokenConverter());
 	}
@@ -72,16 +61,6 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		converter.setSigningKey(privateKey);
 		converter.setVerifierKey(publicKey);
 		return converter;
-	}
-
-	@Bean
-	public SaplMapper getSaplMapper() {
-		SaplMapper saplMapper = new SimpleSaplMapper();
-		saplMapper.register(new AuthenticationMapper());
-		saplMapper.register(new HttpServletRequestMapper());
-		saplMapper.register(new PatientMapper());
-		return saplMapper;
-
 	}
 
 	@Bean

@@ -2,11 +2,10 @@ package org.demo;
 
 import org.demo.domain.Patient;
 
-import io.sapl.api.pdp.marshall.Resource;
 import lombok.Value;
 
 @Value
-public class PatientResource implements Resource {
+public class PatientResource {
 
 	int id;
 	String name;
