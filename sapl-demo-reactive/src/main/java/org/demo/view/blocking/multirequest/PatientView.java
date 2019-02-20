@@ -8,20 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-import io.sapl.pep.BlockingSAPLAuthorizer;
-import io.sapl.pep.SAPLAuthorizer;
+import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.spring.PolicyEnforcementPoint;
 
-@SpringComponent("multiRequestPatientView")
 @SpringView(name = "multiRequest")
+@SpringComponent("multiRequestPatientView")
 public class PatientView extends AbstractPatientView {
 
-    @Autowired
-    public PatientView(SAPLAuthorizer authorizer, PatientRepository patientRepo) {
-        super(authorizer, patientRepo);
+    private PolicyDecisionPoint pdp;
+
+	@Autowired
+    public PatientView(PolicyEnforcementPoint pep, PatientRepository patientRepo, PolicyDecisionPoint pdp) {
+        super(pep, patientRepo);
+        this.pdp = pdp;
     }
 
     @Override
-    protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer) {
-        return new PatientForm(refreshCallback, patientRepo, authorizer);
+    protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepository patientRepo, PolicyEnforcementPoint pep) {
+        return new PatientForm(refreshCallback, patientRepo, pep, pdp);
     }
 }

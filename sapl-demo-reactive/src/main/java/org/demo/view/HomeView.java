@@ -14,18 +14,17 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.pep.BlockingSAPLAuthorizer;
-import io.sapl.pep.SAPLAuthorizer;
+import io.sapl.spring.PolicyEnforcementPoint;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
 
-    private BlockingSAPLAuthorizer authorizer;
+    private PolicyEnforcementPoint pep;
     private BackendService backendService;
 
     @Autowired
-    public HomeView(SAPLAuthorizer authorizer, BackendService backendService) {
-        this.authorizer = new BlockingSAPLAuthorizer(authorizer);
+    public HomeView(PolicyEnforcementPoint pep, BackendService backendService) {
+        this.pep = pep;
         this.backendService = backendService;
 
         setMargin(true);
@@ -68,6 +67,6 @@ public class HomeView extends VerticalLayout implements View {
 
     private boolean canLoadProfiles() {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authorizer.wouldAuthorize(authentication, "get", "profiles");
+        return pep.enforce(authentication, "get", "profiles");
     }
 }

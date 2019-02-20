@@ -27,16 +27,18 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
 import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
-import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 public class EmbeddedPDPDemo {
 
@@ -54,6 +56,9 @@ public class EmbeddedPDPDemo {
 	private static final String ACTION_READ = "read";
 	private static final String ACTION_WRITE = "write";
 	private static final String RESOURCE = "something";
+
+	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ, RESOURCE);
+	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 100000;
 	private static final double BILLION = 1000000000.0D;
@@ -87,7 +92,7 @@ public class EmbeddedPDPDemo {
 		if (path != null) {
 			builder = builder.withFilesystemPolicyRetrievalPoint(path);
 		}
-		final PolicyDecisionPoint pdp = builder.build();
+		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
@@ -98,18 +103,17 @@ public class EmbeddedPDPDemo {
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
-		final Response readResponse = blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+		final Response readResponse = pdp.decide(READ_REQUEST).block();
 		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
-		final Response writeResponse = blockingPdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Response writeResponse = pdp.decide(WRITE_REQUEST).block();
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<Response> readResponse = pdp.decide(SUBJECT, ACTION_READ, RESOURCE);
+		final Mono<Response> readResponse = pdp.decide(READ_REQUEST);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Flux<Response> writeResponse = pdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
+		final Mono<Response> writeResponse = pdp.decide(WRITE_REQUEST);
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
@@ -119,11 +123,10 @@ public class EmbeddedPDPDemo {
 
 	private static void runPerformanceDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance...");
-		final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			blockingPdp.decide(SUBJECT, ACTION_READ, RESOURCE);
-			blockingPdp.decide(SUBJECT, ACTION_WRITE, RESOURCE);
+			pdp.decide(READ_REQUEST).block();
+			pdp.decide(WRITE_REQUEST).block();
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);
@@ -141,4 +144,9 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
+	private static final Request buildRequest(Object subject, Object action, Object resource) {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new Jdk8Module());
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+	}
 }

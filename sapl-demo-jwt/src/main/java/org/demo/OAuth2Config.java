@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.demo.shared.advicehandlers.EmailAdviceHandler;
-import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
-import org.demo.shared.obligationhandlers.CoffeeObligationHandler;
+import org.demo.shared.constraints.CoffeeObligationHandler;
+import org.demo.shared.constraints.EmailConstraintHandler;
+import org.demo.shared.constraints.LoggingConstraintHandler;
 import org.demo.shared.obligationhandlers.EmailObligationHandler;
 import org.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,8 +75,8 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 	@Bean
 	public AdviceHandlerService setAdviceHandlers() {
 		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
-		sahs.register(new EmailAdviceHandler());
-		sahs.register(new SimpleLoggingAdviceHandler());
+		sahs.register(new EmailConstraintHandler());
+		sahs.register(new LoggingConstraintHandler());
 		return sahs;
 	}
 

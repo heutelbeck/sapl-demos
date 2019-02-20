@@ -1,12 +1,6 @@
 package org.demo.config;
 
-import org.demo.obligationhandlers.CoffeeObligationHandler;
-import org.demo.obligationhandlers.EmailObligationHandler;
-import org.demo.obligationhandlers.SimpleLoggingObligationHandler;
-import org.demo.shared.advicehandlers.EmailAdviceHandler;
-import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -15,11 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-import io.sapl.api.pdp.advice.AdviceHandlerService;
-import io.sapl.api.pdp.obligation.ObligationHandlerService;
-import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
-import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
-import io.sapl.spring.PolicyEnforcementFilter;
+import io.sapl.spring.PolicyEnforcementFilterPEP;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +23,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Lazy
 	@Autowired
-	private PolicyEnforcementFilter policyEnforcementFilter;
+	private PolicyEnforcementFilterPEP policyEnforcementFilter;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
@@ -41,24 +31,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/css/**").permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login")
 				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()
 				.httpBasic().and().csrf().disable();
-	}
-
-	@Bean
-	public ObligationHandlerService getObligationHandlers() {
-		ObligationHandlerService sohs = new SimpleObligationHandlerService();
-		sohs.register(new EmailObligationHandler());
-		sohs.register(new CoffeeObligationHandler());
-		sohs.register(new SimpleLoggingObligationHandler());
-		return sohs;
-
-	}
-
-	@Bean
-	public AdviceHandlerService setAdviceHandlers() {
-		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
-		sahs.register(new EmailAdviceHandler());
-		sahs.register(new SimpleLoggingAdviceHandler());
-		return sahs;
 	}
 
 }

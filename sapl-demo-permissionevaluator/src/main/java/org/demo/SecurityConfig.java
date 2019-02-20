@@ -1,9 +1,9 @@
 package org.demo;
 
 import org.demo.domain.UserRepository;
-import org.demo.shared.advicehandlers.EmailAdviceHandler;
-import org.demo.shared.advicehandlers.SimpleLoggingAdviceHandler;
-import org.demo.shared.obligationhandlers.CoffeeObligationHandler;
+import org.demo.shared.constraints.CoffeeObligationHandler;
+import org.demo.shared.constraints.EmailConstraintHandler;
+import org.demo.shared.constraints.LoggingConstraintHandler;
 import org.demo.shared.obligationhandlers.EmailObligationHandler;
 import org.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import org.springframework.context.annotation.Bean;
@@ -43,8 +43,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public AdviceHandlerService setAdviceHandlers() {
 		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
-		sahs.register(new EmailAdviceHandler());
-		sahs.register(new SimpleLoggingAdviceHandler());
+		sahs.register(new EmailConstraintHandler());
+		sahs.register(new LoggingConstraintHandler());
 		return sahs;
 	}
 

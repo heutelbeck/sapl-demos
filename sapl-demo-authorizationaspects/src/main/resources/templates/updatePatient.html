@@ -6,8 +6,8 @@
    	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
     </head>
     <body>
-        <h3>Update Profile</h3>
-        <form id="updatePatientForm" th:action="@{/patient}" th:object="${updatePatient}" th:method="put">
+        <h3>Update Patient</h3>
+        <form id="updatePatientForm" th:action="@{/patients}" th:object="${updatePatient}" th:method="put">
             <div><label> ID : </label><input type="text" readonly="readonly" th:name="id" th:id="id" th:field= "*{id}"/> </div>
             <div><label> Name : </label><input type="text" th:name="name" th:id="name" th:field="*{name}"/> </div>
             <div th:if="${updateDiagnosisPermission}">
@@ -26,7 +26,7 @@
             <div><input type="submit" value="Update"/></div>
         </form>
         <p></p>
-        <form action="/home">
+        <form action="/">
             <input type="submit" value="Back to Home" />
         </form>
     </body>

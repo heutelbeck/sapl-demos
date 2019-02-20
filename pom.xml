@@ -32,6 +32,7 @@
 	</licenses>
 
 	<modules>
+		<module>docs</module>
 		<module>sapl-benchmark</module>
 		<module>sapl-demo-authorizationaspects</module>
 		<module>sapl-demo-domain</module>

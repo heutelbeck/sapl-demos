@@ -24,10 +24,12 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+
+import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
-import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 
 public class RemotePDPDemo {
     private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
@@ -91,11 +93,10 @@ public class RemotePDPDemo {
 
     private static void runDemo(String host, int port) {
         RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port);
-        final BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
 
         long start = System.nanoTime();
         for (int i = 0; i < RUNS; i++) {
-            Response response = blockingPdp.decide("willi", "test-read", "something");
+            Response response = pdp.decide(buildRequest("willi", "test-read", "something")).block();
             LOG.info("response: {}", response);
         }
         long end = System.nanoTime();
@@ -106,4 +107,10 @@ public class RemotePDPDemo {
         LOG.info("Total : {}s", nanoToS((double) end - start));
         LOG.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
     }
+    
+    private static final Request buildRequest(Object subject, Object action, Object resource) {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new Jdk8Module());
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+	}
 }

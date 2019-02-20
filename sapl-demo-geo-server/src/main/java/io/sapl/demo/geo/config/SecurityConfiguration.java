@@ -12,7 +12,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 import io.sapl.demo.geo.AuthManager;
 import io.sapl.demo.geo.domain.CrewRepo;
-import io.sapl.spring.PolicyEnforcementFilter;
+import io.sapl.spring.PolicyEnforcementFilterPEP;
 
 @Configuration
 @EnableWebSecurity
@@ -20,7 +20,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Lazy
 	@Autowired
-	private PolicyEnforcementFilter policyEnforcementFilter;
+	private PolicyEnforcementFilterPEP policyEnforcementFilter;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {

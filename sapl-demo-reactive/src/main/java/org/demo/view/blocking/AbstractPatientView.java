@@ -17,80 +17,79 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-import io.sapl.pep.BlockingSAPLAuthorizer;
-import io.sapl.pep.SAPLAuthorizer;
+import io.sapl.spring.PolicyEnforcementPoint;
 
 public abstract class AbstractPatientView extends VerticalLayout implements View {
 
-    private BlockingSAPLAuthorizer authorizer;
-    private PatientRepository patientRepo;
+	private PolicyEnforcementPoint pep;
+	private PatientRepository patientRepo;
 
-    private Grid<Patient> grid;
+	private Grid<Patient> grid;
 
-    protected AbstractPatientView(SAPLAuthorizer authorizer, PatientRepository patientRepo) {
-        this.authorizer = new BlockingSAPLAuthorizer(authorizer);
-        this.patientRepo = patientRepo;
+	protected AbstractPatientView(PolicyEnforcementPoint pep, PatientRepository patientRepo) {
+		this.pep = pep;
+		this.patientRepo = patientRepo;
 
-        setMargin(true);
-    }
+		setMargin(true);
+	}
 
-    protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback, PatientRepository patientRepo, BlockingSAPLAuthorizer authorizer);
+	protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback,
+			PatientRepository patientRepo, PolicyEnforcementPoint authorizer);
 
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-        final AbstractPatientForm form = createForm(this::refresh, patientRepo, authorizer);
-        form.setSizeFull();
-        form.setVisible(false);
+	@Override
+	public void enter(ViewChangeListener.ViewChangeEvent event) {
+		final AbstractPatientForm form = createForm(this::refresh, patientRepo, pep);
+		form.setSizeFull();
+		form.setVisible(false);
 
-        grid = new Grid<>(Patient.class);
-        grid.setColumns("id", "name");
-        grid.getColumn("id").setWidth(75);
-        grid.setSizeFull();
-        grid.setItems(loadAllPatients());
-        grid.asSingleSelect().addValueChangeListener(selection -> {
-            if (selection.getValue() == null) {
-                form.hide();
-            } else {
-                form.show(selection.getValue(), false);
-            }
-        });
+		grid = new Grid<>(Patient.class);
+		grid.setColumns("id", "name");
+		grid.getColumn("id").setWidth(75);
+		grid.setSizeFull();
+		grid.setItems(loadAllPatients());
+		grid.asSingleSelect().addValueChangeListener(selection -> {
+			if (selection.getValue() == null) {
+				form.hide();
+			} else {
+				form.show(selection.getValue(), false);
+			}
+		});
 
-        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        final Button addPatientBtn = new Button("Add new patient");
-        addPatientBtn.addClickListener(e -> {
-            if (authorizer.authorize(authentication, "create", "profile")) {
-                grid.asSingleSelect().clear();
-                form.show(new Patient(), true);
-            } else {
-                SecurityUtils.notifyNotAuthorized();
-            }
-        });
-        addPatientBtn.setVisible(authorizer.wouldAuthorize(authentication, "create", "profile"));
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final Button addPatientBtn = new Button("Add new patient");
+		addPatientBtn.addClickListener(e -> {
+			if (pep.enforce(authentication, "create", "profile")) {
+				grid.asSingleSelect().clear();
+				form.show(new Patient(), true);
+			} else {
+				SecurityUtils.notifyNotAuthorized();
+			}
+		});
+		addPatientBtn.setVisible(pep.enforce(authentication, "create", "profile"));
 
-        final HorizontalLayout main = new HorizontalLayout(grid, form);
-        main.setSizeFull();
-        main.setExpandRatio(grid, 0.4f);
-        main.setExpandRatio(form, 0.6f);
+		final HorizontalLayout main = new HorizontalLayout(grid, form);
+		main.setSizeFull();
+		main.setExpandRatio(grid, 0.4f);
+		main.setExpandRatio(form, 0.6f);
 
-        addComponents(addPatientBtn, main);
-    }
+		addComponents(addPatientBtn, main);
+	}
 
-    private List<Patient> loadAllPatients() {
-        final List<Patient> result = new ArrayList<>();
-        final Iterable<Patient> allPatients = patientRepo.findAll();
-        allPatients.forEach(result::add);
-        return result;
+	private List<Patient> loadAllPatients() {
+		final List<Patient> result = new ArrayList<>();
+		final Iterable<Patient> allPatients = patientRepo.findAll();
+		allPatients.forEach(result::add);
+		return result;
 
-    }
+	}
 
-    private void refresh() {
-        final List<Patient> patients = loadAllPatients();
-        grid.setItems(patients);
-    }
+	private void refresh() {
+		final List<Patient> patients = loadAllPatients();
+		grid.setItems(patients);
+	}
 
-    @Override
-    public void beforeLeave(ViewBeforeLeaveEvent event) {
-        authorizer.dispose();
-        event.navigate();
-    }
+	@Override
+	public void beforeLeave(ViewBeforeLeaveEvent event) {
+		event.navigate();
+	}
 }

@@ -45,13 +45,11 @@ import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.BlockingPolicyDecisionPoint;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import io.sapl.pep.pdp.BlockingPolicyDecisionPointAdapter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -267,7 +265,8 @@ public class Benchmark {
 		}
 	}
 
-	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path) throws IOException, URISyntaxException, PolicyEvaluationException {
+	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
+			throws IOException, URISyntaxException, PolicyEvaluationException {
 
 		PolicyGenerator generator = new PolicyGenerator(config);
 
@@ -281,15 +280,15 @@ public class Benchmark {
 		try {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
-				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder().withFilesystemPolicyRetrievalPoint(path + subfolder).build();
-				BlockingPolicyDecisionPoint blockingPdp = new BlockingPolicyDecisionPointAdapter(pdp);
+				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
+						.withFilesystemPolicyRetrievalPoint(path + subfolder).build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
 					Request request = generator.createRequestObject();
 
 					long start = System.nanoTime();
-					Response response = blockingPdp.decide(request);
+					Response response = pdp.decide(request).block();
 					long end = System.nanoTime();
 
 					double diff = nanoToMs(end - start);

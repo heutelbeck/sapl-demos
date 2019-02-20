@@ -1,2 +1,24 @@
-policy "permit all for testing"
-permit
+import filter.*
+
+set "accessPolicy"
+deny-unless-permit
+
+policy "all authenticated users may see patient list"
+permit action.java.name == "getPatients" & resource.http.requestedURI == "/patients"
+where
+ subject.authenticated == true;
+transform "test"
+
+policy "doctors may create new patients"
+permit action == "accessCreationButton" & resource == "ui:view:patients"
+where
+ "DOCTOR" in subject..authority;
+
+policy "filter patient data"
+permit action.java.shortSig == "SecurePatientRepository.findById(..)"
+transform resource  |- { @.diagnosis: blacken(1,0,"\u2588") }
+
+
+//policy "admins may do everything"
+//permit "ADMIN" in subject..authority
+ 

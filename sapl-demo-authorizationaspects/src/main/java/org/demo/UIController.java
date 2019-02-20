@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,12 +14,11 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
-import io.sapl.api.pdp.Response;
-import io.sapl.pep.BlockingSAPLAuthorizer;
+import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.annotation.EnforcePolicies;
+import io.sapl.spring.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,55 +27,40 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UIController {
 
-	private static final String REDIRECT_PROFILES = "redirect:profiles";
+	private static final String REDIRECT_PATIENTS = "redirect:patients";
 	private static final String UPDATE = "update";
 
-	private final BlockingSAPLAuthorizer sapl;
-	private final PatientRepository patientenRepo;
+	private final PolicyEnforcementPoint pep;
+	private final SecurePatientRepository patientenRepo;
 
-	/**
-	 * This controller is responsible for retrieving the list of patients for an
-	 * overview table.
-	 * 
-	 * This controller contains two applications of the SAPL policy engine.
-	 * 
-	 * 1. A policy enforcement point for accessing the Model for the view is
-	 * established by the @EnforcePolicies annotation. The subject is the current
-	 * "user", the action is "getProfiles" and the resource are the "profiles". This
-	 * policy enforcement point is automatically invoked whenever the controller is
-	 * accessed and before entering this method.
-	 * 
-	 * 2. While not a directly enforcing a policy, the BlockingSAPLAuthorizer is
-	 * used to check if the current user would have the permission to create new
-	 * profiles, allowing the view (thymeleaf template) to decide if it would like
-	 * to render the button for creating a new patient.
-	 * 
-	 * @param request        The HTTP request
-	 * @param model          The model part of the MVC Setup for the patient list
-	 * @param authentication The Authentication of the current user
-	 * @return The identifier for this MVC view.
-	 */
+	@ResponseStatus(value = HttpStatus.NOT_FOUND)
+	public static class ResourceNotFoundException extends RuntimeException {
+	}
+
 	@EnforcePolicies
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
 		LOGGER.info("Entering: {}", Thread.currentThread().getStackTrace()[1].getMethodName());
 		model.addAttribute("patients", patientenRepo.findAll());
-		model.addAttribute("createPermitted", sapl.wouldAuthorize(authentication, RequestMethod.POST, request));
+		model.addAttribute("createPermitted", pep.enforce(authentication, "accessCreationButton", "ui:view:patients"));
+		Patient patient = patientenRepo.findById(1);
+		LOGGER.info("patient: ", patient);
+		LOGGER.info("diagnosis: ", patient.getDiagnosis());
 		return "patients";
 	}
 
 	@EnforcePolicies
-	@PostMapping("/profiles")
-	public String createProfile(@ModelAttribute(value = "newPatient") Patient newPatient) {
+	@PostMapping("/patients")
+	public String createPatient(@ModelAttribute(value = "newPatient") Patient newPatient) {
 		if (patientenRepo.existsById(newPatient.getId())) {
 			throw new IllegalArgumentException("Patient with this Id already exists");
 		}
 		patientenRepo.save(newPatient);
-		return REDIRECT_PROFILES;
+		return REDIRECT_PATIENTS;
 	}
 
-	@GetMapping("/profiles/new")
-	@EnforcePolicies(action = "viewProfileCreationForm", resource = "/profiles/new")
+	@GetMapping("/patients/new")
+	@EnforcePolicies(action = "viewPatientCreationForm", resource = "/patients/new")
 	public String linkNew(Model model) {
 		Patient newPatient = new Patient();
 		model.addAttribute("newPatient", newPatient);
@@ -83,50 +68,49 @@ public class UIController {
 	}
 
 	@EnforcePolicies
-	@GetMapping("/patient")
-	public String loadProfile(@RequestParam("id") int id, Model model, Authentication authentication) {
-		Patient patient = patientenRepo.findById(id).orElse(null);
+	@GetMapping("/patients/{id}")
+	public String getPatient(@PathVariable int id, Model model, Authentication authentication) {
+		Patient patient = patientenRepo.findById(id);
 		if (patient == null) {
-			throw new IllegalArgumentException();
+			throw new ResourceNotFoundException();
 		}
 
 		model.addAttribute("patient", patient);
 
-		model.addAttribute("viewDiagnosisPermission", sapl.authorize(authentication, "readDiagnosis", patient));
-		model.addAttribute("viewHRNPermission", sapl.authorize(authentication, "read", "HRN"));
-		model.addAttribute("viewRoomNumberPermission", sapl.authorize(authentication, "viewRoomNumber", patient));
-		model.addAttribute("updatePermission", sapl.wouldAuthorize(authentication, RequestMethod.PUT, "/patient"));
-		model.addAttribute("deletePermission", sapl.wouldAuthorize(authentication, RequestMethod.DELETE, "/patient"));
-
-		boolean permissionBlackenedHRN = sapl.wouldAuthorize(authentication, "getBlackenAndObligation", "anything");
-		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
-
-		if (permissionBlackenedHRN) {
-			String hRN = patient.getHealthRecordNumber();
-			Response response = sapl.getResponse(authentication, "getBlackenAndObligation", hRN);
-			model.addAttribute("blackenedHRN", response.getResource().get().asText());
-		}
+//		model.addAttribute("viewDiagnosisPermission", pep.enforce(authentication, "readDiagnosis", patient));
+//		model.addAttribute("viewHRNPermission", pep.enforce(authentication, "readHealthRecordNumber", patient));
+//		model.addAttribute("viewRoomNumberPermission", pep.enforce(authentication, "viewRoomNumber", patient));
+//		model.addAttribute("updatePermission", pep.enforce(authentication, "accessUpdateButton", "ui:view:patient"));
+//		model.addAttribute("deletePermission", pep.enforce(authentication, "accessDeleteButton", "ui:view:patient"));
+//		boolean permissionBlackenedHRN = pep.enforce(authentication, "getBlackenAndObligation", "anything");
+//		model.addAttribute("permissionBlackenedHRN", permissionBlackenedHRN);
+//		if (permissionBlackenedHRN) {
+//			String hRN = patient.getHealthRecordNumber();
+//			Response response = sapl.getResponse(authentication, "getBlackenAndObligation", hRN);
+//			model.addAttribute("blackenedHRN", response.getResource().get().asText());
+//		}
 		return "patient";
 	}
 
 	@EnforcePolicies
-	@DeleteMapping("/patient")
-	public String delete(@RequestParam("id") int id) {
+	@DeleteMapping("/patients/{id}")
+	public String deletePatient(@PathVariable int id) {
 		patientenRepo.deleteById(id);
-		return REDIRECT_PROFILES;
+		return REDIRECT_PATIENTS;
 	}
 
-	@GetMapping("/patient/{id}/update")
-	@EnforcePolicies(action = "viewPatientUpdateForm", resource = "/patient/id/update")
-	public String linkUpdate(@PathVariable int id, Model model, Authentication authentication) {
-		Patient patient = patientenRepo.findById(id)
-				.orElseThrow(() -> new RuntimeException("Patient not found for id " + id));
+	@GetMapping("/patients/{id}/update")
+	@EnforcePolicies(action = "viewPatientUpdateForm")
+	public String linkUpdate(@Resource @PathVariable int id, Model model, Authentication authentication) {
+		Patient patient = patientenRepo.findById(id);
+		if (patient == null) {
+			throw new ResourceNotFoundException();
+		}
 		model.addAttribute("updatePatient", patient);
-		model.addAttribute("updateDiagnosisPermission",
-				sapl.wouldAuthorize(authentication, "updateDiagnosis", patient));
-		model.addAttribute("updateHRNPermission", sapl.wouldAuthorize(authentication, UPDATE, "HRN"));
-		model.addAttribute("updateDoctorPermission", sapl.wouldAuthorize(authentication, UPDATE, "doctor"));
-		model.addAttribute("updateNursePermission", sapl.wouldAuthorize(authentication, UPDATE, "nurse"));
+		model.addAttribute("updateDiagnosisPermission", pep.enforce(authentication, "updateDiagnosis", patient));
+		model.addAttribute("updateHRNPermission", pep.enforce(authentication, UPDATE, "HRN"));
+		model.addAttribute("updateDoctorPermission", pep.enforce(authentication, UPDATE, "doctor"));
+		model.addAttribute("updateNursePermission", pep.enforce(authentication, UPDATE, "nurse"));
 		return "updatePatient";
 	}
 
@@ -137,25 +121,28 @@ public class UIController {
 			throw new IllegalArgumentException("not found");
 		}
 
-		Patient savePatient = patientenRepo.findById(updatePatient.getId()).get();
+		Patient savePatient = patientenRepo.findById(updatePatient.getId());
+		if (savePatient == null) {
+			throw new ResourceNotFoundException();
+		}
 		savePatient.setName(updatePatient.getName());
-		if (sapl.authorize(authentication, "updateDiagnosis", updatePatient)) {
+		if (pep.enforce(authentication, "updateDiagnosis", updatePatient)) {
 			savePatient.setDiagnosis(updatePatient.getDiagnosis());
 		}
-		if (sapl.authorize(authentication, UPDATE, "HRN")) {
+		if (pep.enforce(authentication, UPDATE, "HRN")) {
 			savePatient.setHealthRecordNumber(updatePatient.getHealthRecordNumber());
 		}
 		savePatient.setPhoneNumber(updatePatient.getPhoneNumber());
-		if (sapl.authorize(authentication, UPDATE, "doctor")) {
+		if (pep.enforce(authentication, UPDATE, "doctor")) {
 			savePatient.setAttendingDoctor(updatePatient.getAttendingDoctor());
 		}
-		if (sapl.authorize(authentication, UPDATE, "nurse")) {
+		if (pep.enforce(authentication, UPDATE, "nurse")) {
 			savePatient.setAttendingNurse(updatePatient.getAttendingNurse());
 		}
 
 		patientenRepo.save(savePatient);
 
-		return REDIRECT_PROFILES;
+		return REDIRECT_PATIENTS;
 	}
 
 }
