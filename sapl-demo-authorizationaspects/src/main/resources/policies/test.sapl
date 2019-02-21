@@ -16,8 +16,13 @@ where
 
 policy "filter patient data"
 permit action.java.shortSig == "SecurePatientRepository.findById(..)"
+obligation  
+   { "type" : "sendEmail",
+     "recipient" : "supervisor@example.org",
+     "subject" : "Patient data has been accessed",
+     "message" : subject.name + " has accessed patient data."
+   }  
 transform resource  |- { @.diagnosis: blacken(1,0,"\u2588") }
-
 
 //policy "admins may do everything"
 //permit "ADMIN" in subject..authority

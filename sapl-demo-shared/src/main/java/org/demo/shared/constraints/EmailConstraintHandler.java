@@ -24,7 +24,8 @@ public class EmailConstraintHandler implements ConstraintHandler {
 
 	@Override
 	public boolean canHandle(JsonNode constraint) {
-		return constraint.has("type") && "sendEmail".equals(constraint.findValue("type").asText());
+		return constraint != null && constraint.has("type")
+				&& "sendEmail".equals(constraint.findValue("type").asText());
 	}
 
 	private static void sendEmail(String recipient, String subject, String message) {

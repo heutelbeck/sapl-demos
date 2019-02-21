@@ -1,8 +1,0 @@
-import org.demo.shared.pip.PatientPIP as patient
-
-policy "permit_relative_see_room_number"
-permit
-   action == "viewRoomNumber"
-where
-  subject.name in resource.id.<patient.related>;
-

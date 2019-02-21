@@ -22,7 +22,7 @@ public class LoggingConstraintHandler implements ConstraintHandler {
 
 	@Override
 	public boolean canHandle(JsonNode constraint) {
-		return constraint.has("type") && "sendEmail".equals(constraint.findValue("simpleLogging").asText());
+		return constraint != null && constraint.has("type") && "simpleLogging".equals(constraint.findValue("type").asText());
 	}
 
 }
