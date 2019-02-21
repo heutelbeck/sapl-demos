@@ -17,7 +17,7 @@
         </tr> 
         </table>
 
-        <form th:if="${createPermitted}" action="/patients/new">
+        <form th:if="${permittedToUseCreatePatientButton}" action="/patients/new">
             <input type="submit" value="Register new patient..." />
         </form>
         <p></p>

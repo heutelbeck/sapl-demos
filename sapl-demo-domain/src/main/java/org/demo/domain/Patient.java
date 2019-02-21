@@ -20,32 +20,29 @@ public class Patient {
 	int id;
 
 	String name;
-	String diagnosis;
-	String healthRecordNumber;
+	String diagnosisText;
+	String medicalRecordNumber;
+	String icd11Code;
 	String phoneNumber;
 	String attendingDoctor;
 	String attendingNurse;
 	String roomNumber;
 
-	public Patient(String name, String diagnosis, String healthRecordNumber, String phoneNumber, String attendingDoctor,
-			String attendingNurse, String roomNumber) {
+	public Patient(String name, String medicalRecordNumber, String icd11Code, String diagnosis, String phoneNumber,
+			String attendingDoctor, String attendingNurse, String roomNumber) {
 		this.name = name;
-		this.diagnosis = diagnosis;
-		this.healthRecordNumber = healthRecordNumber;
+		this.medicalRecordNumber = medicalRecordNumber;
+		this.diagnosisText = diagnosis;
 		this.phoneNumber = phoneNumber;
 		this.attendingDoctor = attendingDoctor;
 		this.attendingNurse = attendingNurse;
 		this.roomNumber = roomNumber;
+		this.icd11Code = icd11Code;
 	}
 
 	public static Patient clone(Patient template) {
-		final Patient copy = new Patient(
-				template.name,
-				template.diagnosis,
-				template.healthRecordNumber,
-				template.phoneNumber,
-				template.attendingDoctor,
-				template.attendingNurse,
+		final Patient copy = new Patient(template.name, template.medicalRecordNumber, template.icd11Code,
+				template.diagnosisText, template.phoneNumber, template.attendingDoctor, template.attendingNurse,
 				template.roomNumber);
 		copy.id = template.id;
 		return copy;

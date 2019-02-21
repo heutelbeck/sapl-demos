@@ -16,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DemoData implements CommandLineRunner {
 
-	private static final String HRN1 = "123456";
-	private static final String HRN2 = "4711";
 	private static final String ROLE_DOCTOR = "DOCTOR";
 	private static final String ROLE_NURSE = "NURSE";
 	private static final String ROLE_VISITOR = "VISITOR";
@@ -64,13 +62,13 @@ public class DemoData implements CommandLineRunner {
 		userRepository.save(new User(NAME_JANINA, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false,
 				new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
 		userRepository.save(new User(NAME_HORST, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false,
-				new ArrayList<>(Arrays.asList(ROLE_DOCTOR, ROLE_ADMIN))));
+				new ArrayList<>(Arrays.asList(ROLE_ADMIN))));
 
 		// Create patients
 		patientRepository.save(
-				new Patient(NAME_LENNY, "sick from working", HRN1, "111111111111", NAME_JULIA, NAME_THOMAS, "H264"));
+				new Patient(NAME_LENNY, "123456", "DA63.Z/ME24.90","Duodenal ulcer with acute haemorrhage.", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
 		patientRepository
-				.save(new Patient(NAME_KARL, "healthy", HRN2, "222222222222", NAME_ALINA, NAME_JANINA, "N333"));
+				.save(new Patient(NAME_KARL, "987654", "9B71.0Z/5A11", "Type 2 diabetes mellitus", "+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
 
 		// Establish relations between users and patients
 		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).getId()));

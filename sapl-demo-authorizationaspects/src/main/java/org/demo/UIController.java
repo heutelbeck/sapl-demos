@@ -3,7 +3,6 @@ package org.demo;
 import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -37,15 +36,12 @@ public class UIController {
 	public static class ResourceNotFoundException extends RuntimeException {
 	}
 
-	@EnforcePolicies
+	//@EnforcePolicies
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
-		LOGGER.info("Entering: {}", Thread.currentThread().getStackTrace()[1].getMethodName());
 		model.addAttribute("patients", patientenRepo.findAll());
-		model.addAttribute("createPermitted", pep.enforce(authentication, "accessCreationButton", "ui:view:patients"));
-		Patient patient = patientenRepo.findById(1);
-		LOGGER.info("patient: ", patient);
-		LOGGER.info("diagnosis: ", patient.getDiagnosis());
+		model.addAttribute("permittedToUseCreatePatientButton",
+				pep.enforce(authentication, "use", "ui:view:patients:createPatientButton"));
 		return "patients";
 	}
 
@@ -67,7 +63,7 @@ public class UIController {
 		return "newPatient";
 	}
 
-	@EnforcePolicies
+//	@EnforcePolicies
 	@GetMapping("/patients/{id}")
 	public String getPatient(@PathVariable int id, Model model, Authentication authentication) {
 		Patient patient = patientenRepo.findById(id);
@@ -127,10 +123,10 @@ public class UIController {
 		}
 		savePatient.setName(updatePatient.getName());
 		if (pep.enforce(authentication, "updateDiagnosis", updatePatient)) {
-			savePatient.setDiagnosis(updatePatient.getDiagnosis());
+			savePatient.setDiagnosisText(updatePatient.getDiagnosisText());
 		}
 		if (pep.enforce(authentication, UPDATE, "HRN")) {
-			savePatient.setHealthRecordNumber(updatePatient.getHealthRecordNumber());
+			savePatient.setMedicalRecordNumber(updatePatient.getMedicalRecordNumber());
 		}
 		savePatient.setPhoneNumber(updatePatient.getPhoneNumber());
 		if (pep.enforce(authentication, UPDATE, "doctor")) {

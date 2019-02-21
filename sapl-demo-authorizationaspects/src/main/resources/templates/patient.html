@@ -2,48 +2,51 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
 	  xmlns:sec="http://www.springframework.org/security/tags">
      
-      
     <head>
-        <title>Spring Security Example </title>
+        <title>Patient Record</title>
    	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
     </head>
     <body>
     	<h3 th:text="${patient.name}">Heading</h3>
     	<div th:object="${patient}">
-    		<p>ID: <span th:text="*{id}">text</span></p>
-    		<p>Name: <span th:text="*{name}">text</span></p>
+    		<p th:if="${patient.medicalRecordNumber != null}">
+				Medical Record Number: <span th:text="*{medicalRecordNumber}"></span></p>
 
-    		<p th:if="${viewDiagnosisPermission}">
-				Diagnosis: <span th:text="*{diagnosis}">text</span></p>
+    		<p>Name: <span th:text="*{name}"></span></p>
 
-    		<p th:if="${viewHRNPermission}" >
-				HRN: <span th:text="*{healthRecordNumber}">text</span></p>
-				
-			<p th:if="${permissionBlackenedHRN}">HRN(blackened): <span th:text="${blackenedHRN}">text</span></p>
+    		<p th:if="${patient.icd11Code != null}">
+				IDC11: <span th:text="*{icd11Code}"></span></p>
 
-    		<p>Phone: <span th:text="*{phoneNumber}">text</span></p>
+    		<p th:if="${patient.diagnosisText != null}">
+				Diagnosis: <span th:text="*{diagnosisText}"></span></p>
+    		    		
+    		<p th:if="${patient.attendingDoctor != null}">
+				Attending Doctor: <span th:text="*{attendingDoctor}"></span></p>
+			
+			<p th:if="${patient.attendingNurse != null}">
+				Attending Nurse: <span th:text="*{attendingNurse}"></span></p>
     		
-    		<p>Attending Doctor: <span th:text="*{attendingDoctor}">text</span></p>
-    		
-    		<p>Attending Nurse: <span th:text="*{attendingNurse}">text</span></p>
-    		
-    		<p th:if="${viewRoomNumberPermission}" >
-				Room Number: <span th:text="*{roomNumber}">text</span></p>
+    		<p th:if="${patient.phoneNumber != null}">
+				Phone: <span th:text="*{phoneNumber}"></span></p>
+
+    		<p th:if="${patient.roomNumber != null}">
+				Room: <span th:text="*{roomNumber}"></span></p>
     	</div>
 
     		
     	<form th:if="${deletePermission}" th:action="@{'/patients/'+ ${patient.id}}" th:method="delete">
-    		<button type= "submit">Delete Profile</button>
+    		<button type= "submit">Delete Patient Record</button>
       	</form>
 		<p></p>
+		
 		<form th:if="${updatePermission}" th:action="@{/patients/{id}/update(id=${patient.id})}" >
-			<button type= "submit">Update Profile</button>
+			<button type= "submit">Update Patient Record</button>
 		</form>
 		<p></p>
+		
 		<form action="/">
 			<input type="submit" value="Back to Home" />
 		</form>
-
-    	
+			
     </body>
 </html>

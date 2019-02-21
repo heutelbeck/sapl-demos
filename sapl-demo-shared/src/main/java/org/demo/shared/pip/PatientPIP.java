@@ -14,32 +14,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
+import io.sapl.api.validation.Number;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @PolicyInformationPoint(name = "patient", description = "retrieves information about patients")
 public class PatientPIP {
 
+	private final ObjectMapper mapper;
 	private final RelationRepository relationRepo;
 
-	private final ObjectMapper om = new ObjectMapper();
-
-	@Attribute(name = "related")
-	public JsonNode getRelations(JsonNode value, Map<String, JsonNode> variables) {
+	@Attribute(name = "relatives")
+	public JsonNode getRelations(@Number JsonNode value, Map<String, JsonNode> variables) {
 		List<String> returnList = new ArrayList<>();
-		try {
-			int id = Integer.parseInt(value.asText());
-
-			returnList.addAll(
-					relationRepo.findByPatientid(id).stream().map(Relation::getUsername).collect(Collectors.toList()));
-
-		} catch (NumberFormatException e) {
-			LOGGER.error("getRelations couldn't parse the value to Int", e);
-		}
-		JsonNode result = om.convertValue(returnList, JsonNode.class);
-		return result;
+		int id = value.asInt();
+		returnList.addAll(
+				relationRepo.findByPatientid(id).stream().map(Relation::getUsername).collect(Collectors.toList()));
+		return mapper.convertValue(returnList, JsonNode.class);
 	}
 }
