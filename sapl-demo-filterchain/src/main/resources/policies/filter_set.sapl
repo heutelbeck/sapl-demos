@@ -1,0 +1,12 @@
+import org.demo.shared.pip.PatientPIP as patient
+
+set "filter_set"
+permit-unless-deny
+
+policy "deny_secret"
+deny
+    action.method == "GET"
+where 
+    "ROLE_ANONYMOUS" in subject..authority;
+    resource.requestedURI == "/secret";
+

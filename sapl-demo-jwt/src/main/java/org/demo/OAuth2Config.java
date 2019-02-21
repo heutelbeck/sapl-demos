@@ -4,11 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.demo.shared.constraints.CoffeeObligationHandler;
-import org.demo.shared.constraints.EmailConstraintHandler;
-import org.demo.shared.constraints.LoggingConstraintHandler;
-import org.demo.shared.obligationhandlers.EmailObligationHandler;
-import org.demo.shared.obligationhandlers.SimpleLoggingObligationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,11 +19,6 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-
-import io.sapl.api.pdp.advice.AdviceHandlerService;
-import io.sapl.api.pdp.obligation.ObligationHandlerService;
-import io.sapl.pep.pdp.advice.SimpleAdviceHandlerService;
-import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
 
 @Configuration
 @EnableResourceServer
@@ -62,24 +52,7 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 		converter.setVerifierKey(publicKey);
 		return converter;
 	}
-
-	@Bean
-	public ObligationHandlerService getObligationHandlers() {
-		ObligationHandlerService sohs = new SimpleObligationHandlerService();
-		sohs.register(new EmailObligationHandler());
-		sohs.register(new CoffeeObligationHandler());
-		sohs.register(new SimpleLoggingObligationHandler());
-		return sohs;
-	}
-
-	@Bean
-	public AdviceHandlerService setAdviceHandlers() {
-		AdviceHandlerService sahs = new SimpleAdviceHandlerService();
-		sahs.register(new EmailConstraintHandler());
-		sahs.register(new LoggingConstraintHandler());
-		return sahs;
-	}
-
+	
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
 		oauthServer.tokenKeyAccess("isAnonymous() || hasAuthority('ROLE_TRUSTED_CLIENT')")

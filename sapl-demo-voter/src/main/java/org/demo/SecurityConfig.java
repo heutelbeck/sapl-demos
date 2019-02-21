@@ -3,23 +3,18 @@ package org.demo;
 import java.util.Arrays;
 import java.util.List;
 
-import org.demo.domain.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.access.vote.UnanimousBased;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.expression.WebExpressionVoter;
 
-import io.sapl.api.pdp.obligation.ObligationHandlerService;
-import io.sapl.pep.SAPLAuthorizer;
-import io.sapl.pep.pdp.obligation.SimpleObligationHandlerService;
-import io.sapl.spring.SaplBasedVoter;
+import io.sapl.spring.SaplAccessDecisionVoterPEP;
 
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -31,12 +26,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	public SaplBasedVoter saplBasedVoter(SAPLAuthorizer saplAuthorizer) {
-		return new SaplBasedVoter(saplAuthorizer);
-	}
-
-	@Bean
-	public AccessDecisionManager getAccessDecisionManager(SaplBasedVoter saplBasedVoter) {
+	public AccessDecisionManager getAccessDecisionManager(SaplAccessDecisionVoterPEP saplBasedVoter) {
 
 		List<AccessDecisionVoter<? extends Object>> decisionVoters = Arrays.asList(
 				// The WebExpressionVoter enables us to use SpEL (Spring Expression Language) to
@@ -62,15 +52,6 @@ public class SecurityConfig {
 		// affirmative vote
 
 		return new UnanimousBased(decisionVoters);
-	}
-
-	@Bean
-	public ObligationHandlerService getObligationHandlers() {
-		ObligationHandlerService sohs = new SimpleObligationHandlerService();
-		sohs.register(new EmailObligationHandler());
-		sohs.register(new CoffeeObligationHandler());
-		sohs.register(new SimpleLoggingObligationHandler());
-		return sohs;
 	}
 
 }
