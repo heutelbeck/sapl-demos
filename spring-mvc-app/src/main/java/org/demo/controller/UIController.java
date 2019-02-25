@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UIController {
 
-	private static final String REDIRECT_PATIENTS = "redirect:patients";
+	private static final String REDIRECT_PATIENTS = "redirect:/patients";
 
 	private final ObjectMapper om;
 	private final PolicyEnforcementPoint pep;

@@ -23,8 +23,10 @@ permit action.java.name == "getPatient" & resource.http.requestedURI =~ "^/patie
 where
 	!("ROLE_ANONYMOUS" in subject..authority);
 
-policy "doctors and administrators may create new patients"
-permit (action == "use") & (resource == "ui:view:patients:createPatientButton")
+/*
+ * This policy enables all doctors and administrators to delete users on the controller level
+ */
+policy "delete controller for doctors and administrators"
+permit action.java.name == "deletePatient" & resource.http.requestedURI =~ "^/patients/[0-9]+$"
 where
 	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority);
-

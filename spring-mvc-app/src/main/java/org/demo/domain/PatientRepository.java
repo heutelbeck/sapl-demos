@@ -18,6 +18,7 @@ public interface PatientRepository {
 
 	Patient save(Patient patient);
 
+	@EnforcePolicies
 	void deleteById(Long id);
 
 	@Modifying
