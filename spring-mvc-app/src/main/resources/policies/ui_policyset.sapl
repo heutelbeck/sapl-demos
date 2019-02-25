@@ -1,0 +1,30 @@
+import filter.*
+
+set "UIController"
+first-applicable
+
+/*
+ * This policy enables all authenticated users to see the patient list. The contents of the patient list 
+ * page especially the availability of the button to create new patients is controlled 
+ * by another policy.
+ */
+policy "all authenticated users may see patient list"
+permit action.java.name == "getPatients" & resource.http.requestedURI == "/patients"
+where
+	!("ROLE_ANONYMOUS" in subject..authority);
+
+/*
+ * This policy enables all authenticated users to see a patient list. The contents of the patient list 
+ * page especially the availability of the button to create new patients is controlled 
+ * by another policy.
+ */
+policy "all authenticated users may access patient records"
+permit action.java.name == "getPatient" & resource.http.requestedURI =~ "^/patients/[0-9]+$"
+where
+	!("ROLE_ANONYMOUS" in subject..authority);
+
+policy "doctors and administrators may create new patients"
+permit (action == "use") & (resource == "ui:view:patients:createPatientButton")
+where
+	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority);
+

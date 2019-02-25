@@ -39,8 +39,7 @@
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-domain</module>
-		<module>sapl-demo-shared</module>
-		<module>sapl-demo-authorizationaspects</module>
+		<module>spring-mvc-app</module>
 		<module>sapl-demo-filterchain</module>
 		<module>sapl-demo-geo-app</module>
 		<module>sapl-demo-geo-server</module>
