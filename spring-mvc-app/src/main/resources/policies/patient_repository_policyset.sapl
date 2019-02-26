@@ -91,13 +91,14 @@ transform
 
 
 /*
- * Permit doctors to delete patients
+ * Permit attending doctors to delete patients
  */
 policy "doctors and administrators may access the update patient data interface via navigation button"
 permit 
        action.java.shortSig == "PatientRepository.deleteById(..)"
 where
 	("DOCTOR" in subject..authority);
+	subject.name == action.arguments[1].<patient.patientRecord>.attendingDoctor;
 
 /*
  * Doctors may create new patients. 

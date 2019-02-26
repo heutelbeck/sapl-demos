@@ -53,7 +53,9 @@ where
  */
 policy "staff may access update patient view"
 permit 
-		action.java.name == "updatePatient" & 
-		( resource.http.requestedURI =~ "^/patients/[0-9]+/update.*$" | resource.http.requestedURI =~ "^/patients/[0-9]+" )
+			  action.java.name == "updatePatient" 
+		& (   resource.http.requestedURI =~ "^/patients/[0-9]+/update.*" 
+			| resource.http.requestedURI =~ "^/patients/[0-9]+$"
+		  )
 where
 	("DOCTOR" in subject..authority) || ("NURSE" in subject..authority) || ("ADMIN" in subject..authority);

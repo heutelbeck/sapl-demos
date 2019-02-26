@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.annotation.EnforcePolicies;
-import io.sapl.spring.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,7 +74,7 @@ public class UIController {
 
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUseUpdatePatientButton", pep.enforce(authentication, "use",
-				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patient:updatePatientButton\"}")));
+				"ui:view:patient:updatePatientButton"));
 		model.addAttribute("permittedToUseDeletePatientButton", pep.enforce(authentication, "use",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patient:deletePatientButton\"}")));
 
@@ -89,19 +88,19 @@ public class UIController {
 		return REDIRECT_PATIENTS;
 	}
 
+	@EnforcePolicies
 	@GetMapping("/patients/{id}/update")
-	public String updatePatient(@Resource @PathVariable Long id, Model model, Authentication authentication)
-			throws IOException {
+	public String updatePatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 		model.addAttribute("patient", patient);
-		model.addAttribute("permittedToUpdateDiagnosis", pep.enforce(authentication, "edit",
-				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:diagnosisField\"}")));
-		model.addAttribute("permittedToUpdateIcdClassification", pep.enforce(authentication, "edit",
-				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:icd11Field\"}")));
-		model.addAttribute("permittedToUpdateAttendingDoctor", pep.enforce(authentication, "edit",
-				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:doctorField\"}")));
-		model.addAttribute("permittedToUpdateAttendingNurse", pep.enforce(authentication, "edit",
-				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:nurseField\"}")));
+		model.addAttribute("permittedToUpdateDiagnosis",
+				pep.enforce(authentication, "edit", "ui:view:patients:diagnosisField"));
+		model.addAttribute("permittedToUpdateIcdClassification",
+				pep.enforce(authentication, "edit", "ui:view:patients:icd11Field"));
+		model.addAttribute("permittedToUpdateAttendingDoctor",
+				pep.enforce(authentication, "edit", "ui:view:patients:doctorField"));
+		model.addAttribute("permittedToUpdateAttendingNurse",
+				pep.enforce(authentication, "edit", "ui:view:patients:nurseField"));
 		return "updatePatient";
 	}
 
@@ -133,7 +132,7 @@ public class UIController {
 			patientenRepo.updateAttendingDoctorById(patient.getAttendingDoctor(), id);
 		}
 
-		if (patient.getAttendingNurse() != null){
+		if (patient.getAttendingNurse() != null) {
 			patientenRepo.updateAttendingNurseById(patient.getAttendingNurse(), id);
 		}
 

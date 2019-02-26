@@ -64,11 +64,20 @@ public class DemoData implements CommandLineRunner {
 		userRepository.save(new User(NAME_HORST, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false,
 				new ArrayList<>(Arrays.asList(ROLE_ADMIN))));
 
+		String name;
+		String diagnosisText;
+		String medicalRecordNumber;
+		String icd11Code;
+		String phoneNumber;
+		String attendingDoctor;
+		String attendingNurse;
+		String roomNumber;
+		
 		// Create patients
 		patientRepository.save(
-				new Patient(null, NAME_LENNY, "123456", "DA63.Z/ME24.90","Duodenal ulcer with acute haemorrhage.", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
+				new Patient(null, NAME_LENNY, "Duodenal ulcer with acute haemorrhage.","123456", "DA63.Z/ME24.90", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
 		patientRepository
-				.save(new Patient(null, NAME_KARL, "987654", "9B71.0Z/5A11", "Type 2 diabetes mellitus", "+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
+				.save(new Patient(null, NAME_KARL, "Type 2 diabetes mellitus","987654", "9B71.0Z/5A11",  "+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
 
 		// Establish relations between users and patients
 		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
