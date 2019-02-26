@@ -16,9 +16,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
 import io.sapl.api.pdp.multirequest.IdentifiableAction;
 import io.sapl.api.pdp.multirequest.IdentifiableResource;
@@ -40,40 +43,43 @@ class PatientForm extends AbstractPatientForm {
 
 	protected void updateFieldEnabling(boolean isNewPatient) {
 		id.setEnabled(false);
-		blackenedHRN.setEnabled(false);
+		blackenedIcd11Code.setEnabled(false);
 
 		if (isNewPatient) {
+			mrn.setEnabled(true);
 			name.setEnabled(true);
-			diagnosis.setEnabled(false); // only the admin can create a new patient, but doctors add a diagnosis
-			healthRecordNumber.setEnabled(true);
-			phoneNumber.setEnabled(true);
+			icd11Code.setEnabled(true);
+			diagnosisText.setEnabled(false); // only the admin can create a new patient, but doctors add a diagnosis
 			attendingDoctor.setEnabled(true);
 			attendingNurse.setEnabled(true);
+			phoneNumber.setEnabled(true);
 			roomNumber.setEnabled(true);
 		} else {
 			final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 			final MultiRequest multiRequest = new MultiRequest();
 			multiRequest.addSubject(new IdentifiableSubject(AUTHENTICATION_ID, authentication));
-			multiRequest.addAction(new IdentifiableAction(UPDATE_ID, "update"));
+			multiRequest.addAction(UPDATE_ID);
 			multiRequest.addAction("updateDiagnosis");
+			multiRequest.addResource("mrn");
 			multiRequest.addResource("name");
 			multiRequest.addResource(new IdentifiableResource("patient", patient));
-			multiRequest.addResource("HRN");
-			multiRequest.addResource("phoneNumber");
+			multiRequest.addResource("idc11");
 			multiRequest.addResource("attendingDoctor");
 			multiRequest.addResource("attendingNurse");
+			multiRequest.addResource("phoneNumber");
 			multiRequest.addResource("roomNumber");
+			multiRequest.addRequest("updateMrn", new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "mrn"));
 			multiRequest.addRequest("updateName", new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "name"));
 			multiRequest.addRequest("updateDiagnosis",
 					new RequestElements(AUTHENTICATION_ID, "updateDiagnosis", "patient"));
-			multiRequest.addRequest("updateHRN", new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "HRN"));
-			multiRequest.addRequest("updatePhoneNumber",
-					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "phoneNumber"));
+			multiRequest.addRequest("updateIcd11", new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "icd11"));
 			multiRequest.addRequest("updateAttendingDoctor",
 					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "attendingDoctor"));
 			multiRequest.addRequest("updateAttendingNurse",
 					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "attendingNurse"));
+			multiRequest.addRequest("updatePhoneNumber",
+					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "phoneNumber"));
 			multiRequest.addRequest("updateRoomNumber",
 					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "roomNumber"));
 
@@ -83,12 +89,13 @@ class PatientForm extends AbstractPatientForm {
 				return decision;
 			}).block();
 
+			mrn.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateMrn"));
 			name.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateName"));
-			diagnosis.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateDiagnosis"));
-			healthRecordNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateHRN"));
-			phoneNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updatePhoneNumber"));
+			icd11Code.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateIcd11"));
+			diagnosisText.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateDiagnosis"));
 			attendingDoctor.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingDoctor"));
 			attendingNurse.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingNurse"));
+			phoneNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updatePhoneNumber"));
 			roomNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateRoomNumber"));
 		}
 	}
@@ -96,13 +103,14 @@ class PatientForm extends AbstractPatientForm {
 	protected void updateFieldVisibility(boolean isNewPatient) {
 		if (isNewPatient) {
 			id.setVisible(false);
+			mrn.setVisible(true);
 			name.setVisible(true);
-			diagnosis.setVisible(false); // only the admin can create a new patient, but doctors add a diagnosis
-			healthRecordNumber.setVisible(true);
-			blackenedHRN.setVisible(false);
-			phoneNumber.setVisible(true);
+			icd11Code.setVisible(true);
+			blackenedIcd11Code.setVisible(false);
+			diagnosisText.setVisible(false); // only the admin can create a new patient, but doctors add a diagnosis
 			attendingDoctor.setVisible(true);
 			attendingNurse.setVisible(true);
+			phoneNumber.setVisible(true);
 			roomNumber.setVisible(true);
 		} else {
 			final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -110,26 +118,28 @@ class PatientForm extends AbstractPatientForm {
 			final MultiRequest multiRequest = new MultiRequest();
 			multiRequest.addSubject(new IdentifiableSubject(AUTHENTICATION_ID, authentication));
 			multiRequest.addAction(new IdentifiableAction(READ_ID, "read"));
-			multiRequest.addAction("readBlackenedHRN");
+			multiRequest.addAction("readBlackenedIcd11");
 			multiRequest.addAction("readRoomNumber");
+			multiRequest.addResource("mrn");
 			multiRequest.addResource("name");
+			multiRequest.addResource("icd11");
 			multiRequest.addResource("diagnosis");
-			multiRequest.addResource("HRN");
 			multiRequest.addResource(new IdentifiableResource("patient", patient));
-			multiRequest.addResource("phoneNumber");
 			multiRequest.addResource("attendingDoctor");
 			multiRequest.addResource("attendingNurse");
+			multiRequest.addResource("phoneNumber");
 			multiRequest.addResource("roomNumber");
+			multiRequest.addRequest("readMrn", new RequestElements(AUTHENTICATION_ID, READ_ID, "mrn"));
 			multiRequest.addRequest("readName", new RequestElements(AUTHENTICATION_ID, READ_ID, "name"));
+			multiRequest.addRequest("readIcd11", new RequestElements(AUTHENTICATION_ID, READ_ID, "icd11"));
+			multiRequest.addRequest("readBlackenedIcd11",
+					new RequestElements(AUTHENTICATION_ID, "readBlackenedIcd11", "patient"));
 			multiRequest.addRequest("readDiagnosis", new RequestElements(AUTHENTICATION_ID, READ_ID, "diagnosis"));
-			multiRequest.addRequest("readHRN", new RequestElements(AUTHENTICATION_ID, READ_ID, "HRN"));
-			multiRequest.addRequest("readBlackenedHRN",
-					new RequestElements(AUTHENTICATION_ID, "readBlackenedHRN", "patient"));
-			multiRequest.addRequest("readPhoneNumber", new RequestElements(AUTHENTICATION_ID, READ_ID, "phoneNumber"));
 			multiRequest.addRequest("readAttendingDoctor",
 					new RequestElements(AUTHENTICATION_ID, READ_ID, "attendingDoctor"));
 			multiRequest.addRequest("readAttendingNurse",
 					new RequestElements(AUTHENTICATION_ID, READ_ID, "attendingNurse"));
+			multiRequest.addRequest("readPhoneNumber", new RequestElements(AUTHENTICATION_ID, READ_ID, "phoneNumber"));
 			multiRequest.addRequest("readRoomNumber",
 					new RequestElements(AUTHENTICATION_ID, "readRoomNumber", "patient"));
 
@@ -140,22 +150,30 @@ class PatientForm extends AbstractPatientForm {
 			}).block();
 
 			id.setVisible(true);
-			name.setVisible(responses.isAccessPermittedForRequestWithId("readName"));
-			diagnosis.setVisible(responses.isAccessPermittedForRequestWithId("readDiagnosis"));
-			healthRecordNumber.setVisible(responses.isAccessPermittedForRequestWithId("readHRN"));
-			final Response readBlackenedHRN = responses.getResponseForRequestWithId("readBlackenedHRN");
-			if (readBlackenedHRN.getDecision() == Decision.PERMIT) {
-				final Optional<JsonNode> patientNode = readBlackenedHRN.getResource();
-				blackenedHRN.setValue(patientNode.map(node -> node.get("healthRecordNumber").asText()).orElse(""));
-				blackenedHRN.setVisible(true);
+			mrn.setVisible(pep.enforce(authentication, "read", "mrn"));
+			name.setVisible(pep.enforce(authentication, "read", "name"));
+			icd11Code.setVisible(pep.enforce(authentication, "read", "icd11"));
+			diagnosisText.setVisible(pep.enforce(authentication, "read", "diagnosis"));
+			final Response readBlackenedIcd11 = pdp.decide(buildRequest(authentication, "readBlackenedIcd11", patient))
+					.block();
+			if (readBlackenedIcd11.getDecision() == Decision.PERMIT) {
+				final Optional<JsonNode> patientNode = readBlackenedIcd11.getResource();
+				blackenedIcd11Code.setValue(patientNode.map(node -> node.get("icd11Code").asText()).orElse(""));
+				blackenedIcd11Code.setVisible(true);
 			} else {
-				blackenedHRN.setVisible(false);
+				blackenedIcd11Code.setVisible(false);
 			}
-			phoneNumber.setVisible(responses.isAccessPermittedForRequestWithId("readPhoneNumber"));
-			attendingDoctor.setVisible(responses.isAccessPermittedForRequestWithId("readAttendingDoctor"));
-			attendingNurse.setVisible(responses.isAccessPermittedForRequestWithId("readAttendingNurse"));
-			roomNumber.setVisible(responses.isAccessPermittedForRequestWithId("readRoomNumber"));
+			attendingDoctor.setVisible(pep.enforce(authentication, "read", "attendingDoctor"));
+			attendingNurse.setVisible(pep.enforce(authentication, "read", "attendingNurse"));
+			phoneNumber.setVisible(pep.enforce(authentication, "read", "phoneNumber"));
+			roomNumber.setVisible(pep.enforce(authentication, "readRoomNumber", patient));
 		}
+	}
+
+	private static final Request buildRequest(Object subject, Object action, Object resource) {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.registerModule(new Jdk8Module());
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
 	}
 
 	protected void updateButtonVisibility(boolean isNewPatient) {
@@ -192,24 +210,24 @@ class PatientForm extends AbstractPatientForm {
 			// get the update authorization for each modified field to enforce obligation
 			// handling
 			// and reset the field if necessary
+			if (!Objects.equals(mrn.getValue(), unmodifiedPatient.getMedicalRecordNumber())) {
+				if (!pep.enforce(authentication, "update", "mrn")) {
+					patient.setName(unmodifiedPatient.getMedicalRecordNumber());
+				}
+			}
 			if (!Objects.equals(name.getValue(), unmodifiedPatient.getName())) {
 				if (!pep.enforce(authentication, "update", "name")) {
 					patient.setName(unmodifiedPatient.getName());
 				}
 			}
-			if (!Objects.equals(diagnosis.getValue(), unmodifiedPatient.getDiagnosis())) {
+			if (!Objects.equals(icd11Code.getValue(), unmodifiedPatient.getIcd11Code())) {
+				if (!pep.enforce(authentication, "update", "icd11")) {
+					patient.setIcd11Code(unmodifiedPatient.getIcd11Code());
+				}
+			}
+			if (!Objects.equals(diagnosisText.getValue(), unmodifiedPatient.getDiagnosisText())) {
 				if (!pep.enforce(authentication, "updateDiagnosis", patient)) {
-					patient.setDiagnosis(unmodifiedPatient.getDiagnosis());
-				}
-			}
-			if (!Objects.equals(healthRecordNumber.getValue(), unmodifiedPatient.getHealthRecordNumber())) {
-				if (!pep.enforce(authentication, "update", "HRN")) {
-					patient.setHealthRecordNumber(unmodifiedPatient.getHealthRecordNumber());
-				}
-			}
-			if (!Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber())) {
-				if (!pep.enforce(authentication, "update", "phoneNumber")) {
-					patient.setPhoneNumber(unmodifiedPatient.getPhoneNumber());
+					patient.setDiagnosisText(unmodifiedPatient.getDiagnosisText());
 				}
 			}
 			if (!Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor())) {
@@ -220,6 +238,11 @@ class PatientForm extends AbstractPatientForm {
 			if (!Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse())) {
 				if (!pep.enforce(authentication, "update", "attendingNurse")) {
 					patient.setAttendingNurse(unmodifiedPatient.getAttendingNurse());
+				}
+			}
+			if (!Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber())) {
+				if (!pep.enforce(authentication, "update", "phoneNumber")) {
+					patient.setPhoneNumber(unmodifiedPatient.getPhoneNumber());
 				}
 			}
 			if (!Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber())) {
@@ -239,7 +262,7 @@ class PatientForm extends AbstractPatientForm {
 	protected void onDelete() {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (pep.enforce(authentication, "delete", "profile")) {
-			patientRepo.delete(patient);
+			patientRepo.deleteById(patient.getId());
 			refreshCallback.refresh();
 		} else {
 			SecurityUtils.notifyNotAuthorized();
