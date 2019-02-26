@@ -100,9 +100,79 @@ where
 	("DOCTOR" in subject..authority);
 
 /*
- * Permit admins to delete patients, but the action SHOULD be logged and an email MUST be sent.
+ * Doctors may create new patients. 
+ * 
+ * In the demo, new patients are also created during application startup. In this case there is no subject defined.
+ * So subject == null when the access comes from a system process not linked to a user session.
+ * System processes are also permitted to create patients.
+ *
  */
-policy "admins may delete, but it has to be reported"
+policy "doctors and system processes may create patients"
+permit 
+       action.java.shortSig == "PatientRepository.save(..)"
+where
+	subject == null || ("DOCTOR" in subject..authority);
+
+/*
+ * Only the attending doctor may change diagnosis information or the 
+ * attending doctor without any side effects.  
+ */
+policy "attending doctors may update diagnosis and attending doctors"
+permit 
+		action.java.shortSig == "PatientRepository.updateDiagnosisTextById(..)"
+	|	action.java.shortSig == "PatientRepository.updateIcd11CodeById(..)" 
+	|	action.java.shortSig == "PatientRepository.updateAttendingDoctorById(..)" 
+where
+	("DOCTOR" in subject..authority);
+	subject.name == action.arguments[1].<patient.patientRecord>.attendingDoctor;
+
+/*
+ * All doctors may change diagnosis information or the attending doctor.
+ * But the (original) attending doctor must be notified about the change.
+ * 
+ * This is an emergency override. The so-called "breaking the glass scenario".  
+ */
+policy "breaking the glass"
+permit 
+		action.java.shortSig == "PatientRepository.updateDiagnosisTextById(..)"
+	|	action.java.shortSig == "PatientRepository.updateIcd11CodeById(..)" 
+	|	action.java.shortSig == "PatientRepository.updateAttendingDoctorById(..)" 
+where
+	("DOCTOR" in subject..authority);
+	var patient = action.arguments[1].<patient.patientRecord>;
+obligation
+	{
+		"type"		: "sendEmail",
+		"recipient"	: patient.attendingDoctor,
+		"subject"	: "Data of your patient "+(patient.name)+" was changed.",
+		"message"	: "Doctor " + subject.name + " changed the data."
+	}
+	
+/*
+ * All doctors and nurses may attending nurse field. 
+ */
+policy "doctors and nurses may change other fields"
+permit 
+		action.java.shortSig == "PatientRepository.updateAttendingNurseById(..)" 
+	|	action.java.shortSig == "PatientRepository.updatePhoneNumberById(..)" 
+	|	action.java.shortSig == "PatientRepository.updateNameById(..)" 
+	|	action.java.shortSig == "PatientRepository.updatePhoneNumberById(..)" 
+	|	action.java.shortSig == "PatientRepository.updateRoomNumberById(..)" 
+
+where
+	("DOCTOR" in subject..authority) || ("DOCTOR" in subject..authority);
+
+/*
+ * Permit administrators to update/delete patients, but the action SHOULD be logged and an email MUST be sent.
+ */
+policy "doctors and system processes may create patients"
+permit 
+       	action.java.shortSig == "PatientRepository.deleteById(..)"
+	|	action.java.shortSig =~ "^PatientRepository\\.update.*"
+where
+	("ADMIN" in subject..authority);
+
+policy "administrators may delete, but it has to be reported"
 permit 
        action.java.shortSig == "PatientRepository.deleteById(..)"
 where
@@ -111,11 +181,11 @@ obligation
 	{
 		"type"		: "sendEmail",
 		"recipient"	: "Dr. Gregory House <houseMD@ppth.med>",
-		"subject"	: "Patient deleted by administrator.",
-		"message"	: ("Administrator" + subject.name + " has deleted patient: " + action.http.requestedURI)
+		"subject"	: "Patient manipulated by administrator.",
+		"message"	: ("Administrator" + subject.name + " has manipulated patient: " + action.http.requestedURI)
 	}
 advice
 	{
 		"type" 		: "logAccess",
-		"message"	: "Administrator" + subject.name + " has deleted patient: " + action.http.requestedURI
+		"message"	: ("Administrator" + subject.name + " has manipulated patient: " + action.http.requestedURI)
 	}

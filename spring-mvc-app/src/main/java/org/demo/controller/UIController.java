@@ -24,7 +24,9 @@ import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.annotation.EnforcePolicies;
 import io.sapl.spring.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class UIController {
@@ -58,11 +60,11 @@ public class UIController {
 		return REDIRECT_PATIENTS;
 	}
 
+	@EnforcePolicies
 	@GetMapping("/patients/new")
-	@EnforcePolicies(action = "viewPatientCreationForm", resource = "/patients/new")
-	public String linkNew(Model model) {
-		Patient newPatient = new Patient();
-		model.addAttribute("newPatient", newPatient);
+	public String newPatient(Model model) {
+		Patient patient = new Patient();
+		model.addAttribute("patient", patient);
 		return "newPatient";
 	}
 
@@ -88,11 +90,9 @@ public class UIController {
 	}
 
 	@GetMapping("/patients/{id}/update")
-	@EnforcePolicies(action = "viewPatientUpdateForm")
-	public String linkUpdate(@Resource @PathVariable Long id, Model model, Authentication authentication)
+	public String updatePatient(@Resource @PathVariable Long id, Model model, Authentication authentication)
 			throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
-
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUpdateDiagnosis", pep.enforce(authentication, "edit",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:diagnosisField\"}")));
@@ -102,40 +102,42 @@ public class UIController {
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:doctorField\"}")));
 		model.addAttribute("permittedToUpdateAttendingNurse", pep.enforce(authentication, "edit",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patients:nurseField\"}")));
-
 		return "updatePatient";
 	}
 
 	@EnforcePolicies
-	@PutMapping("/patient")
-	public String updatePatient(@ModelAttribute(value = "updatedPatient") Patient updatedPatient,
-			@ModelAttribute(value = "patient") Patient patient, Authentication authentication) {
-
-		if (!updatedPatient.getName().equals(patient.getName())) {
-			patientenRepo.updateNameById(patient.getName(), patient.getId());
+	@PutMapping("/patients/{id}")
+	public String updatePatient(@ModelAttribute("patient") Patient patient, @PathVariable Long id) {
+		LOGGER.info("Got patient: {}", patient);
+		if (patient.getName() != null) {
+			patientenRepo.updateNameById(patient.getName(), id);
 		}
 
-		if (!updatedPatient.getDiagnosisText().equals(patient.getDiagnosisText())) {
-			patientenRepo.updateDiagnosisTextById(patient.getDiagnosisText(), patient.getId());
+		if (patient.getDiagnosisText() != null) {
+			patientenRepo.updateDiagnosisTextById(patient.getDiagnosisText(), id);
 		}
 
-		if (!updatedPatient.getIcd11Code().equals(patient.getIcd11Code())) {
-			patientenRepo.updateIcd11CodeById(patient.getIcd11Code(), patient.getId());
+		if (patient.getIcd11Code() != null) {
+			patientenRepo.updateIcd11CodeById(patient.getIcd11Code(), id);
 		}
 
-		if (!updatedPatient.getPhoneNumber().equals(patient.getPhoneNumber())) {
-			patientenRepo.updatePhoneNumberById(patient.getIcd11Code(), patient.getId());
+		if (patient.getPhoneNumber() != null) {
+			patientenRepo.updatePhoneNumberById(patient.getPhoneNumber(), id);
 		}
 
-		if (!updatedPatient.getAttendingDoctor().equals(patient.getAttendingDoctor())) {
-			patientenRepo.updateAttendingDoctorById(patient.getIcd11Code(), patient.getId());
+		if (patient.getRoomNumber() != null) {
+			patientenRepo.updatePhoneNumberById(patient.getRoomNumber(), id);
 		}
 
-		if (!updatedPatient.getAttendingNurse().equals(patient.getAttendingNurse())) {
-			patientenRepo.updateAttendingNurseById(patient.getIcd11Code(), patient.getId());
+		if (patient.getAttendingDoctor() != null) {
+			patientenRepo.updateAttendingDoctorById(patient.getAttendingDoctor(), id);
 		}
 
-		return REDIRECT_PATIENTS + "/" + patient.getId();
+		if (patient.getAttendingNurse() != null){
+			patientenRepo.updateAttendingNurseById(patient.getAttendingNurse(), id);
+		}
+
+		return REDIRECT_PATIENTS + "/" + id;
 	}
 
 }

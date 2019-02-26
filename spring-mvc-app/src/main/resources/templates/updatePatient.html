@@ -1,33 +1,82 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.springframework.org/security/tags">
-    <head>
-        <title>Spring Security Example </title>
-   	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
-    </head>
-    <body>
-        <h3>Update Patient</h3>
-        <form id="updatePatientForm" th:action="@{/patients}" th:object="${updatePatient}" th:method="put">
-            <div><label> ID : </label><input type="text" readonly="readonly" th:name="id" th:id="id" th:field= "*{id}"/> </div>
-            <div><label> Name : </label><input type="text" th:name="name" th:id="name" th:field="*{name}"/> </div>
-            <div th:if="${updateDiagnosisPermission}">
-                <label> Diagnosis : </label><input type="text" th:name="diagnosis" th:id="diagnosis" th:field="*{diagnosis}"/> 
-            </div>
-            <div th:if="${updateHRNPermission}" >
-                <label> HRN : </label><input type="text" th:name="healthRecordNumber" th:id="healthRecordNumber" th:field="*{healthRecordNumber}"/> 
-            </div>
-            <div><label> Phone : </label><input type="text" th:name="phoneNumber" th:id="phoneNumber" th:field="*{phoneNumber}"/> </div>
-            <div th:if="${updateDoctorPermission}" >
-                <label> Attending Doctor : </label><input type="text" th:name="attendingDoctor" th:id="attendingDoctor" th:field="*{attendingDoctor}"/> 
-            </div>
-            <div th:if="${updateNursePermission}" >
-                <label> Attending Nurse : </label><input type="text" th:name="attendingNurse" th:id="attendingNurse" th:field="*{attendingNurse}"/> 
-            </div>
-            <div><input type="submit" value="Update"/></div>
-        </form>
-        <p></p>
-        <form action="/">
-            <input type="submit" value="Back to Home" />
-        </form>
-    </body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.springframework.org/security/tags">
+<head>
+<title>Spring Security Example</title>
+<link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
+</head>
+<body>
+	<h3>Update Patient</h3>
+	<form id="updatePatientForm"
+		th:action="@{'/patients/'+ ${patient.id}}" th:method="put" th:object="${patient}">
+		<div>
+			Medical Record Number: <span
+				th:text="${patient.medicalRecordNumber}"></span>
+		</div>
+
+		<div>
+			<label> Name : </label><input type="text" th:name="name" th:id="name"
+				th:field="${patient.name}" />
+		</div>
+
+		<div th:if="${permittedToUpdateIcdClassification}">
+			<label> ICD-11 : </label><input type="text" th:name="icd11Code"
+				th:id="icd11Code" th:field="${patient.icd11Code}" />
+		</div>
+		<div th:unless="${permittedToUpdateIcdClassification}">
+			<label> ICD-11 : </label><span th:text="${patient.icd11Code}"></span>
+		</div>
+
+		<div th:if="${permittedToUpdateDiagnosis}">
+			<label> Diagnosis : </label><input type="text"
+				th:name="diagnosisText" th:id="diagnosisText"
+				th:field="${patient.diagnosisText}" />
+		</div>
+		<div th:unless="${permittedToUpdateDiagnosis}">
+			<label> Diagnosis : </label><span
+				th:text="${patient.diagnosisText}"></span>
+		</div>
+
+
+		<div th:if="${permittedToUpdateAttendingDoctor}">
+			<label> Attending Doctor : </label><input type="text"
+				th:name="attendingDoctor" th:id="attendingDoctor"
+				th:field="${patient.attendingDoctor}" />
+		</div>
+		<div th:unless="${permittedToUpdateAttendingDoctor}">
+			<label> Attending Doctor : </label><span
+				th:text="${patient.attendingDoctor}"></span>
+		</div>
+
+		<div th:if="${permittedToUpdateAttendingNurse}">
+			<label> Attending Nurse : </label><input type="text"
+				th:name="attendingNurse" th:id="attendingNurse"
+				th:field="${patient.attendingNurse}" />
+		</div>
+		<div th:unless="${permittedToUpdateAttendingNurse}">
+			<label> Attending Nurse : </label><span
+				th:text="${patient.attendingNurse}"></span>
+		</div>
+
+		<div>
+			<label> Phone : </label><input type="text" th:name="phoneNumber"
+				th:id="phoneNumber" th:field="${patient.phoneNumber}" />
+		</div>
+
+		<div>
+			<label> Room : </label><input type="text" th:name="roomNumber"
+				th:id="roomNumber" th:field="${patient.roomNumber}" />
+		</div>
+
+		<div>
+			<input type="submit" value="Update" />
+		</div>
+	</form>
+
+	<p></p>
+	<form action="/">
+		<input type="submit" value="Back to Home" />
+	</form>
+</body>
 </html>

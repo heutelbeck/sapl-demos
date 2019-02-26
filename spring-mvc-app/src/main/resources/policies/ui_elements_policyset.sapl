@@ -4,12 +4,24 @@ set "ui elements"
 first-applicable
 for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*" 
 
-policy "doctors and administrators may access the creation interface via navigation button"
+policy "doctors may access the creation interface via navigation button"
 permit (action == "use") & (resource == "ui:view:patients:createPatientButton")
+where
+	("DOCTOR" in subject..authority);
+
+policy "doctors and administrators may access the update patient data interface via navigation button"
+permit (action == "use") & ( resource.uiElement == "ui:view:patient:updatePatientButton" | resource.uiElement == "ui:view:patient:deletePatientButton") 
 where
 	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority);
 
-policy "doctors and administrators may access the update patient data interface via navigation button"
-permit (action == "use") & ( (resource.uiElement == "ui:view:patient:updatePatientButton") | resource.uiElement == "ui:view:patient:deletePatientButton") 
+policy "nurses may not edit doctors, diagnosis and classification"
+deny  		resource.uiElement == "ui:view:patients:icd11Field" 
+		| 	resource.uiElement == "ui:view:patients:doctorField"
+		| 	resource.uiElement == "ui:view:patients:diagnosisField"
 where
-	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority);
+	("NURSE" in subject..authority);
+
+policy "staff may edit all fields"
+permit (action == "edit")  
+where
+	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority) || ("NURSE" in subject..authority);

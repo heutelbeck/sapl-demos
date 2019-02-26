@@ -7,17 +7,18 @@
     </head>
     <body>
         <h3>Create a new patient</h3>
-        <form id="newPatientForm" th:action="@{/patients}" th:object="${newPatient}" method="post">
+        <form id="newPatientForm" th:action="@{/patients}" th:object="${patient}" method="post">
+            <div><label> Medical record number: </label><input type="text" th:field="*{medicalRecordNumber}"/> </div>
             <div><label> Name : </label><input type="text" th:field="*{name}"/> </div>
-            <div><label> Diagnosis : </label><input type="text" th:field="*{diagnosis}"/> </div>
-            <div><label> HRN : </label><input type="text" th:field="*{healthRecordNumber}"/> </div>
+            <div><label> ICD 11 Code : </label><input type="text" th:field="*{icd11Code}"/> </div>
+            <div><label> Diagnosis : </label><input type="text" th:field="*{diagnosisText}"/> </div>
             <div><label> Phone : </label><input type="text" th:field="*{phoneNumber}"/> </div>
             <div><label> Attending Doctor : </label><input type="text" th:field="*{attendingDoctor}"/> </div>
             <div><label> Attending Nurse : </label><input type="text" th:field="*{attendingNurse}"/> </div>
             <div><label> Room Number : </label><input type="text" th:field="*{roomNumber}"/> </div>
             <div><input type="submit" value="Create"/></div>
         </form>        
-        
+
         <form action="/">
 			<input type="submit" value="Back to Home" />
 		</form>
