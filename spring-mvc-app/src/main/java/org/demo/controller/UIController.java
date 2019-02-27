@@ -125,7 +125,7 @@ public class UIController {
 		}
 
 		if (patient.getRoomNumber() != null) {
-			patientenRepo.updatePhoneNumberById(patient.getRoomNumber(), id);
+			patientenRepo.updateRoomNumberById(patient.getRoomNumber(), id);
 		}
 
 		if (patient.getAttendingDoctor() != null) {
