@@ -1,7 +1,6 @@
 package org.demo.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import org.springframework.boot.CommandLineRunner;
@@ -62,22 +61,43 @@ public class DemoData implements CommandLineRunner {
 		userRepository.save(new User(NAME_JANINA, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false,
 				new ArrayList<>(Collections.singletonList(ROLE_NURSE))));
 		userRepository.save(new User(NAME_HORST, passwordEncoder.encode(DEFAULT_RAW_PASSWORD), false,
-				new ArrayList<>(Arrays.asList(ROLE_ADMIN))));
+				new ArrayList<>(Collections.singletonList(ROLE_ADMIN))));
 
-		String name;
-		String diagnosisText;
-		String medicalRecordNumber;
-		String icd11Code;
-		String phoneNumber;
-		String attendingDoctor;
-		String attendingNurse;
-		String roomNumber;
-		
+		// Patient fields
+//		String medicalRecordNumber;
+//		String name;
+//		String icd11Code;
+//		String diagnosisText;
+//		String attendingDoctor;
+//		String attendingNurse;
+//		String phoneNumber;
+//		String roomNumber;
+
 		// Create patients
 		patientRepository.save(
-				new Patient(null, NAME_LENNY, "Duodenal ulcer with acute haemorrhage.","123456", "DA63.Z/ME24.90", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
-		patientRepository
-				.save(new Patient(null, NAME_KARL, "Type 2 diabetes mellitus","987654", "9B71.0Z/5A11",  "+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
+				new Patient(
+						null,
+						"123456",
+						NAME_LENNY,
+						"DA63.Z/ME24.90",
+						"Duodenal ulcer with acute haemorrhage.",
+						NAME_JULIA,
+						NAME_THOMAS,
+						"+78(0)456-789",
+						"A.3.47")
+		);
+		patientRepository.save(
+				new Patient(
+						null,
+						"987654",
+						NAME_KARL,
+						"9B71.0Z/5A11",
+						"Type 2 diabetes mellitus",
+						NAME_ALINA,
+						NAME_JANINA,
+						"+78(0)456-567",
+						"C.2.23")
+		);
 
 		// Establish relations between users and patients
 		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
