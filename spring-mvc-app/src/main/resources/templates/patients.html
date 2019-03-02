@@ -7,14 +7,14 @@
     <body>
     	<h3>List of Patients</h3>
     	<table>
-    	<tr>
-    		<th>ID</th>
-    		<th>NAME</th>
-    	</tr>
-        <tr th:each="patient : ${patients}"> 
-        	<td th:text="${patient.id}"> 0</td>
-        	<td><a href="patient.html" th:href="@{'/patients/' + ${patient.id}}" th:text="${patient.name}"> Name</a></td>
-        </tr> 
+            <tr>
+                <th>ID</th>
+                <th>NAME</th>
+            </tr>
+            <tr th:each="patient : ${patients}">
+                <td th:text="${patient.id}"> 0</td>
+                <td><a href="patient.html" th:href="@{'/patients/' + ${patient.id}}" th:text="${patient.name}"> Name</a></td>
+            </tr>
         </table>
 
         <form th:if="${permittedToUseCreatePatientButton}" action="/patients/new">
