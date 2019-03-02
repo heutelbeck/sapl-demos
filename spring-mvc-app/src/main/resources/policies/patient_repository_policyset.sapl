@@ -48,7 +48,7 @@ transform
 					}
 
 /*
- * Visitors which are relatives may see phone number.
+ * Visitors which are relatives may see the name, phone number and room number.
  */
 policy "visiting relatives access patient data"
 permit 
@@ -66,17 +66,17 @@ where
 transform 
 		// Subtractive template with filters removing content
 		resource |- { 
+						@.medicalRecordNumber 	: remove,
 						@.icd11Code 			: remove,
 						@.diagnosisText 		: remove,
-						@.medicalRecordNumber 	: remove, 
-						@.attendingDoctor 		: remove, 
+						@.attendingDoctor 		: remove,
 						@.attendingNurse 		: remove 
 					}
 
 /*
- * Visitors which are not relatives may see the phone number and name only.
+ * Visitors which are not relatives may see the name and phone number only.
  */
-policy "visiting relatives access patient data"
+policy "visiting non relatives access patient data"
 permit 
        action.java.shortSig == "PatientRepository.findById(..)"
 where 
@@ -93,12 +93,12 @@ transform
 /*
  * Permit attending doctors to delete patients
  */
-policy "doctors and administrators may access the update patient data interface via navigation button"
+policy "attending doctors may access the delete patient data interface via navigation button"
 permit 
        action.java.shortSig == "PatientRepository.deleteById(..)"
 where
 	("DOCTOR" in subject..authority);
-	subject.name == action.arguments[1].<patient.patientRecord>.attendingDoctor;
+	subject.name == action.arguments[0].<patient.patientRecord>.attendingDoctor;
 
 /*
  * Doctors may create new patients. 
@@ -150,32 +150,25 @@ obligation
 	}
 	
 /*
- * All doctors and nurses may attending nurse field. 
+ * All doctors and nurses may update attending nurse, name, phone number and room number fields.
  */
 policy "doctors and nurses may change other fields"
 permit 
 		action.java.shortSig == "PatientRepository.updateAttendingNurseById(..)" 
-	|	action.java.shortSig == "PatientRepository.updatePhoneNumberById(..)" 
-	|	action.java.shortSig == "PatientRepository.updateNameById(..)" 
+	|	action.java.shortSig == "PatientRepository.updateNameById(..)"
 	|	action.java.shortSig == "PatientRepository.updatePhoneNumberById(..)" 
 	|	action.java.shortSig == "PatientRepository.updateRoomNumberById(..)" 
 
 where
-	("DOCTOR" in subject..authority) || ("DOCTOR" in subject..authority);
+	("DOCTOR" in subject..authority) || ("NURSE" in subject..authority);
 
 /*
  * Permit administrators to update/delete patients, but the action SHOULD be logged and an email MUST be sent.
  */
-policy "doctors and system processes may create patients"
+policy "administrators may update/delete patients, but it has to be reported"
 permit 
        	action.java.shortSig == "PatientRepository.deleteById(..)"
 	|	action.java.shortSig =~ "^PatientRepository\\.update.*"
-where
-	("ADMIN" in subject..authority);
-
-policy "administrators may delete, but it has to be reported"
-permit 
-       action.java.shortSig == "PatientRepository.deleteById(..)"
 where
 	("ADMIN" in subject..authority);
 obligation
