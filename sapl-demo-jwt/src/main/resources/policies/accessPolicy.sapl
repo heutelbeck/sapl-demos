@@ -1,4 +1,4 @@
-import org.demo.shared.pip.PatientPIP as patient
+import org.demo.pip.PatientPIP as patient
 
 set "accessPolicy"
 deny-unless-permit
