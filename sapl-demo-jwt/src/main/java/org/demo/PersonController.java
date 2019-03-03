@@ -35,11 +35,11 @@ public class PersonController {
 	private static final String PHONENUMBER = "phoneNumber";
 
 	@Autowired
-	private PatientRepository patientenRepo;
+	private PatientRepository patientRepo;
 
 	@GetMapping("{id}")
-	public ResponseEntity<Patient> loadPerson(@PathVariable int id) {
-		Optional<Patient> patient = patientenRepo.findById(id);
+	public ResponseEntity<Patient> loadPerson(@PathVariable long id) {
+		Optional<Patient> patient = patientRepo.findById(id);
 		if (patient.isPresent()) {
 			return new ResponseEntity<>(patient.get(), HttpStatus.OK);
 		}
@@ -48,12 +48,12 @@ public class PersonController {
 
 	@EnforcePolicies
 	@GetMapping("readAll/{id}")
-	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
-		Optional<Patient> patient = patientenRepo.findById(id);
+	public Map<String, Object> loadPersonAll(@PathVariable long id, HttpServletRequest request) {
+		Optional<Patient> patient = patientRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
-			map.put("healthRecordNumber", patient.get().getHealthRecordNumber());
-			map.put("diagnosis", patient.get().getDiagnosis());
+			map.put("healthRecordNumber", patient.get().getIcd11Code());
+			map.put("diagnosis", patient.get().getDiagnosisText());
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
 			map.put("name", patient.get().getName());
 			map.put("id", patient.get().getId());
@@ -64,11 +64,11 @@ public class PersonController {
 
 	@EnforcePolicies
 	@GetMapping("readDiag/{id}")
-	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
-		Optional<Patient> patient = patientenRepo.findById(id);
+	public Map<String, Object> loadPersonPart(@PathVariable long id, HttpServletRequest request) {
+		Optional<Patient> patient = patientRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
-			map.put("diagnosis", patient.get().getDiagnosis());
+			map.put("diagnosis", patient.get().getDiagnosisText());
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
 			map.put("name", patient.get().getName());
 			map.put("id", patient.get().getId());
@@ -78,8 +78,8 @@ public class PersonController {
 	}
 
 	@GetMapping("readLim/{id}") // permission to all users: VISITOR, DOCTOR,ADMIN, NURSE
-	public Map<String, Object> loadPersonLim(@PathVariable int id) {
-		Optional<Patient> patient = patientenRepo.findById(id);
+	public Map<String, Object> loadPersonLim(@PathVariable long id) {
+		Optional<Patient> patient = patientRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
@@ -93,7 +93,7 @@ public class PersonController {
 	@GetMapping("list") // permission to all users: VISITOR, DOCTOR, NURSE, ADMIN
 	public List<Map<String, Object>> loadPersonList() {
 		List<Map<String, Object>> returnList = new ArrayList<>();
-		patientenRepo.findAll().forEach(p -> {
+		patientRepo.findAll().forEach(p -> {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put(PHONENUMBER, p.getPhoneNumber());
 			map.put("name", p.getName());
@@ -107,28 +107,28 @@ public class PersonController {
 	@EnforcePolicies
 	public ResponseEntity<Void> createPerson(@RequestBody Patient person, UriComponentsBuilder uriComponentsBuilder,
 			HttpServletRequest request) {
-		patientenRepo.save(person);
+		patientRepo.save(person);
 		UriComponents uriComponents = uriComponentsBuilder.path("/person/" + person.getId()).build();
 		return ResponseEntity.created(uriComponents.toUri()).build();
 	}
 
 	@EnforcePolicies
 	@PutMapping("putALL/{id}")
-	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
-		if (!patientenRepo.existsById(id)) {
+	public Patient update(@PathVariable long id, @RequestBody Patient person, HttpServletRequest request) {
+		if (!patientRepo.findById(id).isPresent()) {
 			throw new IllegalArgumentException("not found");
 		}
-		return patientenRepo.save(person);
+		return patientRepo.save(person);
 	}
 
 	@EnforcePolicies
 	@PutMapping("{id}")
-	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
+	public Map<String, Object> updatePart(@PathVariable long id, @RequestBody Patient person,
 			HttpServletRequest request) {
-		if (!patientenRepo.existsById(id)) {
+		if (!patientRepo.findById(id).isPresent()) {
 			throw new IllegalArgumentException("not found");
 		}
-		Patient patient = patientenRepo.findById(id).orElse(null);
+		Patient patient = patientRepo.findById(id).orElse(null);
 		if (patient == null) {
 			throw new IllegalArgumentException();
 		}
@@ -151,8 +151,8 @@ public class PersonController {
 
 	@EnforcePolicies
 	@DeleteMapping("{id}")
-	public void delete(@PathVariable int id, HttpServletRequest request) {
-		patientenRepo.deleteById(id);
+	public void delete(@PathVariable long id, HttpServletRequest request) {
+		patientRepo.deleteById(id);
 	}
 
 }

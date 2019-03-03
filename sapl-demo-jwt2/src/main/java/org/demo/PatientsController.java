@@ -29,12 +29,12 @@ public class PatientsController {
 
 	@EnforcePolicies
 	@GetMapping("{id}")
-	public Patient readPatient(@PathVariable int id) {
+	public Patient readPatient(@PathVariable long id) {
 		return patientRepo.findById(id).orElseThrow(PersonNotFound::new);
 	}
 
 	@DeleteMapping("{id}")
-	public void deletePerson(@PathVariable int id, HttpServletRequest request) {
+	public void deletePerson(@PathVariable long id, HttpServletRequest request) {
 		patientRepo.deleteById(id);
 	}
 
