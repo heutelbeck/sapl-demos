@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
+import org.demo.pip.PatientPIP;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -40,9 +41,12 @@ public class UIController {
 	public static class ResourceNotFoundException extends RuntimeException {
 	}
 
+	private final PatientPIP pip;
+
 	@EnforcePolicies
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
+		pip.getPatientRecord(null, null);
 		model.addAttribute("patients", patientenRepo.findAll());
 		model.addAttribute("permittedToUseCreatePatientButton",
 				pep.enforce(authentication, "use", "ui:view:patients:createPatientButton"));
@@ -73,8 +77,8 @@ public class UIController {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 
 		model.addAttribute("patient", patient);
-		model.addAttribute("permittedToUseUpdatePatientButton", pep.enforce(authentication, "use",
-				"ui:view:patient:updatePatientButton"));
+		model.addAttribute("permittedToUseUpdatePatientButton",
+				pep.enforce(authentication, "use", "ui:view:patient:updatePatientButton"));
 		model.addAttribute("permittedToUseDeletePatientButton", pep.enforce(authentication, "use",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patient:deletePatientButton\"}")));
 
@@ -125,7 +129,7 @@ public class UIController {
 		}
 
 		if (patient.getRoomNumber() != null) {
-			patientenRepo.updatePhoneNumberById(patient.getRoomNumber(), id);
+			patientenRepo.updateRoomNumberById(patient.getRoomNumber(), id);
 		}
 
 		if (patient.getAttendingDoctor() != null) {

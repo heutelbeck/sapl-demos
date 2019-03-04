@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
-        <title>Spring Security Example</title>
-    	<link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
+        <title>SAPL Voter Example</title>
     </head>
     <body>
-        <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-        
-        <h3><a th:href="@{/profiles}">Patient List</a></h3>
-        
-        
-        <form th:action="@{/logout}" method="post">
-            <input type="submit" value="Sign Out"/>
-        </form>      
-        
+        <h1>Welcome!</h1>
+
+        <p>Click <a th:href="@{/public}">here</a> to access the public page.</p>
+        <p>Click <a th:href="@{/protected}">here</a> to access the protected page.</p>
     </body>
 </html>
