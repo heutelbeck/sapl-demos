@@ -8,6 +8,7 @@ import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
 import org.demo.pip.PatientPIP;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.annotation.EnforcePolicies;
+import io.sapl.spring.method.PreEnforce;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,7 +73,9 @@ public class UIController {
 		return "newPatient";
 	}
 
-	@EnforcePolicies
+	@PreEnforce
+	@PreAuthorize("true")
+	// @EnforcePolicies
 	@GetMapping("/patients/{id}")
 	public String getPatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);

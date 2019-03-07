@@ -1,6 +1,6 @@
 package org.demo;
 
-import org.demo.shared.pip.PatientPIP;
+import org.demo.pip.PatientPIP;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("rest/patient")

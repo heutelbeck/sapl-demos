@@ -34,15 +34,21 @@ import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 public class RemotePDPDemo {
     private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
 
+    private static final String USAGE = "java -jar sapl-demo-remote-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
     private static final String DEFAULT_PORT = "8443";
     private static final String DEFAULT_HOST = "localhost";
+    private static final String DEFAULT_KEY = "YJidgyT2mfdkbmL";
+    private static final String DEFAULT_SECRET = "Fa4zvYQdiwHZVXh";
     private static final String HELP_DOC = "print this message";
-    private static final String PORT_DOC = "port of the policy decision point";
     private static final String HOST_DOC = "hostname of the policy decision point";
-    private static final String USAGE = "java -jar sapl-demo-remote-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
+    private static final String PORT_DOC = "port of the policy decision point";
+    private static final String KEY_DOC = "client key for the demo application, to be obtained from the PDP administrator";
+    private static final String SECRET_DOC = "client secret for the demo application, to be obtained from the PDP administrator";
     private static final String HELP = "help";
-    private static final String PORT = "port";
     private static final String HOST = "host";
+    private static final String PORT = "port";
+    private static final String KEY = "key";
+    private static final String SECRET = "secret";
 
     private static final int RUNS = 10;
     private static final double BILLION = 1_000_000_000.0D;
@@ -62,6 +68,8 @@ public class RemotePDPDemo {
 
         options.addOption(HOST, true, HOST_DOC);
         options.addOption(PORT, true, PORT_DOC);
+        options.addOption(KEY, true, KEY_DOC);
+        options.addOption(SECRET, true, SECRET_DOC);
         options.addOption(HELP, false, HELP_DOC);
 
         CommandLineParser parser = new DefaultParser();
@@ -87,12 +95,20 @@ public class RemotePDPDemo {
                 portOption = DEFAULT_PORT;
             }
             int port = Integer.parseInt(portOption);
-            runDemo(host, port);
+            String key = cmd.getOptionValue(KEY);
+            if (key == null) {
+                key = DEFAULT_KEY;
+            }
+            String secret = cmd.getOptionValue(SECRET);
+            if (secret == null) {
+                secret = DEFAULT_SECRET;
+            }
+            runDemo(host, port, key, secret);
         }
     }
 
-    private static void runDemo(String host, int port) {
-        RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port);
+    private static void runDemo(String host, int port, String key, String secret) {
+        RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
 
         long start = System.nanoTime();
         for (int i = 0; i < RUNS; i++) {

@@ -24,7 +24,7 @@ where
 	!("ROLE_ANONYMOUS" in subject..authority);
 
 /*
- * This policy enables all doctors and administrators to delete users on the controller level
+ * This policy enables all doctors and administrators to delete patients on the controller level
  */
 policy "delete controller for doctors and administrators"
 permit action.java.name == "deletePatient" & resource.http.requestedURI =~ "^/patients/[0-9]+$"

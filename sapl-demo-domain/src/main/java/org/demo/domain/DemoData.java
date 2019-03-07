@@ -7,9 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DemoData implements CommandLineRunner {
@@ -36,15 +34,11 @@ public class DemoData implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-
-		LOGGER.info("Loading demo dataset.");
-
 		// Create patients
-		patientRepository.save(new Patient(null, NAME_LENNY, "Duodenal ulcer with acute haemorrhage.", "123456",
+		patientRepository.save(new Patient(null, "123456", NAME_LENNY, "Duodenal ulcer with acute haemorrhage.",
 				"DA63.Z/ME24.90", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
-		patientRepository.save(new Patient(null, NAME_KARL, "Type 2 diabetes mellitus", "987654", "9B71.0Z/5A11",
+		patientRepository.save(new Patient(null, "987654", NAME_KARL, "Type 2 diabetes mellitus", "9B71.0Z/5A11",
 				"+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
-
 		// Establish relations between users and patients
 		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
 		relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).get().getId()));

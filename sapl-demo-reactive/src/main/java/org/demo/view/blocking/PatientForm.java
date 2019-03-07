@@ -29,24 +29,26 @@ class PatientForm extends AbstractPatientForm {
 
 	protected void updateFieldEnabling(boolean isNewPatient) {
 		id.setEnabled(false);
-		blackenedHRN.setEnabled(false);
+		blackenedIcd11Code.setEnabled(false);
 
 		if (isNewPatient) {
+			mrn.setEnabled(true);
 			name.setEnabled(true);
-			diagnosis.setEnabled(false); // only the admin can create a new patient, but doctors add a diagnosis
-			healthRecordNumber.setEnabled(true);
-			phoneNumber.setEnabled(true);
+			icd11Code.setEnabled(true);
+			diagnosisText.setEnabled(false); // only the admin can create a new patient, but doctors add a diagnosis
 			attendingDoctor.setEnabled(true);
 			attendingNurse.setEnabled(true);
+			phoneNumber.setEnabled(true);
 			roomNumber.setEnabled(true);
 		} else {
 			final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+			mrn.setEnabled(pep.enforce(authentication, "update", "mrn"));
 			name.setEnabled(pep.enforce(authentication, "update", "name"));
-			diagnosis.setEnabled(pep.enforce(authentication, "updateDiagnosis", patient));
-			healthRecordNumber.setEnabled(pep.enforce(authentication, "update", "HRN"));
-			phoneNumber.setEnabled(pep.enforce(authentication, "update", "phoneNumber"));
+			icd11Code.setEnabled(pep.enforce(authentication, "update", "icd11"));
+			diagnosisText.setEnabled(pep.enforce(authentication, "updateDiagnosis", patient));
 			attendingDoctor.setEnabled(pep.enforce(authentication, "update", "attendingDoctor"));
 			attendingNurse.setEnabled(pep.enforce(authentication, "update", "attendingNurse"));
+			phoneNumber.setEnabled(pep.enforce(authentication, "update", "phoneNumber"));
 			roomNumber.setEnabled(pep.enforce(authentication, "update", "roomNumber"));
 		}
 	}
@@ -54,33 +56,35 @@ class PatientForm extends AbstractPatientForm {
 	protected void updateFieldVisibility(boolean isNewPatient) {
 		if (isNewPatient) {
 			id.setVisible(false);
+			mrn.setVisible(true);
 			name.setVisible(true);
-			diagnosis.setVisible(false); // only the admin can create a new patient, but doctors add a diagnosis
-			healthRecordNumber.setVisible(true);
-			blackenedHRN.setVisible(false);
-			phoneNumber.setVisible(true);
+			icd11Code.setVisible(true);
+			blackenedIcd11Code.setVisible(false);
+			diagnosisText.setVisible(false); // only the admin can create a new patient, but doctors add a diagnosis
 			attendingDoctor.setVisible(true);
 			attendingNurse.setVisible(true);
+			phoneNumber.setVisible(true);
 			roomNumber.setVisible(true);
 		} else {
 			final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 			id.setVisible(true);
+			mrn.setVisible(pep.enforce(authentication, "read", "mrn"));
 			name.setVisible(pep.enforce(authentication, "read", "name"));
-			diagnosis.setVisible(pep.enforce(authentication, "read", "diagnosis"));
-			healthRecordNumber.setVisible(pep.enforce(authentication, "read", "HRN"));
-			final Response readBlackenedHRN = pdp.decide(buildRequest(authentication, "readBlackenedHRN", patient))
+			diagnosisText.setVisible(pep.enforce(authentication, "read", "diagnosis"));
+			icd11Code.setVisible(pep.enforce(authentication, "read", "icd11"));
+			final Response readBlackenedIcd11 = pdp.decide(buildRequest(authentication, "readBlackenedIcd11", patient))
 					.block();
-			if (readBlackenedHRN.getDecision() == Decision.PERMIT) {
-				final Optional<JsonNode> patientNode = readBlackenedHRN.getResource();
-				blackenedHRN.setValue(patientNode.map(node -> node.get("healthRecordNumber").asText()).orElse(""));
-				blackenedHRN.setVisible(true);
+			if (readBlackenedIcd11.getDecision() == Decision.PERMIT) {
+				final Optional<JsonNode> patientNode = readBlackenedIcd11.getResource();
+				blackenedIcd11Code.setValue(patientNode.map(node -> node.get("icd11Code").asText()).orElse(""));
+				blackenedIcd11Code.setVisible(true);
 			} else {
-				blackenedHRN.setVisible(false);
+				blackenedIcd11Code.setVisible(false);
 			}
-			phoneNumber.setVisible(pep.enforce(authentication, "read", "phoneNumber"));
 			attendingDoctor.setVisible(pep.enforce(authentication, "read", "attendingDoctor"));
 			attendingNurse.setVisible(pep.enforce(authentication, "read", "attendingNurse"));
+			phoneNumber.setVisible(pep.enforce(authentication, "read", "phoneNumber"));
 			roomNumber.setVisible(pep.enforce(authentication, "readRoomNumber", patient));
 		}
 	}
@@ -104,24 +108,24 @@ class PatientForm extends AbstractPatientForm {
 			// get the update authorization for each modified field to enforce obligation
 			// handling
 			// and reset the field if necessary
+			if (!Objects.equals(mrn.getValue(), unmodifiedPatient.getMedicalRecordNumber())) {
+				if (!pep.enforce(authentication, "update", "mrn")) {
+					patient.setName(unmodifiedPatient.getMedicalRecordNumber());
+				}
+			}
 			if (!Objects.equals(name.getValue(), unmodifiedPatient.getName())) {
 				if (!pep.enforce(authentication, "update", "name")) {
 					patient.setName(unmodifiedPatient.getName());
 				}
 			}
-			if (!Objects.equals(diagnosis.getValue(), unmodifiedPatient.getDiagnosis())) {
+			if (!Objects.equals(icd11Code.getValue(), unmodifiedPatient.getIcd11Code())) {
+				if (!pep.enforce(authentication, "update", "icd11")) {
+					patient.setIcd11Code(unmodifiedPatient.getIcd11Code());
+				}
+			}
+			if (!Objects.equals(diagnosisText.getValue(), unmodifiedPatient.getDiagnosisText())) {
 				if (!pep.enforce(authentication, "updateDiagnosis", patient)) {
-					patient.setDiagnosis(unmodifiedPatient.getDiagnosis());
-				}
-			}
-			if (!Objects.equals(healthRecordNumber.getValue(), unmodifiedPatient.getHealthRecordNumber())) {
-				if (!pep.enforce(authentication, "update", "HRN")) {
-					patient.setHealthRecordNumber(unmodifiedPatient.getHealthRecordNumber());
-				}
-			}
-			if (!Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber())) {
-				if (!pep.enforce(authentication, "update", "phoneNumber")) {
-					patient.setPhoneNumber(unmodifiedPatient.getPhoneNumber());
+					patient.setDiagnosisText(unmodifiedPatient.getDiagnosisText());
 				}
 			}
 			if (!Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor())) {
@@ -132,6 +136,11 @@ class PatientForm extends AbstractPatientForm {
 			if (!Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse())) {
 				if (!pep.enforce(authentication, "update", "attendingNurse")) {
 					patient.setAttendingNurse(unmodifiedPatient.getAttendingNurse());
+				}
+			}
+			if (!Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber())) {
+				if (!pep.enforce(authentication, "update", "phoneNumber")) {
+					patient.setPhoneNumber(unmodifiedPatient.getPhoneNumber());
 				}
 			}
 			if (!Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber())) {
@@ -151,7 +160,7 @@ class PatientForm extends AbstractPatientForm {
 	protected void onDelete() {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (pep.enforce(authentication, "delete", "profile")) {
-			patientRepo.delete(patient);
+			patientRepo.deleteById(patient.getId());
 			refreshCallback.refresh();
 		} else {
 			SecurityUtils.notifyNotAuthorized();

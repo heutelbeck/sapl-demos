@@ -35,7 +35,7 @@ public class RestService {
 	private PatientRepository patientenRepo;
 
 	@GetMapping("{id}")
-	public ResponseEntity<Patient> loadPerson(@PathVariable int id) {
+	public ResponseEntity<Patient> loadPerson(@PathVariable long id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		if (patient.isPresent()) {
 			return new ResponseEntity<>(patient.get(), HttpStatus.OK);
@@ -45,12 +45,12 @@ public class RestService {
 
 	@GetMapping("readAll/{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public Map<String, Object> loadPersonAll(@PathVariable int id, HttpServletRequest request) {
+	public Map<String, Object> loadPersonAll(@PathVariable long id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
-			map.put("healthRecordNumber", patient.get().getHealthRecordNumber());
-			map.put("diagnosis", patient.get().getDiagnosis());
+			map.put("healthRecordNumber", patient.get().getIcd11Code());
+			map.put("diagnosis", patient.get().getDiagnosisText());
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
 			map.put("name", patient.get().getName());
 			map.put("id", patient.get().getId());
@@ -61,11 +61,11 @@ public class RestService {
 
 	@GetMapping("readDiag/{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR, NURSE
-	public Map<String, Object> loadPersonPart(@PathVariable int id, HttpServletRequest request) {
+	public Map<String, Object> loadPersonPart(@PathVariable long id, HttpServletRequest request) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
-			map.put("diagnosis", patient.get().getDiagnosis());
+			map.put("diagnosis", patient.get().getDiagnosisText());
 			map.put(PHONENUMBER, patient.get().getPhoneNumber());
 			map.put("name", patient.get().getName());
 			map.put("id", patient.get().getId());
@@ -75,7 +75,7 @@ public class RestService {
 	}
 
 	@GetMapping("readLim/{id}") // permission to all users: VISITOR, DOCTOR,ADMIN, NURSE
-	public Map<String, Object> loadPersonLim(@PathVariable int id) {
+	public Map<String, Object> loadPersonLim(@PathVariable long id) {
 		Optional<Patient> patient = patientenRepo.findById(id);
 		HashMap<String, Object> map = new HashMap<>();
 		if (patient.isPresent()) {
@@ -111,8 +111,8 @@ public class RestService {
 
 	@PutMapping("putALL/{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public Patient update(@PathVariable int id, @RequestBody Patient person, HttpServletRequest request) {
-		if (!patientenRepo.existsById(id)) {
+	public Patient update(@PathVariable long id, @RequestBody Patient person, HttpServletRequest request) {
+		if (!patientenRepo.findById(id).isPresent()) {
 			throw new IllegalArgumentException("not found");
 		}
 		return patientenRepo.save(person);
@@ -120,9 +120,9 @@ public class RestService {
 
 	@PutMapping("{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR, NURSE
-	public Map<String, Object> updatePart(@PathVariable int id, @RequestBody Patient person,
+	public Map<String, Object> updatePart(@PathVariable long id, @RequestBody Patient person,
 			HttpServletRequest request) {
-		if (!patientenRepo.existsById(id)) {
+		if (!patientenRepo.findById(id).isPresent()) {
 			throw new IllegalArgumentException("not found");
 		}
 		Patient patient = patientenRepo.findById(id).orElse(null);
@@ -148,7 +148,7 @@ public class RestService {
 
 	@DeleteMapping("{id}")
 	@PreAuthorize("hasPermission(#request, #request)") // using SaplPolicies = DOCTOR
-	public void delete(@PathVariable int id, HttpServletRequest request) {
+	public void delete(@PathVariable long id, HttpServletRequest request) {
 		patientenRepo.deleteById(id);
 	}
 

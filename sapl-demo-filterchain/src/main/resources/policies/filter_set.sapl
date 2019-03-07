@@ -1,4 +1,4 @@
-import org.demo.shared.pip.PatientPIP as patient
+import org.demo.pip.PatientPIP as patient
 
 set "filter_set"
 permit-unless-deny

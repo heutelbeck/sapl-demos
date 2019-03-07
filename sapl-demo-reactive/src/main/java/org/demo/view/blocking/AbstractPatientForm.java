@@ -3,7 +3,7 @@ package org.demo.view.blocking;
 import org.demo.domain.Patient;
 
 import com.vaadin.data.Binder;
-import com.vaadin.data.converter.StringToIntegerConverter;
+import com.vaadin.data.converter.StringToLongConverter;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
@@ -14,13 +14,14 @@ import com.vaadin.ui.themes.ValoTheme;
 public abstract class AbstractPatientForm extends FormLayout {
 
     protected TextField id;
+    protected TextField mrn;
     protected TextField name;
-    protected TextField diagnosis;
-    protected TextField healthRecordNumber;
-    protected TextField blackenedHRN;
-    protected TextField phoneNumber;
+    protected TextField icd11Code;
+    protected TextField blackenedIcd11Code;
+    protected TextField diagnosisText;
     protected TextField attendingDoctor;
     protected TextField attendingNurse;
+    protected TextField phoneNumber;
     protected TextField roomNumber;
 
     private Binder<Patient> binder;
@@ -43,32 +44,34 @@ public abstract class AbstractPatientForm extends FormLayout {
 
     private void addFormFields() {
         id = new TextField("ID");
+        mrn = new TextField("Medical Record Number");
         name = new TextField("Name");
-        diagnosis = new TextField("Diagnosis");
-        healthRecordNumber = new TextField("HRN");
-        blackenedHRN = new TextField("HRN");
-        phoneNumber = new TextField("Phone");
+        icd11Code = new TextField("ICD-11");
+        blackenedIcd11Code = new TextField("ICD-11");
+        diagnosisText = new TextField("Diagnosis");
         attendingDoctor = new TextField("Attending Doctor");
         attendingNurse = new TextField("Attending Nurse");
+        phoneNumber = new TextField("Phone");
         roomNumber = new TextField("Room Number");
 
         id.setSizeFull();
+        mrn.setSizeFull();
         name.setSizeFull();
-        diagnosis.setSizeFull();
-        healthRecordNumber.setSizeFull();
-        blackenedHRN.setSizeFull();
-        phoneNumber.setSizeFull();
+        icd11Code.setSizeFull();
+        blackenedIcd11Code.setSizeFull();
+        diagnosisText.setSizeFull();
         attendingDoctor.setSizeFull();
         attendingNurse.setSizeFull();
+        phoneNumber.setSizeFull();
         roomNumber.setSizeFull();
 
-        addComponents(id, name, diagnosis, healthRecordNumber, blackenedHRN, phoneNumber, attendingDoctor, attendingNurse, roomNumber);
+        addComponents(id, mrn, name, icd11Code, blackenedIcd11Code, diagnosisText, attendingDoctor, attendingNurse, phoneNumber, roomNumber);
     }
 
     private void bindFormFields() {
         binder = new Binder<>(Patient.class);
         binder.forField(id)
-                .withConverter(new StringToIntegerConverter("Must enter a number"))
+                .withConverter(new StringToLongConverter("Must enter a number"))
                 .bind(Patient::getId, Patient::setId);
         binder.bindInstanceFields(this);
     }

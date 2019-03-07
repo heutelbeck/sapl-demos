@@ -19,18 +19,18 @@ public class Patient {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	String name;
-	String diagnosisText;
 	String medicalRecordNumber;
+	String name;
 	String icd11Code;
-	String phoneNumber;
+	String diagnosisText;
 	String attendingDoctor;
 	String attendingNurse;
+	String phoneNumber;
 	String roomNumber;
 
 	public static Patient clone(Patient template) {
-		return new Patient(template.id, template.name, template.diagnosisText, template.medicalRecordNumber,
-				template.icd11Code, template.phoneNumber, template.attendingDoctor, template.attendingNurse,
+		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
+				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
 				template.roomNumber);
 	}
 }

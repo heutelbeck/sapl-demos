@@ -1,7 +1,22 @@
-import org.demo.shared.pip.PatientPIP as patient
+import org.demo.pip.PatientPIP as patient
 
 set "accessPolicy"
 deny-unless-permit
+
+/*
+ * Doctors may create new patients.
+ *
+ * In the demo, new patients are also created during application startup. In this case there is no subject defined.
+ * So subject == null when the access comes from a system process not linked to a user session.
+ * System processes are also permitted to create patients.
+ *
+ */
+policy "doctors and system processes may create patients"
+permit
+       action.java.shortSig == "PatientRepository.save(..)"
+where
+	subject == null || ("DOCTOR" in subject..authority);
+
 
 policy "permit_doctor_read_HRN"
 permit
