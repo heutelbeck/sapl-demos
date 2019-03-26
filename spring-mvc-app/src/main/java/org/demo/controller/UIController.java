@@ -6,9 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
-import org.demo.pip.PatientPIP;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,8 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.spring.PolicyEnforcementPoint;
-import io.sapl.spring.annotation.EnforcePolicies;
-import io.sapl.spring.method.PreEnforce;
+import io.sapl.spring.method.pre.PreEnforce;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,19 +40,16 @@ public class UIController {
 	public static class ResourceNotFoundException extends RuntimeException {
 	}
 
-	private final PatientPIP pip;
-
-	@EnforcePolicies
+	@PreEnforce
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
-		pip.getPatientRecord(null, null);
 		model.addAttribute("patients", patientenRepo.findAll());
 		model.addAttribute("permittedToUseCreatePatientButton",
 				pep.enforce(authentication, "use", "ui:view:patients:createPatientButton"));
 		return "patients";
 	}
 
-	@EnforcePolicies
+	@PreEnforce
 	@PostMapping("/patients")
 	public String createPatient(@ModelAttribute(value = "newPatient") Patient patient) {
 		if (patient.getId() != null) {
@@ -65,7 +59,7 @@ public class UIController {
 		return REDIRECT_PATIENTS;
 	}
 
-	@EnforcePolicies
+	@PreEnforce
 	@GetMapping("/patients/new")
 	public String newPatient(Model model) {
 		Patient patient = new Patient();
@@ -74,12 +68,10 @@ public class UIController {
 	}
 
 	@PreEnforce
-	@PreAuthorize("true")
-	// @EnforcePolicies
 	@GetMapping("/patients/{id}")
 	public String getPatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
-
+		LOGGER.info("ZZZZ repo: {}", patientenRepo);
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUseUpdatePatientButton",
 				pep.enforce(authentication, "use", "ui:view:patient:updatePatientButton"));
@@ -89,14 +81,14 @@ public class UIController {
 		return "patient";
 	}
 
-	@EnforcePolicies
+	@PreEnforce
 	@DeleteMapping("/patients/{id}")
 	public String deletePatient(@PathVariable Long id) {
 		patientenRepo.deleteById(id);
 		return REDIRECT_PATIENTS;
 	}
 
-	@EnforcePolicies
+	@PreEnforce
 	@GetMapping("/patients/{id}/update")
 	public String updatePatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -112,7 +104,7 @@ public class UIController {
 		return "updatePatient";
 	}
 
-	@EnforcePolicies
+	@PreEnforce
 	@PutMapping("/patients/{id}")
 	public String updatePatient(@ModelAttribute("patient") Patient patient, @PathVariable Long id) {
 		LOGGER.info("Got patient: {}", patient);

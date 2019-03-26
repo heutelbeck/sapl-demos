@@ -1,8 +1,17 @@
 package org.demo.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +43,12 @@ public class DemoData implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
+		List<GrantedAuthority> authorities = new ArrayList<>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
+		Authentication auth = new UsernamePasswordAuthenticationToken("system", null, authorities);
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		SecurityContext sc = SecurityContextHolder.getContext();
+		sc.setAuthentication(auth);
 		// Create patients
 		patientRepository.save(new Patient(null, "123456", NAME_LENNY, "Duodenal ulcer with acute haemorrhage.",
 				"DA63.Z/ME24.90", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));

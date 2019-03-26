@@ -45,7 +45,6 @@
 		<module>sapl-demo-geo-server</module>
 		<!--<module>sapl-demo-jwt</module> -->
 		<module>sapl-demo-jwt2</module>
-		<module>sapl-demo-permissionevaluator</module>
 		<module>sapl-demo-pip-server</module>
 		<module>sapl-demo-reactive</module>
 		<module>sapl-demo-remote</module>

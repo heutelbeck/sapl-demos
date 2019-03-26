@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import org.demo.domain.PatientRepository;
 import org.demo.domain.Relation;
 import org.demo.domain.RelationRepository;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
