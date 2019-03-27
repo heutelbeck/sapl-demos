@@ -7,13 +7,11 @@ import javax.transaction.Transactional;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import io.sapl.spring.method.post.PostEnforce;
 import io.sapl.spring.method.pre.PreEnforce;
 
 public interface PatientRepository {
-	@PreAuthorize("hasRole('XCADMIN')")
 	@PreEnforce
 	@PostEnforce(resource = "returnObject")
 	Optional<Patient> findById(Long id);

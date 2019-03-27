@@ -112,7 +112,16 @@ policy "doctors and system processes may create patients"
 permit 
        action.java.shortSig == "PatientRepository.save(..)"
 where
-	subject == null || ("DOCTOR" in subject..authority);
+	("ROLE_SYSTEM" in subject..authority) || ("DOCTOR" in subject..authority);
+
+/*
+ * System may search by name. 
+ */
+policy "system search by name"
+permit 
+       action.java.shortSig == "PatientRepository.findByName(..)"
+where
+	("ROLE_SYSTEM" in subject..authority);
 
 /*
  * Only the attending doctor may change diagnosis information or the 
