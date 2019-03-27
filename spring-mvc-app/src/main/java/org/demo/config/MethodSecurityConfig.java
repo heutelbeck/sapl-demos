@@ -3,6 +3,7 @@ package org.demo.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -42,15 +43,15 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 	@Value("${io.sapl.runaskey}")
 	private String runAsKey;
 	private final SAPLProperties pdpProperites;
-	private final PolicyDecisionPoint pdp;
-	private final ConstraintHandlerService constraintHandlers;
-	private final ObjectMapper mapper;
+	protected final ObjectFactory<PolicyDecisionPoint> pdpFactory;
+	protected final ObjectFactory<ConstraintHandlerService> constraintHandlerFactory;
+	protected final ObjectFactory<ObjectMapper> objectMapperFactory;
 
 	@Override
 	protected AccessDecisionManager accessDecisionManager() {
 		List<AccessDecisionVoter<? extends Object>> decisionVoters = new ArrayList<>();
-		PolicyBasedPreInvocationEnforcementAdvice policyAdvice = new PolicyBasedPreInvocationEnforcementAdvice(pdp,
-				constraintHandlers, mapper);
+		PolicyBasedPreInvocationEnforcementAdvice policyAdvice = new PolicyBasedPreInvocationEnforcementAdvice(
+				pdpFactory, constraintHandlerFactory, objectMapperFactory);
 		policyAdvice.setExpressionHandler(getExpressionHandler());
 		decisionVoters.add(new PreInvocationEnforcementAdviceVoter(policyAdvice));
 		decisionVoters.add(new RoleVoter());
@@ -60,8 +61,8 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	@Override
 	protected AfterInvocationManager afterInvocationManager() {
-		PolicyBasedPostInvocationEnforcementAdvice advice = new PolicyBasedPostInvocationEnforcementAdvice(pdp,
-				constraintHandlers, mapper);
+		PolicyBasedPostInvocationEnforcementAdvice advice = new PolicyBasedPostInvocationEnforcementAdvice(pdpFactory,
+				constraintHandlerFactory, objectMapperFactory);
 		advice.setExpressionHandler(getExpressionHandler());
 		PostInvocationEnforcementProvider provider = new PostInvocationEnforcementProvider(advice);
 
