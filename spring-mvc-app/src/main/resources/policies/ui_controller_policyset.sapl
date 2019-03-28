@@ -3,6 +3,16 @@ import filter.*
 set "UIController"
 first-applicable
 
+
+/*
+ * This 'for' statement ensures, that the policies are only checked when they are actions, e.g., method calls,
+ * in the designated Java class.
+ * In this case, spring will indirectly implement the PatientRepository interface and it may not appear directly 
+ * in the method signatures, e.g. when using default methods from CrudRepositories. Thus we inspect the class 
+ * hierarchiy and interfaces implemented by the class to scope the policy set. 
+ */
+for "UIController" in action.java.instanceof..simpleName
+
 /*
  * This policy enables all authenticated users to see the patient list. The contents of the patient list 
  * page especially the availability of the button to create new patients is controlled 

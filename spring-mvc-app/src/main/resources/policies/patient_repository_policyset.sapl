@@ -14,17 +14,32 @@ first-applicable
 /*
  * This 'for' statement ensures, that the policies are only checked when they are actions, e.g., method calls,
  * in the designated Java class.
+ * In this case, spring will indirectly implement the PatientRepository interface and it may not appear directly 
+ * in the method signatures, e.g. when using default methods from CrudRepositories. Thus we inspect the class 
+ * hierarchiy and interfaces implemented by the class to scope the policy set. 
  */
-for action.java.declaringTypeName == "org.demo.domain.PatientRepository"
+for "PatientRepository" in action.java.instanceof..simpleName
 
 /*
  * All doctors and nurses have full read access on all patient records.
  */
 policy "doctor and nurse access to patient data"
 permit 
-       action.java.shortSig == "PatientRepository.findById(..)"
+       action.java.name == "findById"
 where 
-       "DOCTOR" in subject..authority || "NURSE" in subject..authority; 
+       "ROLE_DOCTOR" in subject..authority || "ROLE_NURSE" in subject..authority; 
+
+
+/*
+ * This policy enables all authenticated users to see the patient list.
+ */
+policy "all authenticated users may see patient list"
+permit        
+	action.java.name == "findAll"
+where
+	!("ROLE_ANONYMOUS" in subject..authority);
+
+
 
 /*
  * Administrators read access patients, however the classification and diagnosis are blackened in parts
@@ -32,9 +47,9 @@ where
  */
 policy "administrator access to patient data"
 permit 
-       action.java.shortSig == "PatientRepository.findById(..)"
+       action.java.name == "findById"
 where 
-       "ADMIN" in subject..authority;
+       "ROLE_ADMIN" in subject..authority;
 obligation  
 		{ 
         	"type" : "logAccess",
@@ -52,9 +67,9 @@ transform
  */
 policy "visiting relatives access patient data"
 permit 
-       action.java.shortSig == "PatientRepository.findById(..)"
+       action.java.name == "findById"
 where 
-       "VISITOR" in subject..authority;
+       "ROLE_VISITOR" in subject..authority;
         /*
          * The next condition invokes the "patient" policy information point and 
          * determines the "relatives" attribute of id of the patient.
@@ -78,9 +93,9 @@ transform
  */
 policy "visiting non relatives access patient data"
 permit 
-       action.java.shortSig == "PatientRepository.findById(..)"
+       action.java.name == "findById"
 where 
-       "VISITOR" in subject..authority;
+       "ROLE_VISITOR" in subject..authority;
 transform
 		// Constructive template 
 		{ 
@@ -95,9 +110,9 @@ transform
  */
 policy "attending doctors may access the delete patient data interface via navigation button"
 permit 
-       action.java.shortSig == "PatientRepository.deleteById(..)"
+       action.java.name == "deleteById"
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 	subject.name == action.arguments[0].<patient.patientRecord>.attendingDoctor;
 
 /*
@@ -110,16 +125,16 @@ where
  */
 policy "doctors and system processes may create patients"
 permit 
-       action.java.shortSig == "PatientRepository.save(..)"
+       action.java.name == "save"
 where
-	("ROLE_SYSTEM" in subject..authority) || ("DOCTOR" in subject..authority);
+	("ROLE_SYSTEM" in subject..authority) || ("ROLE_DOCTOR" in subject..authority);
 
 /*
  * System may search by name. 
  */
 policy "system search by name"
 permit 
-       action.java.shortSig == "PatientRepository.findByName(..)"
+       action.java.name == "findByName"
 where
 	("ROLE_SYSTEM" in subject..authority);
 
@@ -129,11 +144,11 @@ where
  */
 policy "attending doctors may update diagnosis and attending doctors"
 permit 
-		action.java.shortSig == "PatientRepository.updateDiagnosisTextById(..)"
-	|	action.java.shortSig == "PatientRepository.updateIcd11CodeById(..)" 
-	|	action.java.shortSig == "PatientRepository.updateAttendingDoctorById(..)" 
+		action.java.name == "updateDiagnosisTextById"
+	|	action.java.name == "updateIcd11CodeById" 
+	|	action.java.name == "updateAttendingDoctorById" 
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 	subject.name == action.arguments[1].<patient.patientRecord>.attendingDoctor;
 
 /*
@@ -144,11 +159,11 @@ where
  */
 policy "breaking the glass"
 permit 
-		action.java.shortSig == "PatientRepository.updateDiagnosisTextById(..)"
-	|	action.java.shortSig == "PatientRepository.updateIcd11CodeById(..)" 
-	|	action.java.shortSig == "PatientRepository.updateAttendingDoctorById(..)" 
+		action.java.name == "updateDiagnosisTextById"
+	|	action.java.name == "updateIcd11CodeById" 
+	|	action.java.name == "updateAttendingDoctorById" 
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 	var patient = action.arguments[1].<patient.patientRecord>;
 obligation
 	{
@@ -163,23 +178,23 @@ obligation
  */
 policy "doctors and nurses may change other fields"
 permit 
-		action.java.shortSig == "PatientRepository.updateAttendingNurseById(..)" 
-	|	action.java.shortSig == "PatientRepository.updateNameById(..)"
-	|	action.java.shortSig == "PatientRepository.updatePhoneNumberById(..)" 
-	|	action.java.shortSig == "PatientRepository.updateRoomNumberById(..)" 
+		action.java.name == "updateAttendingNurseById" 
+	|	action.java.name == "updateNameById"
+	|	action.java.name == "updatePhoneNumberById" 
+	|	action.java.name == "updateRoomNumberById" 
 
 where
-	("DOCTOR" in subject..authority) || ("NURSE" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_NURSE" in subject..authority);
 
 /*
  * Permit administrators to update/delete patients, but the action SHOULD be logged and an email MUST be sent.
  */
 policy "administrators may update/delete patients, but it has to be reported"
 permit 
-       	action.java.shortSig == "PatientRepository.deleteById(..)"
-	|	action.java.shortSig =~ "^PatientRepository\\.update.*"
+       	action.java.name == "deleteById"
+	|	action.java.name =~ "^update.*"
 where
-	("ADMIN" in subject..authority);
+	("ROLE_ADMIN" in subject..authority);
 obligation
 	{
 		"type"		: "sendEmail",

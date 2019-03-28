@@ -37,7 +37,7 @@ import lombok.RequiredArgsConstructor;
 @ComponentScan({ "io.sapl", "org.demo" })
 @Configuration
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = false)
 public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	@Value("${io.sapl.runaskey}")
@@ -56,7 +56,9 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 		decisionVoters.add(new PreInvocationEnforcementAdviceVoter(policyAdvice));
 		decisionVoters.add(new RoleVoter());
 		decisionVoters.add(new AuthenticatedVoter());
-		return new AffirmativeBased(decisionVoters);
+		AffirmativeBased manager = new AffirmativeBased(decisionVoters);
+		manager.setAllowIfAllAbstainDecisions(true);
+		return manager;
 	}
 
 	@Override

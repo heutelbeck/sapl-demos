@@ -12,7 +12,6 @@ import io.sapl.spring.method.post.PostEnforce;
 import io.sapl.spring.method.pre.PreEnforce;
 
 public interface PatientRepository {
-	@PreEnforce
 	@PostEnforce(resource = "returnObject")
 	Optional<Patient> findById(Long id);
 
