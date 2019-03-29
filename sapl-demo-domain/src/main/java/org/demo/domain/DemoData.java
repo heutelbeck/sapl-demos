@@ -50,10 +50,10 @@ public class DemoData implements CommandLineRunner {
 		SecurityContext sc = SecurityContextHolder.getContext();
 		sc.setAuthentication(auth);
 		// Create patients
-		patientRepository.save(new Patient(null, "123456", NAME_LENNY, "Duodenal ulcer with acute haemorrhage.",
-				"DA63.Z/ME24.90", "+78(0)456-789", NAME_JULIA, NAME_THOMAS, "A.3.47"));
-		patientRepository.save(new Patient(null, "987654", NAME_KARL, "Type 2 diabetes mellitus", "9B71.0Z/5A11",
-				"+78(0)456-567", NAME_ALINA, NAME_JANINA, "C.2.23"));
+		patientRepository.save(new Patient(null, "123456", NAME_LENNY, "DA63.Z/ME24.90",
+				"Duodenal ulcer with acute haemorrhage.", NAME_JULIA, NAME_THOMAS, "+78(0)456-789", "A.3.47"));
+		patientRepository.save(new Patient(null, "987654", NAME_KARL, "9B71.0Z/5A11", "Type 2 diabetes mellitus",
+				NAME_ALINA, NAME_JANINA, "+78(0)456-567", "C.2.23"));
 		// Establish relations between users and patients
 		relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
 		relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).get().getId()));

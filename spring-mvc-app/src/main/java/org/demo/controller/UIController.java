@@ -71,7 +71,6 @@ public class UIController {
 	@GetMapping("/patients/{id}")
 	public String getPatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
-		LOGGER.info("ZZZZ repo: {}", patientenRepo);
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUseUpdatePatientButton",
 				pep.enforce(authentication, "use", "ui:view:patient:updatePatientButton"));
