@@ -9,7 +9,7 @@ first-applicable
  * in the designated Java class.
  * In this case, spring will indirectly implement the PatientRepository interface and it may not appear directly 
  * in the method signatures, e.g. when using default methods from CrudRepositories. Thus we inspect the class 
- * hierarchiy and interfaces implemented by the class to scope the policy set. 
+ * hierarchy and interfaces implemented by the class to scope the policy set. 
  */
 for "UIController" in action.java.instanceof..simpleName
 
@@ -39,7 +39,7 @@ where
 policy "delete controller for doctors and administrators"
 permit action.java.name == "deletePatient" & resource.http.requestedURI =~ "^/patients/[0-9]+$"
 where
-	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority);
 
 /*
  * Doctors may access the view for registering a new patient
@@ -47,7 +47,7 @@ where
 policy "doctors may register new patients"
 permit action.java.name == "newPatient" & resource.http.requestedURI =~ "^/patients/new.*"
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 
 
 /*
@@ -56,7 +56,7 @@ where
 policy "doctors may register new patients"
 permit action.http.method == "POST" & resource.http.requestedURI == "/patients"
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 	
 /*
  * All staff members can edit patients under certain conditions defined by other policies
@@ -68,4 +68,4 @@ permit
 			| resource.http.requestedURI =~ "^/patients/[0-9]+$"
 		  )
 where
-	("DOCTOR" in subject..authority) || ("NURSE" in subject..authority) || ("ADMIN" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_NURSE" in subject..authority) || ("ROLE_ADMIN" in subject..authority);

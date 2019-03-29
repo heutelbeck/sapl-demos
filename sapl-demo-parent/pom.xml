@@ -28,7 +28,7 @@
 		<version.maven-source-plugin>3.0.1</version.maven-source-plugin>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.lombok>1.18.4</version.lombok>
+		<version.lombok>1.18.6</version.lombok>
 	</properties>
 
 	<dependencyManagement>
@@ -55,6 +55,7 @@
 				<groupId>org.projectlombok</groupId>
 				<artifactId>lombok</artifactId>
 				<version>${version.lombok}</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -75,19 +76,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
-	<distributionManagement>
-		<repository>
-			<id>openconjurer</id>
-			<name>OpenConjurer Nexus Maven Release Repository</name>
-			<url>http://nexus.openconjurer.org/content/repositories/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>openconjurer-snapshots</id>
-			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
-			<url>http://nexus.openconjurer.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<build>
 		<plugins>

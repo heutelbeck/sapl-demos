@@ -7,17 +7,17 @@ for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*"
 policy "doctors may access the creation interface via navigation button"
 permit (action == "use") & (resource == "ui:view:patients:createPatientButton")
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 
 policy "doctors and administrators may access the update patient data interface via navigation button"
 permit action == "use" & resource == "ui:view:patient:updatePatientButton"  
 where
-	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority) || ("NURSE" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);
 
 policy "attending doctors can access delete patient button"
 permit action == "use" & resource.uiElement == "ui:view:patient:deletePatientButton" 
 where
-	("DOCTOR" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority);
 	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
 
 policy "nurses may not edit doctors, diagnosis and classification"
@@ -25,15 +25,15 @@ deny  		resource == "ui:view:patients:icd11Field"
 		| 	resource == "ui:view:patients:doctorField"
 		| 	resource == "ui:view:patients:diagnosisField"
 where
-	("NURSE" in subject..authority);
+	("ROLE_NURSE" in subject..authority);
 
 policy "administrators may not edit diagnosis and classification"
 deny  		resource == "ui:view:patients:icd11Field" 
 		| 	resource == "ui:view:patients:diagnosisField"
 where
-	("ADMIN" in subject..authority);
+	("ROLE_ADMIN" in subject..authority);
 
 policy "staff may edit all fields"
 permit (action == "edit")  
 where
-	("DOCTOR" in subject..authority) || ("ADMIN" in subject..authority) || ("NURSE" in subject..authority);
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);
