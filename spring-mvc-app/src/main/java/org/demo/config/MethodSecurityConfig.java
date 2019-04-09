@@ -42,7 +42,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	@Value("${io.sapl.runaskey}")
 	private String runAsKey;
-	private final SAPLProperties pdpProperites;
+	private final SAPLProperties pdpProperties;
 	protected final ObjectFactory<PolicyDecisionPoint> pdpFactory;
 	protected final ObjectFactory<ConstraintHandlerService> constraintHandlerFactory;
 	protected final ObjectFactory<ObjectMapper> objectMapperFactory;
@@ -92,7 +92,7 @@ public class MethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	@Override
 	protected RunAsManager runAsManager() {
-		PolicyEngineRunAsManager ram = new PolicyEngineRunAsManager(pdpProperites);
+		PolicyEngineRunAsManager ram = new PolicyEngineRunAsManager(pdpProperties);
 		ram.setKey(runAsKey);
 		return ram;
 	}

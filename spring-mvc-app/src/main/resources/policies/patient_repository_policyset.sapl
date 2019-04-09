@@ -16,7 +16,7 @@ first-applicable
  * in the designated Java class.
  * In this case, spring will indirectly implement the PatientRepository interface and it may not appear directly 
  * in the method signatures, e.g. when using default methods from CrudRepositories. Thus we inspect the class 
- * hierarchiy and interfaces implemented by the class to scope the policy set. 
+ * hierarchy and interfaces implemented by the class to scope the policy set.
  */
 for "PatientRepository" in action.java.instanceof..simpleName
 
