@@ -1,5 +1,3 @@
-import org.demo.pip.PatientPIP as patient
-
 set "filter_set"
 permit-unless-deny
 
