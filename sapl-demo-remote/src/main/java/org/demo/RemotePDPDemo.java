@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.sapl.api.pdp.Request;
-import io.sapl.api.pdp.Response;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 
 public class RemotePDPDemo {
@@ -110,10 +109,10 @@ public class RemotePDPDemo {
     private static void runDemo(String host, int port, String key, String secret) {
         RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
 
+        final Request request = buildRequest("willi", "test-read", "something");
         long start = System.nanoTime();
         for (int i = 0; i < RUNS; i++) {
-            Response response = pdp.decide(buildRequest("willi", "test-read", "something")).block();
-            LOG.info("response: {}", response);
+            pdp.decide(request).take(1).subscribe(response -> LOG.info("response: {}", response));
         }
         long end = System.nanoTime();
 

@@ -74,7 +74,7 @@ class PatientForm extends AbstractPatientForm {
 			diagnosisText.setVisible(pep.enforce(authentication, "read", "diagnosis"));
 			icd11Code.setVisible(pep.enforce(authentication, "read", "icd11"));
 			final Response readBlackenedIcd11 = pdp.decide(buildRequest(authentication, "readBlackenedIcd11", patient))
-					.block();
+					.blockFirst();
 			if (readBlackenedIcd11.getDecision() == Decision.PERMIT) {
 				final Optional<JsonNode> patientNode = readBlackenedIcd11.getResource();
 				blackenedIcd11Code.setValue(patientNode.map(node -> node.get("icd11Code").asText()).orElse(""));

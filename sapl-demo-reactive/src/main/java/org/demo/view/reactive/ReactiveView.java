@@ -43,10 +43,10 @@ public class ReactiveView extends AbstractReactiveView {
 		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		final Flux<Decision> heartBeatAccessDecisionFlux = pdp
-				.subscribe(buildRequest(authentication, "read", "heartBeatData"))
+				.decide(buildRequest(authentication, "read", "heartBeatData"))
 				.subscribeOn(Schedulers.newElastic("hb-pdp")).map(result -> result.getDecision());
 		final Flux<Decision> bloodPressureAccessDecisionFlux = pdp
-				.subscribe(buildRequest(authentication, "read", "bloodPressureData"))
+				.decide(buildRequest(authentication, "read", "bloodPressureData"))
 				.subscribeOn(Schedulers.newElastic("bp-pdp")).map(result -> result.getDecision());
 
 		return Flux.combineLatest(heartBeatAccessDecisionFlux, bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),

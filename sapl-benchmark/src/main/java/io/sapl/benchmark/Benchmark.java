@@ -288,7 +288,7 @@ public class Benchmark {
 					Request request = generator.createRequestObject();
 
 					long start = System.nanoTime();
-					Response response = pdp.decide(request).block();
+					Response response = pdp.decide(request).blockFirst();
 					long end = System.nanoTime();
 
 					double diff = nanoToMs(end - start);

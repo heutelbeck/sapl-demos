@@ -63,8 +63,8 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 		multiRequest.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID,
 				new RequestElements(AUTHENTICATION_ID, READ_ID, "bloodPressureData"));
 
-		final Flux<IdentifiableDecision> accessDecisionFlux = pdp.subscribe(multiRequest)
-				.subscribeOn(Schedulers.newElastic("pdp")).map(r -> new IdentifiableDecision(r));
+		final Flux<IdentifiableDecision> accessDecisionFlux = pdp.decide(multiRequest)
+				.subscribeOn(Schedulers.newElastic("pdp")).map(IdentifiableDecision::new);
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
 				getSystolicBloodPressureDataFlux(), Function.identity());

@@ -38,7 +38,7 @@ import io.sapl.api.pdp.Response;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 public class EmbeddedPDPDemo {
 
@@ -103,17 +103,17 @@ public class EmbeddedPDPDemo {
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final Response readResponse = pdp.decide(READ_REQUEST).block();
+		final Response readResponse = pdp.decide(READ_REQUEST).blockFirst();
 		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
-		final Response writeResponse = pdp.decide(WRITE_REQUEST).block();
+		final Response writeResponse = pdp.decide(WRITE_REQUEST).blockFirst();
 		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Mono<Response> readResponse = pdp.decide(READ_REQUEST);
+		final Flux<Response> readResponse = pdp.decide(READ_REQUEST);
 		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Mono<Response> writeResponse = pdp.decide(WRITE_REQUEST);
+		final Flux<Response> writeResponse = pdp.decide(WRITE_REQUEST);
 		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
 	}
 
@@ -125,8 +125,8 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Performance...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(READ_REQUEST).block();
-			pdp.decide(WRITE_REQUEST).block();
+			pdp.decide(READ_REQUEST).take(1).subscribe(response -> {});
+			pdp.decide(WRITE_REQUEST).take(1).subscribe(response -> {});
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);

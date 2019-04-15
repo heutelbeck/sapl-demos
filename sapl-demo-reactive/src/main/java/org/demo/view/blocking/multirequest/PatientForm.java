@@ -26,7 +26,6 @@ import io.sapl.api.pdp.Response;
 import io.sapl.api.pdp.multirequest.IdentifiableAction;
 import io.sapl.api.pdp.multirequest.IdentifiableResource;
 import io.sapl.api.pdp.multirequest.IdentifiableSubject;
-import io.sapl.api.pdp.multirequest.MultiDecision;
 import io.sapl.api.pdp.multirequest.MultiRequest;
 import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.api.pdp.multirequest.RequestElements;
@@ -83,20 +82,16 @@ class PatientForm extends AbstractPatientForm {
 			multiRequest.addRequest("updateRoomNumber",
 					new RequestElements(AUTHENTICATION_ID, UPDATE_ID, "roomNumber"));
 
-			final MultiDecision multiDecision = pdp.decide(multiRequest).map(r -> {
-				MultiDecision decision = new MultiDecision();
-				// FIXME
-				return decision;
-			}).block();
+			final MultiResponse multiResponse = pdp.decideAll(multiRequest).blockFirst();
 
-			mrn.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateMrn"));
-			name.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateName"));
-			icd11Code.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateIcd11"));
-			diagnosisText.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateDiagnosis"));
-			attendingDoctor.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingDoctor"));
-			attendingNurse.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateAttendingNurse"));
-			phoneNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updatePhoneNumber"));
-			roomNumber.setEnabled(multiDecision.isAccessPermittedForRequestWithId("updateRoomNumber"));
+			mrn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateMrn"));
+			name.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateName"));
+			icd11Code.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateIcd11"));
+			diagnosisText.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateDiagnosis"));
+			attendingDoctor.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateAttendingDoctor"));
+			attendingNurse.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateAttendingNurse"));
+			phoneNumber.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updatePhoneNumber"));
+			roomNumber.setEnabled(multiResponse.isAccessPermittedForRequestWithId("updateRoomNumber"));
 		}
 	}
 
@@ -143,19 +138,14 @@ class PatientForm extends AbstractPatientForm {
 			multiRequest.addRequest("readRoomNumber",
 					new RequestElements(AUTHENTICATION_ID, "readRoomNumber", "patient"));
 
-			final MultiResponse responses = pdp.decide(multiRequest).map(r -> {
-				MultiResponse result = new MultiResponse();
-				// FIXME
-				return result;
-			}).block();
+			final MultiResponse multiResponse = pdp.decideAll(multiRequest).blockFirst();
 
 			id.setVisible(true);
-			mrn.setVisible(pep.enforce(authentication, "read", "mrn"));
-			name.setVisible(pep.enforce(authentication, "read", "name"));
-			icd11Code.setVisible(pep.enforce(authentication, "read", "icd11"));
-			diagnosisText.setVisible(pep.enforce(authentication, "read", "diagnosis"));
-			final Response readBlackenedIcd11 = pdp.decide(buildRequest(authentication, "readBlackenedIcd11", patient))
-					.block();
+			mrn.setVisible(multiResponse.isAccessPermittedForRequestWithId("readMrn"));
+			name.setVisible(multiResponse.isAccessPermittedForRequestWithId("readName"));
+			icd11Code.setVisible(multiResponse.isAccessPermittedForRequestWithId("readIcd11"));
+			diagnosisText.setVisible(multiResponse.isAccessPermittedForRequestWithId("readDiagnosis"));
+			final Response readBlackenedIcd11 = multiResponse.getResponseForRequestWithId("readBlackenedIcd11");
 			if (readBlackenedIcd11.getDecision() == Decision.PERMIT) {
 				final Optional<JsonNode> patientNode = readBlackenedIcd11.getResource();
 				blackenedIcd11Code.setValue(patientNode.map(node -> node.get("icd11Code").asText()).orElse(""));
@@ -163,10 +153,10 @@ class PatientForm extends AbstractPatientForm {
 			} else {
 				blackenedIcd11Code.setVisible(false);
 			}
-			attendingDoctor.setVisible(pep.enforce(authentication, "read", "attendingDoctor"));
-			attendingNurse.setVisible(pep.enforce(authentication, "read", "attendingNurse"));
-			phoneNumber.setVisible(pep.enforce(authentication, "read", "phoneNumber"));
-			roomNumber.setVisible(pep.enforce(authentication, "readRoomNumber", patient));
+			attendingDoctor.setVisible(multiResponse.isAccessPermittedForRequestWithId("readAttendingDoctor"));
+			attendingNurse.setVisible(multiResponse.isAccessPermittedForRequestWithId("readAttendingNurse"));
+			phoneNumber.setVisible(multiResponse.isAccessPermittedForRequestWithId("readPhoneNumber"));
+			roomNumber.setVisible(multiResponse.isAccessPermittedForRequestWithId("readRoomNumber"));
 		}
 	}
 
@@ -193,14 +183,10 @@ class PatientForm extends AbstractPatientForm {
 		}
 		multiRequest.addRequest("deleteProfile", new RequestElements(AUTHENTICATION_ID, DELETE_ID, "profile"));
 
-		final MultiDecision multiDecision = pdp.decide(multiRequest).map(r -> {
-			MultiDecision decision = new MultiDecision();
-			// FIXME
-			return decision;
-		}).block();
+		final MultiResponse multiResponse = pdp.decideAll(multiRequest).blockFirst();
 
-		saveBtn.setVisible(multiDecision.isAccessPermittedForRequestWithId("saveProfile"));
-		deleteBtn.setVisible(!isNewPatient && multiDecision.isAccessPermittedForRequestWithId("deleteProfile"));
+		saveBtn.setVisible(multiResponse.isAccessPermittedForRequestWithId("saveProfile"));
+		deleteBtn.setVisible(!isNewPatient && multiResponse.isAccessPermittedForRequestWithId("deleteProfile"));
 	}
 
 	protected void onSave() {
