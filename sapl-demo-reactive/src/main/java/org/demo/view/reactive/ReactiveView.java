@@ -2,11 +2,11 @@ package org.demo.view.reactive;
 
 import java.util.function.Function;
 
+import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -40,7 +40,7 @@ public class ReactiveView extends AbstractReactiveView {
 	}
 
 	protected Flux<Object[]> getCombinedFlux() {
-		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final Authentication authentication = SecurityUtils.getAuthentication();
 
 		final Flux<Decision> heartBeatAccessDecisionFlux = pdp
 				.decide(buildRequest(authentication, "read", "heartBeatData"))

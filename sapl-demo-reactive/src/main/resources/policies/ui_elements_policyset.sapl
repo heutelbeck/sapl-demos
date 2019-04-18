@@ -1,0 +1,119 @@
+import filter.*
+// import io.sapl.pip.http.HttpPolicyInformationPoint as http
+
+set "UI Elements"
+first-applicable
+for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*"
+
+/*************
+ * Home View *
+ *************/
+
+policy "every logged in user may use the 'Show Patient List (Traditional)' button"
+permit
+    action == "use" & resource == "ui:view:home:showPatientListTraditionalButton"
+where
+    !("ROLE_ANONYMOUS" in subject..authority);
+
+
+policy "every logged in user may use the 'Show Patient List (Multi-Request)' button"
+permit
+    action == "use" & resource == "ui:view:home:showPatientListMultiRequestButton"
+where
+    !("ROLE_ANONYMOUS" in subject..authority);
+
+
+policy "every logged in user may use the 'Show Reactive View' button"
+permit
+    action == "use" & resource == "ui:view:home:showReactiveViewButton"
+where
+    !("ROLE_ANONYMOUS" in subject..authority);
+
+
+policy "every logged in user may use the 'Show Reactive View (Multi-Request)' button"
+permit
+    action == "use" & resource == "ui:view:home:showReactiveViewMultiRequestButton"
+where
+    !("ROLE_ANONYMOUS" in subject..authority);
+
+
+/*****************
+ * Patients View *
+ *****************/
+
+policy "doctors may use the button to open the form entering new patient data"
+permit
+    action == "use" & resource == "ui:view:patients:addPatientButton"
+where
+	"ROLE_DOCTOR" in subject..authority;
+
+
+policy "doctors may use the button to save new patient data"
+permit
+    action == "useForCreate" & resource == "ui:view:patients:savePatientButton"
+where
+	"ROLE_DOCTOR" in subject..authority;
+
+
+policy "doctors, nurses and administrators may use the button to save updated patient data"
+permit
+    action == "useForUpdate" & resource == "ui:view:patients:savePatientButton"
+where
+	"ROLE_DOCTOR" in subject..authority || "ROLE_ADMIN" in subject..authority || "ROLE_NURSE" in subject..authority;
+
+
+policy "attending doctors can use the button to delete patient data"
+permit
+    action == "use" & resource.uiElement == "ui:view:patients:deletePatientButton"
+where
+	"ROLE_DOCTOR" in subject..authority;
+	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
+
+
+policy "administrators can use the button to delete patient data"
+permit
+    action == "use" & resource.uiElement == "ui:view:patients:deletePatientButton"
+where
+	"ROLE_ADMIN" in subject..authority;
+
+
+policy "nurses may not edit doctors, diagnosis and classification"
+deny
+    action == "edit" & resource in ["ui:view:patients:doctorField", "ui:view:patients:diagnosisField", "ui:view:patients:icd11Field"]
+where
+	"ROLE_NURSE" in subject..authority;
+
+
+policy "administrators may not edit diagnosis and classification"
+deny
+    action == "edit" & resource in ["ui:view:patients:diagnosisField", "ui:view:patients:icd11Field"]
+where
+	"ROLE_ADMIN" in subject..authority;
+
+
+policy "visiting relatives may read the room number"
+permit
+    action == "read" & resource.uiElement == "ui:view:patients:roomField"
+where
+    "ROLE_VISITOR" in subject..authority;
+    subject.name in resource.id.<patient.relatives>;
+    // or via HTTP-PIP:
+    // var url = "http://localhost:8081/rest/patient/related/" + standard.numberToString(resource.id);
+    // subject.name in url.<http.get>;
+
+
+policy "visitors may read the name and phone number"
+permit
+    action == "read" & resource in ["ui:view:patients:nameField", "ui:view:patients:phoneField"]
+where
+    "ROLE_VISITOR" in subject..authority;
+
+
+/**
+ * Catch all policy for reading and editing fields not handled yet.
+ */
+policy "staff may read and edit all fields"
+permit
+    action in ["read", "edit"]
+where
+	"ROLE_DOCTOR" in subject..authority || "ROLE_ADMIN" in subject..authority || "ROLE_NURSE" in subject..authority;

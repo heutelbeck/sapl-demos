@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.sapl.api.pdp.Decision;
 import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.method.pre.PreEnforce;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class UIController {
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
 		model.addAttribute("patients", patientenRepo.findAll());
 		model.addAttribute("permittedToUseCreatePatientButton",
-				pep.enforce(authentication, "use", "ui:view:patients:createPatientButton"));
+				isPermitted(authentication, "use", "ui:view:patients:createPatientButton"));
 		return "patients";
 	}
 
@@ -73,8 +74,8 @@ public class UIController {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUseUpdatePatientButton",
-				pep.enforce(authentication, "use", "ui:view:patient:updatePatientButton"));
-		model.addAttribute("permittedToUseDeletePatientButton", pep.enforce(authentication, "use",
+				isPermitted(authentication, "use", "ui:view:patient:updatePatientButton"));
+		model.addAttribute("permittedToUseDeletePatientButton", isPermitted(authentication, "use",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patient:deletePatientButton\"}")));
 
 		return "patient";
@@ -93,13 +94,13 @@ public class UIController {
 		Patient patient = patientenRepo.findById(id).orElseThrow(ResourceNotFoundException::new);
 		model.addAttribute("patient", patient);
 		model.addAttribute("permittedToUpdateDiagnosis",
-				pep.enforce(authentication, "edit", "ui:view:patients:diagnosisField"));
+				isPermitted(authentication, "edit", "ui:view:patients:diagnosisField"));
 		model.addAttribute("permittedToUpdateIcdClassification",
-				pep.enforce(authentication, "edit", "ui:view:patients:icd11Field"));
+				isPermitted(authentication, "edit", "ui:view:patients:icd11Field"));
 		model.addAttribute("permittedToUpdateAttendingDoctor",
-				pep.enforce(authentication, "edit", "ui:view:patients:doctorField"));
+				isPermitted(authentication, "edit", "ui:view:patients:doctorField"));
 		model.addAttribute("permittedToUpdateAttendingNurse",
-				pep.enforce(authentication, "edit", "ui:view:patients:nurseField"));
+				isPermitted(authentication, "edit", "ui:view:patients:nurseField"));
 		return "updatePatient";
 	}
 
@@ -136,6 +137,10 @@ public class UIController {
 		}
 
 		return REDIRECT_PATIENTS + "/" + id;
+	}
+
+	private boolean isPermitted(Object subject, Object action, Object resource) {
+		return pep.enforce(subject, action, resource).blockFirst() == Decision.PERMIT;
 	}
 
 }

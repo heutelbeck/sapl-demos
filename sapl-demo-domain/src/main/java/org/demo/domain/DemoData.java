@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.authentication.configurers
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -47,8 +46,6 @@ public class DemoData implements CommandLineRunner {
 		authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
 		Authentication auth = new UsernamePasswordAuthenticationToken("system", null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		SecurityContext sc = SecurityContextHolder.getContext();
-		sc.setAuthentication(auth);
 		// Create patients
 		patientRepository.save(new Patient(null, "123456", NAME_LENNY, "DA63.Z/ME24.90",
 				"Duodenal ulcer with acute haemorrhage.", NAME_JULIA, NAME_THOMAS, "+78(0)456-789", "A.3.47"));

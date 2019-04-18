@@ -1,13 +1,16 @@
 package org.demo.view.blocking;
 
-import java.util.ArrayList;
+import static io.sapl.api.pdp.Decision.PERMIT;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.demo.domain.Patient;
-import org.demo.domain.PatientRepository;
+import org.demo.model.PatientListItem;
 import org.demo.security.SecurityUtils;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.demo.service.UIController;
+import org.springframework.security.access.AccessDeniedException;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
@@ -22,27 +25,27 @@ import io.sapl.spring.PolicyEnforcementPoint;
 public abstract class AbstractPatientView extends VerticalLayout implements View {
 
 	private PolicyEnforcementPoint pep;
-	private PatientRepository patientRepo;
+	private UIController controller;
 
-	private Grid<Patient> grid;
+	private Grid<PatientListItem> grid;
 
-	protected AbstractPatientView(PolicyEnforcementPoint pep, PatientRepository patientRepo) {
+	protected AbstractPatientView(PolicyEnforcementPoint pep, UIController controller) {
 		this.pep = pep;
-		this.patientRepo = patientRepo;
+		this.controller = controller;
 
 		setMargin(true);
 	}
 
-	protected abstract AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback,
-			PatientRepository patientRepo, PolicyEnforcementPoint authorizer);
+	protected abstract AbstractPatientForm createForm(PolicyEnforcementPoint pep, UIController uiController,
+			AbstractPatientForm.RefreshCallback refreshCallback);
 
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
-		final AbstractPatientForm form = createForm(this::refresh, patientRepo, pep);
+		final AbstractPatientForm form = createForm(pep, controller, this::refresh);
 		form.setSizeFull();
 		form.setVisible(false);
 
-		grid = new Grid<>(Patient.class);
+		grid = new Grid<>(PatientListItem.class);
 		grid.setColumns("id", "name");
 		grid.getColumn("id").setWidth(75);
 		grid.setSizeFull();
@@ -51,21 +54,20 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 			if (selection.getValue() == null) {
 				form.hide();
 			} else {
-				form.show(selection.getValue(), false);
+				final Optional<Patient> patient = controller.getPatient(selection.getValue().getId());
+				patient.ifPresent(form::show);
 			}
 		});
 
-		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		final Button addPatientBtn = new Button("Add new patient");
+		addPatientBtn.setData("ui:view:patients:addPatientButton");
 		addPatientBtn.addClickListener(e -> {
-			if (pep.enforce(authentication, "create", "profile")) {
-				grid.asSingleSelect().clear();
-				form.show(new Patient(), true);
-			} else {
-				SecurityUtils.notifyNotAuthorized();
-			}
+			grid.asSingleSelect().clear();
+			form.show(new Patient());
 		});
-		addPatientBtn.setVisible(pep.enforce(authentication, "create", "profile"));
+		addPatientBtn.setVisible(
+			pep.enforce(SecurityUtils.getAuthentication(), "use", addPatientBtn.getData()).blockFirst() == PERMIT
+		);
 
 		final HorizontalLayout main = new HorizontalLayout(grid, form);
 		main.setSizeFull();
@@ -75,17 +77,17 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 		addComponents(addPatientBtn, main);
 	}
 
-	private List<Patient> loadAllPatients() {
-		final List<Patient> result = new ArrayList<>();
-		final Iterable<Patient> allPatients = patientRepo.findAll();
-		allPatients.forEach(result::add);
-		return result;
-
+	private List<PatientListItem> loadAllPatients() {
+		try {
+			return controller.getPatients();
+		} catch (AccessDeniedException e) {
+			SecurityUtils.notifyNotAuthorized();
+			return Collections.emptyList();
+		}
 	}
 
 	private void refresh() {
-		final List<Patient> patients = loadAllPatients();
-		grid.setItems(patients);
+		grid.setItems(loadAllPatients());
 	}
 
 	@Override

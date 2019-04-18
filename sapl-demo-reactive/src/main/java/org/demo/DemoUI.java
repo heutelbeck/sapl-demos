@@ -1,5 +1,16 @@
 package org.demo;
 
+import org.demo.security.SecurityUtils;
+import org.demo.view.AccessDeniedView;
+import org.demo.view.ErrorView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.VaadinRequest;
@@ -17,17 +28,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
-import org.demo.security.SecurityUtils;
-import org.demo.view.AccessDeniedView;
-import org.demo.view.ErrorView;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @SpringUI
 @Theme(ValoTheme.THEME_NAME)
@@ -67,14 +67,22 @@ public class DemoUI extends UI {
 
         final HorizontalLayout toolbar = new HorizontalLayout();
         toolbar.setSpacing(true);
-        toolbar.setWidthUndefined();
+        toolbar.setWidth("100%");
         layout.addComponent(toolbar);
+
+        final HorizontalLayout right = new HorizontalLayout();
+        right.setSpacing(true);
+        right.setSizeUndefined();
 
         final Button homeBtn = new Button("Home", event -> getNavigator().navigateTo(""));
         final Label username = new Label("Username: " + SecurityUtils.getUsername());
         final Button logoutBtn = new Button("Logout", event -> logout());
-        toolbar.addComponents(homeBtn, username, logoutBtn);
-        toolbar.setComponentAlignment(logoutBtn, Alignment.TOP_RIGHT);
+        toolbar.addComponents(homeBtn, right);
+        toolbar.setComponentAlignment(homeBtn, Alignment.MIDDLE_LEFT);
+        toolbar.setComponentAlignment(right, Alignment.MIDDLE_RIGHT);
+        right.addComponents(username, logoutBtn);
+        right.setComponentAlignment(username, Alignment.MIDDLE_LEFT);
+        right.setComponentAlignment(logoutBtn, Alignment.MIDDLE_RIGHT);
 
         final Panel viewContainer = new Panel();
         viewContainer.setSizeFull();
@@ -113,6 +121,7 @@ public class DemoUI extends UI {
     private void logout() {
         getPage().reload();
         getSession().close();
+        SecurityContextHolder.clearContext();
     }
 
     private void handleError(com.vaadin.server.ErrorEvent event) {

@@ -1,30 +1,26 @@
 package org.demo.view.blocking;
 
-import org.demo.domain.PatientRepository;
+import org.demo.service.UIController;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.PolicyEnforcementPoint;
 
 @SpringView(name = "traditional")
 @SpringComponent("traditionalPatientView")
 public class PatientView extends AbstractPatientView {
 
-	private PolicyDecisionPoint pdp;
-
 	@Autowired
-	public PatientView(PolicyEnforcementPoint pep, PatientRepository patientRepo, PolicyDecisionPoint pdp) {
-		super(pep, patientRepo);
-		this.pdp = pdp;
+	public PatientView(PolicyEnforcementPoint pep, UIController controller) {
+		super(pep, controller);
 	}
 
 	@Override
-	protected AbstractPatientForm createForm(AbstractPatientForm.RefreshCallback refreshCallback,
-			PatientRepository patientRepo, PolicyEnforcementPoint pep) {
-		return new PatientForm(refreshCallback, patientRepo, pep, pdp);
+	protected AbstractPatientForm createForm(PolicyEnforcementPoint pep, UIController uiController,
+			AbstractPatientForm.RefreshCallback refreshCallback) {
+		return new PatientForm(pep, uiController, refreshCallback);
 	}
 
 }

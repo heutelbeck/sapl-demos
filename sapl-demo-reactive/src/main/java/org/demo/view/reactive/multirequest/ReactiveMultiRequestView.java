@@ -7,12 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
 import org.demo.view.reactive.AbstractReactiveView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.spring.annotation.SpringComponent;
@@ -28,8 +28,8 @@ import io.sapl.api.pdp.multirequest.RequestElements;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-@SpringComponent("reactiveMultiRequestView")
 @SpringView(name = "reactiveMultiRequest")
+@SpringComponent("reactiveMultiRequestView")
 public class ReactiveMultiRequestView extends AbstractReactiveView {
 
 	private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
@@ -51,7 +51,7 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 	}
 
 	protected Flux<Object[]> getCombinedFlux() {
-		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		final Authentication authentication = SecurityUtils.getAuthentication();
 
 		final MultiRequest multiRequest = new MultiRequest();
 		multiRequest.addSubject(new IdentifiableSubject(AUTHENTICATION_ID, authentication));
