@@ -3,6 +3,7 @@ package org.demo.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -20,30 +21,33 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DemoData implements CommandLineRunner {
 
-	public static final String ROLE_DOCTOR = "DOCTOR";
-	public static final String ROLE_NURSE = "NURSE";
-	public static final String ROLE_VISITOR = "VISITOR";
-	public static final String ROLE_ADMIN = "ADMIN";
-	public static final String NAME_DOMINIC = "Dominic";
-	public static final String NAME_JULIA = "Julia";
-	public static final String NAME_PETER = "Peter";
-	public static final String NAME_ALINA = "Alina";
-	public static final String NAME_THOMAS = "Thomas";
-	public static final String NAME_BRIGITTE = "Brigitte";
-	public static final String NAME_JANOSCH = "Janosch";
-	public static final String NAME_JANINA = "Janina";
-	public static final String NAME_LENNY = "Lenny";
-	public static final String NAME_KARL = "Karl";
-	public static final String NAME_HORST = "Horst";
-	public static final String DEFAULT_RAW_PASSWORD = "password";
+	private static final String ROLE_DOCTOR = "DOCTOR";
+	private static final String ROLE_NURSE = "NURSE";
+	private static final String ROLE_VISITOR = "VISITOR";
+	private static final String ROLE_ADMIN = "ADMIN";
+	private static final String NAME_DOMINIC = "Dominic";
+	private static final String NAME_JULIA = "Julia";
+	private static final String NAME_PETER = "Peter";
+	private static final String NAME_ALINA = "Alina";
+	private static final String NAME_THOMAS = "Thomas";
+	private static final String NAME_BRIGITTE = "Brigitte";
+	private static final String NAME_JANOSCH = "Janosch";
+	private static final String NAME_JANINA = "Janina";
+	private static final String NAME_LENNY = "Lenny";
+	private static final String NAME_KARL = "Karl";
+	private static final String NAME_HORST = "Horst";
+	private static final String DEFAULT_RAW_PASSWORD = "password";
 
 	private final PatientRepository patientRepository;
 	private final RelationRepository relationRepository;
 
+	@Value("${io.sapl.policy-engine-authority}")
+	private String systemAuthority;
+
 	@Override
 	public void run(String... args) throws Exception {
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
+		authorities.add(new SimpleGrantedAuthority(systemAuthority));
 		Authentication auth = new UsernamePasswordAuthenticationToken("system", null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// Create patients
