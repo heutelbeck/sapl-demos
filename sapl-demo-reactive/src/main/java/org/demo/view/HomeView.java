@@ -1,9 +1,8 @@
 package org.demo.view;
 
-import static io.sapl.api.pdp.multirequest.IdentifiableSubject.AUTHENTICATION_ID;
-
 import org.demo.security.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -14,10 +13,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.pdp.multirequest.IdentifiableSubject;
 import io.sapl.api.pdp.multirequest.MultiRequest;
 import io.sapl.api.pdp.multirequest.MultiResponse;
-import io.sapl.api.pdp.multirequest.RequestElements;
 import io.sapl.spring.PolicyEnforcementPoint;
 
 @SpringView(name = "") // Root view
@@ -73,17 +70,13 @@ public class HomeView extends VerticalLayout implements View {
         reactiveMultiRequestBtn.setWidth("360px");
         grid.addComponent(reactiveMultiRequestBtn, 0, 4);
 
-        final MultiRequest multiRequest = new MultiRequest();
-        multiRequest.addSubject(new IdentifiableSubject(AUTHENTICATION_ID, SecurityUtils.getAuthentication()));
-        multiRequest.addAction("use");
-        multiRequest.addResource((String) traditionalBtn.getData());
-        multiRequest.addResource((String) multiRequestBtn.getData());
-        multiRequest.addResource((String) reactiveBtn.getData());
-        multiRequest.addResource((String) reactiveMultiRequestBtn.getData());
-        multiRequest.addRequest("useTraditionalBtn", new RequestElements(AUTHENTICATION_ID, "use", (String) traditionalBtn.getData()));
-        multiRequest.addRequest("useMultiRequestBtn", new RequestElements(AUTHENTICATION_ID, "use", (String) multiRequestBtn.getData()));
-        multiRequest.addRequest("useReactiveBtn", new RequestElements(AUTHENTICATION_ID, "use", (String) reactiveBtn.getData()));
-        multiRequest.addRequest("useReactiveMultiRequestBtn", new RequestElements(AUTHENTICATION_ID, "use", (String) reactiveMultiRequestBtn.getData()));
+        final Authentication authentication = SecurityUtils.getAuthentication();
+        final MultiRequest multiRequest = new MultiRequest()
+                .addRequest("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
+                .addRequest("useMultiRequestBtn", authentication, "use", multiRequestBtn.getData())
+                .addRequest("useReactiveBtn", authentication, "use", reactiveBtn.getData())
+                .addRequest("useReactiveMultiRequestBtn", authentication, "use", reactiveMultiRequestBtn.getData());
+
         final MultiResponse multiResponse = pep.filterEnforce(multiRequest).blockFirst();
 
         traditionalBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));

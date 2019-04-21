@@ -10,7 +10,9 @@ import org.demo.service.UIController;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.spring.PolicyEnforcementPoint;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 class PatientForm extends AbstractPatientForm {
 
 	private final PolicyEnforcementPoint pep;
@@ -33,6 +35,7 @@ class PatientForm extends AbstractPatientForm {
 			final JsonNode resource = objectMapper.readTree("{ \"id\": " + patient.getId() + ", \"uiElement\": \"" + roomNumber.getData() + "\"}");
 			roomNumber.setVisible(isPermitted("read", resource));
 		} catch (IOException e) {
+			LOGGER.error("Error while creating a JsonNode from a JSON string.", e);
 			roomNumber.setVisible(false);
 		}
 	}
@@ -57,6 +60,7 @@ class PatientForm extends AbstractPatientForm {
 			final JsonNode resource = objectMapper.readTree("{ \"id\": " + patient.getId() + ", \"uiElement\": \"" + deleteBtn.getData() + "\"}");
 			deleteBtn.setVisible(!isNewPatient && isPermitted("use", resource));
 		} catch (IOException e) {
+			LOGGER.error("Error while creating a JsonNode from a JSON string.", e);
 			deleteBtn.setVisible(false);
 		}
 	}
