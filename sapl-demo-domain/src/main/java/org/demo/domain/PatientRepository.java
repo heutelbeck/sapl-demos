@@ -15,8 +15,10 @@ public interface PatientRepository {
 	@PostEnforce(resource = "returnObject")
 	Optional<Patient> findById(Long id);
 
+	@PreEnforce
 	Optional<Patient> findByName(String name);
 
+	@PreEnforce
 	List<Patient> findAll();
 
 	@PreEnforce
