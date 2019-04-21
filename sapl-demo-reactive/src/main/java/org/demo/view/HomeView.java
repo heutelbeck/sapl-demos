@@ -9,6 +9,7 @@ import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
@@ -39,25 +40,38 @@ public class HomeView extends VerticalLayout implements View {
         label.setStyleName(ValoTheme.LABEL_LARGE);
         addComponent(label);
 
+        final GridLayout grid = new GridLayout(1, 5);
+        grid.setSpacing(true);
+        grid.setHideEmptyRowsAndColumns(false);
+        addComponent(grid);
+
         final Button traditionalBtn = new Button("Show Patient List (blocking, single requests)",
                 click -> getUI().getNavigator().navigateTo("traditional")
         );
         traditionalBtn.setData("ui:view:home:showPatientListTraditionalButton");
+        traditionalBtn.setWidth("360px");
+        grid.addComponent(traditionalBtn, 0, 0);
 
         final Button multiRequestBtn = new Button("Show Patient List (blocking, multi-request)",
                 click -> getUI().getNavigator().navigateTo("multiRequest")
         );
         multiRequestBtn.setData("ui:view:home:showPatientListMultiRequestButton");
+        multiRequestBtn.setWidth("360px");
+        grid.addComponent(multiRequestBtn, 0, 1);
 
-        final Button reactiveBtn = new Button("Show Reactive View",
+        final Button reactiveBtn = new Button("Show Reactive View (single requests)",
                 click -> getUI().getNavigator().navigateTo("reactive")
         );
         reactiveBtn.setData("ui:view:home:showReactiveViewButton");
+        reactiveBtn.setWidth("360px");
+        grid.addComponent(reactiveBtn, 0, 3);
 
         final Button reactiveMultiRequestBtn = new Button("Show Reactive View (multi-request)",
                 click -> getUI().getNavigator().navigateTo("reactiveMultiRequest")
         );
         reactiveMultiRequestBtn.setData("ui:view:home:showReactiveViewMultiRequestButton");
+        reactiveMultiRequestBtn.setWidth("360px");
+        grid.addComponent(reactiveMultiRequestBtn, 0, 4);
 
         final MultiRequest multiRequest = new MultiRequest();
         multiRequest.addSubject(new IdentifiableSubject(AUTHENTICATION_ID, SecurityUtils.getAuthentication()));
@@ -76,8 +90,6 @@ public class HomeView extends VerticalLayout implements View {
         multiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
         reactiveBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
         reactiveMultiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-
-        addComponents(traditionalBtn, multiRequestBtn, reactiveBtn, reactiveMultiRequestBtn);
     }
 
 }
