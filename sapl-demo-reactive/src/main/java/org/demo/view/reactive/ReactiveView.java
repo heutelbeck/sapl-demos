@@ -15,8 +15,8 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
+import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -24,13 +24,13 @@ import reactor.core.scheduler.Schedulers;
 @SpringComponent("reactiveView")
 public class ReactiveView extends AbstractReactiveView {
 
-	private final PolicyDecisionPoint pdp;
+	private final PolicyEnforcementPoint pep;
 
 	@Autowired
-	public ReactiveView(PolicyDecisionPoint pdp, HeartBeatService heartBeatService,
-			BloodPressureService bloodPressureService) {
+	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
+						BloodPressureService bloodPressureService) {
 		super(heartBeatService, bloodPressureService);
-		this.pdp = pdp;
+		this.pep = pep;
 	}
 
 	private static final Request buildRequest(Object subject, Object action, Object resource) {
@@ -42,12 +42,12 @@ public class ReactiveView extends AbstractReactiveView {
 	protected Flux<Object[]> getCombinedFlux() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
-		final Flux<Decision> heartBeatAccessDecisionFlux = pdp
-				.decide(buildRequest(authentication, "read", "heartBeatData"))
-				.subscribeOn(Schedulers.newElastic("hb-pdp")).map(result -> result.getDecision());
-		final Flux<Decision> bloodPressureAccessDecisionFlux = pdp
-				.decide(buildRequest(authentication, "read", "bloodPressureData"))
-				.subscribeOn(Schedulers.newElastic("bp-pdp")).map(result -> result.getDecision());
+		final Flux<Decision> heartBeatAccessDecisionFlux = pep
+				.enforce(authentication, "read", "heartBeatData")
+				.subscribeOn(Schedulers.newElastic("hb-pdp"));
+		final Flux<Decision> bloodPressureAccessDecisionFlux = pep
+				.enforce(authentication, "read", "bloodPressureData")
+				.subscribeOn(Schedulers.newElastic("bp-pdp"));
 
 		return Flux.combineLatest(heartBeatAccessDecisionFlux, bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
 				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(), Function.identity());

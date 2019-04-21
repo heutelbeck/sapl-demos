@@ -19,12 +19,13 @@ import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.multirequest.IdentifiableAction;
-import io.sapl.api.pdp.multirequest.IdentifiableDecision;
+import io.sapl.api.pdp.multirequest.IdentifiableResponse;
 import io.sapl.api.pdp.multirequest.IdentifiableSubject;
 import io.sapl.api.pdp.multirequest.MultiRequest;
+import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.api.pdp.multirequest.RequestElements;
+import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
@@ -35,15 +36,15 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 	private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
 	private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
 
-	private final PolicyDecisionPoint pdp;
+	private final PolicyEnforcementPoint pep;
 
 	private final Map<String, Decision> accessDecisions;
 
 	@Autowired
-	public ReactiveMultiRequestView(PolicyDecisionPoint pdp, HeartBeatService heartBeatService,
-			BloodPressureService bloodPressureService) {
+	public ReactiveMultiRequestView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
+									BloodPressureService bloodPressureService) {
 		super(heartBeatService, bloodPressureService);
-		this.pdp = pdp;
+		this.pep = pep;
 
 		accessDecisions = new HashMap<>();
 		accessDecisions.put(READ_HEART_BEAT_DATA_REQUEST_ID, Decision.DENY);
@@ -63,16 +64,18 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 		multiRequest.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID,
 				new RequestElements(AUTHENTICATION_ID, READ_ID, "bloodPressureData"));
 
-		final Flux<IdentifiableDecision> accessDecisionFlux = pdp.decide(multiRequest)
-				.subscribeOn(Schedulers.newElastic("pdp")).map(IdentifiableDecision::new);
+		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforce(multiRequest)
+				.subscribeOn(Schedulers.newElastic("pdp"));
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
 				getSystolicBloodPressureDataFlux(), Function.identity());
 	}
 
 	protected void updateUI(Object[] fluxValues) {
-		final IdentifiableDecision identifiableDecision = (IdentifiableDecision) fluxValues[0];
-		accessDecisions.put(identifiableDecision.getRequestId(), identifiableDecision.getDecision());
+		final MultiResponse multiResponse = (MultiResponse) fluxValues[0];
+		for (IdentifiableResponse identifiableResponse : multiResponse) {
+			accessDecisions.put(identifiableResponse.getRequestId(), identifiableResponse.getResponse().getDecision());
+		}
 
 		final Decision heartBeatDecision = accessDecisions.get(READ_HEART_BEAT_DATA_REQUEST_ID);
 		final Decision bloodPressureDecision = accessDecisions.get(READ_BLOOD_PRESSURE_DATA_REQUEST_ID);
