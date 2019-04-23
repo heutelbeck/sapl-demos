@@ -80,9 +80,9 @@ public class HomeView extends VerticalLayout implements View {
         final MultiResponse multiResponse = pep.filterEnforce(multiRequest).blockFirst();
 
         traditionalBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-        multiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-        reactiveBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-        reactiveMultiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
+        multiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useMultiRequestBtn"));
+        reactiveBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useReactiveBtn"));
+        reactiveMultiRequestBtn.setEnabled(multiResponse.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
     }
 
 }
