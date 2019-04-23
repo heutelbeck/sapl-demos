@@ -66,7 +66,8 @@ permit
     action == "use" & resource.uiElement == "ui:view:patients:deletePatientButton"
 where
 	"ROLE_DOCTOR" in subject..authority;
-	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
+    var url = "http://localhost:8081/rest/patients/" + standard.numberToString(resource.id);
+    subject.name == url.<http.get>.attendingDoctor;
 
 
 policy "administrators can use the button to delete patient data"
@@ -95,7 +96,8 @@ permit
     action == "read" & resource.uiElement == "ui:view:patients:roomField"
 where
     "ROLE_VISITOR" in subject..authority;
-    subject.name in resource.id.<patient.relatives>;
+    var url = "http://localhost:8081/rest/patients/" + standard.numberToString(resource.id) + "/relatives";
+    subject.name in url.<http.get>;
 
 
 policy "visitors may read the name and phone number"
