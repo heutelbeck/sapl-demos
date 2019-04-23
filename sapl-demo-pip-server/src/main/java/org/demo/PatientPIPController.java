@@ -14,16 +14,20 @@ import lombok.RequiredArgsConstructor;
 
 
 @RestController
-@RequestMapping("rest/patient")
+@RequestMapping("rest/patients")
 @RequiredArgsConstructor
 public class PatientPIPController {
 
     private final PatientPIP patientPIP;
 
-    @GetMapping(value = "related/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{id}/relatives", produces = MediaType.APPLICATION_JSON_VALUE)
     public JsonNode getRelations(@PathVariable String id) {
-        final JsonNode relations = patientPIP.getRelations(JsonNodeFactory.instance.textNode(id), null);
-        return relations;
+        return patientPIP.getRelations(JsonNodeFactory.instance.textNode(id), null);
+    }
+
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public JsonNode getPatientRecord(@PathVariable String id) {
+        return patientPIP.getPatientRecord(JsonNodeFactory.instance.textNode(id), null);
     }
 
 }
