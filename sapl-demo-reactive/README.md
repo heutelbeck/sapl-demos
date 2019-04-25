@@ -1,6 +1,7 @@
 # Tutorial sapl-demo-reactive
 
-This sub-project demonstrates the different possibilities to use the reactive API of the SAPL policy engine.
+This sub-project demonstrates the different possibilities to use the reactive API of the
+[SAPL Policy Engine](https://github.com/heutelbeck/sapl-policy-engine).
 A Policy Decision Point (PDP) can be integrated in two ways:
 1) either directly embedded in the application (embedded PDP),
 2) or running on a separate server (remote PDP).
@@ -59,8 +60,10 @@ to authenticate clients. The configuration values `io.sapl.remote.key` and `io.s
 values from the configuration of the PDP server (`http.basic.auth.client-key` and `http.basic.auth.client-secret`).
 
 ### The demo application
-The demo application shows how a Vaadin web application can be integrated with Spring-Security and the SAPL Policy Engine. It presents 
-the use of the reactive Policy Decision Point and the reactive Policy Enforcement Point, as well as the use of reactive multi-requests.
+The demo application shows how a [Vaadin](https://vaadin.com/framework) web application can be integrated with
+[Spring Security](https://spring.io/projects/spring-security) and the [SAPL Policy Engine](https://github.com/heutelbeck/sapl-policy-engine).
+It presents the use of the reactive Policy Decision Point and the reactive Policy Enforcement Point, as well as the use of reactive
+multi-requests.
 
 After the user has logged in with the password `password`, four buttons are presented on the initial page of the application. The first
 two buttons `Show Patient List (blocking, single requests)` and `Show Patient List (blocking, multi-requests)` lead to the fictitious
