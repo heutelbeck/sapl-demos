@@ -3,7 +3,6 @@ package org.demo.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -41,13 +40,10 @@ public class DemoData implements CommandLineRunner {
 	private final PatientRepository patientRepository;
 	private final RelationRepository relationRepository;
 
-	@Value("${io.sapl.policy-engine-authority}")
-	private String systemAuthority;
-
 	@Override
 	public void run(String... args) throws Exception {
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(systemAuthority));
+		authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
 		Authentication auth = new UsernamePasswordAuthenticationToken("system", null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// Create patients
