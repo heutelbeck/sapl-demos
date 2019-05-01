@@ -97,7 +97,7 @@ permit
 where
     "ROLE_VISITOR" in subject..authority;
     var url = "http://localhost:8081/rest/patients/" + standard.numberToString(resource.id) + "/relatives";
-    subject.name in url.<http.get>;
+    subject.name in url.<http.get>.relatives;
 
 
 policy "visitors may read the name and phone number"

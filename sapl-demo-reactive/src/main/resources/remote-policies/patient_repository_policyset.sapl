@@ -78,7 +78,7 @@ where
      * list of relatives.
      */
     var url = "http://localhost:8081/rest/patients/" + standard.numberToString(resource.id) + "/relatives";
-    subject.name in url.<http.get>;
+    subject.name in url.<http.get>.relatives;
 transform 
 	// Subtractive template with filters removing content
 	resource |- {
