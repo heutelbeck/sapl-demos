@@ -90,7 +90,7 @@ public class EmbeddedPDPDemo {
 			throws IOException, AttributeException, FunctionException, URISyntaxException, PolicyEvaluationException {
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
 		if (path != null) {
-			builder = builder.withFilesystemPolicyRetrievalPoint(path);
+			builder = builder.withFilesystemPolicyRetrievalPoint(path, Builder.IndexType.SIMPLE);
 		}
 		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 

@@ -15,6 +15,8 @@
  ******************************************************************************/
 package io.sapl.benchmark;
 
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -281,7 +283,7 @@ public class Benchmark {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
 				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
-						.withFilesystemPolicyRetrievalPoint(path + subfolder).build();
+						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE).build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
