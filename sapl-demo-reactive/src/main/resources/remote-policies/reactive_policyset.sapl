@@ -21,7 +21,7 @@ permit
 where
   "ROLE_DOCTOR" in subject..authority || "ROLE_NURSE" in subject..authority;
   var url = "http://localhost:8081/rest/time/ticker";
-  time.localSecond(url.<http.get>) < 31 || time.localSecond(interval.<clock.ticker>) > 35;
+  time.localSecond(url.<http.get>) < 31 || time.localSecond(url.<http.get>) > 35;
 
 
 policy "permit visitor read time restricted heart beat data"
