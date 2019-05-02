@@ -39,15 +39,37 @@ PDP will look for the policy files in the directory `~/sapl/policies`. Before th
 distinguish in one point of those found under `src/main/resources/policies`: they cannot use the Policy Information Point
 `org.demo.pip.PatientPIP` directly (as it is part of this demo project and therefore not known to the policy engine). Instead
 the policies have to call the `PatientPIP` via the `HTTPPolicyInformationPoint`, which is provided by the SAPL policy engine.
-Therefore a PIP server must be runnig, providing the functionality of the `PatientPIP` via corresponding REST endpoints. Such
-a server is available in the sub-project `sapl-demo-pip-server` of this demo project. It can be started via the Spring-Boot
-application `org.demo.PipServerApplication`. Just make sure that it is running on a port other than the ones used by the demo 
-application and the PDP server. The configured port 8081 is just fine. If you modify it, you also have to adjust the URLs in
-the remote policy files.
+Therefore a PIP server must be running, providing the functionality of the `PatientPIP` via corresponding REST endpoints. Such
+a server is available in the sub-project `sapl-demo-pip-server`. As it provides patient data, which is stored by the demo
+application, it has to use the same in memory database as the demo application. This is achieved by connecting to the database
+server started by the demo application. The demo application defines a H2 database server bean as follows:
+```
+import org.h2.tools.Server;
 
-Now that both the PDP server from the project [sapl-policy-engine](https://github.com/heutelbeck/sapl-policy-engine)
-and the PIP server from the demo sub-project `sapl-demo-pip-server` have been started, the demo application can be started next.
-But for it to use the remote PDP, it must be configured in `application.properties` as follows:
+@Bean(initMethod = "start", destroyMethod = "stop")
+public Server h2DatabaseServer() throws SQLException {
+	return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9090");
+}
+```
+In `applications.properties` of the demo application, the default data source created by Spring Boot's auto-configuration
+are overridden as follows:
+```properties
+spring.datasource.url=jdbc:h2:mem:demo-db
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create
+```
+In `applications.properties` of the PIP server application, this database can now be used as follows:
+```properties
+spring.datasource.url=jdbc:h2:tcp://localhost:9090/mem:demo-db
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.hibernate.ddl-auto=create
+```
+The demo application has to be started next. But for it to use the remote PDP, it must be configured in `application.properties` 
+as follows:
 ```properties
 io.sapl.type=remote
 io.sapl.remote.host=localhost
@@ -58,6 +80,12 @@ io.sapl.remote.secret=Fa4zvYQdiwHZVXh
 The PDP server of the [sapl-policy-engine](https://github.com/heutelbeck/sapl-policy-engine) project uses basic authentication 
 to authenticate clients. The configuration values `io.sapl.remote.key` and `io.sapl.remote.secret` must match the corresponding 
 values from the configuration of the PDP server (`http.basic.auth.client-key` and `http.basic.auth.client-secret`).
+
+Now that both the PDP server from the project [sapl-policy-engine](https://github.com/heutelbeck/sapl-policy-engine) and the demo
+application providing the H2 database server have been started, the PIP-Server can be started via the Spring-Boot application 
+`org.demo.PipServerApplication` from the demo sub-project `sapl-demo-pip-server`. Just make sure that it is running on a port 
+other than the ones used by the demo application and the PDP server. The configured port 8081 is just fine. If you modify it, 
+you also have to adjust the URLs in the remote policy files.
 
 ### The demo application
 The demo application shows how a [Vaadin](https://vaadin.com/framework) web application can be integrated with
