@@ -58,11 +58,5 @@
 	    	"wgs84" : "EPSG:4326",
 	    	"webMercator": "EPSG:3857"
 	    }
-	},
-	"attributeFinders": [
-		"io.sapl.pip.geo"
-	],
-	"libraries": [
-		"geo"
-	]
+	}
 }

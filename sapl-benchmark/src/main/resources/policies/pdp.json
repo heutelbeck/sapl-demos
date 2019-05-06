@@ -10,10 +10,5 @@
 				
 			}
 		}
-	},
-	"attributeFinders": [
-		"geo"
-	],
-	"libraries": [],
-	"prpImplementation": "INDEXED"
+	}
 }
