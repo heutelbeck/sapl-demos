@@ -15,34 +15,42 @@ in the file system. If nothing in this regard is configured in the file `src/mai
 the policies are retrieved from the `/policies` directory in the classpath. This is where this demo-application looks
 up the policies too. If the directory is to be changed, this can be done in the file `application.properties` as follows:
 ```properties
-io.sapl.type=resources
+io.sapl.pdp-type=embedded
+io.sapl.prp-type=resources
 io.sapl.resources.policies-path=/path/to/other/directory
 ```
 However, if the policy files are located in a directory outside the classpath, the following configuration must be used:
 ```properties
-io.sapl.type=filesystem
+io.sapl.prp-type=filesystem
 io.sapl.filesystem.policies-path=/absolute/path/to/policy/directory
 ```
 If no directory path is configured in the second variant, the policies will be searched under `~/policies`
 (Windows: `${user.home}/policies`).
 
+The same mechanism and defaults hold for the configuration file `pdp.json`, where the policy document combining algorithm
+and system variables referenced from within the policies are defined for the PDP. Just use the following properties to override
+the defaults:
+```properties
+io.sapl.pdp-config-type=filesystem
+io.sapl.filesystem.config-path=/absolute/path/to/config/directory
+```
+
 To start the demo application directly from within the IDE, just start the Spring-Boot application
 `org.demo.DemoApplication`, open your browser and navigate to the URL `http://localhost:8080/demo`.
 
 ### Using the remote PDP
-The demo application can also use a Policy Decision Point running on a separate server. A corresponding server must be 
-started. For the purposes of this demo application, the PDP server from the project
-[sapl-policy-engine](https://github.com/heutelbeck/sapl-policy-engine) can be used. After having downloaded the project,
-just start the Spring-Boot application `io.sapl.pdp.server.PDPServerApplication` in the sub-project `sapl-pdp-server`. The
-PDP will look for the policy files in the directory `~/sapl/policies`. Before the server is started, the policy files under
-`src/main/resources/remote-policies` in this demo application project must be copied to `~/sapl/policies`. These policies 
-distinguish in one point of those found under `src/main/resources/policies`: they cannot use the Policy Information Point
-`org.demo.pip.PatientPIP` directly (as it is part of this demo project and therefore not known to the policy engine). Instead
-the policies have to call the `PatientPIP` via the `HTTPPolicyInformationPoint`, which is provided by the SAPL policy engine.
-Therefore a PIP server must be running, providing the functionality of the `PatientPIP` via corresponding REST endpoints. Such
-a server is available in the sub-project `sapl-demo-pip-server`. As it provides patient data, which is stored by the demo
-application, it has to use the same in memory database as the demo application. This is achieved by connecting to the database
-server started by the demo application. The demo application defines a H2 database server bean as follows:
+The demo application can also use a Policy Decision Point running on a separate server. For the purposes of this demo 
+application, the PDP server from the project [sapl-policy-engine](https://github.com/heutelbeck/sapl-policy-engine) can be 
+used. After having downloaded the project, just start the Spring-Boot application `io.sapl.pdp.server.PDPServerApplication` 
+in the sub-project `sapl-pdp-server`. The PDP will look for the policy files in the directory `~/sapl/policies`. Before the 
+server is started, the policy files under `src/main/resources/remote-policies` in this demo application project must be copied 
+to `~/sapl/policies`. These policies distinguish in one point of those found under `src/main/resources/policies`: they cannot 
+use the Policy Information Point `org.demo.pip.PatientPIP` directly (as it is part of this demo project and therefore not known 
+to the policy engine). Instead the policies have to call the `PatientPIP` via the `HTTPPolicyInformationPoint`, which is provided 
+by the SAPL policy engine. Therefore a PIP server must be running, providing the functionality of the `PatientPIP` via corresponding
+REST endpoints. Such a server is available in the sub-project `sapl-demo-pip-server`. As it provides patient data, which is stored 
+by the demo application, it has to use the same in memory database as the demo application. This is achieved by connecting to the 
+database server started by the demo application. The demo application defines an H2 database server bean as follows:
 ```
 import org.h2.tools.Server;
 
@@ -71,7 +79,7 @@ spring.jpa.hibernate.ddl-auto=create
 The demo application has to be started next. But for it to use the remote PDP, it must be configured in `application.properties` 
 as follows:
 ```properties
-io.sapl.type=remote
+io.sapl.pdp-type=remote
 io.sapl.remote.host=localhost
 io.sapl.remote.port=8443
 io.sapl.remote.key=YJidgyT2mfdkbmL
@@ -107,7 +115,7 @@ to demonstrate this. Doctors and nurses get to see pulse rate data when the numb
 Blood pressure data is always displayed when the number of seconds of the current time is less than 31 or greater than 35. Visitors
 only see pulse rate data, and also less frequently than doctors and nurses.
 
-If the policy files are not stored in the classpath, but in any directory of the filesystem (`io.sapl.type=filesystem`, see above),
-it is possible in all four variants to modify the policies while the application is running. The changes have an immediate effect
-on the reactive variants and on the blocking variants after a page refresh. Restarting the demo application or the PDP server is 
-no longer necessary in either case.
+If the PDP configuration file `pdp.json` and/or the policy files are not stored in the classpath, but in any directory of the filesystem
+(`io.sapl.pdp-config-type=filesystem`, `io.sapl.prp-type=filesystem`, see above), it is possible in all four variants to modify the 
+configuration and/or policies while the application is running. The changes have an immediate effect on the reactive variants and on the
+blocking variants after a page refresh. Restarting the demo application or the PDP server is no longer necessary in either case.
