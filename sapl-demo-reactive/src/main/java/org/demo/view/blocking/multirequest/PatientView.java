@@ -14,14 +14,16 @@ import io.sapl.spring.PolicyEnforcementPoint;
 @SpringComponent("multiRequestPatientView")
 public class PatientView extends AbstractPatientView {
 
-    @Autowired
-    public PatientView(PolicyEnforcementPoint pep, UIController controller) {
-        super(pep, controller);
-    }
+	@Autowired
+	public PatientView(PolicyEnforcementPoint pep, UIController controller) {
+		super(pep, controller);
+	}
 
-    @Override
-    protected AbstractPatientForm createForm(PolicyEnforcementPoint pep, UIController uiController,
-            AbstractPatientForm.RefreshCallback refreshCallback) {
-        return new PatientForm(pep, uiController, refreshCallback);
-    }
+	@Override
+	protected AbstractPatientForm createForm(PolicyEnforcementPoint pep,
+			UIController uiController,
+			AbstractPatientForm.RefreshCallback refreshCallback) {
+		return new PatientForm(pep, uiController, refreshCallback);
+	}
+
 }

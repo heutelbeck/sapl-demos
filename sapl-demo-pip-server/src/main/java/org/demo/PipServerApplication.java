@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 @EntityScan
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class PipServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(PipServerApplication.class, args);
-    }
+
+	public static void main(String[] args) {
+		SpringApplication.run(PipServerApplication.class, args);
+	}
+
 }

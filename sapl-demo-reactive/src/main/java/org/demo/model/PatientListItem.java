@@ -7,7 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class PatientListItem {
 
-    private Long id;
-    private String name;
+	private Long id;
+
+	private String name;
 
 }

@@ -12,6 +12,7 @@ import io.sapl.spring.method.post.PostEnforce;
 import io.sapl.spring.method.pre.PreEnforce;
 
 public interface PatientRepository {
+
 	@PostEnforce(resource = "returnObject")
 	Optional<Patient> findById(Long id);
 
@@ -68,4 +69,5 @@ public interface PatientRepository {
 	@Transactional
 	@Query("update Patient p set p.roomNumber = ?1 where p.id = ?2")
 	void updateRoomNumberById(String ruumNumber, Long id);
+
 }

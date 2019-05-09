@@ -14,10 +14,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CrewMember implements Serializable {
+
 	private static final long serialVersionUID = 1L;
+
 	@Id
 	String username;
+
 	String password;
+
 	String role;
+
 	boolean isActive;
+
 }

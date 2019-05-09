@@ -19,30 +19,32 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    static {
-        SecurityContextHolder.setStrategyName(VaadinSessionSecurityContextHolderStrategy.class.getName());
-    }
+	static {
+		SecurityContextHolder.setStrategyName(
+				VaadinSessionSecurityContextHolderStrategy.class.getName());
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-    }
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().disable();
+	}
 
-    @Autowired
-    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen = auth.inMemoryAuthentication();
-        DemoData.loadUsers(inmen, passwordEncoder());
-    }
+	@Autowired
+	protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen = auth
+				.inMemoryAuthentication();
+		DemoData.loadUsers(inmen, passwordEncoder());
+	}
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+	@Bean
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 }

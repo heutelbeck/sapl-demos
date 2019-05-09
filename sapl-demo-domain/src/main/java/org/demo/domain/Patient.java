@@ -20,17 +20,25 @@ public class Patient {
 	private Long id;
 
 	String medicalRecordNumber;
+
 	String name;
+
 	String icd11Code;
+
 	String diagnosisText;
+
 	String attendingDoctor;
+
 	String attendingNurse;
+
 	String phoneNumber;
+
 	String roomNumber;
 
 	public static Patient clone(Patient template) {
-		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
-				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
-				template.roomNumber);
+		return new Patient(template.id, template.medicalRecordNumber, template.name,
+				template.icd11Code, template.diagnosisText, template.attendingDoctor,
+				template.attendingNurse, template.phoneNumber, template.roomNumber);
 	}
+
 }

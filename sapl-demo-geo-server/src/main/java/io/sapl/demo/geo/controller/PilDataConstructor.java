@@ -25,46 +25,80 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class PilDataConstructor {
+
 	private static final String AC_TYPE = "B748";
+
 	private static final String M = "M"; // male
+
 	private static final String F = "F"; // female
+
 	private static final String FILE_PATH = "src/main/resources/";
+
 	private static final String FILE_MALE = "male_names.txt";
+
 	private static final String FILE_FEMALE = "female_names.txt";
+
 	private static final String FILE_SURNAMES = "surnames.txt";
+
 	private static final String COMMA = ",";
+
 	private static final String PIL_BUILD_ERR = "An error occurred while creating the PIL.";
+
 	public static final String DATE_FORMAT = "dd.MM.yyyy";
+
 	private static final String[] SPECIALS = { "-", "-", "-", "-", "HON", "SEN", "FTL" };
+
 	private static final int F_MAX = 8; // max passengers in first class
+
 	private static final int C_MAX = 80; // max passengers in business class
+
 	private static final int E_MAX = 32; // max passengers in premium economy class
+
 	private static final int Y_MAX = 244; // max passengers in economy class
+
 	private static final int TTL_MAX = F_MAX + C_MAX + E_MAX + Y_MAX;
+
 	private static final int META = 0;
+
 	private static final int RESTRICTED = 1;
+
 	private static final int CONFIDENTIAL = 2;
+
 	private static final int MALE = 0;
+
 	private static final int GENDER = 2;
+
 	private static final long BDATE_YEAR_BEGIN = -946771200000L; // 01.01.1940
-	private static final long BDATE_TIMEFRAME = 75L * 365 * 24 * 60 * 60 * 1000; // 75 years
+
+	private static final long BDATE_TIMEFRAME = 75L * 365 * 24 * 60 * 60 * 1000; // 75
+																					// years
+
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	private String[] firstNamesMale;
+
 	private String[] firstNamesFemale;
+
 	private String[] surnames;
+
 	private SecureRandom rand;
 
 	private PilData data;
+
 	private int classification;
+
 	private String depAp;
+
 	private String arrAp;
+
 	private String fltNo;
+
 	private String date;
+
 	private int actNumPax;
 
-	public PilDataConstructor(int level, String from, String to, String flightNumber, String dateOfFlight, int minSeats)
-			throws IOException {
+	public PilDataConstructor(int level, String from, String to, String flightNumber,
+			String dateOfFlight, int minSeats) throws IOException {
 		rand = new SecureRandom();
 		data = new PilData();
 		actNumPax = minSeats + rand.nextInt(TTL_MAX - minSeats);
@@ -92,15 +126,16 @@ public class PilDataConstructor {
 
 		try {
 			return MAPPER.writeValueAsString(data);
-		} catch (JsonProcessingException e) {
+		}
+		catch (JsonProcessingException e) {
 			LOGGER.error(e.toString());
 			return PIL_BUILD_ERR;
 		}
 	}
 
 	private PilMetaInf constructMetaInf() {
-		return PilMetaInf.builder().arrAp(arrAp).depAp(depAp).fltNo(fltNo).date(date).acType(AC_TYPE)
-				.classification(classification).build();
+		return PilMetaInf.builder().arrAp(arrAp).depAp(depAp).fltNo(fltNo).date(date)
+				.acType(AC_TYPE).classification(classification).build();
 	}
 
 	private PilPaxInf constructRandomPaxInf() {
@@ -114,21 +149,24 @@ public class PilDataConstructor {
 		// First class
 		if ((fAct = rand.nextInt(F_MAX)) <= tempPaxCount) {
 			tempPaxCount -= fAct;
-		} else {
+		}
+		else {
 			fAct = 0;
 		}
 
 		// Business class
 		if ((cAct = rand.nextInt(C_MAX)) <= tempPaxCount) {
 			tempPaxCount -= fAct;
-		} else {
+		}
+		else {
 			cAct = 0;
 		}
 
 		// Premium Economy class
 		if ((eAct = rand.nextInt(E_MAX)) <= tempPaxCount) {
 			tempPaxCount -= fAct;
-		} else {
+		}
+		else {
 			eAct = 0;
 		}
 
@@ -136,20 +174,22 @@ public class PilDataConstructor {
 		if (tempPaxCount > Y_MAX) {
 			yAct = Y_MAX;
 			actNumPax = fAct + cAct + eAct + yAct;
-		} else {
+		}
+		else {
 			yAct = tempPaxCount;
 		}
 
-		return PilPaxInf.builder().fAct(fAct).fMax(F_MAX).cAct(cAct).cMax(C_MAX).eAct(eAct).eMax(E_MAX).yAct(yAct)
-				.yMax(Y_MAX).build();
+		return PilPaxInf.builder().fAct(fAct).fMax(F_MAX).cAct(cAct).cMax(C_MAX)
+				.eAct(eAct).eMax(E_MAX).yAct(yAct).yMax(Y_MAX).build();
 	}
 
 	private PilPassenger[] constructRandomPaxDetails() {
 		PilPassenger[] pax = new PilPassenger[actNumPax];
 		for (int i = 0; i < actNumPax; i++) {
 			int gender = rand.nextInt(GENDER);
-			pax[i] = PilPassenger.builder().name(randomName(gender)).bdate(randomBdate()).gender(gender == MALE ? M : F)
-					.seat(String.valueOf(i)).special(SPECIALS[rand.nextInt(SPECIALS.length - 1)]).build();
+			pax[i] = PilPassenger.builder().name(randomName(gender)).bdate(randomBdate())
+					.gender(gender == MALE ? M : F).seat(String.valueOf(i))
+					.special(SPECIALS[rand.nextInt(SPECIALS.length - 1)]).build();
 		}
 		return pax;
 	}
@@ -165,7 +205,8 @@ public class PilDataConstructor {
 		name.append(surnames[rand.nextInt(surnames.length - 1)]).append(COMMA);
 		if (gender == MALE) {
 			name.append(firstNamesMale[rand.nextInt(firstNamesMale.length - 1)]);
-		} else {
+		}
+		else {
 			name.append(firstNamesFemale[rand.nextInt(firstNamesFemale.length - 1)]);
 		}
 		return name.toString();
@@ -173,7 +214,8 @@ public class PilDataConstructor {
 
 	private static String[] getNameList(String file) throws IOException {
 		InputStreamReader fileReader = new InputStreamReader(
-				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)), StandardCharsets.UTF_8);
+				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)),
+				StandardCharsets.UTF_8);
 
 		List<String> result = new ArrayList<>();
 		try (BufferedReader bufferedReader = new BufferedReader(fileReader)) {

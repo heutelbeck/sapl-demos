@@ -17,10 +17,10 @@ import reactor.core.publisher.Flux;
 @RequestMapping("rest/time")
 public class TimeTickerPIPController {
 
-    @GetMapping(value = "ticker", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
-    public Flux<JsonNode> getTimeTicker() {
-        return Flux.interval(Duration.ofSeconds(1))
-                .map(i -> JsonNodeFactory.instance.textNode(Instant.now().toString()));
-    }
+	@GetMapping(value = "ticker", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
+	public Flux<JsonNode> getTimeTicker() {
+		return Flux.interval(Duration.ofSeconds(1))
+				.map(i -> JsonNodeFactory.instance.textNode(Instant.now().toString()));
+	}
 
 }

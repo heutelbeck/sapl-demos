@@ -20,6 +20,7 @@ public class Relation {
 	Long id;
 
 	String username;
+
 	Long patientid;
 
 	public Relation(String username, Long patientid) {

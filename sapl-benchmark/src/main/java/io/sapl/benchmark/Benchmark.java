@@ -70,12 +70,17 @@ public class Benchmark {
 	private static final String DEFAULT_PATH = "C:/sapl/";
 
 	private static final String HELP_DOC = "print this message";
+
 	private static final String HELP = "help";
+
 	private static final String USAGE = "java -jar sapl-benchmark-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
+
 	private static final String PATH = "path";
+
 	private static final String PATH_DOC = "path for output files";
 
 	private static final int ITERATIONS = 10;
+
 	private static final int RUNS = 30;
 
 	private static final double MILLION = 1000000.0D;
@@ -85,8 +90,8 @@ public class Benchmark {
 	}
 
 	private static List<String> getExportHeader() {
-		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
-				"Response String (ms)");
+		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)",
+				"Execution Time (ms)", "Request String", "Response String (ms)");
 	}
 
 	private static double extractMin(List<XlsRecord> data) {
@@ -118,11 +123,13 @@ public class Benchmark {
 	}
 
 	private static double extractMdn(List<XlsRecord> data) {
-		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
+		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted()
+				.collect(Collectors.toList());
 		int index = list.size() / 2;
 		if (list.size() % 2 == 0) {
 			return (list.get(index) + list.get(index - 1)) / 2;
-		} else {
+		}
+		else {
 			return list.get(index);
 		}
 	}
@@ -140,14 +147,16 @@ public class Benchmark {
 			if (cmd.hasOption(HELP)) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(USAGE, options);
-			} else {
+			}
+			else {
 				String path = cmd.getOptionValue(PATH);
 				if (Strings.isNullOrEmpty(path)) {
 					path = DEFAULT_PATH;
 				}
 				runBenchmark(path);
 			}
-		} catch (ParseException e) {
+		}
+		catch (ParseException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
@@ -157,8 +166,10 @@ public class Benchmark {
 		ObjectMapper mapper = new ObjectMapper();
 		TestSuite suite = null;
 		try {
-			suite = mapper.readValue(Resources.getResource("tests.json"), TestSuite.class);
-		} catch (IOException e) {
+			suite = mapper.readValue(Resources.getResource("tests.json"),
+					TestSuite.class);
+		}
+		catch (IOException e) {
 			LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
 			System.exit(1);
 		}
@@ -175,7 +186,8 @@ public class Benchmark {
 		List<PolicyGeneratorConfiguration> configs = suite.getCases();
 		List<String> identifier = new LinkedList<>();
 		for (PolicyGeneratorConfiguration config : configs) {
-			benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues, mdnValues, identifier, config);
+			benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues,
+					mdnValues, identifier, config);
 		}
 
 		writeOverviewChart(path, chart);
@@ -185,14 +197,16 @@ public class Benchmark {
 		writeExcelFile(path, data);
 	}
 
-	private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
-			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
+	private static void benchmarkConfiguration(String path, List<XlsRecord> data,
+			XYChart chart, List<Double> minValues, List<Double> maxValues,
+			List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
 			PolicyGeneratorConfiguration config) throws URISyntaxException {
 		identifier.add(config.getName());
 		List<XlsRecord> results = null;
 		try {
 			results = runTest(config, path);
-		} catch (IOException | PolicyEvaluationException e) {
+		}
+		catch (IOException | PolicyEvaluationException e) {
 			LOGGER.error("Error running test", e);
 			System.exit(1);
 		}
@@ -210,8 +224,11 @@ public class Benchmark {
 		details.addSeries(config.getName(), times);
 
 		try {
-			BitmapEncoder.saveBitmap(details, path + config.getName().replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
-		} catch (IOException e) {
+			BitmapEncoder.saveBitmap(details,
+					path + config.getName().replaceAll("[^a-zA-Z0-9]", ""),
+					BitmapFormat.PNG);
+		}
+		catch (IOException e) {
 			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
@@ -231,14 +248,16 @@ public class Benchmark {
 		chart.setYAxisTitle("ms");
 		try {
 			BitmapEncoder.saveBitmap(chart, path + "overview", BitmapFormat.PNG);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
 	}
 
-	private static void writeHistogram(String path, List<Double> minValues, List<Double> maxValues,
-			List<Double> avgValues, List<Double> mdnValues, List<String> identifier) {
+	private static void writeHistogram(String path, List<Double> minValues,
+			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues,
+			List<String> identifier) {
 		CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		histogram.setTitle("Aggregates");
 		histogram.setXAxisTitle("Run");
@@ -250,7 +269,8 @@ public class Benchmark {
 
 		try {
 			BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.error(ERROR_WRITING_BITMAP, e);
 			System.exit(1);
 		}
@@ -261,13 +281,15 @@ public class Benchmark {
 		try (OutputStream os = new FileOutputStream(file)) {
 			SimpleExporter exp = new SimpleExporter();
 			exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			LOGGER.error("Error writing XLS", e);
 			System.exit(1);
 		}
 	}
 
-	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
+	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config,
+			String path)
 			throws IOException, URISyntaxException, PolicyEvaluationException {
 
 		PolicyGenerator generator = new PolicyGenerator(config);
@@ -283,7 +305,8 @@ public class Benchmark {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
 				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
-						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE).build();
+						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE)
+						.build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
@@ -295,13 +318,14 @@ public class Benchmark {
 
 					double diff = nanoToMs(end - start);
 
-					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
-							response.toString()));
+					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep,
+							diff, request.toString(), response.toString()));
 
 					LOGGER.info("Total : {}ms", diff);
 				}
 			}
-		} catch (IOException | AttributeException | FunctionException e) {
+		}
+		catch (IOException | AttributeException | FunctionException e) {
 			LOGGER.error("Error running test", e);
 		}
 

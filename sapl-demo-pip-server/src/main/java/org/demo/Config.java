@@ -11,18 +11,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class Config implements WebMvcConfigurer {
 
-    @Override
-    public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        configurer.setTaskExecutor(createAsyncTaskExecutor());
-    }
+	@Override
+	public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
+		configurer.setTaskExecutor(createAsyncTaskExecutor());
+	}
 
-    private AsyncTaskExecutor createAsyncTaskExecutor() {
-        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(32);
-        executor.setQueueCapacity(16);
-        executor.setThreadNamePrefix("TaskExecutor-");
-        executor.initialize();
-        return executor;
-    }
+	private AsyncTaskExecutor createAsyncTaskExecutor() {
+		final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(4);
+		executor.setMaxPoolSize(32);
+		executor.setQueueCapacity(16);
+		executor.setThreadNamePrefix("TaskExecutor-");
+		executor.initialize();
+		return executor;
+	}
+
 }

@@ -28,6 +28,7 @@ import reactor.core.scheduler.Schedulers;
 public class ReactiveMultiRequestView extends AbstractReactiveView {
 
 	private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
+
 	private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
 
 	private final PolicyEnforcementPoint pep;
@@ -35,8 +36,9 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 	private final Map<String, Decision> accessDecisions;
 
 	@Autowired
-	public ReactiveMultiRequestView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
-									BloodPressureService bloodPressureService) {
+	public ReactiveMultiRequestView(PolicyEnforcementPoint pep,
+			HeartBeatService heartBeatService,
+			BloodPressureService bloodPressureService) {
 		super(heartBeatService, bloodPressureService);
 		this.pep = pep;
 
@@ -49,34 +51,42 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
 		final MultiRequest multiRequest = new MultiRequest()
-				.addRequest(READ_HEART_BEAT_DATA_REQUEST_ID, authentication, "read", "heartBeatData")
-				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read", "bloodPressureData");
+				.addRequest(READ_HEART_BEAT_DATA_REQUEST_ID, authentication, "read",
+						"heartBeatData")
+				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read",
+						"bloodPressureData");
 
 		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforce(multiRequest)
 				.subscribeOn(Schedulers.newElastic("pdp"));
 
-		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
-				getSystolicBloodPressureDataFlux(), Function.identity());
+		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(),
+				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(),
+				Function.identity());
 	}
 
 	protected void updateUI(Object[] fluxValues) {
 		final MultiResponse multiResponse = (MultiResponse) fluxValues[0];
 		for (IdentifiableResponse identifiableResponse : multiResponse) {
-			accessDecisions.put(identifiableResponse.getRequestId(), identifiableResponse.getResponse().getDecision());
+			accessDecisions.put(identifiableResponse.getRequestId(),
+					identifiableResponse.getResponse().getDecision());
 		}
 
-		final Decision heartBeatDecision = accessDecisions.get(READ_HEART_BEAT_DATA_REQUEST_ID);
-		final Decision bloodPressureDecision = accessDecisions.get(READ_BLOOD_PRESSURE_DATA_REQUEST_ID);
+		final Decision heartBeatDecision = accessDecisions
+				.get(READ_HEART_BEAT_DATA_REQUEST_ID);
+		final Decision bloodPressureDecision = accessDecisions
+				.get(READ_BLOOD_PRESSURE_DATA_REQUEST_ID);
 
 		final Integer heartBeat = (Integer) fluxValues[1];
 		final Integer diastolic = (Integer) fluxValues[2];
 		final Integer systolic = (Integer) fluxValues[3];
 
-		updateUI(heartBeatDecision, bloodPressureDecision, heartBeat, diastolic, systolic);
+		updateUI(heartBeatDecision, bloodPressureDecision, heartBeat, diastolic,
+				systolic);
 	}
 
 	@Override
 	public void beforeLeave(ViewBeforeLeaveEvent event) {
 		super.beforeLeave(event);
 	}
+
 }

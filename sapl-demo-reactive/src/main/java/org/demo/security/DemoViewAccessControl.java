@@ -22,4 +22,5 @@ public class DemoViewAccessControl implements ViewAccessControl {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 		return pep.enforce(authentication, "access", beanName).blockFirst() == PERMIT;
 	}
+
 }

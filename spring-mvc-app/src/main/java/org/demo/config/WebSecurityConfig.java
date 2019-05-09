@@ -18,18 +18,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.authorizeRequests().antMatchers("/css/**").permitAll()
-				.anyRequest().authenticated()
-				.and().formLogin().loginPage("/login").defaultSuccessUrl("/patients").permitAll()
-				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll()
-				.and().httpBasic()
-				.and().csrf().disable();
+		http.authorizeRequests().antMatchers("/css/**").permitAll().anyRequest()
+				.authenticated().and().formLogin().loginPage("/login")
+				.defaultSuccessUrl("/patients").permitAll().and().logout()
+				.logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()
+				.httpBasic().and().csrf().disable();
 	}
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen = auth.inMemoryAuthentication();
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen = auth
+				.inMemoryAuthentication();
 		DemoData.loadUsers(inmen, passwordEncoder());
 	}
 
@@ -37,4 +36,5 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+
 }

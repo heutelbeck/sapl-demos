@@ -23,29 +23,38 @@ import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
-@PolicyInformationPoint(name = "patient", description = "retrieves information about patients")
+@PolicyInformationPoint(name = "patient",
+		description = "retrieves information about patients")
 public class PatientPIP {
 
 	private final ObjectMapper mapper;
+
 	private final RelationRepository relationRepo;
+
 	private final PatientRepository patientRepo;
 
 	@Attribute(name = "relatives")
-	public Flux<JsonNode> getRelations(@Number JsonNode value, Map<String, JsonNode> variables) {
+	public Flux<JsonNode> getRelations(@Number JsonNode value,
+			Map<String, JsonNode> variables) {
 		final List<Relation> relations = relationRepo.findByPatientid(value.asLong());
-		final List<String> relationNames = relations.stream().map(Relation::getUsername).collect(Collectors.toList());
+		final List<String> relationNames = relations.stream().map(Relation::getUsername)
+				.collect(Collectors.toList());
 		final JsonNode jsonNode = mapper.convertValue(relationNames, JsonNode.class);
 		return Flux.just(jsonNode);
 	}
 
 	@Attribute(name = "patientRecord")
-	public Flux<JsonNode> getPatientRecord(@Number JsonNode patientId, Map<String, JsonNode> variables) {
+	public Flux<JsonNode> getPatientRecord(@Number JsonNode patientId,
+			Map<String, JsonNode> variables) {
 		try {
-			final Patient patient = patientRepo.findById(patientId.asLong()).orElseThrow(AttributeException::new);
+			final Patient patient = patientRepo.findById(patientId.asLong())
+					.orElseThrow(AttributeException::new);
 			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
 			return Flux.just(jsonNode);
-		} catch (IllegalArgumentException | AttributeException e) {
+		}
+		catch (IllegalArgumentException | AttributeException e) {
 			return Flux.just(JsonNodeFactory.instance.nullNode());
 		}
 	}
+
 }

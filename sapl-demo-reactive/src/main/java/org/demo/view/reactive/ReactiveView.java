@@ -28,15 +28,17 @@ public class ReactiveView extends AbstractReactiveView {
 
 	@Autowired
 	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
-						BloodPressureService bloodPressureService) {
+			BloodPressureService bloodPressureService) {
 		super(heartBeatService, bloodPressureService);
 		this.pep = pep;
 	}
 
-	private static final Request buildRequest(Object subject, Object action, Object resource) {
+	private static final Request buildRequest(Object subject, Object action,
+			Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),
+				mapper.valueToTree(resource), null);
 	}
 
 	protected Flux<Object[]> getCombinedFlux() {
@@ -49,8 +51,10 @@ public class ReactiveView extends AbstractReactiveView {
 				.enforce(authentication, "read", "bloodPressureData")
 				.subscribeOn(Schedulers.newElastic("bp-pdp"));
 
-		return Flux.combineLatest(heartBeatAccessDecisionFlux, bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
-				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(), Function.identity());
+		return Flux.combineLatest(heartBeatAccessDecisionFlux,
+				bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
+				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(),
+				Function.identity());
 	}
 
 	protected void updateUI(Object[] fluxValues) {
@@ -61,11 +65,13 @@ public class ReactiveView extends AbstractReactiveView {
 		final Integer diastolic = (Integer) fluxValues[3];
 		final Integer systolic = (Integer) fluxValues[4];
 
-		updateUI(heartBeatDecision, bloodPressureDecision, heartBeat, diastolic, systolic);
+		updateUI(heartBeatDecision, bloodPressureDecision, heartBeat, diastolic,
+				systolic);
 	}
 
 	@Override
 	public void beforeLeave(ViewBeforeLeaveEvent event) {
 		super.beforeLeave(event);
 	}
+
 }

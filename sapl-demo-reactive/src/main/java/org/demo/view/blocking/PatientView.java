@@ -18,7 +18,8 @@ public class PatientView extends AbstractPatientView {
 	}
 
 	@Override
-	protected AbstractPatientForm createForm(PolicyEnforcementPoint pep, UIController uiController,
+	protected AbstractPatientForm createForm(PolicyEnforcementPoint pep,
+			UIController uiController,
 			AbstractPatientForm.RefreshCallback refreshCallback) {
 		return new PatientForm(pep, uiController, refreshCallback);
 	}

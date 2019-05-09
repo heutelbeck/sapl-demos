@@ -25,6 +25,7 @@ import io.sapl.spring.PolicyEnforcementPoint;
 public abstract class AbstractPatientView extends VerticalLayout implements View {
 
 	private PolicyEnforcementPoint pep;
+
 	private UIController controller;
 
 	private Grid<PatientListItem> grid;
@@ -36,7 +37,8 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 		setMargin(true);
 	}
 
-	protected abstract AbstractPatientForm createForm(PolicyEnforcementPoint pep, UIController uiController,
+	protected abstract AbstractPatientForm createForm(PolicyEnforcementPoint pep,
+			UIController uiController,
 			AbstractPatientForm.RefreshCallback refreshCallback);
 
 	@Override
@@ -53,8 +55,10 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 		grid.asSingleSelect().addValueChangeListener(selection -> {
 			if (selection.getValue() == null) {
 				form.hide();
-			} else {
-				final Optional<Patient> patient = controller.getPatient(selection.getValue().getId());
+			}
+			else {
+				final Optional<Patient> patient = controller
+						.getPatient(selection.getValue().getId());
 				patient.ifPresent(form::show);
 			}
 		});
@@ -65,9 +69,8 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 			grid.asSingleSelect().clear();
 			form.show(new Patient());
 		});
-		addPatientBtn.setVisible(
-			pep.enforce(SecurityUtils.getAuthentication(), "use", addPatientBtn.getData()).blockFirst() == PERMIT
-		);
+		addPatientBtn.setVisible(pep.enforce(SecurityUtils.getAuthentication(), "use",
+				addPatientBtn.getData()).blockFirst() == PERMIT);
 
 		final HorizontalLayout main = new HorizontalLayout(grid, form);
 		main.setSizeFull();
@@ -80,7 +83,8 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 	private List<PatientListItem> loadAllPatients() {
 		try {
 			return controller.getPatients();
-		} catch (AccessDeniedException e) {
+		}
+		catch (AccessDeniedException e) {
 			SecurityUtils.notifyNotAuthorized();
 			return Collections.emptyList();
 		}
@@ -94,4 +98,5 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 	public void beforeLeave(ViewBeforeLeaveEvent event) {
 		event.navigate();
 	}
+
 }

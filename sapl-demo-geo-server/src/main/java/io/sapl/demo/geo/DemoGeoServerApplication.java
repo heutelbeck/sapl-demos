@@ -17,7 +17,9 @@ import io.sapl.demo.geo.domain.CrewRepo;
 public class DemoGeoServerApplication {
 
 	private static final String CREW1 = "a12345";
+
 	private static final String CREW2 = "a11111";
+
 	private static final String ROLE_CREW = "CREW";
 
 	@Value("${encrypted.testpwd}")
@@ -35,4 +37,5 @@ public class DemoGeoServerApplication {
 			crewRepo.save(new CrewMember(CREW2, defaultPassword, ROLE_CREW, true));
 		};
 	}
+
 }

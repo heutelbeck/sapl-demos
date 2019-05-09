@@ -98,6 +98,11 @@
 					<skipLocalStaging>true</skipLocalStaging>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<version>0.0.9</version>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>

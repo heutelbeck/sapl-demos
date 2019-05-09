@@ -13,9 +13,10 @@ public class EmailConstraintHandler implements ConstraintHandler {
 
 	@Override
 	public boolean handle(JsonNode constraint) {
-		if (canHandle(constraint) && constraint.has("recipient") && constraint.has("subject")
-				&& constraint.has("message")) {
-			sendEmail(constraint.findValue("recipient").asText(), constraint.findValue("subject").asText(),
+		if (canHandle(constraint) && constraint.has("recipient")
+				&& constraint.has("subject") && constraint.has("message")) {
+			sendEmail(constraint.findValue("recipient").asText(),
+					constraint.findValue("subject").asText(),
 					constraint.findValue("message").asText());
 			return true;
 		}
@@ -29,8 +30,9 @@ public class EmailConstraintHandler implements ConstraintHandler {
 	}
 
 	private static void sendEmail(String recipient, String subject, String message) {
-		LOGGER.info("An E-Mail has been sent to {} with the subject '{}' and the message '{}'.", recipient, subject,
-				message);
+		LOGGER.info(
+				"An E-Mail has been sent to {} with the subject '{}' and the message '{}'.",
+				recipient, subject, message);
 	}
 
 }

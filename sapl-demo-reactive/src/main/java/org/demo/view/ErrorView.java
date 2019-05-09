@@ -12,18 +12,19 @@ import org.springframework.stereotype.Component;
 @UIScope
 public class ErrorView extends VerticalLayout implements View {
 
-    private Label errorLabel;
+	private Label errorLabel;
 
-    public ErrorView() {
-        setMargin(true);
-        errorLabel = new Label();
-        errorLabel.addStyleName(ValoTheme.LABEL_FAILURE);
-        errorLabel.setSizeUndefined();
-        addComponent(errorLabel);
-    }
+	public ErrorView() {
+		setMargin(true);
+		errorLabel = new Label();
+		errorLabel.addStyleName(ValoTheme.LABEL_FAILURE);
+		errorLabel.setSizeUndefined();
+		addComponent(errorLabel);
+	}
 
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-        errorLabel.setValue(String.format("No such view: %s", event.getViewName()));
-    }
+	@Override
+	public void enter(ViewChangeListener.ViewChangeEvent event) {
+		errorLabel.setValue(String.format("No such view: %s", event.getViewName()));
+	}
+
 }

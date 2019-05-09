@@ -21,4 +21,5 @@ public class DemoApplication {
 	public Server h2DatabaseServer() throws SQLException {
 		return Server.createTcpServer("-tcp", "-tcpAllowOthers", "-tcpPort", "9090");
 	}
+
 }

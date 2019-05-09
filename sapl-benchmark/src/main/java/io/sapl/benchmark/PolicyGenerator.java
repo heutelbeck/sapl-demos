@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017-2018 Dominic Heutelbeck (dheutelbeck@ftk.de)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -33,7 +33,9 @@ import io.sapl.api.pdp.Request;
 public class PolicyGenerator {
 
 	private static final int DEFAULT_BUFFER = 50;
+
 	private final Random dice;
+
 	private final PolicyGeneratorConfiguration config;
 
 	public PolicyGenerator(PolicyGeneratorConfiguration config) {
@@ -50,8 +52,9 @@ public class PolicyGenerator {
 		final double bracketChance = config.getBracketProbability();
 		final double conjunctionChance = config.getConjunctionProbability();
 
-		StringBuilder statement = new StringBuilder(DEFAULT_BUFFER).append("policy \"").append(name).append("\"")
-				.append(System.lineSeparator()).append("permit ");
+		StringBuilder statement = new StringBuilder(DEFAULT_BUFFER).append("policy \"")
+				.append(name).append("\"").append(System.lineSeparator())
+				.append("permit ");
 
 		int open = 0;
 		for (int j = 0; j < numberOfVariables; ++j) {
@@ -71,7 +74,8 @@ public class PolicyGenerator {
 			if (j < numberOfConnectors) {
 				if (roll() <= conjunctionChance) {
 					statement.append(" & ");
-				} else {
+				}
+				else {
 					statement.append(" | ");
 				}
 			}
@@ -92,20 +96,23 @@ public class PolicyGenerator {
 		return dice.nextInt(supremum);
 	}
 
-	public void generatePolicies(String subfolder) throws FileNotFoundException, UnsupportedEncodingException {
+	public void generatePolicies(String subfolder)
+			throws FileNotFoundException, UnsupportedEncodingException {
 		String path = config.getPath() + subfolder + "/";
 
 		File folder = new File(path);
 		if (folder.mkdirs()) {
 			for (File file : folder.listFiles()) {
 				if (file.getName().endsWith("sapl") && !file.delete()) {
-					System.err.println(String.format("failed to delete: %s.", file.getAbsolutePath()));
+					System.err.println(String.format("failed to delete: %s.",
+							file.getAbsolutePath()));
 				}
 			}
 		}
 		for (int i = 0; i < config.getPolicyCount(); i++) {
 			String name = "p_" + i;
-			try (PrintWriter writer = new PrintWriter(path + name + ".sapl", StandardCharsets.UTF_8.name())) {
+			try (PrintWriter writer = new PrintWriter(path + name + ".sapl",
+					StandardCharsets.UTF_8.name())) {
 				writer.println(generatePolicyString(name));
 			}
 		}
@@ -122,8 +129,11 @@ public class PolicyGenerator {
 	public Request createRequestObject() {
 		ObjectNode resource = JsonNodeFactory.instance.objectNode();
 		for (String var : getVariables()) {
-			resource = resource.put(var, roll() < config.getFalseProbability() ? false : true);
+			resource = resource.put(var,
+					roll() < config.getFalseProbability() ? false : true);
 		}
-		return new Request(NullNode.getInstance(), NullNode.getInstance(), resource, NullNode.getInstance());
+		return new Request(NullNode.getInstance(), NullNode.getInstance(), resource,
+				NullNode.getInstance());
 	}
+
 }

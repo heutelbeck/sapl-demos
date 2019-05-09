@@ -12,71 +12,72 @@ import com.vaadin.ui.VerticalLayout;
 
 class LoginForm extends VerticalLayout {
 
-    LoginForm(LoginCallback callback) {
-        setMargin(true);
-        setSpacing(true);
+	LoginForm(LoginCallback callback) {
+		setMargin(true);
+		setSpacing(true);
 
-        final HorizontalLayout leftRight = new HorizontalLayout();
+		final HorizontalLayout leftRight = new HorizontalLayout();
 
-        final VerticalLayout left = createLeftPart(callback);
-        final VerticalLayout right = createRightPart();
-        leftRight.addComponents(left, right);
+		final VerticalLayout left = createLeftPart(callback);
+		final VerticalLayout right = createRightPart();
+		leftRight.addComponents(left, right);
 
-        addComponentsAndExpand(leftRight);
-    }
+		addComponentsAndExpand(leftRight);
+	}
 
-    private VerticalLayout createLeftPart(LoginCallback callback) {
-        final VerticalLayout left = new VerticalLayout();
+	private VerticalLayout createLeftPart(LoginCallback callback) {
+		final VerticalLayout left = new VerticalLayout();
 
-        final TextField username = new TextField("Username");
-        final PasswordField password = new PasswordField("Password");
+		final TextField username = new TextField("Username");
+		final PasswordField password = new PasswordField("Password");
 
-        final Button login = new Button("Login", evt -> {
-            String pwd = password.getValue();
-            password.setValue("");
-            if (!callback.login(username.getValue(), pwd)) {
-                Notification.show("Login failed");
-                username.focus();
-            }
-        });
-        login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+		final Button login = new Button("Login", evt -> {
+			String pwd = password.getValue();
+			password.setValue("");
+			if (!callback.login(username.getValue(), pwd)) {
+				Notification.show("Login failed");
+				username.focus();
+			}
+		});
+		login.setClickShortcut(ShortcutAction.KeyCode.ENTER);
 
-        left.addComponents(username, password, login);
-        return left;
-    }
+		left.addComponents(username, password, login);
+		return left;
+	}
 
-    private VerticalLayout createRightPart() {
-        final VerticalLayout right = new VerticalLayout();
-        right.setWidth("100%");
-        right.setHeight("100%");
+	private VerticalLayout createRightPart() {
+		final VerticalLayout right = new VerticalLayout();
+		right.setWidth("100%");
+		right.setHeight("100%");
 
-        final Label text = new Label();
-        text.setWidth("650px");
-        text.setHeightUndefined();
-        text.setContentMode(ContentMode.HTML);
-        text.setValue(
-            "<p>This demo is based on a fictional healthcare scenario, where doctors, nurses and family members access health records of patients.</p>" +
-            "<p>You can access the system as one of the following users (the password is always 'password'):" +
-                "<ul>" +
-                    "<li><b>Dominic</b> is a visitor and is related to the patient Lenny.</li>" +
-                    "<li><b>Peter</b> is a doctor.</li>" +
-                    "<li><b>Alina</b> is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Karl.</li>" +
-                    "<li><b>Julia</b> is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Lenny.</li>" +
-                    "<li><b>Brigitte</b> is a nurse.</li>" +
-                    "<li><b>Janosch</b> is a nurse and is related to the patient Karl.</li>" +
-                    "<li><b>Janina</b> is a nurse. And she is the attending nurse of the patient Karl.</li>" +
-                    "<li><b>Thomas</b> is a nurse. And he is the attending nurse of the patient Lenny.</li>" +
-                    "<li><b>Horst</b> is a system administrator.</li>" +
-                "</ul>" +
-            "</p>"
-        );
+		final Label text = new Label();
+		text.setWidth("650px");
+		text.setHeightUndefined();
+		text.setContentMode(ContentMode.HTML);
+		text.setValue(
+				"<p>This demo is based on a fictional healthcare scenario, where doctors, nurses and family members access health records of patients.</p>"
+						+ "<p>You can access the system as one of the following users (the password is always 'password'):"
+						+ "<ul>"
+						+ "<li><b>Dominic</b> is a visitor and is related to the patient Lenny.</li>"
+						+ "<li><b>Peter</b> is a doctor.</li>"
+						+ "<li><b>Alina</b> is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Karl.</li>"
+						+ "<li><b>Julia</b> is a doctor and is related to the patient Karl. She is also the attending doctor for the patient Lenny.</li>"
+						+ "<li><b>Brigitte</b> is a nurse.</li>"
+						+ "<li><b>Janosch</b> is a nurse and is related to the patient Karl.</li>"
+						+ "<li><b>Janina</b> is a nurse. And she is the attending nurse of the patient Karl.</li>"
+						+ "<li><b>Thomas</b> is a nurse. And he is the attending nurse of the patient Lenny.</li>"
+						+ "<li><b>Horst</b> is a system administrator.</li>" + "</ul>"
+						+ "</p>");
 
-        right.addComponentsAndExpand(text);
-        return right;
-    }
+		right.addComponentsAndExpand(text);
+		return right;
+	}
 
-    @FunctionalInterface
-    public interface LoginCallback {
-        boolean login(String username, String password);
-    }
+	@FunctionalInterface
+	public interface LoginCallback {
+
+		boolean login(String username, String password);
+
+	}
+
 }

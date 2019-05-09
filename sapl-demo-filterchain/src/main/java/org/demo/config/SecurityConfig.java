@@ -15,9 +15,9 @@ import io.sapl.spring.PolicyEnforcementFilterPEP;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	/**
-	 * Lazy initialization is needed to prevent circular dependency problem caused
-	 * by the {@link #configure(HttpSecurity)}-method that needs this field
-	 * reference early in startup
+	 * Lazy initialization is needed to prevent circular dependency problem caused by the
+	 * {@link #configure(HttpSecurity)}-method that needs this field reference early in
+	 * startup
 	 */
 	@Lazy
 	@Autowired
@@ -25,9 +25,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests().and().formLogin().loginPage("/login")
-				.permitAll().and().logout().logoutUrl("/logout").logoutSuccessUrl("/login").permitAll().and()
-				.httpBasic().and().csrf().disable();
+		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class)
+				.authorizeRequests().and().formLogin().loginPage("/login").permitAll()
+				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login")
+				.permitAll().and().httpBasic().and().csrf().disable();
 	}
 
 }

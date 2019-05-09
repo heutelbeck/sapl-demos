@@ -33,103 +33,109 @@ import com.vaadin.ui.themes.ValoTheme;
 @Theme(ValoTheme.THEME_NAME)
 public class DemoUI extends UI {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private SpringNavigator navigator;
+	@Autowired
+	private SpringNavigator navigator;
 
-    @Autowired
-    private SpringViewProvider viewProvider;
+	@Autowired
+	private SpringViewProvider viewProvider;
 
-    @Autowired
-    private ErrorView errorView;
+	@Autowired
+	private ErrorView errorView;
 
-    @Override
-    protected void init(VaadinRequest request) {
-        getPage().setTitle("Vaadin Spring Security Demo");
-        if (SecurityUtils.isAuthenticated()) {
-            showMainContent();
-        } else {
-            showLoginForm();
-        }
-    }
+	@Override
+	protected void init(VaadinRequest request) {
+		getPage().setTitle("Vaadin Spring Security Demo");
+		if (SecurityUtils.isAuthenticated()) {
+			showMainContent();
+		}
+		else {
+			showLoginForm();
+		}
+	}
 
-    private void showLoginForm() {
-        setContent(new LoginForm(this::login));
-    }
+	private void showLoginForm() {
+		setContent(new LoginForm(this::login));
+	}
 
-    private void showMainContent() {
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        layout.setSpacing(true);
-        layout.setSizeFull();
+	private void showMainContent() {
+		final VerticalLayout layout = new VerticalLayout();
+		layout.setMargin(true);
+		layout.setSpacing(true);
+		layout.setSizeFull();
 
-        final HorizontalLayout toolbar = new HorizontalLayout();
-        toolbar.setSpacing(true);
-        toolbar.setWidth("100%");
-        layout.addComponent(toolbar);
+		final HorizontalLayout toolbar = new HorizontalLayout();
+		toolbar.setSpacing(true);
+		toolbar.setWidth("100%");
+		layout.addComponent(toolbar);
 
-        final HorizontalLayout right = new HorizontalLayout();
-        right.setSpacing(true);
-        right.setSizeUndefined();
+		final HorizontalLayout right = new HorizontalLayout();
+		right.setSpacing(true);
+		right.setSizeUndefined();
 
-        final Button homeBtn = new Button("Home", event -> getNavigator().navigateTo(""));
-        final Label username = new Label("Username: " + SecurityUtils.getUsername());
-        final Button logoutBtn = new Button("Logout", event -> logout());
-        toolbar.addComponents(homeBtn, right);
-        toolbar.setComponentAlignment(homeBtn, Alignment.MIDDLE_LEFT);
-        toolbar.setComponentAlignment(right, Alignment.MIDDLE_RIGHT);
-        right.addComponents(username, logoutBtn);
-        right.setComponentAlignment(username, Alignment.MIDDLE_LEFT);
-        right.setComponentAlignment(logoutBtn, Alignment.MIDDLE_RIGHT);
+		final Button homeBtn = new Button("Home", event -> getNavigator().navigateTo(""));
+		final Label username = new Label("Username: " + SecurityUtils.getUsername());
+		final Button logoutBtn = new Button("Logout", event -> logout());
+		toolbar.addComponents(homeBtn, right);
+		toolbar.setComponentAlignment(homeBtn, Alignment.MIDDLE_LEFT);
+		toolbar.setComponentAlignment(right, Alignment.MIDDLE_RIGHT);
+		right.addComponents(username, logoutBtn);
+		right.setComponentAlignment(username, Alignment.MIDDLE_LEFT);
+		right.setComponentAlignment(logoutBtn, Alignment.MIDDLE_RIGHT);
 
-        final Panel viewContainer = new Panel();
-        viewContainer.setSizeFull();
-        layout.addComponent(viewContainer);
-        layout.setExpandRatio(viewContainer, 1.0f);
+		final Panel viewContainer = new Panel();
+		viewContainer.setSizeFull();
+		layout.addComponent(viewContainer);
+		layout.setExpandRatio(viewContainer, 1.0f);
 
-        setContent(layout);
+		setContent(layout);
 
-        setErrorHandler(this::handleError);
+		setErrorHandler(this::handleError);
 
-        viewProvider.setAccessDeniedViewClass(AccessDeniedView.class);
-        navigator.init(this, viewContainer);
-        navigator.setErrorView(errorView);
+		viewProvider.setAccessDeniedViewClass(AccessDeniedView.class);
+		navigator.init(this, viewContainer);
+		navigator.setErrorView(errorView);
 
-        navigator.navigateTo("");
-    }
+		navigator.navigateTo("");
+	}
 
-    private boolean login(String username, String password) {
-        try {
-            final Authentication token = new UsernamePasswordAuthenticationToken(username, password);
-            final Authentication authentication = authenticationManager.authenticate(token);
-            VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+	private boolean login(String username, String password) {
+		try {
+			final Authentication token = new UsernamePasswordAuthenticationToken(username,
+					password);
+			final Authentication authentication = authenticationManager
+					.authenticate(token);
+			VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            getPushConfiguration().setTransport(Transport.WEBSOCKET);
-            getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+			getPushConfiguration().setTransport(Transport.WEBSOCKET);
+			getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
 
-            showMainContent();
+			showMainContent();
 
-            return true;
-        } catch (AuthenticationException e) {
-            return false;
-        }
-    }
+			return true;
+		}
+		catch (AuthenticationException e) {
+			return false;
+		}
+	}
 
-    private void logout() {
-        getPage().reload();
-        getSession().close();
-        SecurityContextHolder.clearContext();
-    }
+	private void logout() {
+		getPage().reload();
+		getSession().close();
+		SecurityContextHolder.clearContext();
+	}
 
-    private void handleError(com.vaadin.server.ErrorEvent event) {
-        Throwable t = DefaultErrorHandler.findRelevantThrowable(event.getThrowable());
-        if (t instanceof AccessDeniedException) {
-            SecurityUtils.notifyNotAuthorized();
-        } else {
-            DefaultErrorHandler.doDefault(event);
-        }
-    }
+	private void handleError(com.vaadin.server.ErrorEvent event) {
+		Throwable t = DefaultErrorHandler.findRelevantThrowable(event.getThrowable());
+		if (t instanceof AccessDeniedException) {
+			SecurityUtils.notifyNotAuthorized();
+		}
+		else {
+			DefaultErrorHandler.doDefault(event);
+		}
+	}
+
 }

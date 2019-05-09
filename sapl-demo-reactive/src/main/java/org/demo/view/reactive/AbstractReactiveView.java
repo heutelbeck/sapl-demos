@@ -19,157 +19,167 @@ import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
 
-    private HeartBeatService heartBeatService;
-    private BloodPressureService bloodPressureService;
+	private HeartBeatService heartBeatService;
 
-    private Label heartBeatAccessDenied;
-    private Canvas heartBeatCanvas;
+	private BloodPressureService bloodPressureService;
 
-    private Label bloodPressureAccessDenied;
-    private Canvas bloodPressureCanvas;
+	private Label heartBeatAccessDenied;
 
-    private Thread fluxSubscriptionThread;
-    private Disposable subscription;
+	private Canvas heartBeatCanvas;
 
-    protected AbstractReactiveView(HeartBeatService heartBeatService, BloodPressureService bloodPressureService) {
-        this.heartBeatService = heartBeatService;
-        this.bloodPressureService = bloodPressureService;
+	private Label bloodPressureAccessDenied;
 
-        setSpacing(true);
-        setMargin(true);
+	private Canvas bloodPressureCanvas;
 
-        final VerticalLayout heatBeatCard = new VerticalLayout();
-        heatBeatCard.setSizeFull();
-        heatBeatCard.setStyleName(ValoTheme.LAYOUT_CARD);
-        addComponent(heatBeatCard);
+	private Thread fluxSubscriptionThread;
 
-        final Label heartBeatLabel = new Label("Heart Beat: ");
-        heartBeatAccessDenied = new Label("You have no access to heart beat data.");
-        heartBeatAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
-        heartBeatAccessDenied.setVisible(false);
-        heartBeatCanvas = new Canvas();
-        heartBeatCanvas.setWidth("350px");
-        heartBeatCanvas.setHeight("40px");
-        heartBeatCanvas.setVisible(true);
-        heatBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied, heartBeatCanvas);
+	private Disposable subscription;
 
-        final VerticalLayout bloodPressureCard = new VerticalLayout();
-        bloodPressureCard.setSizeFull();
-        bloodPressureCard.setStyleName(ValoTheme.LAYOUT_CARD);
-        addComponent(bloodPressureCard);
+	protected AbstractReactiveView(HeartBeatService heartBeatService,
+			BloodPressureService bloodPressureService) {
+		this.heartBeatService = heartBeatService;
+		this.bloodPressureService = bloodPressureService;
 
-        final Label bloodPressureLabel = new Label("Blood Pressure: ");
-        bloodPressureAccessDenied = new Label("You have no access to blood pressure data.");
-        bloodPressureAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
-        bloodPressureAccessDenied.setVisible(false);
-        bloodPressureCanvas = new Canvas();
-        bloodPressureCanvas.setWidth("350px");
-        bloodPressureCanvas.setHeight("40px");
-        bloodPressureCanvas.setVisible(true);
-        bloodPressureCard.addComponents(bloodPressureLabel, bloodPressureAccessDenied, bloodPressureCanvas);
-    }
+		setSpacing(true);
+		setMargin(true);
 
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent event) {
-        final Flux<Object[]> combinedFlux = getCombinedFlux();
+		final VerticalLayout heatBeatCard = new VerticalLayout();
+		heatBeatCard.setSizeFull();
+		heatBeatCard.setStyleName(ValoTheme.LAYOUT_CARD);
+		addComponent(heatBeatCard);
 
-        // subscribe in a separate thread to give the current thread the chance to unlock the vaadin session;
-        // otherwise getUI().access(() -> {}) within updateUI() could not acquire the lock necessary to update the UI
-        fluxSubscriptionThread = new Thread(() ->
-            subscription = combinedFlux.subscribe(
-                    this::updateUI,
-                    error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
-            )
-        );
-        fluxSubscriptionThread.start();
-    }
+		final Label heartBeatLabel = new Label("Heart Beat: ");
+		heartBeatAccessDenied = new Label("You have no access to heart beat data.");
+		heartBeatAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
+		heartBeatAccessDenied.setVisible(false);
+		heartBeatCanvas = new Canvas();
+		heartBeatCanvas.setWidth("350px");
+		heartBeatCanvas.setHeight("40px");
+		heartBeatCanvas.setVisible(true);
+		heatBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied,
+				heartBeatCanvas);
 
-    @Override
-    public void beforeLeave(ViewBeforeLeaveEvent event) {
-        subscription.dispose();
-        fluxSubscriptionThread.interrupt();
-        event.navigate();
-    }
+		final VerticalLayout bloodPressureCard = new VerticalLayout();
+		bloodPressureCard.setSizeFull();
+		bloodPressureCard.setStyleName(ValoTheme.LAYOUT_CARD);
+		addComponent(bloodPressureCard);
 
-    protected Flux<Integer> getHeartBeatDataFlux() {
-        return heartBeatService.getHeartBeatData()
-                .subscribeOn(Schedulers.newElastic("hb-data"));
-    }
+		final Label bloodPressureLabel = new Label("Blood Pressure: ");
+		bloodPressureAccessDenied = new Label(
+				"You have no access to blood pressure data.");
+		bloodPressureAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
+		bloodPressureAccessDenied.setVisible(false);
+		bloodPressureCanvas = new Canvas();
+		bloodPressureCanvas.setWidth("350px");
+		bloodPressureCanvas.setHeight("40px");
+		bloodPressureCanvas.setVisible(true);
+		bloodPressureCard.addComponents(bloodPressureLabel, bloodPressureAccessDenied,
+				bloodPressureCanvas);
+	}
 
-    protected Flux<Integer> getDiastolicBloodPressureDataFlux() {
-        return bloodPressureService.getDiastolicBloodPressureData()
-                .subscribeOn(Schedulers.newElastic("bpd-data"));
-    }
+	@Override
+	public void enter(ViewChangeListener.ViewChangeEvent event) {
+		final Flux<Object[]> combinedFlux = getCombinedFlux();
 
-    protected Flux<Integer> getSystolicBloodPressureDataFlux() {
-        return bloodPressureService.getSystolicBloodPressureData()
-                .subscribeOn(Schedulers.newElastic("bps-data"));
-    }
+		// subscribe in a separate thread to give the current thread the chance to unlock
+		// the vaadin session;
+		// otherwise getUI().access(() -> {}) within updateUI() could not acquire the lock
+		// necessary to update the UI
+		fluxSubscriptionThread = new Thread(() -> subscription = combinedFlux
+				.subscribe(this::updateUI, error -> Notification.show(error.getMessage(),
+						Notification.Type.ERROR_MESSAGE)));
+		fluxSubscriptionThread.start();
+	}
 
-    protected abstract Flux<Object[]> getCombinedFlux();
+	@Override
+	public void beforeLeave(ViewBeforeLeaveEvent event) {
+		subscription.dispose();
+		fluxSubscriptionThread.interrupt();
+		event.navigate();
+	}
 
-    protected abstract void updateUI(Object[] fluxValues);
+	protected Flux<Integer> getHeartBeatDataFlux() {
+		return heartBeatService.getHeartBeatData()
+				.subscribeOn(Schedulers.newElastic("hb-data"));
+	}
 
-    protected void updateUI(Decision heartBeatDecision, Decision bloodPressureDecision,
-                            Integer heartBeat, Integer diastolic, Integer systolic) {
-        getUI().access(() -> {
-            if (heartBeatDecision == Decision.PERMIT) {
-                heartBeatAccessDenied.setVisible(false);
-                heartBeatCanvas.setVisible(true);
-                drawHeartBeat(heartBeat);
-            }
-            else {
-                heartBeatCanvas.setVisible(false);
-                heartBeatAccessDenied.setVisible(true);
-            }
+	protected Flux<Integer> getDiastolicBloodPressureDataFlux() {
+		return bloodPressureService.getDiastolicBloodPressureData()
+				.subscribeOn(Schedulers.newElastic("bpd-data"));
+	}
 
-            if (bloodPressureDecision == Decision.PERMIT) {
-                bloodPressureAccessDenied.setVisible(false);
-                bloodPressureCanvas.setVisible(true);
-                drawBloodPressure(diastolic, systolic);
-            }
-            else {
-                bloodPressureCanvas.setVisible(false);
-                bloodPressureAccessDenied.setVisible(true);
-            }
+	protected Flux<Integer> getSystolicBloodPressureDataFlux() {
+		return bloodPressureService.getSystolicBloodPressureData()
+				.subscribeOn(Schedulers.newElastic("bps-data"));
+	}
 
-        });
-    }
+	protected abstract Flux<Object[]> getCombinedFlux();
 
-    private void drawHeartBeat(int heartBeat) {
-        heartBeatCanvas.saveContext();
+	protected abstract void updateUI(Object[] fluxValues);
 
-        heartBeatCanvas.clear();
+	protected void updateUI(Decision heartBeatDecision, Decision bloodPressureDecision,
+			Integer heartBeat, Integer diastolic, Integer systolic) {
+		getUI().access(() -> {
+			if (heartBeatDecision == Decision.PERMIT) {
+				heartBeatAccessDenied.setVisible(false);
+				heartBeatCanvas.setVisible(true);
+				drawHeartBeat(heartBeat);
+			}
+			else {
+				heartBeatCanvas.setVisible(false);
+				heartBeatAccessDenied.setVisible(true);
+			}
 
-        heartBeatCanvas.moveTo(0, 0);
-        heartBeatCanvas.setFillStyle("red");
-        heartBeatCanvas.fillRect(0,  0,  heartBeat,  20);
+			if (bloodPressureDecision == Decision.PERMIT) {
+				bloodPressureAccessDenied.setVisible(false);
+				bloodPressureCanvas.setVisible(true);
+				drawBloodPressure(diastolic, systolic);
+			}
+			else {
+				bloodPressureCanvas.setVisible(false);
+				bloodPressureAccessDenied.setVisible(true);
+			}
 
-        heartBeatCanvas.setFont("italic bold 12px sans-serif");
-        heartBeatCanvas.setTextBaseline("top");
-        heartBeatCanvas.fillText("" + heartBeat + " bpm", heartBeat + 10, 4, 350);
+		});
+	}
 
-        heartBeatCanvas.restoreContext();
-    }
+	private void drawHeartBeat(int heartBeat) {
+		heartBeatCanvas.saveContext();
 
-    private void drawBloodPressure(int diastolic, int systolic) {
-        bloodPressureCanvas.saveContext();
+		heartBeatCanvas.clear();
 
-        bloodPressureCanvas.clear();
+		heartBeatCanvas.moveTo(0, 0);
+		heartBeatCanvas.setFillStyle("red");
+		heartBeatCanvas.fillRect(0, 0, heartBeat, 20);
 
-        bloodPressureCanvas.setFont("italic bold 12px sans-serif");
-        bloodPressureCanvas.setTextBaseline("top");
+		heartBeatCanvas.setFont("italic bold 12px sans-serif");
+		heartBeatCanvas.setTextBaseline("top");
+		heartBeatCanvas.fillText("" + heartBeat + " bpm", heartBeat + 10, 4, 350);
 
-        bloodPressureCanvas.moveTo(0, 0);
+		heartBeatCanvas.restoreContext();
+	}
 
-        bloodPressureCanvas.setFillStyle("green");
-        bloodPressureCanvas.fillRect(0,  0,  diastolic,  12);
-        bloodPressureCanvas.fillText("" + diastolic + " mmHg (diastolic)", diastolic + 10, 0, 350);
+	private void drawBloodPressure(int diastolic, int systolic) {
+		bloodPressureCanvas.saveContext();
 
-        bloodPressureCanvas.setFillStyle("blue");
-        bloodPressureCanvas.fillRect(0,  20,  systolic,  12);
-        bloodPressureCanvas.fillText("" + systolic + " mmHg (systolic)", systolic + 10, 20, 350);
+		bloodPressureCanvas.clear();
 
-        bloodPressureCanvas.restoreContext();
-    }
+		bloodPressureCanvas.setFont("italic bold 12px sans-serif");
+		bloodPressureCanvas.setTextBaseline("top");
+
+		bloodPressureCanvas.moveTo(0, 0);
+
+		bloodPressureCanvas.setFillStyle("green");
+		bloodPressureCanvas.fillRect(0, 0, diastolic, 12);
+		bloodPressureCanvas.fillText("" + diastolic + " mmHg (diastolic)", diastolic + 10,
+				0, 350);
+
+		bloodPressureCanvas.setFillStyle("blue");
+		bloodPressureCanvas.fillRect(0, 20, systolic, 12);
+		bloodPressureCanvas.fillText("" + systolic + " mmHg (systolic)", systolic + 10,
+				20, 350);
+
+		bloodPressureCanvas.restoreContext();
+	}
+
 }

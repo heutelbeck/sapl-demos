@@ -23,198 +23,222 @@ import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class AbstractPatientForm extends FormLayout {
 
-    protected TextField medicalRecordNumber;
-    protected TextField name;
-    protected TextField icd11Code;
-    protected TextField diagnosisText;
-    protected TextField attendingDoctor;
-    protected TextField attendingNurse;
-    protected TextField phoneNumber;
-    protected TextField roomNumber;
+	protected TextField medicalRecordNumber;
 
-    private Binder<Patient> binder;
+	protected TextField name;
 
-    protected Button saveBtn;
-    protected Button deleteBtn;
+	protected TextField icd11Code;
 
-    private UIController controller;
-    private RefreshCallback refreshCallback;
+	protected TextField diagnosisText;
 
-    protected ObjectMapper objectMapper;
+	protected TextField attendingDoctor;
 
-    protected Patient patient;
-    private Patient unmodifiedPatient;
+	protected TextField attendingNurse;
 
-    protected AbstractPatientForm(UIController controller, RefreshCallback refreshCallback) {
-        this.controller = controller;
-        this.refreshCallback = refreshCallback;
+	protected TextField phoneNumber;
 
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new Jdk8Module());
+	protected TextField roomNumber;
 
-        setSizeFull();
-        setVisible(false);
+	private Binder<Patient> binder;
 
-        addFormFields();
-        bindFormFields();
-        addButtonBar();
-    }
+	protected Button saveBtn;
 
-    private void addFormFields() {
-        medicalRecordNumber = new TextField("Medical Record Number");
-        medicalRecordNumber.setData("ui:view:patients:mrnField");
+	protected Button deleteBtn;
 
-        name = new TextField("Name");
-        name.setData("ui:view:patients:nameField");
+	private UIController controller;
 
-        icd11Code = new TextField("ICD-11");
-        icd11Code.setData("ui:view:patients:icd11Field");
+	private RefreshCallback refreshCallback;
 
-        diagnosisText = new TextField("Diagnosis");
-        diagnosisText.setData("ui:view:patients:diagnosisField");
+	protected ObjectMapper objectMapper;
 
-        attendingDoctor = new TextField("Attending Doctor");
-        attendingDoctor.setData("ui:view:patients:doctorField");
+	protected Patient patient;
 
-        attendingNurse = new TextField("Attending Nurse");
-        attendingNurse.setData("ui:view:patients:nurseField");
+	private Patient unmodifiedPatient;
 
-        phoneNumber = new TextField("Phone");
-        phoneNumber.setData("ui:view:patients:phoneField");
+	protected AbstractPatientForm(UIController controller,
+			RefreshCallback refreshCallback) {
+		this.controller = controller;
+		this.refreshCallback = refreshCallback;
 
-        roomNumber = new TextField("Room Number");
-        roomNumber.setData("ui:view:patients:roomField");
+		objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new Jdk8Module());
 
-        medicalRecordNumber.setSizeFull();
-        name.setSizeFull();
-        icd11Code.setSizeFull();
-        diagnosisText.setSizeFull();
-        attendingDoctor.setSizeFull();
-        attendingNurse.setSizeFull();
-        phoneNumber.setSizeFull();
-        roomNumber.setSizeFull();
+		setSizeFull();
+		setVisible(false);
 
-        addComponents(medicalRecordNumber, name, icd11Code, diagnosisText, attendingDoctor, attendingNurse, phoneNumber, roomNumber);
-    }
+		addFormFields();
+		bindFormFields();
+		addButtonBar();
+	}
 
-    private void bindFormFields() {
-        binder = new Binder<>(Patient.class);
-        binder.forMemberField(medicalRecordNumber)
-                .asRequired("Please enter a medical record number.");
-        binder.forMemberField(name)
-                .asRequired("Please enter a name.");
-        binder.bindInstanceFields(this);
-    }
+	private void addFormFields() {
+		medicalRecordNumber = new TextField("Medical Record Number");
+		medicalRecordNumber.setData("ui:view:patients:mrnField");
 
-    private void addButtonBar() {
-        saveBtn = new Button("Save");
-        saveBtn.setData("ui:view:patients:savePatientButton");
-        saveBtn.setStyleName(ValoTheme.BUTTON_PRIMARY);
-        saveBtn.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-        saveBtn.addClickListener(e -> this.onSave());
+		name = new TextField("Name");
+		name.setData("ui:view:patients:nameField");
 
-        deleteBtn = new Button("Delete");
-        deleteBtn.setData("ui:view:patients:deletePatientButton");
-        deleteBtn.addClickListener(e -> this.onDelete());
+		icd11Code = new TextField("ICD-11");
+		icd11Code.setData("ui:view:patients:icd11Field");
 
-        final HorizontalLayout buttonBar = new HorizontalLayout(saveBtn, deleteBtn);
-        addComponent(buttonBar);
-    }
+		diagnosisText = new TextField("Diagnosis");
+		diagnosisText.setData("ui:view:patients:diagnosisField");
 
-    protected abstract void updateFieldVisibility();
+		attendingDoctor = new TextField("Attending Doctor");
+		attendingDoctor.setData("ui:view:patients:doctorField");
 
-    protected abstract void updateFieldEnabling();
+		attendingNurse = new TextField("Attending Nurse");
+		attendingNurse.setData("ui:view:patients:nurseField");
 
-    protected abstract void updateButtonVisibility();
+		phoneNumber = new TextField("Phone");
+		phoneNumber.setData("ui:view:patients:phoneField");
 
-    void show(Patient patient) {
-        this.patient = patient;
-        this.unmodifiedPatient = Patient.clone(patient);
-        binder.setBean(patient);
+		roomNumber = new TextField("Room Number");
+		roomNumber.setData("ui:view:patients:roomField");
 
-        updateFieldVisibility();
-        updateFieldEnabling();
-        updateButtonVisibility();
+		medicalRecordNumber.setSizeFull();
+		name.setSizeFull();
+		icd11Code.setSizeFull();
+		diagnosisText.setSizeFull();
+		attendingDoctor.setSizeFull();
+		attendingNurse.setSizeFull();
+		phoneNumber.setSizeFull();
+		roomNumber.setSizeFull();
 
-        setVisible(true);
-    }
+		addComponents(medicalRecordNumber, name, icd11Code, diagnosisText,
+				attendingDoctor, attendingNurse, phoneNumber, roomNumber);
+	}
 
-    void hide() {
-        setVisible(false);
-    }
+	private void bindFormFields() {
+		binder = new Binder<>(Patient.class);
+		binder.forMemberField(medicalRecordNumber)
+				.asRequired("Please enter a medical record number.");
+		binder.forMemberField(name).asRequired("Please enter a name.");
+		binder.bindInstanceFields(this);
+	}
 
-    private void onSave() {
-        try {
-            if (patient.getId() == null) {
-                if (binder.isValid()) {
-                    controller.createPatient(patient);
-                } else {
-                    Notification.show("Please enter values for all required fields.", Notification.Type.WARNING_MESSAGE);
-                    return;
-                }
-            } else {
-                controller.updatePatient(patient, this);
-            }
-        } catch (AccessDeniedException e) {
-            SecurityUtils.notifyNotAuthorized();
-        }
-        refreshCallback.refresh();
-        hide();
-    }
+	private void addButtonBar() {
+		saveBtn = new Button("Save");
+		saveBtn.setData("ui:view:patients:savePatientButton");
+		saveBtn.setStyleName(ValoTheme.BUTTON_PRIMARY);
+		saveBtn.setClickShortcut(ShortcutAction.KeyCode.ENTER);
+		saveBtn.addClickListener(e -> this.onSave());
 
-    private void onDelete() {
-        try {
-            controller.deletePatient(patient);
-            refreshCallback.refresh();
-        } catch (AccessDeniedException e) {
-            SecurityUtils.notifyNotAuthorized();
-        }
-        hide();
-    }
+		deleteBtn = new Button("Delete");
+		deleteBtn.setData("ui:view:patients:deletePatientButton");
+		deleteBtn.addClickListener(e -> this.onDelete());
 
-    public boolean hasNameBeenModified() {
-        return !Objects.equals(name.getValue(), unmodifiedPatient.getName());
-    }
+		final HorizontalLayout buttonBar = new HorizontalLayout(saveBtn, deleteBtn);
+		addComponent(buttonBar);
+	}
 
-    public boolean hasIcd11CodeBeenModified() {
-        return !Objects.equals(icd11Code.getValue(), unmodifiedPatient.getIcd11Code());
-    }
+	protected abstract void updateFieldVisibility();
 
-    public boolean hasDiagnosisTextBeenModified() {
-        return !Objects.equals(diagnosisText.getValue(), unmodifiedPatient.getDiagnosisText());
-    }
+	protected abstract void updateFieldEnabling();
 
-    public boolean hasAttendingDoctorBeenModified() {
-        return !Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor());
-    }
+	protected abstract void updateButtonVisibility();
 
-    public boolean hasAttendingNurseBeenModified() {
-        return !Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse());
-    }
+	void show(Patient patient) {
+		this.patient = patient;
+		this.unmodifiedPatient = Patient.clone(patient);
+		binder.setBean(patient);
 
-    public boolean hasPhoneNumberBeenModified() {
-        return !Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber());
-    }
+		updateFieldVisibility();
+		updateFieldEnabling();
+		updateButtonVisibility();
 
-    public boolean hasRoomNumberBeenModified() {
-        return !Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber());
-    }
+		setVisible(true);
+	}
 
+	void hide() {
+		setVisible(false);
+	}
 
-    @FunctionalInterface
-    public interface RefreshCallback {
-        void refresh();
-    }
+	private void onSave() {
+		try {
+			if (patient.getId() == null) {
+				if (binder.isValid()) {
+					controller.createPatient(patient);
+				}
+				else {
+					Notification.show("Please enter values for all required fields.",
+							Notification.Type.WARNING_MESSAGE);
+					return;
+				}
+			}
+			else {
+				controller.updatePatient(patient, this);
+			}
+		}
+		catch (AccessDeniedException e) {
+			SecurityUtils.notifyNotAuthorized();
+		}
+		refreshCallback.refresh();
+		hide();
+	}
 
-    private static class RequiredValidator implements Validator<String> {
-        @Override
-        public ValidationResult apply(String value, ValueContext context) {
-            if (value == null || value.trim().length() == 0) {
-                return ValidationResult.error("Please enter a value.");
-            } else {
-                return ValidationResult.ok();
-            }
-        }
-    }
+	private void onDelete() {
+		try {
+			controller.deletePatient(patient);
+			refreshCallback.refresh();
+		}
+		catch (AccessDeniedException e) {
+			SecurityUtils.notifyNotAuthorized();
+		}
+		hide();
+	}
+
+	public boolean hasNameBeenModified() {
+		return !Objects.equals(name.getValue(), unmodifiedPatient.getName());
+	}
+
+	public boolean hasIcd11CodeBeenModified() {
+		return !Objects.equals(icd11Code.getValue(), unmodifiedPatient.getIcd11Code());
+	}
+
+	public boolean hasDiagnosisTextBeenModified() {
+		return !Objects.equals(diagnosisText.getValue(),
+				unmodifiedPatient.getDiagnosisText());
+	}
+
+	public boolean hasAttendingDoctorBeenModified() {
+		return !Objects.equals(attendingDoctor.getValue(),
+				unmodifiedPatient.getAttendingDoctor());
+	}
+
+	public boolean hasAttendingNurseBeenModified() {
+		return !Objects.equals(attendingNurse.getValue(),
+				unmodifiedPatient.getAttendingNurse());
+	}
+
+	public boolean hasPhoneNumberBeenModified() {
+		return !Objects.equals(phoneNumber.getValue(),
+				unmodifiedPatient.getPhoneNumber());
+	}
+
+	public boolean hasRoomNumberBeenModified() {
+		return !Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber());
+	}
+
+	@FunctionalInterface
+	public interface RefreshCallback {
+
+		void refresh();
+
+	}
+
+	private static class RequiredValidator implements Validator<String> {
+
+		@Override
+		public ValidationResult apply(String value, ValueContext context) {
+			if (value == null || value.trim().length() == 0) {
+				return ValidationResult.error("Please enter a value.");
+			}
+			else {
+				return ValidationResult.ok();
+			}
+		}
+
+	}
 
 }

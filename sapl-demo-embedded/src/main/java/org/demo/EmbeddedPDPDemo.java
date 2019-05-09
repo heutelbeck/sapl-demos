@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2017-2018 Dominic Heutelbeck (dheutelbeck@ftk.de)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License.  You may obtain a copy
  * of the License at
- * 
+ *
  *   http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
@@ -45,23 +45,35 @@ public class EmbeddedPDPDemo {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
 	private static final String USAGE = "java -jar sapl-demo-embedded-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
+
 	private static final String HELP_DOC = "print this message";
+
 	private static final String HELP = "help";
+
 	private static final String POLICYPATH = "policypath";
+
 	private static final String POLICYPATH_DOC = "ANT style pattern providing the path to the polices. "
 			+ "The default path is 'classpath:policies'. The pattern will be extended by '/*.sapl' by the PDP/PRP. "
 			+ "So all files with the '.sapl' suffix will be loaded.";
 
 	private static final String SUBJECT = "willi";
+
 	private static final String ACTION_READ = "read";
+
 	private static final String ACTION_WRITE = "write";
+
 	private static final String RESOURCE = "something";
 
-	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ, RESOURCE);
-	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE, RESOURCE);
+	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ,
+			RESOURCE);
+
+	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE,
+			RESOURCE);
 
 	private static final int RUNS = 100000;
+
 	private static final double BILLION = 1000000000.0D;
+
 	private static final double MILLION = 1000000.0D;
 
 	public static void main(String[] args) {
@@ -75,22 +87,25 @@ public class EmbeddedPDPDemo {
 			if (cmd.hasOption(HELP)) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(USAGE, options);
-			} else {
+			}
+			else {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
-		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
-				| PolicyEvaluationException e) {
+		}
+		catch (ParseException | IOException | AttributeException | FunctionException
+				| URISyntaxException | PolicyEvaluationException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 
 	}
 
-	private static void runDemo(String path)
-			throws IOException, AttributeException, FunctionException, URISyntaxException, PolicyEvaluationException {
+	private static void runDemo(String path) throws IOException, AttributeException,
+			FunctionException, URISyntaxException, PolicyEvaluationException {
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
 		if (path != null) {
-			builder = builder.withFilesystemPolicyRetrievalPoint(path, Builder.IndexType.SIMPLE);
+			builder = builder.withFilesystemPolicyRetrievalPoint(path,
+					Builder.IndexType.SIMPLE);
 		}
 		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 
@@ -125,8 +140,10 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Performance...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(READ_REQUEST).take(1).subscribe(response -> {});
-			pdp.decide(WRITE_REQUEST).take(1).subscribe(response -> {});
+			pdp.decide(READ_REQUEST).take(1).subscribe(response -> {
+			});
+			pdp.decide(WRITE_REQUEST).take(1).subscribe(response -> {
+			});
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Start : {}", start);
@@ -144,9 +161,12 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	private static final Request buildRequest(Object subject, Object action, Object resource) {
+	private static final Request buildRequest(Object subject, Object action,
+			Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),
+				mapper.valueToTree(resource), null);
 	}
+
 }

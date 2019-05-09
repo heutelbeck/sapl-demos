@@ -20,10 +20,13 @@ import lombok.RequiredArgsConstructor;
 public class AuthManager implements AuthenticationManager {
 
 	private static final String NO_VALID_USER = "No valid user name provided.";
+
 	private static final String USER_INACTIVE = "User is not active.";
+
 	private static final String INVALID_PW = "User and/or password do not match.";
 
 	private final BCryptPasswordEncoder passwdEncoder = new BCryptPasswordEncoder();
+
 	private final CrewRepo crewRepo;
 
 	@Override
@@ -44,6 +47,8 @@ public class AuthManager implements AuthenticationManager {
 
 		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		userAuthorities.add(new SimpleGrantedAuthority(flightAttendant.getRole()));
-		return new UsernamePasswordAuthenticationToken(username, flightAttendant.getPassword(), userAuthorities);
+		return new UsernamePasswordAuthenticationToken(username,
+				flightAttendant.getPassword(), userAuthorities);
 	}
+
 }
