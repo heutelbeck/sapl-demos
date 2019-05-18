@@ -10,9 +10,6 @@ import org.springframework.security.access.AccessDeniedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.vaadin.data.Binder;
-import com.vaadin.data.ValidationResult;
-import com.vaadin.data.Validator;
-import com.vaadin.data.ValueContext;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
@@ -224,20 +221,6 @@ public abstract class AbstractPatientForm extends FormLayout {
 	public interface RefreshCallback {
 
 		void refresh();
-
-	}
-
-	private static class RequiredValidator implements Validator<String> {
-
-		@Override
-		public ValidationResult apply(String value, ValueContext context) {
-			if (value == null || value.trim().length() == 0) {
-				return ValidationResult.error("Please enter a value.");
-			}
-			else {
-				return ValidationResult.ok();
-			}
-		}
 
 	}
 

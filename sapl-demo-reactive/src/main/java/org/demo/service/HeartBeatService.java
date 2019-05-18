@@ -5,7 +5,6 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 public class HeartBeatService {
@@ -24,7 +23,7 @@ public class HeartBeatService {
 			sink.next(state);
 			simulateSomeWork();
 			return state;
-		}).distinctUntilChanged().subscribeOn(Schedulers.newElastic("hb-data"));
+		});
 	}
 
 	private void simulateSomeWork() {

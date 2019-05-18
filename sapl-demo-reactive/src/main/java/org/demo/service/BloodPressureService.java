@@ -5,7 +5,6 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 @Service
 public class BloodPressureService {
@@ -24,7 +23,7 @@ public class BloodPressureService {
 			sink.next(state);
 			simulateSomeWork();
 			return state;
-		}).distinctUntilChanged().subscribeOn(Schedulers.newElastic("dbp-data"));
+		});
 	}
 
 	public Flux<Integer> getSystolicBloodPressureData() {
@@ -39,7 +38,7 @@ public class BloodPressureService {
 			sink.next(state);
 			simulateSomeWork();
 			return state;
-		}).distinctUntilChanged().subscribeOn(Schedulers.newElastic("sbp-data"));
+		});
 	}
 
 	private void simulateSomeWork() {
