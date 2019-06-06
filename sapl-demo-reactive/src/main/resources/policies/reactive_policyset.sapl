@@ -1,5 +1,4 @@
 import io.sapl.pip.ClockPolicyInformationPoint as clock
-import io.sapl.pip.http.HttpPolicyInformationPoint as http
 import io.sapl.functions.TemporalFunctionLibrary as time
 import filter.*
 
