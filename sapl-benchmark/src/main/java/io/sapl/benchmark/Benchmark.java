@@ -18,10 +18,10 @@ package io.sapl.benchmark;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -42,7 +42,6 @@ import org.knowm.xchart.XYChart;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
@@ -278,7 +277,7 @@ public class Benchmark {
 
 	private static void writeExcelFile(String path, List<XlsRecord> data) {
 		File file = new File(path, "overview.xls");
-		try (OutputStream os = new FileOutputStream(file)) {
+		try (OutputStream os = Files.newOutputStream(file.toPath())) {
 			SimpleExporter exp = new SimpleExporter();
 			exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
 		}
@@ -297,7 +296,7 @@ public class Benchmark {
 		String subfolder = config.getName().replaceAll("[^a-zA-Z0-9]", "");
 		generator.generatePolicies(subfolder);
 
-		Files.copy(new File(path + "pdp.json"), new File(path + subfolder + "/pdp.json"));
+		Files.copy(new File(path + "pdp.json").toPath(), new File(path + subfolder + "/pdp.json").toPath());
 
 		List<XlsRecord> results = new LinkedList<>();
 

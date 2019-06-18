@@ -6,8 +6,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.demo.model.SchedulerData;
 import org.springframework.stereotype.Service;
@@ -25,9 +27,9 @@ public class ScheduleService {
 	private final String[] names = new String[] { "Peter", "Alina", "Julia",
 			"Brigitte", "Janosch", "Janina", "Thomas" };
 
-	private final List<String> doctors = Arrays.asList("Peter", "Alina", "Julia");
+	private final Set<String> doctors = new HashSet<>(Arrays.asList("Peter", "Alina", "Julia"));
 
-	private long instantSeconds = Instant.now().getEpochSecond();
+	private AtomicLong instantSeconds = new AtomicLong(Instant.now().getEpochSecond());
 
 	public Flux<SchedulerData> getData() {
 		return Flux.<SchedulerData>generate(sink -> {
@@ -43,8 +45,8 @@ public class ScheduleService {
 
 	private String randomInstant() {
 		int oneDayInSeconds = 24 * 60 * 60;
-		instantSeconds += rnd.nextInt(oneDayInSeconds) + 60;
-		final Instant instant = Instant.ofEpochSecond(instantSeconds);
+		instantSeconds.getAndAdd(rnd.nextInt(oneDayInSeconds) + 60);
+		final Instant instant = Instant.ofEpochSecond(instantSeconds.get());
 		final LocalDateTime cet = LocalDateTime.ofInstant(instant, ZoneId.of("CET"));
 		return dateTimeFormatter.format(cet);
 	}

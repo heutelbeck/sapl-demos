@@ -40,7 +40,7 @@ public class PilDataConstructor {
 
 	private static final String FILE_SURNAMES = "surnames.txt";
 
-	private static final String COMMA = ",";
+	private static final char COMMA = ',';
 
 	private static final String PIL_BUILD_ERR = "An error occurred while creating the PIL.";
 
