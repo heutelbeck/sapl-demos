@@ -68,6 +68,6 @@ public interface PatientRepository {
 	@PreEnforce
 	@Transactional
 	@Query("update Patient p set p.roomNumber = ?1 where p.id = ?2")
-	void updateRoomNumberById(String ruumNumber, Long id);
+	void updateRoomNumberById(String roomNumber, Long id);
 
 }
