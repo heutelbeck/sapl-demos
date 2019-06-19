@@ -25,7 +25,9 @@ import reactor.core.scheduler.Schedulers;
 @SpringComponent("reactiveView")
 public class ReactiveView extends AbstractReactiveView {
 
-	private final transient PolicyEnforcementPoint pep;
+	private static final long serialVersionUID = 1L;
+
+	private transient PolicyEnforcementPoint pep;
 
 	@Autowired
 	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,

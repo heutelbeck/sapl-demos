@@ -20,7 +20,9 @@ import io.sapl.spring.PolicyEnforcementPoint;
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
 
-	private final transient PolicyEnforcementPoint pep;
+	private static final long serialVersionUID = 1L;
+
+	private transient PolicyEnforcementPoint pep;
 
 	@Autowired
 	public HomeView(PolicyEnforcementPoint pep) {

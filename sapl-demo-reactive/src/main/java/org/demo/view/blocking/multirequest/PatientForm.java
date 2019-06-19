@@ -17,7 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 class PatientForm extends AbstractPatientForm {
 
-	private final transient PolicyEnforcementPoint pep;
+	private static final long serialVersionUID = 1L;
+
+	private transient PolicyEnforcementPoint pep;
 
 	PatientForm(PolicyEnforcementPoint pep, UIController controller,
 			RefreshCallback refreshCallback) {

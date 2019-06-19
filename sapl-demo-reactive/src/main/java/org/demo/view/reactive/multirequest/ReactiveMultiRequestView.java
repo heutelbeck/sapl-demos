@@ -29,11 +29,13 @@ import reactor.core.scheduler.Schedulers;
 @SpringComponent("reactiveMultiRequestView")
 public class ReactiveMultiRequestView extends AbstractReactiveView {
 
+	private static final long serialVersionUID = 1L;
+
 	private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
 
 	private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
 
-	private final transient PolicyEnforcementPoint pep;
+	private transient PolicyEnforcementPoint pep;
 
 	private final Map<String, Decision> accessDecisions;
 
