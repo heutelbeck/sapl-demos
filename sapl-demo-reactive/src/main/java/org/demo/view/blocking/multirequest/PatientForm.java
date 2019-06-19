@@ -54,6 +54,10 @@ class PatientForm extends AbstractPatientForm {
 
 		final MultiResponse multiResponse = pep.filterEnforce(multiRequest).blockFirst();
 
+		if (multiResponse == null) {
+			throw new IllegalStateException("PEP returned a null multi-response");
+		}
+
 		medicalRecordNumber
 				.setVisible(multiResponse.isAccessPermittedForRequestWithId("readMrn"));
 		name.setVisible(multiResponse.isAccessPermittedForRequestWithId("readName"));
