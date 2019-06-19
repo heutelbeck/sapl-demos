@@ -8,7 +8,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.annotations.Theme;
@@ -101,25 +100,18 @@ public class DemoUI extends UI {
 		navigator.navigateTo("");
 	}
 
-	private boolean login(String username, String password) {
-		try {
-			final Authentication token = new UsernamePasswordAuthenticationToken(username,
-					password);
-			final Authentication authentication = authenticationManager
-					.authenticate(token);
-			VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+	private void login(String username, String password) {
+		final Authentication token = new UsernamePasswordAuthenticationToken(username,
+				password);
+		final Authentication authentication = authenticationManager
+				.authenticate(token);
+		VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			getPushConfiguration().setTransport(Transport.WEBSOCKET);
-			getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
+		getPushConfiguration().setTransport(Transport.WEBSOCKET);
+		getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
 
-			showMainContent();
-
-			return true;
-		}
-		catch (AuthenticationException e) {
-			return false;
-		}
+		showMainContent();
 	}
 
 	private void logout() {

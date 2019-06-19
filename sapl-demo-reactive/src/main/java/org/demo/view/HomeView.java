@@ -20,7 +20,7 @@ import io.sapl.spring.PolicyEnforcementPoint;
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
 
-	private PolicyEnforcementPoint pep;
+	private final transient PolicyEnforcementPoint pep;
 
 	@Autowired
 	public HomeView(PolicyEnforcementPoint pep) {
@@ -82,6 +82,10 @@ public class HomeView extends VerticalLayout implements View {
 						reactiveMultiRequestBtn.getData());
 
 		final MultiResponse multiResponse = pep.filterEnforce(multiRequest).blockFirst();
+
+		if (multiResponse == null) {
+			throw new IllegalStateException("PEP returned a null multi-response");
+		}
 
 		traditionalBtn.setEnabled(
 				multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));

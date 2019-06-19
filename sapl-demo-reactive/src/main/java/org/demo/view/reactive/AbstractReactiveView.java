@@ -251,8 +251,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				schedulerDataHolder[0] = mapper.treeToValue(resource.get(), SchedulerData.class);
 			}
 			catch (JsonProcessingException e) {
-				e.printStackTrace();
-				schedulerDataHolder[0] = new SchedulerData("", "?", "?");
+				schedulerDataHolder[0] = new SchedulerData("", "JsonProcessingException", e.getMessage());
 			}
 		}
 		getUI().access(() -> {

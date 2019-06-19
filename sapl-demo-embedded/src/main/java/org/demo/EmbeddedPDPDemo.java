@@ -119,9 +119,11 @@ public class EmbeddedPDPDemo {
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
 		final Response readResponse = pdp.decide(READ_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'read': {}", readResponse.getDecision());
+		LOGGER.info("Decision for action 'read': {}",
+				readResponse != null ? readResponse.getDecision() : "null");
 		final Response writeResponse = pdp.decide(WRITE_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'write': {}", writeResponse.getDecision());
+		LOGGER.info("Decision for action 'write': {}",
+				writeResponse != null ? writeResponse.getDecision() : "null");
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {

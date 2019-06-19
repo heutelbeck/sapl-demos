@@ -1,5 +1,7 @@
 package org.demo;
 
+import org.springframework.security.core.AuthenticationException;
+
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
@@ -34,7 +36,10 @@ class LoginForm extends VerticalLayout {
 		final Button login = new Button("Login", evt -> {
 			String pwd = password.getValue();
 			password.setValue("");
-			if (!callback.login(username.getValue(), pwd)) {
+			try {
+				callback.login(username.getValue(), pwd);
+			}
+			catch (AuthenticationException e) {
 				Notification.show("Login failed");
 				username.focus();
 			}
@@ -76,7 +81,7 @@ class LoginForm extends VerticalLayout {
 	@FunctionalInterface
 	public interface LoginCallback {
 
-		boolean login(String username, String password);
+		void login(String username, String password);
 
 	}
 

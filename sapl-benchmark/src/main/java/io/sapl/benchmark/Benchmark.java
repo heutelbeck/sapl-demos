@@ -17,11 +17,13 @@ package io.sapl.benchmark;
 
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -66,7 +68,7 @@ public class Benchmark {
 
 	private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
 
-	private static final String DEFAULT_PATH = "C:/sapl/";
+	private static final String DEFAULT_PATH = "C:/sapl";
 
 	private static final String HELP_DOC = "print this message";
 
@@ -276,8 +278,7 @@ public class Benchmark {
 	}
 
 	private static void writeExcelFile(String path, List<XlsRecord> data) {
-		File file = new File(path, "overview.xls");
-		try (OutputStream os = Files.newOutputStream(file.toPath())) {
+		try (OutputStream os = Files.newOutputStream(Paths.get(path, "overview.xls"))) {
 			SimpleExporter exp = new SimpleExporter();
 			exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
 		}
@@ -296,7 +297,9 @@ public class Benchmark {
 		String subfolder = config.getName().replaceAll("[^a-zA-Z0-9]", "");
 		generator.generatePolicies(subfolder);
 
-		Files.copy(new File(path + "pdp.json").toPath(), new File(path + subfolder + "/pdp.json").toPath());
+		final Path dir = Paths.get(path, subfolder);
+		Files.createDirectories(dir);
+		Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"), StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
 
 		List<XlsRecord> results = new LinkedList<>();
 
@@ -305,6 +308,7 @@ public class Benchmark {
 				long begin = System.nanoTime();
 				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
 						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE)
+						.withFilesystemPDPConfigurationProvider(path + subfolder)
 						.build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
@@ -317,6 +321,9 @@ public class Benchmark {
 
 					double diff = nanoToMs(end - start);
 
+					if (response == null) {
+						throw new IOException("PDP returned null response");
+					}
 					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep,
 							diff, request.toString(), response.toString()));
 

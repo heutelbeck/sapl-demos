@@ -1,10 +1,12 @@
 package io.sapl.demo.geo.controller;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -214,7 +216,8 @@ public class PilDataConstructor {
 
 	private static String[] getNameList(String file) throws IOException {
 		InputStreamReader fileReader = new InputStreamReader(
-				new FileInputStream(FILE_PATH + FilenameUtils.getName(file)),
+				Files.newInputStream(Paths.get(FILE_PATH, FilenameUtils.getName(file)),
+						StandardOpenOption.READ),
 				StandardCharsets.UTF_8);
 
 		List<String> result = new ArrayList<>();

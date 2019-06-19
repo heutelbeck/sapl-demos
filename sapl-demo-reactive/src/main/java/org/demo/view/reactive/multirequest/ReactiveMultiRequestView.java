@@ -33,7 +33,7 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 
 	private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
 
-	private final PolicyEnforcementPoint pep;
+	private final transient PolicyEnforcementPoint pep;
 
 	private final Map<String, Decision> accessDecisions;
 

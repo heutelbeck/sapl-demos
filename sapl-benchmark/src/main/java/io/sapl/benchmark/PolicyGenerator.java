@@ -102,10 +102,13 @@ public class PolicyGenerator {
 
 		File folder = new File(path);
 		if (folder.mkdirs()) {
-			for (File file : folder.listFiles()) {
-				if (file.getName().endsWith("sapl") && !file.delete()) {
-					System.err.println(String.format("failed to delete: %s.",
-							file.getAbsolutePath()));
+			final File[] files = folder.listFiles();
+			if (files != null) {
+				for (File file : files) {
+					if (file.getName().endsWith("sapl") && !file.delete()) {
+						System.err.println(String.format("failed to delete: %s.",
+								file.getAbsolutePath()));
+					}
 				}
 			}
 		}
