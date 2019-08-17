@@ -113,8 +113,6 @@ public class EmbeddedPDPDemo {
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
 		runPerformanceDemo(pdp);
-
-		pdp.dispose();
 	}
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
