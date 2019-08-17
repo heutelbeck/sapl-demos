@@ -32,6 +32,7 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
@@ -93,7 +94,7 @@ public class EmbeddedPDPDemo {
 			}
 		}
 		catch (ParseException | IOException | AttributeException | FunctionException
-				| URISyntaxException | PolicyEvaluationException e) {
+				| URISyntaxException | PolicyEvaluationException | PDPConfigurationException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
@@ -101,7 +102,7 @@ public class EmbeddedPDPDemo {
 	}
 
 	private static void runDemo(String path) throws IOException, AttributeException,
-			FunctionException, URISyntaxException, PolicyEvaluationException {
+			FunctionException, URISyntaxException, PolicyEvaluationException, PDPConfigurationException {
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
 		if (path != null) {
 			builder = builder.withFilesystemPolicyRetrievalPoint(path,

@@ -48,6 +48,7 @@ import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
@@ -331,7 +332,7 @@ public class Benchmark {
 				}
 			}
 		}
-		catch (IOException | AttributeException | FunctionException e) {
+		catch (IOException | AttributeException | FunctionException | PDPConfigurationException e) {
 			LOGGER.error("Error running test", e);
 		}
 
