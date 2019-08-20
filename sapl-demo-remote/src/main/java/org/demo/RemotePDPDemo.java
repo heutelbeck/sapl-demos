@@ -132,7 +132,11 @@ public class RemotePDPDemo {
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(request).take(1)
-					.subscribe(response -> LOG.info("response: {}", response));
+					.subscribe(
+					        response -> LOG.info("response: {}", response),
+                            error -> LOG.error("error", error),
+                            () -> LOG.info("complete")
+                    );
 		}
 		long end = System.nanoTime();
 
@@ -141,10 +145,11 @@ public class RemotePDPDemo {
 		LOG.info("Runs  : {}", RUNS);
 		LOG.info("Total : {}s", nanoToS((double) end - start));
 		LOG.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+
+		try { Thread.sleep(1000); } catch (Exception e) {}
 	}
 
-	private static final Request buildRequest(Object subject, Object action,
-			Object resource) {
+	private static Request buildRequest(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
 		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),
