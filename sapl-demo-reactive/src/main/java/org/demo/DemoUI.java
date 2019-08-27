@@ -3,6 +3,8 @@ package org.demo;
 import org.demo.security.SecurityUtils;
 import org.demo.view.AccessDeniedView;
 import org.demo.view.ErrorView;
+import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
+import org.demo.view.traditional.SingleRequestStreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +30,8 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.sapl.spring.PolicyEnforcementPoint;
+
 @SpringUI
 @Theme(ValoTheme.THEME_NAME)
 public class DemoUI extends UI {
@@ -43,6 +47,9 @@ public class DemoUI extends UI {
 
 	@Autowired
 	private ErrorView errorView;
+
+	@Autowired
+	private PolicyEnforcementPoint pep;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -101,12 +108,13 @@ public class DemoUI extends UI {
 	}
 
 	private void login(String username, String password) {
-		final Authentication token = new UsernamePasswordAuthenticationToken(username,
-				password);
-		final Authentication authentication = authenticationManager
-				.authenticate(token);
+		final Authentication token = new UsernamePasswordAuthenticationToken(username, password);
+		final Authentication authentication = authenticationManager.authenticate(token);
 		VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+
+		getSession().setAttribute(SingleRequestStreamManager.class, new SingleRequestStreamManager(pep));
+		getSession().setAttribute(MultiRequestStreamManager.class, new MultiRequestStreamManager(pep));
 
 		getPushConfiguration().setTransport(Transport.WEBSOCKET);
 		getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
@@ -116,6 +124,8 @@ public class DemoUI extends UI {
 
 	private void logout() {
 		getPage().reload();
+		getSession().getAttribute(SingleRequestStreamManager.class).dispose();
+		getSession().getAttribute(MultiRequestStreamManager.class).dispose();
 		getSession().close();
 		SecurityContextHolder.clearContext();
 	}

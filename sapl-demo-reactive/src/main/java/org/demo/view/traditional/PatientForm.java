@@ -1,15 +1,11 @@
-package org.demo.view.blocking;
-
-import static io.sapl.api.pdp.Decision.PERMIT;
+package org.demo.view.traditional;
 
 import java.io.IOException;
 
-import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.spring.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -17,17 +13,12 @@ class PatientForm extends AbstractPatientForm {
 
 	private static final long serialVersionUID = 1L;
 
-	private transient PolicyEnforcementPoint pep;
-
-	PatientForm(PolicyEnforcementPoint pep, UIController controller,
-			RefreshCallback refreshCallback) {
+	PatientForm(UIController controller, RefreshCallback refreshCallback) {
 		super(controller, refreshCallback);
-		this.pep = pep;
 	}
 
 	protected void updateFieldVisibility() {
-		medicalRecordNumber
-				.setVisible(isPermitted("read", medicalRecordNumber.getData()));
+		medicalRecordNumber.setVisible(isPermitted("read", medicalRecordNumber.getData()));
 		name.setVisible(isPermitted("read", name.getData()));
 		diagnosisText.setVisible(isPermitted("read", diagnosisText.getData()));
 		icd11Code.setVisible(isPermitted("read", icd11Code.getData()));
@@ -48,8 +39,7 @@ class PatientForm extends AbstractPatientForm {
 
 	protected void updateFieldEnabling() {
 		boolean isNewPatient = patient.getId() == null;
-		medicalRecordNumber.setEnabled(
-				isNewPatient && isPermitted("edit", medicalRecordNumber.getData()));
+		medicalRecordNumber.setEnabled(isNewPatient && isPermitted("edit", medicalRecordNumber.getData()));
 		name.setEnabled(isPermitted("edit", name.getData()));
 		icd11Code.setEnabled(isPermitted("edit", icd11Code.getData()));
 		diagnosisText.setEnabled(isPermitted("edit", diagnosisText.getData()));
@@ -61,8 +51,7 @@ class PatientForm extends AbstractPatientForm {
 
 	protected void updateButtonVisibility() {
 		boolean isNewPatient = patient.getId() == null;
-		saveBtn.setVisible(isPermitted(isNewPatient ? "useForCreate" : "useForUpdate",
-				saveBtn.getData()));
+		saveBtn.setVisible(isPermitted(isNewPatient ? "useForCreate" : "useForUpdate", saveBtn.getData()));
 
 		try {
 			final JsonNode resource = objectMapper.readTree("{ \"id\": " + patient.getId()
@@ -76,8 +65,8 @@ class PatientForm extends AbstractPatientForm {
 	}
 
 	private boolean isPermitted(Object action, Object resource) {
-		return pep.enforce(SecurityUtils.getAuthentication(), action, resource)
-				.blockFirst() == PERMIT;
+		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
+		return streamManager.isAccessPermitted(action, resource);
 	}
 
 }

@@ -1,4 +1,4 @@
-package org.demo.view.blocking;
+package org.demo.view.traditional;
 
 import java.util.Objects;
 
@@ -52,8 +52,7 @@ public abstract class AbstractPatientForm extends FormLayout {
 
 	private Patient unmodifiedPatient;
 
-	protected AbstractPatientForm(UIController controller,
-			RefreshCallback refreshCallback) {
+	protected AbstractPatientForm(UIController controller, RefreshCallback refreshCallback) {
 		this.controller = controller;
 		this.refreshCallback = refreshCallback;
 
@@ -216,6 +215,7 @@ public abstract class AbstractPatientForm extends FormLayout {
 	public boolean hasRoomNumberBeenModified() {
 		return !Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber());
 	}
+
 
 	@FunctionalInterface
 	public interface RefreshCallback {

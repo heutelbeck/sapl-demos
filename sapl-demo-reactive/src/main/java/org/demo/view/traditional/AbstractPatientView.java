@@ -1,6 +1,4 @@
-package org.demo.view.blocking;
-
-import static io.sapl.api.pdp.Decision.PERMIT;
+package org.demo.view.traditional;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,30 +18,28 @@ import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
 
-import io.sapl.spring.PolicyEnforcementPoint;
-
 public abstract class AbstractPatientView extends VerticalLayout implements View {
-
-	private PolicyEnforcementPoint pep;
 
 	private UIController controller;
 
 	private Grid<PatientListItem> grid;
 
-	protected AbstractPatientView(PolicyEnforcementPoint pep, UIController controller) {
-		this.pep = pep;
+	protected AbstractPatientView(UIController controller) {
 		this.controller = controller;
-
 		setMargin(true);
 	}
 
-	protected abstract AbstractPatientForm createForm(PolicyEnforcementPoint pep,
-			UIController uiController,
+	protected abstract AbstractPatientForm createForm(UIController uiController,
 			AbstractPatientForm.RefreshCallback refreshCallback);
+
+	protected boolean isPermitted(Object action, Object resource) {
+		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
+		return streamManager.isAccessPermitted(action, resource);
+	}
 
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
-		final AbstractPatientForm form = createForm(pep, controller, this::refresh);
+		final AbstractPatientForm form = createForm(controller, this::refresh);
 		form.setSizeFull();
 		form.setVisible(false);
 
@@ -69,8 +65,7 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 			grid.asSingleSelect().clear();
 			form.show(new Patient());
 		});
-		addPatientBtn.setVisible(pep.enforce(SecurityUtils.getAuthentication(), "use",
-				addPatientBtn.getData()).blockFirst() == PERMIT);
+		addPatientBtn.setVisible(isPermitted("use", addPatientBtn.getData()));
 
 		final HorizontalLayout main = new HorizontalLayout(grid, form);
 		main.setSizeFull();

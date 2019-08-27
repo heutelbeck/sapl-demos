@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
 import org.demo.model.PatientListItem;
-import org.demo.view.blocking.AbstractPatientForm;
+import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.stereotype.Component;
 
 import io.sapl.spring.method.pre.PreEnforce;

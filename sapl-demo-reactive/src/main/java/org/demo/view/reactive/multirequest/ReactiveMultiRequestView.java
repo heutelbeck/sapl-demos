@@ -55,12 +55,10 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
 		final MultiRequest multiRequest = new MultiRequest()
-				.addRequest(READ_HEART_BEAT_DATA_REQUEST_ID, authentication, "read",
-						"heartBeatData")
-				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read",
-						"bloodPressureData");
+				.addRequest(READ_HEART_BEAT_DATA_REQUEST_ID, authentication, "read", "heartBeatData")
+				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read", "bloodPressureData");
 
-		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforce(multiRequest)
+		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforceAll(multiRequest)
 				.subscribeOn(Schedulers.newElastic("pdp"));
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(),

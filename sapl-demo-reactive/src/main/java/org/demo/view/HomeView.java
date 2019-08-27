@@ -1,7 +1,7 @@
 package org.demo.view;
 
 import org.demo.security.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
 import org.springframework.security.core.Authentication;
 
 import com.vaadin.navigator.View;
@@ -14,20 +14,15 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
 import io.sapl.api.pdp.multirequest.MultiRequest;
-import io.sapl.api.pdp.multirequest.MultiResponse;
-import io.sapl.spring.PolicyEnforcementPoint;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 1L;
 
-	private transient PolicyEnforcementPoint pep;
+	private static final String BUTTON_WIDTH = "400px";
 
-	@Autowired
-	public HomeView(PolicyEnforcementPoint pep) {
-		this.pep = pep;
-
+	public HomeView() {
 		setMargin(true);
 		setSpacing(true);
 	}
@@ -44,59 +39,45 @@ public class HomeView extends VerticalLayout implements View {
 		grid.setHideEmptyRowsAndColumns(false);
 		addComponent(grid);
 
-		final Button traditionalBtn = new Button(
-				"Show Patient List (blocking, single requests)",
+		final Button traditionalBtn = new Button("Show Patient List (session based, single requests)",
 				click -> getUI().getNavigator().navigateTo("traditional"));
 		traditionalBtn.setData("ui:view:home:showPatientListTraditionalButton");
-		traditionalBtn.setWidth("360px");
+		traditionalBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(traditionalBtn, 0, 0);
 
-		final Button multiRequestBtn = new Button(
-				"Show Patient List (blocking, multi-request)",
+		final Button multiRequestBtn = new Button("Show Patient List (session based, multi-request)",
 				click -> getUI().getNavigator().navigateTo("multiRequest"));
 		multiRequestBtn.setData("ui:view:home:showPatientListMultiRequestButton");
-		multiRequestBtn.setWidth("360px");
+		multiRequestBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(multiRequestBtn, 0, 1);
 
 		final Button reactiveBtn = new Button("Show Reactive View (single requests)",
 				click -> getUI().getNavigator().navigateTo("reactive"));
 		reactiveBtn.setData("ui:view:home:showReactiveViewButton");
-		reactiveBtn.setWidth("360px");
+		reactiveBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveBtn, 0, 3);
 
-		final Button reactiveMultiRequestBtn = new Button(
-				"Show Reactive View (multi-request)",
+		final Button reactiveMultiRequestBtn = new Button("Show Reactive View (multi-request)",
 				click -> getUI().getNavigator().navigateTo("reactiveMultiRequest"));
-		reactiveMultiRequestBtn
-				.setData("ui:view:home:showReactiveViewMultiRequestButton");
-		reactiveMultiRequestBtn.setWidth("360px");
+		reactiveMultiRequestBtn.setData("ui:view:home:showReactiveViewMultiRequestButton");
+		reactiveMultiRequestBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveMultiRequestBtn, 0, 4);
 
-		final Authentication authentication = SecurityUtils.getAuthentication();
-		final MultiRequest multiRequest = new MultiRequest()
-				.addRequest("useTraditionalBtn", authentication, "use",
-						traditionalBtn.getData())
-				.addRequest("useMultiRequestBtn", authentication, "use",
-						multiRequestBtn.getData())
-				.addRequest("useReactiveBtn", authentication, "use",
-						reactiveBtn.getData())
-				.addRequest("useReactiveMultiRequestBtn", authentication, "use",
-						reactiveMultiRequestBtn.getData());
-
-		final MultiResponse multiResponse = pep.filterEnforce(multiRequest).blockFirst();
-
-		if (multiResponse == null) {
-			throw new IllegalStateException("PEP returned a null multi-response");
+		final MultiRequestStreamManager streamManager = getSession().getAttribute(MultiRequestStreamManager.class);
+		if (!streamManager.hasMultiRequestSubscriptionFor("homeViewButtons")) {
+			final Authentication authentication = SecurityUtils.getAuthentication();
+			final MultiRequest multiRequest = new MultiRequest()
+					.addRequest("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
+					.addRequest("useMultiRequestBtn", authentication, "use", multiRequestBtn.getData())
+					.addRequest("useReactiveBtn", authentication, "use", reactiveBtn.getData())
+					.addRequest("useReactiveMultiRequestBtn", authentication, "use", reactiveMultiRequestBtn.getData());
+			streamManager.setupNewMultiRequest("homeViewButtons", multiRequest);
 		}
 
-		traditionalBtn.setEnabled(
-				multiResponse.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-		multiRequestBtn.setEnabled(
-				multiResponse.isAccessPermittedForRequestWithId("useMultiRequestBtn"));
-		reactiveBtn.setEnabled(
-				multiResponse.isAccessPermittedForRequestWithId("useReactiveBtn"));
-		reactiveMultiRequestBtn.setEnabled(multiResponse
-				.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
+		traditionalBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useTraditionalBtn"));
+		multiRequestBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useMultiRequestBtn"));
+		reactiveBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveBtn"));
+		reactiveMultiRequestBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
 	}
 
 }
