@@ -20,7 +20,7 @@ public class HomeView extends VerticalLayout implements View {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String BUTTON_WIDTH = "400px";
+	private static final String BUTTON_WIDTH = "475px";
 
 	public HomeView() {
 		setMargin(true);
@@ -39,25 +39,25 @@ public class HomeView extends VerticalLayout implements View {
 		grid.setHideEmptyRowsAndColumns(false);
 		addComponent(grid);
 
-		final Button traditionalBtn = new Button("Show Patient List (session based, single requests)",
+		final Button traditionalBtn = new Button("Show Patient View (session based, single requests)",
 				click -> getUI().getNavigator().navigateTo("traditional"));
 		traditionalBtn.setData("ui:view:home:showPatientListTraditionalButton");
 		traditionalBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(traditionalBtn, 0, 0);
 
-		final Button multiRequestBtn = new Button("Show Patient List (session based, multi-request)",
+		final Button multiRequestBtn = new Button("Show Patient View (session based, multi-request)",
 				click -> getUI().getNavigator().navigateTo("multiRequest"));
 		multiRequestBtn.setData("ui:view:home:showPatientListMultiRequestButton");
 		multiRequestBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(multiRequestBtn, 0, 1);
 
-		final Button reactiveBtn = new Button("Show Reactive View (single requests)",
+		final Button reactiveBtn = new Button("Show Live-Data View (reactive frontend, single requests)",
 				click -> getUI().getNavigator().navigateTo("reactive"));
 		reactiveBtn.setData("ui:view:home:showReactiveViewButton");
 		reactiveBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveBtn, 0, 3);
 
-		final Button reactiveMultiRequestBtn = new Button("Show Reactive View (multi-request)",
+		final Button reactiveMultiRequestBtn = new Button("Show Live-Data View (reactive frontend, multi-request)",
 				click -> getUI().getNavigator().navigateTo("reactiveMultiRequest"));
 		reactiveMultiRequestBtn.setData("ui:view:home:showReactiveViewMultiRequestButton");
 		reactiveMultiRequestBtn.setWidth(BUTTON_WIDTH);

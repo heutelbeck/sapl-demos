@@ -3,8 +3,8 @@ package org.demo;
 import org.demo.security.SecurityUtils;
 import org.demo.view.AccessDeniedView;
 import org.demo.view.ErrorView;
-import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
 import org.demo.view.traditional.SingleRequestStreamManager;
+import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.DefaultErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
@@ -54,11 +55,11 @@ public class DemoUI extends UI {
 	@Override
 	protected void init(VaadinRequest request) {
 		getPage().setTitle("Vaadin Spring Security Demo");
-		if (SecurityUtils.isAuthenticated()) {
-			showMainContent();
+		if (!SecurityUtils.isAuthenticated()) {
+			showLoginForm();
 		}
 		else {
-			showLoginForm();
+			showMainContent();
 		}
 	}
 
@@ -81,10 +82,12 @@ public class DemoUI extends UI {
 		right.setSpacing(true);
 		right.setSizeUndefined();
 
-		final Button homeBtn = new Button("Home", event -> getNavigator().navigateTo(""));
+		final Button homeBtn = new Button("Home", event -> navigator.navigateTo(""));
+		final Label homeLbl = new Label("Reactive SAPL Demo Application");
+		homeLbl.setStyleName(ValoTheme.LABEL_HUGE);
 		final Label username = new Label("Username: " + SecurityUtils.getUsername());
 		final Button logoutBtn = new Button("Logout", event -> logout());
-		toolbar.addComponents(homeBtn, right);
+		toolbar.addComponents(homeBtn, homeLbl, right);
 		toolbar.setComponentAlignment(homeBtn, Alignment.MIDDLE_LEFT);
 		toolbar.setComponentAlignment(right, Alignment.MIDDLE_RIGHT);
 		right.addComponents(username, logoutBtn);
@@ -103,6 +106,13 @@ public class DemoUI extends UI {
 		viewProvider.setAccessDeniedViewClass(AccessDeniedView.class);
 		navigator.init(this, viewContainer);
 		navigator.setErrorView(errorView);
+
+		// don't show the home-button on the home-view
+		navigator.addViewChangeListener((ViewChangeListener) event -> {
+			homeBtn.setVisible(!"".equals(event.getViewName()));
+			homeLbl.setVisible("".equals(event.getViewName()));
+			return true;
+		});
 
 		navigator.navigateTo("");
 	}
