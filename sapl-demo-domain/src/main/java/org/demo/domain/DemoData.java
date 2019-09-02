@@ -82,25 +82,25 @@ public class DemoData implements CommandLineRunner {
 	}
 
 	public static void loadUsers(
-			InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen,
+			InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMem,
 			PasswordEncoder encoder) {
-		inmen.withUser(NAME_DOMINIC).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_DOMINIC).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_VISITOR);
-		inmen.withUser(NAME_JULIA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_JULIA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_DOCTOR);
-		inmen.withUser(NAME_PETER).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_PETER).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_DOCTOR);
-		inmen.withUser(NAME_ALINA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_ALINA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_DOCTOR);
-		inmen.withUser(NAME_THOMAS).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_THOMAS).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_NURSE);
-		inmen.withUser(NAME_BRIGITTE).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_BRIGITTE).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_NURSE);
-		inmen.withUser(NAME_JANOSCH).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_JANOSCH).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_NURSE);
-		inmen.withUser(NAME_JANINA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_JANINA).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_NURSE);
-		inmen.withUser(NAME_HORST).password(encoder.encode(DEFAULT_RAW_PASSWORD))
+		inMem.withUser(NAME_HORST).password(encoder.encode(DEFAULT_RAW_PASSWORD))
 				.roles(ROLE_ADMIN);
 	}
 
