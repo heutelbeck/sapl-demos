@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.demo.model.SchedulerData;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
-import org.demo.service.ScheduleService;
+import org.demo.service.SchedulerService;
 import org.vaadin.hezamu.canvas.Canvas;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,7 +34,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	private BloodPressureService bloodPressureService;
 
-	private final ScheduleService scheduleService;
+	private final SchedulerService schedulerService;
 
 	private Label heartBeatAccessDenied;
 
@@ -57,13 +57,13 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	private Disposable subscription2;
 
 	protected AbstractReactiveView(HeartBeatService heartBeatService,
-			BloodPressureService bloodPressureService, ScheduleService scheduleService) {
+			BloodPressureService bloodPressureService, SchedulerService schedulerService) {
 		this.mapper = new ObjectMapper();
 		this.mapper.registerModule(new Jdk8Module());
 
 		this.heartBeatService = heartBeatService;
 		this.bloodPressureService = bloodPressureService;
-		this.scheduleService = scheduleService;
+		this.schedulerService = schedulerService;
 
 		setupUI();
 	}
@@ -127,15 +127,18 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		// the vaadin session;
 		// otherwise getUI().access(() -> {}) could not acquire the lock necessary to update the UI
 		fluxSubscriptionThread1 = new Thread(() -> subscription1 = combinedFlux
-				.subscribe(this::updateUIForNonFilteredResources, error -> Notification.show(error.getMessage(),
-						Notification.Type.ERROR_MESSAGE)));
+				.subscribe(
+						this::updateUIForNonFilteredResources,
+						error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+				));
 		fluxSubscriptionThread1.start();
 
 		final Flux<Response> responseFlux = getFilteredResourceFlux();
 		fluxSubscriptionThread2 = new Thread(() -> subscription2 = responseFlux
 				.subscribe(
-						this::updateUIWithFilteredResource, error -> Notification.show(error.getMessage(),
-								Notification.Type.ERROR_MESSAGE)));
+						this::updateUIWithFilteredResource,
+						error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+				));
 		fluxSubscriptionThread2.start();
 	}
 
@@ -166,8 +169,8 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				.subscribeOn(Schedulers.newElastic("bps-data"));
 	}
 
-	protected Flux<SchedulerData> getScheduleDataFlux() {
-		return scheduleService.getData()
+	protected Flux<SchedulerData> getSchedulerDataFlux() {
+		return schedulerService.getData()
 				.subscribeOn(Schedulers.newElastic("sc-data"));
 	}
 
@@ -176,7 +179,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	protected abstract void updateUIForNonFilteredResources(Object[] fluxValues);
 
 	protected void updateUIForNonFilteredResources(Decision heartBeatDecision, Decision bloodPressureDecision,
-												   Integer heartBeat, Integer diastolic, Integer systolic) {
+			Integer heartBeat, Integer diastolic, Integer systolic) {
 		getUI().access(() -> {
 			if (heartBeatDecision == Decision.PERMIT) {
 				heartBeatAccessDenied.setVisible(false);

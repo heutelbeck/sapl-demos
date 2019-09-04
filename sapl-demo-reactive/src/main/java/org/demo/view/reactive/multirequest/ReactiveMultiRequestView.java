@@ -8,7 +8,7 @@ import org.demo.model.SchedulerData;
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
-import org.demo.service.ScheduleService;
+import org.demo.service.SchedulerService;
 import org.demo.view.reactive.AbstractReactiveView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -42,8 +42,8 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 	@Autowired
 	public ReactiveMultiRequestView(PolicyEnforcementPoint pep,
 			HeartBeatService heartBeatService, BloodPressureService bloodPressureService,
-			ScheduleService scheduleService) {
-		super(heartBeatService, bloodPressureService, scheduleService);
+			SchedulerService schedulerService) {
+		super(heartBeatService, bloodPressureService, schedulerService);
 		this.pep = pep;
 
 		accessDecisions = new HashMap<>();
@@ -94,7 +94,7 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 		// one, it would not make much sense to create a multi request with all the
 		// resources if only one of them has changed.
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		final Flux<SchedulerData> schedulerDataFlux = getScheduleDataFlux();
+		final Flux<SchedulerData> schedulerDataFlux = getSchedulerDataFlux();
 		return schedulerDataFlux.switchMap(
 				data -> pep.filterEnforce(authentication, "readSchedulerData", data)
 						.subscribeOn(Schedulers.newElastic("sc-pdp")));

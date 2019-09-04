@@ -8,7 +8,7 @@ import org.demo.model.SchedulerData;
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
-import org.demo.service.ScheduleService;
+import org.demo.service.SchedulerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 
@@ -31,8 +31,8 @@ public class ReactiveView extends AbstractReactiveView {
 
 	@Autowired
 	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
-			BloodPressureService bloodPressureService, ScheduleService scheduleService) {
-		super(heartBeatService, bloodPressureService, scheduleService);
+			BloodPressureService bloodPressureService, SchedulerService schedulerService) {
+		super(heartBeatService, bloodPressureService, schedulerService);
 		this.pep = pep;
 	}
 
@@ -70,7 +70,7 @@ public class ReactiveView extends AbstractReactiveView {
 		// request to the PDP to transform / filter the resource.
 		// In this example there is just one resource flux. If there where more than one,
 		// we would have to execute the following lines of code for each of them.
-		final Flux<SchedulerData> schedulerDataFlux = getScheduleDataFlux();
+		final Flux<SchedulerData> schedulerDataFlux = getSchedulerDataFlux();
 		final Authentication authentication = SecurityUtils.getAuthentication();
 		final ExecutorService executorService = Executors.newFixedThreadPool(2);
 		return schedulerDataFlux.switchMap(
