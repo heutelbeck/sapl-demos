@@ -26,13 +26,6 @@ where
 
 policy "Logged in users may access the reactive view."
 permit
-    resource == "reactiveView"
+    resource =~ "reactive(MultiRequest)?View"
 where
-    !("ROLE_ANONYMOUS" in subject..authority);
-
-
-policy "Logged in users may access the reactive multi-request view."
-permit
-    resource == "reactiveMultiRequestView"
-where
-    !("ROLE_ANONYMOUS" in subject..authority);
+    !("ROLE_ANONYMOUS" in subject..authority || "ROLE_ADMIN" in subject..authority);
