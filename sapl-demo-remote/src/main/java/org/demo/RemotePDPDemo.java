@@ -78,7 +78,7 @@ public class RemotePDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
 		Options options = new Options();
 
@@ -124,7 +124,7 @@ public class RemotePDPDemo {
 		}
 	}
 
-	private static void runDemo(String host, int port, String key, String secret) {
+	private static void runDemo(String host, int port, String key, String secret) throws InterruptedException {
 		RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key,
 				secret);
 
@@ -146,7 +146,7 @@ public class RemotePDPDemo {
 		LOG.info("Total : {}s", nanoToS((double) end - start));
 		LOG.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 
-		try { Thread.sleep(1000); } catch (Exception e) {}
+		Thread.sleep(1000);
 	}
 
 	private static Request buildRequest(Object subject, Object action, Object resource) {
