@@ -46,14 +46,13 @@ public class SingleRequestStreamManager {
      */
     public boolean isAccessPermitted(Object action, Object resource) {
         final String key = createKeyFor(action, resource);
-        if (! keysWithSubscription.contains(key)) {
+        if (keysWithSubscription.add(key)) {
             LOGGER.debug("setup subscription for action {} and resource {}", action, resource);
             final Decision initialDecision = pep.enforce(SecurityUtils.getAuthentication(), action, resource).blockFirst();
             decisionsByKey.put(key, initialDecision);
             final Disposable subscription = pep.enforce(SecurityUtils.getAuthentication(), action, resource)
                     .subscribe(decision -> decisionsByKey.put(key, decision));
             subscriptions.add(subscription);
-            keysWithSubscription.add(key);
         }
         return decisionsByKey.get(key) == Decision.PERMIT;
     }
