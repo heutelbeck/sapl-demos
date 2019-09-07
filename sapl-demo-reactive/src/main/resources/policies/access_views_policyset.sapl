@@ -10,21 +10,21 @@ where
     !("ROLE_ANONYMOUS" in subject..authority);
 
 
-policy "Logged in users may access the traditional patient view."
+policy "Logged in users may access the patient view."
 permit
     resource == "traditionalPatientView"
 where
     !("ROLE_ANONYMOUS" in subject..authority);
 
 
-policy "Logged in users may access the traditional multi-request patient view."
+policy "Logged in users may access the multi-request patient view."
 permit
     resource == "multiRequestPatientView"
 where
     !("ROLE_ANONYMOUS" in subject..authority);
 
 
-policy "Logged in users may access the reactive view."
+policy "Logged in users except administrators may access the live-data view."
 permit
     resource =~ "reactive(MultiRequest)?View"
 where

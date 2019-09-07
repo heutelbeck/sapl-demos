@@ -6,10 +6,7 @@ import org.springframework.stereotype.Component;
 import com.vaadin.spring.access.ViewAccessControl;
 import com.vaadin.ui.UI;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
-@RequiredArgsConstructor
 public class DemoViewAccessControl implements ViewAccessControl {
 
 	@Override
