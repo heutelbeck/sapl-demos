@@ -40,7 +40,7 @@ where
  * Patients View *
  *****************/
 
-policy "doctors may use the button to open the form entering new patient data"
+policy "doctors may use the button to open the form for entering new patient data"
 permit
     action == "use" & resource == "ui:view:patients:addPatientButton"
 where

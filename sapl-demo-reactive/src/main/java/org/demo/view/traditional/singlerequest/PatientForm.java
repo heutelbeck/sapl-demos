@@ -26,8 +26,7 @@ class PatientForm extends AbstractPatientForm {
 	}
 
 	protected void updateFieldEnabling() {
-		boolean isNewPatient = patient.getId() == null;
-		medicalRecordNumber.setEnabled(isNewPatient && isPermitted("edit", medicalRecordNumber));
+		medicalRecordNumber.setEnabled(isNewPatient() && isPermitted("edit", medicalRecordNumber));
 		name.setEnabled(isPermitted("edit", name));
 		icd11Code.setEnabled(isPermitted("edit", icd11Code));
 		diagnosisText.setEnabled(isPermitted("edit", diagnosisText));

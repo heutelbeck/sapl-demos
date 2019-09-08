@@ -45,15 +45,15 @@ public abstract class AbstractPatientForm extends FormLayout {
 
 	private Binder<Patient> binder;
 
-	protected Button saveBtn;
+	private Button saveBtn;
 
-	protected Button deleteBtn;
+	private Button deleteBtn;
 
 	private UIController controller;
 
 	private RefreshCallback refreshCallback;
 
-	protected ObjectMapper objectMapper;
+	private ObjectMapper objectMapper;
 
 	protected Patient patient;
 
@@ -125,54 +125,19 @@ public abstract class AbstractPatientForm extends FormLayout {
 		saveBtn.setData("ui:view:patients:savePatientButton");
 		saveBtn.setStyleName(ValoTheme.BUTTON_PRIMARY);
 		saveBtn.setClickShortcut(ShortcutAction.KeyCode.ENTER);
-		saveBtn.addClickListener(e -> this.onSave());
+		saveBtn.addClickListener(e -> onSave());
 
 		deleteBtn = new Button("Delete");
 		deleteBtn.setData("ui:view:patients:deletePatientButton");
-		deleteBtn.addClickListener(e -> this.onDelete());
+		deleteBtn.addClickListener(e -> onDelete());
 
 		final HorizontalLayout buttonBar = new HorizontalLayout(saveBtn, deleteBtn);
 		addComponent(buttonBar);
 	}
 
-	protected abstract void updateFieldVisibility();
-
-	protected abstract void updateFieldEnabling();
-
-	protected void updateButtonVisibility() {
-		boolean isNewPatient = patient.getId() == null;
-		saveBtn.setVisible(isPermitted(isNewPatient ? "useForCreate" : "useForUpdate", saveBtn));
-		deleteBtn.setVisible(!isNewPatient && isPermitted("use", deleteBtn, patient.getId()));
-	}
-
-	protected boolean isPermitted(String action, AbstractComponent resource) {
-		return isPermitted(action, resource, null);
-	}
-
-	protected boolean isPermitted(String action, AbstractComponent resource, Object environment) {
-		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
-		return streamManager.isAccessPermitted(action, resource.getData(), environment);
-	}
-
-	void show(Patient patient) {
-		this.patient = patient;
-		this.unmodifiedPatient = Patient.clone(patient);
-		binder.setBean(patient);
-
-		updateFieldVisibility();
-		updateFieldEnabling();
-		updateButtonVisibility();
-
-		setVisible(true);
-	}
-
-	void hide() {
-		setVisible(false);
-	}
-
 	private void onSave() {
 		try {
-			if (patient.getId() == null) {
+			if (isNewPatient()) {
 				if (binder.isValid()) {
 					controller.createPatient(patient);
 				}
@@ -204,6 +169,45 @@ public abstract class AbstractPatientForm extends FormLayout {
 		hide();
 	}
 
+	void show(Patient patient) {
+		this.patient = patient;
+		this.unmodifiedPatient = Patient.clone(patient);
+		binder.setBean(patient);
+
+		updateFieldVisibility();
+		updateFieldEnabling();
+		updateButtonVisibility();
+
+		setVisible(true);
+	}
+
+	void hide() {
+		setVisible(false);
+	}
+
+	protected abstract void updateFieldVisibility();
+
+	protected abstract void updateFieldEnabling();
+
+	private void updateButtonVisibility() {
+		saveBtn.setVisible(isPermitted(isNewPatient() ? "useForCreate" : "useForUpdate", saveBtn));
+		deleteBtn.setVisible(!isNewPatient() && isPermitted("use", deleteBtn, patient.getId()));
+	}
+
+	protected boolean isPermitted(String action, AbstractComponent resource) {
+		return getSession().getAttribute(SingleRequestStreamManager.class)
+				.isAccessPermitted(action, resource.getData());
+	}
+
+	protected boolean isPermitted(String action, AbstractComponent resource, Object environment) {
+		return getSession().getAttribute(SingleRequestStreamManager.class)
+				.isAccessPermitted(action, resource.getData(), environment);
+	}
+
+	protected boolean isNewPatient() {
+		return patient.getId() == null;
+	}
+
 	public boolean hasNameBeenModified() {
 		return !Objects.equals(name.getValue(), unmodifiedPatient.getName());
 	}
@@ -213,23 +217,19 @@ public abstract class AbstractPatientForm extends FormLayout {
 	}
 
 	public boolean hasDiagnosisTextBeenModified() {
-		return !Objects.equals(diagnosisText.getValue(),
-				unmodifiedPatient.getDiagnosisText());
+		return !Objects.equals(diagnosisText.getValue(), unmodifiedPatient.getDiagnosisText());
 	}
 
 	public boolean hasAttendingDoctorBeenModified() {
-		return !Objects.equals(attendingDoctor.getValue(),
-				unmodifiedPatient.getAttendingDoctor());
+		return !Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor());
 	}
 
 	public boolean hasAttendingNurseBeenModified() {
-		return !Objects.equals(attendingNurse.getValue(),
-				unmodifiedPatient.getAttendingNurse());
+		return !Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse());
 	}
 
 	public boolean hasPhoneNumberBeenModified() {
-		return !Objects.equals(phoneNumber.getValue(),
-				unmodifiedPatient.getPhoneNumber());
+		return !Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber());
 	}
 
 	public boolean hasRoomNumberBeenModified() {

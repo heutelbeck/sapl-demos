@@ -38,8 +38,7 @@ class PatientForm extends AbstractPatientForm {
 		if (!streamManager.hasMultiRequestSubscriptionFor("fieldEnabling")) {
 			streamManager.setupNewMultiRequest("fieldEnabling", createMultiRequestForFieldEnabling());
 		}
-		boolean isNewPatient = patient.getId() == null;
-		medicalRecordNumber.setEnabled(isNewPatient && streamManager.isAccessPermittedForRequestWithId("editMrn"));
+		medicalRecordNumber.setEnabled(isNewPatient() && streamManager.isAccessPermittedForRequestWithId("editMrn"));
 		name.setEnabled(streamManager.isAccessPermittedForRequestWithId("editName"));
 		icd11Code.setEnabled(streamManager.isAccessPermittedForRequestWithId("editIcd11"));
 		diagnosisText.setEnabled(streamManager.isAccessPermittedForRequestWithId("editDiagnosis"));
