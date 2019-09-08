@@ -1,13 +1,9 @@
 package org.demo.view.traditional.multirequest;
 
-import java.io.IOException;
-
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.security.core.Authentication;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.api.pdp.multirequest.MultiRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +29,8 @@ class PatientForm extends AbstractPatientForm {
 		attendingDoctor.setVisible(streamManager.isAccessPermittedForRequestWithId("readAttendingDoctor"));
 		attendingNurse.setVisible(streamManager.isAccessPermittedForRequestWithId("readAttendingNurse"));
 		phoneNumber.setVisible(streamManager.isAccessPermittedForRequestWithId("readPhoneNumber"));
-		roomNumber.setVisible(streamManager.isAccessPermittedForRequestWithId("readRoomNumber"));
+
+		roomNumber.setVisible(isPermitted("read", roomNumber, patient.getId()));
 	}
 
 	protected void updateFieldEnabling() {
@@ -52,20 +49,9 @@ class PatientForm extends AbstractPatientForm {
 		roomNumber.setEnabled(streamManager.isAccessPermittedForRequestWithId("editRoomNumber"));
 	}
 
-	protected void updateButtonVisibility() {
-		final MultiRequestStreamManager streamManager = getSession().getAttribute(MultiRequestStreamManager.class);
-		if (!streamManager.hasMultiRequestSubscriptionFor("buttonVisibility")) {
-			streamManager.setupNewMultiRequest("buttonVisibility", createMultiRequestForButtonVisibility());
-		}
-		boolean isNewPatient = patient.getId() == null;
-		saveBtn.setVisible(streamManager.isAccessPermittedForRequestWithId("useSaveBtn"));
-		deleteBtn.setVisible(!isNewPatient && streamManager.isAccessPermittedForRequestWithId("useDeleteBtn"));
-	}
-
 	private MultiRequest createMultiRequestForFieldVisibility() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-
-		final MultiRequest multiRequest = new MultiRequest()
+		return new MultiRequest()
 				.addRequest("readMrn", authentication, "read", medicalRecordNumber.getData())
 				.addRequest("readName", authentication, "read", name.getData())
 				.addRequest("readDiagnosis", authentication, "read", diagnosisText.getData())
@@ -73,16 +59,6 @@ class PatientForm extends AbstractPatientForm {
 				.addRequest("readAttendingDoctor", authentication, "read", attendingDoctor.getData())
 				.addRequest("readAttendingNurse", authentication, "read", attendingNurse.getData())
 				.addRequest("readPhoneNumber", authentication, "read", phoneNumber.getData());
-		try {
-			final JsonNode resource = objectMapper.readTree("{ \"id\": " + patient.getId()
-					+ ", \"uiElement\": \"" + roomNumber.getData() + "\"}");
-			multiRequest.addRequest("readRoomNumber", authentication, "read", resource);
-		}
-		catch (IOException e) {
-			LOGGER.error("Error while creating a JsonNode from a JSON string.", e);
-		}
-
-		return multiRequest;
 	}
 
 	private MultiRequest createMultiRequestForFieldEnabling() {
@@ -96,25 +72,6 @@ class PatientForm extends AbstractPatientForm {
 				.addRequest("editAttendingNurse", authentication, "edit", attendingNurse.getData())
 				.addRequest("editPhoneNumber", authentication, "edit", phoneNumber.getData())
 				.addRequest("editRoomNumber", authentication, "edit", roomNumber.getData());
-	}
-
-	private MultiRequest createMultiRequestForButtonVisibility() {
-		final Authentication authentication = SecurityUtils.getAuthentication();
-		boolean isNewPatient = patient.getId() == null;
-
-		final MultiRequest multiRequest = new MultiRequest()
-				.addRequest("useSaveBtn", authentication,
-						isNewPatient ? "useForCreate" : "useForUpdate", saveBtn.getData());
-		try {
-			final JsonNode resource = objectMapper.readTree("{ \"id\": " + patient.getId()
-					+ ", \"uiElement\": \"" + deleteBtn.getData() + "\"}");
-			multiRequest.addRequest("useDeleteBtn", authentication, "use", resource);
-		}
-		catch (IOException e) {
-			LOGGER.error("Error while creating a JsonNode from a JSON string.", e);
-		}
-
-		return multiRequest;
 	}
 
 }

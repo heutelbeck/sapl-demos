@@ -3,7 +3,7 @@ package org.demo;
 import org.demo.security.SecurityUtils;
 import org.demo.view.AccessDeniedView;
 import org.demo.view.ErrorView;
-import org.demo.view.traditional.SingleRequestStreamManager;
+import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
 import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;

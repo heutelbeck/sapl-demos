@@ -1,6 +1,8 @@
-package org.demo.view.traditional;
+package org.demo.view.traditional.singlerequest;
 
 import org.demo.service.UIController;
+import org.demo.view.traditional.AbstractPatientForm;
+import org.demo.view.traditional.AbstractPatientView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.spring.annotation.SpringComponent;
@@ -17,7 +19,7 @@ public class PatientView extends AbstractPatientView {
 
 	@Override
 	protected AbstractPatientForm createForm(UIController uiController,
-			AbstractPatientForm.RefreshCallback refreshCallback) {
+    		AbstractPatientForm.RefreshCallback refreshCallback) {
 		return new PatientForm(uiController, refreshCallback);
 	}
 

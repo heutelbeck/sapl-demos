@@ -1,6 +1,6 @@
 package org.demo.security;
 
-import org.demo.view.traditional.SingleRequestStreamManager;
+import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
 import org.springframework.stereotype.Component;
 
 import com.vaadin.spring.access.ViewAccessControl;

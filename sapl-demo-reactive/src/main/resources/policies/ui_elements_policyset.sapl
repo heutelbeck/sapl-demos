@@ -2,7 +2,7 @@ import filter.*
 
 set "UI Elements"
 first-applicable
-for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*"
+for resource =~ "^ui:view:.*"
 
 /*************
  * Home View *
@@ -61,17 +61,22 @@ where
 	"ROLE_DOCTOR" in subject..authority || "ROLE_ADMIN" in subject..authority || "ROLE_NURSE" in subject..authority;
 
 
+/*
+ * This policy uses the possibility to provide additional information about the context
+ * of the request via the request variable 'environment'. In this case 'environment'
+ * holds the ID of the currently selected patient.
+ */
 policy "attending doctors can use the button to delete patient data"
 permit
-    action == "use" & resource.uiElement == "ui:view:patients:deletePatientButton"
+    action == "use" & resource == "ui:view:patients:deletePatientButton"
 where
 	"ROLE_DOCTOR" in subject..authority;
-	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
+	subject.name == environment.<patient.patientRecord>.attendingDoctor;
 
 
 policy "administrators can use the button to delete patient data"
 permit
-    action == "use" & resource.uiElement == "ui:view:patients:deletePatientButton"
+    action == "use" & resource == "ui:view:patients:deletePatientButton"
 where
 	"ROLE_ADMIN" in subject..authority;
 
@@ -90,12 +95,17 @@ where
 	"ROLE_ADMIN" in subject..authority;
 
 
+/*
+ * This policy uses the possibility to provide additional information about the context
+ * of the request via the request variable 'environment'. In this case 'environment'
+ * holds the ID of the currently selected patient.
+ */
 policy "visiting relatives may read the room number"
 permit
-    action == "read" & resource.uiElement == "ui:view:patients:roomField"
+    action == "read" & resource == "ui:view:patients:roomField"
 where
     "ROLE_VISITOR" in subject..authority;
-    subject.name in resource.id.<patient.relatives>;
+    subject.name in environment.<patient.relatives>;
 
 
 policy "visitors may read the name and phone number"

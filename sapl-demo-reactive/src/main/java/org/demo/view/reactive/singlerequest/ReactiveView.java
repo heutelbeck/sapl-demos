@@ -1,4 +1,4 @@
-package org.demo.view.reactive;
+package org.demo.view.reactive.singlerequest;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,6 +9,7 @@ import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
 import org.demo.service.SchedulerService;
+import org.demo.view.reactive.AbstractReactiveView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 

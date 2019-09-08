@@ -29,6 +29,12 @@ public class MultiRequestStreamManager {
     private Set<String> multiRequestIdsWithSubscription = new HashSet<>();
     private Map<String, Decision> decisionsByRequestId = new HashMap<>();
 
+    /**
+     * Creates a new {@code MultiRequestStreamManager} instance delegating
+     * to the given Policy Enforcement Point.
+     *
+     * @param pep the Policy Enforcement Point to be used.
+     */
     public MultiRequestStreamManager(PolicyEnforcementPoint pep) {
         this.pep = pep;
     }

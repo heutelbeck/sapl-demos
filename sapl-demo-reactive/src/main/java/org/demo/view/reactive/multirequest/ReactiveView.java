@@ -27,7 +27,7 @@ import reactor.core.scheduler.Schedulers;
 
 @SpringView(name = "reactiveMultiRequest")
 @SpringComponent("reactiveMultiRequestView")
-public class ReactiveMultiRequestView extends AbstractReactiveView {
+public class ReactiveView extends AbstractReactiveView {
 
 	private static final long serialVersionUID = 1L;
 
@@ -40,9 +40,9 @@ public class ReactiveMultiRequestView extends AbstractReactiveView {
 	private final Map<String, Decision> accessDecisions;
 
 	@Autowired
-	public ReactiveMultiRequestView(PolicyEnforcementPoint pep,
-			HeartBeatService heartBeatService, BloodPressureService bloodPressureService,
-			SchedulerService schedulerService) {
+	public ReactiveView(PolicyEnforcementPoint pep,
+                        HeartBeatService heartBeatService, BloodPressureService bloodPressureService,
+                        SchedulerService schedulerService) {
 		super(heartBeatService, bloodPressureService, schedulerService);
 		this.pep = pep;
 

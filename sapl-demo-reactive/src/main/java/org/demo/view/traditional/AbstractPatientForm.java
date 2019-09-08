@@ -5,12 +5,14 @@ import java.util.Objects;
 import org.demo.domain.Patient;
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
+import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.vaadin.data.Binder;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
@@ -19,6 +21,11 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
 public abstract class AbstractPatientForm extends FormLayout {
+
+	@FunctionalInterface
+	public interface RefreshCallback {
+		void refresh();
+	}
 
 	protected TextField medicalRecordNumber;
 
@@ -132,7 +139,20 @@ public abstract class AbstractPatientForm extends FormLayout {
 
 	protected abstract void updateFieldEnabling();
 
-	protected abstract void updateButtonVisibility();
+	protected void updateButtonVisibility() {
+		boolean isNewPatient = patient.getId() == null;
+		saveBtn.setVisible(isPermitted(isNewPatient ? "useForCreate" : "useForUpdate", saveBtn));
+		deleteBtn.setVisible(!isNewPatient && isPermitted("use", deleteBtn, patient.getId()));
+	}
+
+	protected boolean isPermitted(String action, AbstractComponent resource) {
+		return isPermitted(action, resource, null);
+	}
+
+	protected boolean isPermitted(String action, AbstractComponent resource, Object environment) {
+		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
+		return streamManager.isAccessPermitted(action, resource.getData(), environment);
+	}
 
 	void show(Patient patient) {
 		this.patient = patient;
@@ -214,14 +234,6 @@ public abstract class AbstractPatientForm extends FormLayout {
 
 	public boolean hasRoomNumberBeenModified() {
 		return !Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber());
-	}
-
-
-	@FunctionalInterface
-	public interface RefreshCallback {
-
-		void refresh();
-
 	}
 
 }

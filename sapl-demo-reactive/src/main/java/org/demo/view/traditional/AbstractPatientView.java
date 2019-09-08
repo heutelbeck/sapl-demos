@@ -8,11 +8,14 @@ import org.demo.domain.Patient;
 import org.demo.model.PatientListItem;
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
+import org.demo.view.traditional.AbstractPatientForm.RefreshCallback;
+import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewBeforeLeaveEvent;
 import com.vaadin.navigator.ViewChangeListener;
+import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
@@ -22,32 +25,26 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 
 	private UIController controller;
 
-	private Grid<PatientListItem> grid;
-
 	protected AbstractPatientView(UIController controller) {
 		this.controller = controller;
 		setMargin(true);
 	}
 
 	protected abstract AbstractPatientForm createForm(UIController uiController,
-			AbstractPatientForm.RefreshCallback refreshCallback);
-
-	protected boolean isPermitted(Object action, Object resource) {
-		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
-		return streamManager.isAccessPermitted(action, resource);
-	}
+			RefreshCallback refreshCallback);
 
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
-		final AbstractPatientForm form = createForm(controller, this::refresh);
-		form.setSizeFull();
-		form.setVisible(false);
-
-		grid = new Grid<>(PatientListItem.class);
+		final Grid<PatientListItem> grid = new Grid<>(PatientListItem.class);
 		grid.setColumns("id", "name");
 		grid.getColumn("id").setWidth(75);
 		grid.setSizeFull();
 		grid.setItems(loadAllPatients());
+
+		final AbstractPatientForm form = createForm(controller, () -> grid.setItems(loadAllPatients()));
+		form.setSizeFull();
+		form.setVisible(false);
+
 		grid.asSingleSelect().addValueChangeListener(selection -> {
 			if (selection.getValue() == null) {
 				form.hide();
@@ -65,7 +62,7 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 			grid.asSingleSelect().clear();
 			form.show(new Patient());
 		});
-		addPatientBtn.setVisible(isPermitted("use", addPatientBtn.getData()));
+		addPatientBtn.setVisible(isPermitted("use", addPatientBtn));
 
 		final HorizontalLayout main = new HorizontalLayout(grid, form);
 		main.setSizeFull();
@@ -85,8 +82,9 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 		}
 	}
 
-	private void refresh() {
-		grid.setItems(loadAllPatients());
+	private boolean isPermitted(String action, AbstractComponent resource) {
+		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
+		return streamManager.isAccessPermitted(action, resource.getData());
 	}
 
 	@Override
