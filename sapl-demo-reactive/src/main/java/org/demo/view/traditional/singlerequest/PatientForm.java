@@ -3,9 +3,11 @@ package org.demo.view.traditional.singlerequest;
 import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
+/**
+ * Concrete patient form implementation demonstrating the usage of
+ * SAPL single requests for controlling the visibility and enabling
+ * of form fields.
+ */
 class PatientForm extends AbstractPatientForm {
 
 	private static final long serialVersionUID = 1L;
@@ -14,6 +16,7 @@ class PatientForm extends AbstractPatientForm {
 		super(controller, refreshCallback);
 	}
 
+	@Override
 	protected void updateFieldVisibility() {
 		medicalRecordNumber.setVisible(isPermitted("read", medicalRecordNumber));
 		name.setVisible(isPermitted("read", name));
@@ -25,6 +28,7 @@ class PatientForm extends AbstractPatientForm {
 		roomNumber.setVisible(isPermitted("read", roomNumber, patient.getId()));
 	}
 
+	@Override
 	protected void updateFieldEnabling() {
 		medicalRecordNumber.setEnabled(isNewPatient() && isPermitted("edit", medicalRecordNumber));
 		name.setEnabled(isPermitted("edit", name));

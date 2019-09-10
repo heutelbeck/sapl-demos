@@ -20,6 +20,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.themes.ValoTheme;
 
+/**
+ * Abstract base class for patient forms. Concrete subclasses demonstrating
+ * the usage of SAPL single requests and SAPL multi-requests must implement
+ * the methods controlling the visibility and enabling of form fields.
+ */
 public abstract class AbstractPatientForm extends FormLayout {
 
 	@FunctionalInterface
@@ -169,6 +174,12 @@ public abstract class AbstractPatientForm extends FormLayout {
 		hide();
 	}
 
+	/**
+	 * Binds the given patient data to the form, updates the visibility and enabling
+	 * of form fields and buttons and makes the form visible.
+	 *
+	 * @param patient the patient model to bind with the form fields.
+	 */
 	void show(Patient patient) {
 		this.patient = patient;
 		this.unmodifiedPatient = Patient.clone(patient);
@@ -181,29 +192,67 @@ public abstract class AbstractPatientForm extends FormLayout {
 		setVisible(true);
 	}
 
+	/**
+	 * Hides the form.
+	 */
 	void hide() {
 		setVisible(false);
 	}
 
+	/**
+	 * Updates the visibility of the form fields for the current patient data
+	 * according to the SAPL policies.
+	 */
 	protected abstract void updateFieldVisibility();
 
+	/**
+	 * Updates the enabling of the form fields for the current patient data
+	 * according to the SAPL policies.
+	 */
 	protected abstract void updateFieldEnabling();
 
+	/*
+	 * Updates the visibility of the save and delete button for the current
+	 * patient data according to the SAPL policies.
+	 */
 	private void updateButtonVisibility() {
 		saveBtn.setVisible(isPermitted(isNewPatient() ? "useForCreate" : "useForUpdate", saveBtn));
 		deleteBtn.setVisible(!isNewPatient() && isPermitted("use", deleteBtn, patient.getId()));
 	}
 
-	protected boolean isPermitted(String action, AbstractComponent resource) {
+	/**
+	 * Returns {@code true} if the last authorisation decision for the given
+	 * {@code action} on the given {@code uiComponent} was PERMIT, {@code false}
+	 * otherwise.
+	 *
+	 * @param action the action to perform on the given UI component.
+	 * @param uiComponent the UI component acting as the resource.
+	 * @return {@code true} if the last authorisation decision was PERMIT.
+	 */
+	protected boolean isPermitted(String action, AbstractComponent uiComponent) {
 		return getSession().getAttribute(SingleRequestStreamManager.class)
-				.isAccessPermitted(action, resource.getData());
+				.isAccessPermitted(action, uiComponent.getData());
 	}
 
-	protected boolean isPermitted(String action, AbstractComponent resource, Object environment) {
+	/**
+	 * Returns {@code true} if the last authorisation decision for the given
+	 * {@code action} on the given {@code uiComponent} in the given {@code environment}
+	 * was PERMIT, {@code false} otherwise.
+	 *
+	 * @param action the action to perform on the given UI component.
+	 * @param uiComponent the UI component acting as the resource.
+	 * @param environment additional environment data for the SAPL request.
+	 * @return {@code true} if the last authorisation decision was PERMIT.
+	 */
+	protected boolean isPermitted(String action, AbstractComponent uiComponent, Object environment) {
 		return getSession().getAttribute(SingleRequestStreamManager.class)
-				.isAccessPermitted(action, resource.getData(), environment);
+				.isAccessPermitted(action, uiComponent.getData(), environment);
 	}
 
+	/**
+	 * @return {@code true} if the current patient has not yet been persisted
+	 *         (i.e. its ID is still null), {@code false} otherwise.
+	 */
 	protected boolean isNewPatient() {
 		return patient.getId() == null;
 	}

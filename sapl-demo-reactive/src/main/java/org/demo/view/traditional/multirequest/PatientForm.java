@@ -6,9 +6,12 @@ import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.security.core.Authentication;
 
 import io.sapl.api.pdp.multirequest.MultiRequest;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+/**
+ * Concrete patient form implementation demonstrating the usage of
+ * SAPL multi-requests for controlling the visibility and enabling
+ * of form fields.
+ */
 class PatientForm extends AbstractPatientForm {
 
 	private static final long serialVersionUID = 1L;
@@ -17,6 +20,7 @@ class PatientForm extends AbstractPatientForm {
 		super(controller, refreshCallback);
 	}
 
+	@Override
 	protected void updateFieldVisibility() {
 		final MultiRequestStreamManager streamManager = getSession().getAttribute(MultiRequestStreamManager.class);
 		if (!streamManager.hasMultiRequestSubscriptionFor("fieldVisibility")) {
@@ -33,6 +37,19 @@ class PatientForm extends AbstractPatientForm {
 		roomNumber.setVisible(isPermitted("read", roomNumber, patient.getId()));
 	}
 
+	private MultiRequest createMultiRequestForFieldVisibility() {
+		final Authentication authentication = SecurityUtils.getAuthentication();
+		return new MultiRequest()
+				.addRequest("readMrn", authentication, "read", medicalRecordNumber.getData())
+				.addRequest("readName", authentication, "read", name.getData())
+				.addRequest("readDiagnosis", authentication, "read", diagnosisText.getData())
+				.addRequest("readIcd11", authentication, "read", icd11Code.getData())
+				.addRequest("readAttendingDoctor", authentication, "read", attendingDoctor.getData())
+				.addRequest("readAttendingNurse", authentication, "read", attendingNurse.getData())
+				.addRequest("readPhoneNumber", authentication, "read", phoneNumber.getData());
+	}
+
+	@Override
 	protected void updateFieldEnabling() {
 		final MultiRequestStreamManager streamManager = getSession().getAttribute(MultiRequestStreamManager.class);
 		if (!streamManager.hasMultiRequestSubscriptionFor("fieldEnabling")) {
@@ -46,18 +63,6 @@ class PatientForm extends AbstractPatientForm {
 		attendingNurse.setEnabled(streamManager.isAccessPermittedForRequestWithId("editAttendingNurse"));
 		phoneNumber.setEnabled(streamManager.isAccessPermittedForRequestWithId("editPhoneNumber"));
 		roomNumber.setEnabled(streamManager.isAccessPermittedForRequestWithId("editRoomNumber"));
-	}
-
-	private MultiRequest createMultiRequestForFieldVisibility() {
-		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiRequest()
-				.addRequest("readMrn", authentication, "read", medicalRecordNumber.getData())
-				.addRequest("readName", authentication, "read", name.getData())
-				.addRequest("readDiagnosis", authentication, "read", diagnosisText.getData())
-				.addRequest("readIcd11", authentication, "read", icd11Code.getData())
-				.addRequest("readAttendingDoctor", authentication, "read", attendingDoctor.getData())
-				.addRequest("readAttendingNurse", authentication, "read", attendingNurse.getData())
-				.addRequest("readPhoneNumber", authentication, "read", phoneNumber.getData());
 	}
 
 	private MultiRequest createMultiRequestForFieldEnabling() {
