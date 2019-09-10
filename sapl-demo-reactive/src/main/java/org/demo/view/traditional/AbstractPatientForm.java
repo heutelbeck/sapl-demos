@@ -1,7 +1,5 @@
 package org.demo.view.traditional;
 
-import java.util.Objects;
-
 import org.demo.domain.Patient;
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
@@ -153,7 +151,7 @@ public abstract class AbstractPatientForm extends FormLayout {
 				}
 			}
 			else {
-				controller.updatePatient(patient, this);
+				controller.updatePatient(patient, unmodifiedPatient);
 			}
 		}
 		catch (AccessDeniedException e) {
@@ -256,33 +254,4 @@ public abstract class AbstractPatientForm extends FormLayout {
 	protected boolean isNewPatient() {
 		return patient.getId() == null;
 	}
-
-	public boolean hasNameBeenModified() {
-		return !Objects.equals(name.getValue(), unmodifiedPatient.getName());
-	}
-
-	public boolean hasIcd11CodeBeenModified() {
-		return !Objects.equals(icd11Code.getValue(), unmodifiedPatient.getIcd11Code());
-	}
-
-	public boolean hasDiagnosisTextBeenModified() {
-		return !Objects.equals(diagnosisText.getValue(), unmodifiedPatient.getDiagnosisText());
-	}
-
-	public boolean hasAttendingDoctorBeenModified() {
-		return !Objects.equals(attendingDoctor.getValue(), unmodifiedPatient.getAttendingDoctor());
-	}
-
-	public boolean hasAttendingNurseBeenModified() {
-		return !Objects.equals(attendingNurse.getValue(), unmodifiedPatient.getAttendingNurse());
-	}
-
-	public boolean hasPhoneNumberBeenModified() {
-		return !Objects.equals(phoneNumber.getValue(), unmodifiedPatient.getPhoneNumber());
-	}
-
-	public boolean hasRoomNumberBeenModified() {
-		return !Objects.equals(roomNumber.getValue(), unmodifiedPatient.getRoomNumber());
-	}
-
 }

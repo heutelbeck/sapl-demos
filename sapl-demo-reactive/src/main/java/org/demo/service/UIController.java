@@ -2,12 +2,12 @@ package org.demo.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
 import org.demo.model.PatientListItem;
-import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.stereotype.Component;
 
 import io.sapl.spring.method.pre.PreEnforce;
@@ -43,30 +43,30 @@ public class UIController {
 	}
 
 	@PreEnforce
-	public void updatePatient(Patient patient, AbstractPatientForm form) {
-		if (form.hasNameBeenModified()) {
-			patientRepo.updateNameById(patient.getName(), patient.getId());
+	public void updatePatient(Patient modifiedPatient, Patient originalPatient) {
+		if (!Objects.equals(modifiedPatient.getName(), originalPatient.getName())) {
+			patientRepo.updateNameById(modifiedPatient.getName(), modifiedPatient.getId());
 		}
-		if (form.hasIcd11CodeBeenModified()) {
-			patientRepo.updateIcd11CodeById(patient.getIcd11Code(), patient.getId());
+		if (!Objects.equals(modifiedPatient.getIcd11Code(), originalPatient.getIcd11Code())) {
+			patientRepo.updateIcd11CodeById(modifiedPatient.getIcd11Code(), modifiedPatient.getId());
 		}
-		if (form.hasDiagnosisTextBeenModified()) {
-			patientRepo.updateDiagnosisTextById(patient.getDiagnosisText(),
-					patient.getId());
+		if (!Objects.equals(modifiedPatient.getDiagnosisText(), originalPatient.getDiagnosisText())) {
+			patientRepo.updateDiagnosisTextById(modifiedPatient.getDiagnosisText(),
+					modifiedPatient.getId());
 		}
-		if (form.hasAttendingDoctorBeenModified()) {
-			patientRepo.updateAttendingDoctorById(patient.getAttendingDoctor(),
-					patient.getId());
+		if (!Objects.equals(modifiedPatient.getAttendingDoctor(), originalPatient.getAttendingDoctor())) {
+			patientRepo.updateAttendingDoctorById(modifiedPatient.getAttendingDoctor(),
+					modifiedPatient.getId());
 		}
-		if (form.hasAttendingNurseBeenModified()) {
-			patientRepo.updateAttendingNurseById(patient.getAttendingNurse(),
-					patient.getId());
+		if (!Objects.equals(modifiedPatient.getAttendingNurse(), originalPatient.getAttendingNurse())) {
+			patientRepo.updateAttendingNurseById(modifiedPatient.getAttendingNurse(),
+					modifiedPatient.getId());
 		}
-		if (form.hasPhoneNumberBeenModified()) {
-			patientRepo.updatePhoneNumberById(patient.getPhoneNumber(), patient.getId());
+		if (!Objects.equals(modifiedPatient.getPhoneNumber(), originalPatient.getPhoneNumber())) {
+			patientRepo.updatePhoneNumberById(modifiedPatient.getPhoneNumber(), modifiedPatient.getId());
 		}
-		if (form.hasRoomNumberBeenModified()) {
-			patientRepo.updateRoomNumberById(patient.getRoomNumber(), patient.getId());
+		if (!Objects.equals(modifiedPatient.getRoomNumber(), originalPatient.getRoomNumber())) {
+			patientRepo.updateRoomNumberById(modifiedPatient.getRoomNumber(), modifiedPatient.getId());
 		}
 	}
 
