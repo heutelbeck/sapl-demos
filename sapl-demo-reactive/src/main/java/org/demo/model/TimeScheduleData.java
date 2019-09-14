@@ -17,6 +17,9 @@ public class TimeScheduleData {
 
 	@Override
 	public String toString() {
+		if (title == null && name == null && date == null) {
+			return "";
+		}
 		return title + name + ": " + date;
 	}
 

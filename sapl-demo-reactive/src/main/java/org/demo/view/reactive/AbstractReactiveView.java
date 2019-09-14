@@ -27,11 +27,13 @@ import com.vaadin.ui.themes.ValoTheme;
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import io.sapl.spring.PolicyEnforcementPoint;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+@Slf4j
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
 
 	protected transient PolicyEnforcementPoint pep;
@@ -83,10 +85,10 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		setSpacing(true);
 		setMargin(true);
 
-		final VerticalLayout heatBeatCard = new VerticalLayout();
-		heatBeatCard.setSizeFull();
-		heatBeatCard.setStyleName(ValoTheme.LAYOUT_CARD);
-		addComponent(heatBeatCard);
+		final VerticalLayout heartBeatCard = new VerticalLayout();
+		heartBeatCard.setSizeFull();
+		heartBeatCard.setStyleName(ValoTheme.LAYOUT_CARD);
+		addComponent(heartBeatCard);
 
 		final Label heartBeatLabel = new Label("Heart Beat: ");
 		heartBeatAccessDenied = new Label("You have no access to heart beat data.");
@@ -96,7 +98,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		heartBeatCanvas.setWidth("350px");
 		heartBeatCanvas.setHeight("40px");
 		heartBeatCanvas.setVisible(true);
-		heatBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied,
+		heartBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied,
 				heartBeatCanvas);
 
 		final VerticalLayout bloodPressureCard = new VerticalLayout();
@@ -168,33 +170,24 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				.subscribeOn(nonUIThread);
 	}
 
-	protected abstract Flux<Object[]> getCombinedFluxForNonFilteredResources();
+	protected abstract Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources();
 
-	protected abstract NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues);
-
-	private void updateUIForNonFilteredResources(Object[] fluxValues) {
-		final NonFilteredResourcesData fluxElements = getNonFilteredResourcesDataFrom(fluxValues);
-		updateUIForNonFilteredResources(fluxElements.heartBeatDecision, fluxElements.bloodPressureDecision,
-				fluxElements.heartBeat, fluxElements.diastolic, fluxElements.systolic);
-	}
-
-	private void updateUIForNonFilteredResources(Decision heartBeatDecision, Decision bloodPressureDecision,
-			Integer heartBeat, Integer diastolic, Integer systolic) {
+	private void updateUIForNonFilteredResources(NonFilteredResourcesData data) {
 		getUI().access(() -> {
-			if (heartBeatDecision == Decision.PERMIT) {
+			if (data.heartBeatDecision == Decision.PERMIT) {
 				heartBeatAccessDenied.setVisible(false);
 				heartBeatCanvas.setVisible(true);
-				drawHeartBeat(heartBeat);
+				drawHeartBeat(data.heartBeat);
 			}
 			else {
 				heartBeatCanvas.setVisible(false);
 				heartBeatAccessDenied.setVisible(true);
 			}
 
-			if (bloodPressureDecision == Decision.PERMIT) {
+			if (data.bloodPressureDecision == Decision.PERMIT) {
 				bloodPressureAccessDenied.setVisible(false);
 				bloodPressureCanvas.setVisible(true);
-				drawBloodPressure(diastolic, systolic);
+				drawBloodPressure(data.diastolic, data.systolic);
 			}
 			else {
 				bloodPressureCanvas.setVisible(false);
@@ -258,14 +251,14 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	private void updateUIWithFilteredResource(Response response) {
 		final Decision decision = response.getDecision();
-		final TimeScheduleData[] timeScheduleDataHolder = new TimeScheduleData[1];
+		final TimeScheduleData[] timeScheduleDataHolder = new TimeScheduleData[] { new TimeScheduleData() };
 		final Optional<JsonNode> resource = response.getResource();
 		if (resource.isPresent()) {
 			try {
 				timeScheduleDataHolder[0] = mapper.treeToValue(resource.get(), TimeScheduleData.class);
 			}
 			catch (JsonProcessingException e) {
-				timeScheduleDataHolder[0] = new TimeScheduleData("", "JsonProcessingException", e.getMessage());
+				LOGGER.error("Error while unmarshalling TimeScheduleData: {}", e.getMessage());
 			}
 		}
 		getUI().access(() -> {

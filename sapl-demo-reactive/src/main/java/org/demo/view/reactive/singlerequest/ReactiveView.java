@@ -1,7 +1,5 @@
 package org.demo.view.reactive.singlerequest;
 
-import java.util.function.Function;
-
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
@@ -30,7 +28,7 @@ public class ReactiveView extends AbstractReactiveView {
 	}
 
 	@Override
-	protected Flux<Object[]> getCombinedFluxForNonFilteredResources() {
+	protected Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
 		final Flux<Decision> heartBeatAccessDecisionFlux = pep
@@ -43,11 +41,10 @@ public class ReactiveView extends AbstractReactiveView {
 		return Flux.combineLatest(heartBeatAccessDecisionFlux,
 				bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
 				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(),
-				Function.identity());
+				this::getNonFilteredResourcesDataFrom);
 	}
 
-	@Override
-	protected NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
+	private NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
 		final NonFilteredResourcesData data = new NonFilteredResourcesData();
 		data.heartBeatDecision = (Decision) fluxValues[0];
 		data.bloodPressureDecision = (Decision) fluxValues[1];
