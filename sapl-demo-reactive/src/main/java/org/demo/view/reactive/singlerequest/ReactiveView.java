@@ -34,6 +34,7 @@ public class ReactiveView extends AbstractReactiveView {
 		this.pep = pep;
 	}
 
+	@Override
 	protected Flux<Object[]> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
@@ -50,16 +51,15 @@ public class ReactiveView extends AbstractReactiveView {
 				Function.identity());
 	}
 
-	protected void updateUIForNonFilteredResources(Object[] fluxValues) {
-		final Decision heartBeatDecision = (Decision) fluxValues[0];
-		final Decision bloodPressureDecision = (Decision) fluxValues[1];
-
-		final Integer heartBeat = (Integer) fluxValues[2];
-		final Integer diastolic = (Integer) fluxValues[3];
-		final Integer systolic = (Integer) fluxValues[4];
-
-		updateUIForNonFilteredResources(heartBeatDecision, bloodPressureDecision,
-				heartBeat, diastolic, systolic);
+	@Override
+	protected NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
+		final NonFilteredResourcesData data = new NonFilteredResourcesData();
+		data.heartBeatDecision = (Decision) fluxValues[0];
+		data.bloodPressureDecision = (Decision) fluxValues[1];
+		data.heartBeat = (Integer) fluxValues[2];
+		data.diastolic = (Integer) fluxValues[3];
+		data.systolic = (Integer) fluxValues[4];
+		return data;
 	}
 
 	@Override

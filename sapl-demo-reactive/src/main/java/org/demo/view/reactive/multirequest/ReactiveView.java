@@ -49,6 +49,7 @@ public class ReactiveView extends AbstractReactiveView {
 		accessDecisions.put(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, Decision.DENY);
 	}
 
+	@Override
 	protected Flux<Object[]> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
@@ -64,24 +65,25 @@ public class ReactiveView extends AbstractReactiveView {
 				Function.identity());
 	}
 
-	protected void updateUIForNonFilteredResources(Object[] fluxValues) {
+	@Override
+	protected NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
 		final MultiResponse multiResponse = (MultiResponse) fluxValues[0];
 		for (IdentifiableResponse identifiableResponse : multiResponse) {
 			accessDecisions.put(identifiableResponse.getRequestId(),
 					identifiableResponse.getResponse().getDecision());
 		}
 
-		final Decision heartBeatDecision = accessDecisions
+		final NonFilteredResourcesData data = new NonFilteredResourcesData();
+		data.heartBeatDecision = accessDecisions
 				.get(READ_HEART_BEAT_DATA_REQUEST_ID);
-		final Decision bloodPressureDecision = accessDecisions
+		data.bloodPressureDecision = accessDecisions
 				.get(READ_BLOOD_PRESSURE_DATA_REQUEST_ID);
 
-		final Integer heartBeat = (Integer) fluxValues[1];
-		final Integer diastolic = (Integer) fluxValues[2];
-		final Integer systolic = (Integer) fluxValues[3];
+		data.heartBeat = (Integer) fluxValues[1];
+		data.diastolic = (Integer) fluxValues[2];
+		data.systolic = (Integer) fluxValues[3];
 
-		updateUIForNonFilteredResources(heartBeatDecision, bloodPressureDecision,
-				heartBeat, diastolic, systolic);
+		return data;
 	}
 
 	@Override

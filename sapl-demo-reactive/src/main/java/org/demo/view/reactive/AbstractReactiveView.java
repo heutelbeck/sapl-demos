@@ -168,9 +168,15 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	protected abstract Flux<Object[]> getCombinedFluxForNonFilteredResources();
 
-	protected abstract void updateUIForNonFilteredResources(Object[] fluxValues);
+	protected abstract NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues);
 
-	protected void updateUIForNonFilteredResources(Decision heartBeatDecision, Decision bloodPressureDecision,
+	private void updateUIForNonFilteredResources(Object[] fluxValues) {
+		final NonFilteredResourcesData fluxElements = getNonFilteredResourcesDataFrom(fluxValues);
+		updateUIForNonFilteredResources(fluxElements.heartBeatDecision, fluxElements.bloodPressureDecision,
+				fluxElements.heartBeat, fluxElements.diastolic, fluxElements.systolic);
+	}
+
+	private void updateUIForNonFilteredResources(Decision heartBeatDecision, Decision bloodPressureDecision,
 			Integer heartBeat, Integer diastolic, Integer systolic) {
 		getUI().access(() -> {
 			if (heartBeatDecision == Decision.PERMIT) {
@@ -263,4 +269,15 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		});
 	}
 
+	/**
+	 * Data structure holding the results emitted by the flux combining
+	 * non filtered resources and their related access decisions.
+	 */
+	public static class NonFilteredResourcesData {
+		public Decision heartBeatDecision;
+		public Decision bloodPressureDecision;
+		public Integer heartBeat;
+		public Integer diastolic;
+		public Integer systolic;
+	}
 }
