@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import org.demo.model.SchedulerData;
+import org.demo.model.TimeScheduleData;
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
-import org.demo.service.SchedulerService;
+import org.demo.service.TimeScheduleService;
 import org.demo.view.reactive.AbstractReactiveView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -23,7 +23,6 @@ import io.sapl.api.pdp.multirequest.MultiRequest;
 import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 @SpringView(name = "reactiveMultiRequest")
 @SpringComponent("reactiveMultiRequestView")
@@ -40,10 +39,9 @@ public class ReactiveView extends AbstractReactiveView {
 	private final Map<String, Decision> accessDecisions;
 
 	@Autowired
-	public ReactiveView(PolicyEnforcementPoint pep,
-                        HeartBeatService heartBeatService, BloodPressureService bloodPressureService,
-                        SchedulerService schedulerService) {
-		super(heartBeatService, bloodPressureService, schedulerService);
+	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
+			BloodPressureService bloodPressureService, TimeScheduleService timeScheduleService) {
+		super(heartBeatService, bloodPressureService, timeScheduleService);
 		this.pep = pep;
 
 		accessDecisions = new HashMap<>();
@@ -59,7 +57,7 @@ public class ReactiveView extends AbstractReactiveView {
 				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read", "bloodPressureData");
 
 		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforceAll(multiRequest)
-				.subscribeOn(Schedulers.newElastic("pdp"));
+				.subscribeOn(nonUIThread);
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(),
 				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(),
@@ -90,14 +88,14 @@ public class ReactiveView extends AbstractReactiveView {
 	protected Flux<Response> getFilteredResourceFlux() {
 		// Each time the data flux emits a new resource, we have to send an authorization
 		// request to the PDP to transform / filter the resource.
-		// In this example there is just one data flux. But even if there where more than
+		// In this example there is just one data flux. But even if there were more than
 		// one, it would not make much sense to create a multi request with all the
 		// resources if only one of them has changed.
+		final Flux<TimeScheduleData> schedulerDataFlux = getSchedulerDataFlux();
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		final Flux<SchedulerData> schedulerDataFlux = getSchedulerDataFlux();
 		return schedulerDataFlux.switchMap(
 				data -> pep.filterEnforce(authentication, "readSchedulerData", data)
-						.subscribeOn(Schedulers.newElastic("sc-pdp")));
+						.subscribeOn(nonUIThread));
 	}
 
 }

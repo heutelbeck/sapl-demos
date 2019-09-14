@@ -1,11 +1,13 @@
 package org.demo.view.reactive;
 
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-import org.demo.model.SchedulerData;
+import org.demo.model.TimeScheduleData;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
-import org.demo.service.SchedulerService;
+import org.demo.service.TimeScheduleService;
 import org.vaadin.hezamu.canvas.Canvas;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,6 +26,7 @@ import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
@@ -34,7 +37,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	private BloodPressureService bloodPressureService;
 
-	private final SchedulerService schedulerService;
+	private final TimeScheduleService timeScheduleService;
 
 	private Label heartBeatAccessDenied;
 
@@ -44,26 +47,27 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	private Canvas bloodPressureCanvas;
 
-	private Label schedulerDataLabel;
+	private Label timeScheduleDataLabel;
 
-	private Label schedulerAccessDenied;
-
-	private Thread fluxSubscriptionThread1;
+	private Label timeScheduleAccessDenied;
 
 	private Disposable subscription1;
 
-	private Thread fluxSubscriptionThread2;
-
 	private Disposable subscription2;
 
+	protected Scheduler nonUIThread;
+
 	protected AbstractReactiveView(HeartBeatService heartBeatService,
-			BloodPressureService bloodPressureService, SchedulerService schedulerService) {
+			BloodPressureService bloodPressureService, TimeScheduleService timeScheduleService) {
 		this.mapper = new ObjectMapper();
 		this.mapper.registerModule(new Jdk8Module());
 
 		this.heartBeatService = heartBeatService;
 		this.bloodPressureService = bloodPressureService;
-		this.schedulerService = schedulerService;
+		this.timeScheduleService = timeScheduleService;
+
+		final ExecutorService executorService = Executors.newFixedThreadPool(8);
+		this.nonUIThread = Schedulers.fromExecutor(executorService);
 
 		setupUI();
 	}
@@ -111,67 +115,55 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		addComponent(schedulerCard);
 
 		final Label schedulerLabel = new Label("Schedule-Ticker:");
-		schedulerDataLabel = new Label();
-		schedulerDataLabel.setVisible(false);
-		schedulerAccessDenied = new Label("You have no access to scheduler data.");
-		schedulerAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
-		schedulerAccessDenied.setVisible(false);
-		schedulerCard.addComponents(schedulerLabel, schedulerDataLabel, schedulerAccessDenied);
+		timeScheduleDataLabel = new Label();
+		timeScheduleDataLabel.setVisible(false);
+		timeScheduleAccessDenied = new Label("You have no access to scheduler data.");
+		timeScheduleAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
+		timeScheduleAccessDenied.setVisible(false);
+		schedulerCard.addComponents(schedulerLabel, timeScheduleDataLabel, timeScheduleAccessDenied);
 	}
 
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
-		final Flux<Object[]> combinedFlux = getCombinedFluxForNonFilteredResources();
+		subscription1 = getCombinedFluxForNonFilteredResources().subscribe(
+				this::updateUIForNonFilteredResources,
+				error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+		);
 
-		// subscribe in a separate thread to give the current thread the chance to unlock
-		// the vaadin session;
-		// otherwise getUI().access(() -> {}) could not acquire the lock necessary to update the UI
-		fluxSubscriptionThread1 = new Thread(() -> subscription1 = combinedFlux
-				.subscribe(
-						this::updateUIForNonFilteredResources,
-						error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
-				));
-		fluxSubscriptionThread1.start();
-
-		final Flux<Response> responseFlux = getFilteredResourceFlux();
-		fluxSubscriptionThread2 = new Thread(() -> subscription2 = responseFlux
-				.subscribe(
-						this::updateUIWithFilteredResource,
-						error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
-				));
-		fluxSubscriptionThread2.start();
+		subscription2 = getFilteredResourceFlux().subscribe(
+				this::updateUIWithFilteredResource,
+				error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
+		);
 	}
 
 	@Override
 	public void beforeLeave(ViewBeforeLeaveEvent event) {
 		subscription1.dispose();
-		fluxSubscriptionThread1.interrupt();
 		subscription2.dispose();
-		fluxSubscriptionThread2.interrupt();
 		event.navigate();
 	}
 
 	protected Flux<Integer> getHeartBeatDataFlux() {
 		return heartBeatService.getHeartBeatData()
 				.distinctUntilChanged()
-				.subscribeOn(Schedulers.newElastic("hb-data"));
+				.subscribeOn(nonUIThread);
 	}
 
 	protected Flux<Integer> getDiastolicBloodPressureDataFlux() {
 		return bloodPressureService.getDiastolicBloodPressureData()
 				.distinctUntilChanged()
-				.subscribeOn(Schedulers.newElastic("bpd-data"));
+				.subscribeOn(nonUIThread);
 	}
 
 	protected Flux<Integer> getSystolicBloodPressureDataFlux() {
 		return bloodPressureService.getSystolicBloodPressureData()
 				.distinctUntilChanged()
-				.subscribeOn(Schedulers.newElastic("bps-data"));
+				.subscribeOn(nonUIThread);
 	}
 
-	protected Flux<SchedulerData> getSchedulerDataFlux() {
-		return schedulerService.getData()
-				.subscribeOn(Schedulers.newElastic("sc-data"));
+	protected Flux<TimeScheduleData> getSchedulerDataFlux() {
+		return timeScheduleService.getData()
+				.subscribeOn(nonUIThread);
 	}
 
 	protected abstract Flux<Object[]> getCombinedFluxForNonFilteredResources();
@@ -247,26 +239,26 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	private void updateUIWithFilteredResource(Response response) {
 		final Decision decision = response.getDecision();
-		final SchedulerData[] schedulerDataHolder = new SchedulerData[1];
+		final TimeScheduleData[] timeScheduleDataHolder = new TimeScheduleData[1];
 		final Optional<JsonNode> resource = response.getResource();
 		if (resource.isPresent()) {
 			try {
-				schedulerDataHolder[0] = mapper.treeToValue(resource.get(), SchedulerData.class);
+				timeScheduleDataHolder[0] = mapper.treeToValue(resource.get(), TimeScheduleData.class);
 			}
 			catch (JsonProcessingException e) {
-				schedulerDataHolder[0] = new SchedulerData("", "JsonProcessingException", e.getMessage());
+				timeScheduleDataHolder[0] = new TimeScheduleData("", "JsonProcessingException", e.getMessage());
 			}
 		}
 		getUI().access(() -> {
 			if (decision == Decision.PERMIT) {
-				schedulerDataLabel.setValue(schedulerDataHolder[0].toString());
-				schedulerDataLabel.setVisible(true);
-				schedulerAccessDenied.setVisible(false);
+				timeScheduleDataLabel.setValue(timeScheduleDataHolder[0].toString());
+				timeScheduleDataLabel.setVisible(true);
+				timeScheduleAccessDenied.setVisible(false);
 			}
 			else {
-				schedulerDataLabel.setValue("");
-				schedulerDataLabel.setVisible(false);
-				schedulerAccessDenied.setVisible(true);
+				timeScheduleDataLabel.setValue("");
+				timeScheduleDataLabel.setVisible(false);
+				timeScheduleAccessDenied.setVisible(true);
 			}
 		});
 	}

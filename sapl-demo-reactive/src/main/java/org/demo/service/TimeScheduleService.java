@@ -11,13 +11,13 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.demo.model.SchedulerData;
+import org.demo.model.TimeScheduleData;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 
 @Service
-public class SchedulerService {
+public class TimeScheduleService {
 
 	private final Random rnd = new Random();
 
@@ -31,11 +31,11 @@ public class SchedulerService {
 
 	private AtomicLong instantSeconds = new AtomicLong(Instant.now().getEpochSecond());
 
-	public Flux<SchedulerData> getData() {
-		return Flux.<SchedulerData>generate(sink -> {
+	public Flux<TimeScheduleData> getData() {
+		return Flux.<TimeScheduleData>generate(sink -> {
 			final String name = randomName();
 			final String title = doctors.contains(name) ? "Dr. " : "";
-			sink.next(new SchedulerData(title, name, randomInstant()));
+			sink.next(new TimeScheduleData(title, name, randomInstant()));
 		}).delayElements(Duration.ofSeconds(2));
 	}
 

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SchedulerData {
+public class TimeScheduleData {
 
 	private String title;
 
