@@ -5,9 +5,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.demo.model.TimeScheduleData;
+import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
 import org.demo.service.HeartBeatService;
 import org.demo.service.TimeScheduleService;
+import org.springframework.security.core.Authentication;
 import org.vaadin.hezamu.canvas.Canvas;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -24,12 +26,15 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.Response;
+import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
+
+	protected transient PolicyEnforcementPoint pep;
 
 	private ObjectMapper mapper;
 
@@ -57,8 +62,10 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 	protected Scheduler nonUIThread;
 
-	protected AbstractReactiveView(HeartBeatService heartBeatService,
+	protected AbstractReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
 			BloodPressureService bloodPressureService, TimeScheduleService timeScheduleService) {
+		this.pep = pep;
+
 		this.mapper = new ObjectMapper();
 		this.mapper.registerModule(new Jdk8Module());
 
@@ -161,11 +168,6 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				.subscribeOn(nonUIThread);
 	}
 
-	protected Flux<TimeScheduleData> getSchedulerDataFlux() {
-		return timeScheduleService.getData()
-				.subscribeOn(nonUIThread);
-	}
-
 	protected abstract Flux<Object[]> getCombinedFluxForNonFilteredResources();
 
 	protected abstract NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues);
@@ -241,7 +243,18 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		bloodPressureCanvas.restoreContext();
 	}
 
-	protected abstract Flux<Response> getFilteredResourceFlux();
+	private Flux<Response> getFilteredResourceFlux() {
+		// Each time the data flux emits a new resource, we have to send an authorization
+		// request to the PDP to transform / filter the resource.
+		// In this example there is just one resource flux. If there were more than one,
+		// we would have to execute the following lines of code for each of them. It would
+		// not make much sense to create a multi request with all the resources if only one
+		// of them has changed.
+		final Authentication authentication = SecurityUtils.getAuthentication();
+		return timeScheduleService.getData().switchMap(
+				data -> pep.filterEnforce(authentication, "readSchedulerData", data)
+						.subscribeOn(nonUIThread));
+	}
 
 	private void updateUIWithFilteredResource(Response response) {
 		final Decision decision = response.getDecision();
