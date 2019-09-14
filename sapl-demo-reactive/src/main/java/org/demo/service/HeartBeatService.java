@@ -14,7 +14,7 @@ public class HeartBeatService {
 	public Flux<Integer> getHeartBeatData() {
 		return Flux.<Integer, Integer>generate(() -> 60, (state, sink) -> {
 			int diff = rnd.nextInt(10) - 4;
-			if (state + diff > 170 || state + diff < 45) {
+			if (state + diff > 180 || state + diff < 50) {
 				state = state - diff;
 			}
 			else {

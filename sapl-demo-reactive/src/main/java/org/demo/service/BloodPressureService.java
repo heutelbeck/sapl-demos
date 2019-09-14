@@ -13,8 +13,8 @@ public class BloodPressureService {
 
 	public Flux<Integer> getDiastolicBloodPressureData() {
 		return Flux.<Integer, Integer>generate(() -> 80, (state, sink) -> {
-			int diff = rnd.nextInt(10) - 5;
-			if (state + diff > 130 || state + diff < 65) {
+			int diff = rnd.nextInt(10) - 4;
+			if (state + diff > 120 || state + diff < 65) {
 				state = state - diff;
 			}
 			else {
