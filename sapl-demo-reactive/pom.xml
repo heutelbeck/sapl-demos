@@ -38,13 +38,18 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-boot-starter</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pip-http</artifactId>
+			<version>${version.sapl.policy.engine}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-interpreter</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
