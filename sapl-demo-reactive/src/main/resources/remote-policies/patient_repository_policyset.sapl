@@ -162,7 +162,7 @@ permit
 where
 	"ROLE_DOCTOR" in subject..authority;
     var url = "http://localhost:8081/rest/patients/" + standard.numberToString(action.arguments[1]);
-    var patient = url.<http.get>.attendingDoctor;
+    var patient = url.<http.get>;
 obligation
 	{
 		"type"		: "sendEmail",
@@ -193,7 +193,7 @@ permit
 where
 	"ROLE_ADMIN" in subject..authority;
     var url = "http://localhost:8081/rest/patients/" + standard.numberToString(action.arguments[1]);
-    var patient = url.<http.get>.attendingDoctor;
+    var patient = url.<http.get>;
 obligation
 	{
 		"type"		: "sendEmail",
@@ -216,7 +216,7 @@ permit
 where
 	"ROLE_ADMIN" in subject..authority;
     var url = "http://localhost:8081/rest/patients/" + standard.numberToString(action.arguments[0]);
-    var patient = url.<http.get>.attendingDoctor;
+    var patient = url.<http.get>;
 obligation
 	{
 		"type"		: "sendEmail",
