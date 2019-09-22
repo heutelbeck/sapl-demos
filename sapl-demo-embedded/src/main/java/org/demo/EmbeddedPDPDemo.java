@@ -71,11 +71,11 @@ public class EmbeddedPDPDemo {
 	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE,
 			RESOURCE);
 
-	private static final int RUNS = 100000;
+	private static final int RUNS = 25_000;
 
-	private static final double BILLION = 1000000000.0D;
+	private static final double BILLION = 1_000_000_000.0D;
 
-	private static final double MILLION = 1000000.0D;
+	private static final double MILLION = 1_000_000.0D;
 
 	public static void main(String[] args) {
 		Options options = new Options();
@@ -108,6 +108,8 @@ public class EmbeddedPDPDemo {
 			builder = builder.withFilesystemPolicyRetrievalPoint(path,
 					Builder.IndexType.SIMPLE);
 		}
+		builder.withPolicyInformationPoint(new EchoPIP())
+				.withFunctionLibrary(new SimpleFunctionLibrary());
 		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 
 		blockingUsageDemo(pdp);
@@ -139,17 +141,18 @@ public class EmbeddedPDPDemo {
 
 	private static void runPerformanceDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance...");
+
+		final Response response = pdp.decide(READ_REQUEST).blockFirst();
+		LOGGER.info("{}", response);
+
+		int[] count = { 0 };
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(READ_REQUEST).take(1).subscribe(response -> {
-			});
-			pdp.decide(WRITE_REQUEST).take(1).subscribe(response -> {
-			});
+			pdp.decide(READ_REQUEST).take(1).subscribe(resp -> count[0]++);
 		}
 		long end = System.nanoTime();
-		LOGGER.info("Start : {}", start);
-		LOGGER.info("End   : {}", end);
 		LOGGER.info("Runs  : {}", RUNS);
+		LOGGER.info("Count  : {}", count[0]);
 		LOGGER.info("Total : {}s", nanoToS((double) end - start));
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
@@ -162,8 +165,7 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	private static final Request buildRequest(Object subject, Object action,
-			Object resource) {
+	private static Request buildRequest(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
 		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),

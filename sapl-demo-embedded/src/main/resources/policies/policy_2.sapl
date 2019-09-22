@@ -1,2 +1,5 @@
-policy "policy 2"
-deny action == "write"
+policy "policy write"
+permit
+  action == "write"
+where
+  subject == "willi" & resource =~ "some.+";
