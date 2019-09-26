@@ -1,5 +1,7 @@
 package org.demo;
 
+import java.util.Map;
+
 import org.demo.pip.PatientPIP;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
+/**
+ * REST controller providing endpoints for the policy information point
+ * providing patient attributes.
+ * The endpoints can be connected using the client
+ * {@code HttpPolicyInformationPoint} of the SAPL policy engine.
+ */
 @RestController
 @RequestMapping("rest/patients")
 @RequiredArgsConstructor
@@ -27,6 +35,14 @@ public class PatientPIPController {
 
 	private final ObjectMapper objectMapper;
 
+	/**
+	 * Delegates to {@link PatientPIP#getRelations(JsonNode, Map)}.
+	 *
+	 * @param id the id of the patient whose relatives should be returned.
+	 * @return a flux emitting an object containing the current list of
+	 *         names of users being related to the patient with the given id.
+	 * @see PatientPIP#getRelations(JsonNode, Map)
+	 */
 	@GetMapping(value = "{id}/relatives",
 			produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<JsonNode> getRelations(@PathVariable String id) {
@@ -54,6 +70,14 @@ public class PatientPIPController {
 				.trace("PatientPIPController.getRelations() returns {}", jsonNode));
 	}
 
+	/**
+	 * Delegates to {@link PatientPIP#getPatientRecord(JsonNode, Map)}.
+	 *
+	 * @param id the id of the patient whose data record should be returned.
+	 * @return a flux emitting the current data record of the patient identified
+	 *         by the given id.
+	 * @see PatientPIP#getPatientRecord(JsonNode, Map)
+	 */
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<JsonNode> getPatientRecord(@PathVariable String id) {
 		return patientPIP.getPatientRecord(JsonNodeFactory.instance.textNode(id), null)
