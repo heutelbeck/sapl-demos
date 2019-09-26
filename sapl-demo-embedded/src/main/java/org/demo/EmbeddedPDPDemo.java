@@ -36,6 +36,9 @@ import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.Request;
 import io.sapl.api.pdp.Response;
+import io.sapl.api.pdp.multirequest.IdentifiableResponse;
+import io.sapl.api.pdp.multirequest.MultiRequest;
+import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
@@ -114,7 +117,12 @@ public class EmbeddedPDPDemo {
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
-		runPerformanceDemo(pdp);
+
+		// to compare single requests with multi-requests, only run one of the following
+		// methods at once to avoid later methods benefit from earlier methods (e.g. class loading)
+		runPerformanceDemoSingle(pdp);
+//		runPerformanceDemoMulti(pdp);
+//		runPerformanceDemoMultiAll(pdp);
 	}
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
@@ -139,8 +147,8 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
 	}
 
-	private static void runPerformanceDemo(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance...");
+	private static void runPerformanceDemoSingle(PolicyDecisionPoint pdp) {
+		LOGGER.info("Performance Single...");
 
 		final Response response = pdp.decide(READ_REQUEST).blockFirst();
 		LOGGER.info("{}", response);
@@ -149,8 +157,57 @@ public class EmbeddedPDPDemo {
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_REQUEST).take(1).subscribe(resp -> count[0]++);
+			//pdp.decide(READ_REQUEST).blockFirst();
+			//count[0]++;
 		}
 		long end = System.nanoTime();
+		LOGGER.info("Single");
+		LOGGER.info("Runs  : {}", RUNS);
+		LOGGER.info("Count  : {}", count[0]);
+		LOGGER.info("Total : {}s", nanoToS((double) end - start));
+		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+	}
+
+	private static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
+		LOGGER.info("Performance Multi...");
+
+		final MultiRequest multiRequest = new MultiRequest();
+		multiRequest.addRequest("req", SUBJECT, ACTION_READ, RESOURCE);
+		final IdentifiableResponse identifiableResponse = pdp.decide(multiRequest).blockFirst();
+		LOGGER.info("{}", identifiableResponse.getResponse());
+
+		int[] count = { 0 };
+		long start = System.nanoTime();
+		for (int i = 0; i < RUNS; i++) {
+			//pdp.decide(multiRequest).take(1).subscribe(resp -> count[0]++);
+			pdp.decide(multiRequest).blockFirst();
+			count[0]++;
+		}
+		long end = System.nanoTime();
+		LOGGER.info("Multi");
+		LOGGER.info("Runs  : {}", RUNS);
+		LOGGER.info("Count  : {}", count[0]);
+		LOGGER.info("Total : {}s", nanoToS((double) end - start));
+		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+	}
+
+	private static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
+		LOGGER.info("Performance Multi All...");
+
+		final MultiRequest multiRequest = new MultiRequest();
+		multiRequest.addRequest("read", SUBJECT, ACTION_READ, RESOURCE);
+		final MultiResponse multiResponse = pdp.decideAll(multiRequest).blockFirst();
+		LOGGER.info("{}", multiResponse.getResponseForRequestWithId("read"));
+
+		int[] count = { 0 };
+		long start = System.nanoTime();
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decideAll(multiRequest).take(1).subscribe(resp -> count[0]++);
+			//pdp.decideAll(multiRequest).blockFirst();
+			//count[0]++;
+		}
+		long end = System.nanoTime();
+		LOGGER.info("Multi All");
 		LOGGER.info("Runs  : {}", RUNS);
 		LOGGER.info("Count  : {}", count[0]);
 		LOGGER.info("Total : {}s", nanoToS((double) end - start));
