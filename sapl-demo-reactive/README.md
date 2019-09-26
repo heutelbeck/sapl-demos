@@ -102,18 +102,20 @@ It presents the use of the reactive Policy Decision Point and the reactive Polic
 multi-requests.
 
 After the user has logged in with the password `password`, four buttons are presented on the initial page of the application. The first
-two buttons `Show Patient List (blocking, single requests)` and `Show Patient List (blocking, multi-requests)` lead to the fictitious
-healthcare scenario, which is also the basis of the demo application in spring-mvc-app. It demonstrates the blocking use of the PDP.
-Although the Policy Decision Points of the SAPL policy engine are implemented reactively, applications can still use them in a blocking
-way. This applies to both simple requests and multi-requests. The variant accessed via the second button uses multi-requests wherever
-possible. The corresponding performance improvement compared to the single requests is clearly noticeable when using the remote PDP.
+two buttons `Show Patient View (session based, single requests)` and `Show Patient View (session based, multi-requests)` lead to the 
+fictitious healthcare scenario, which is also the basis of the demo application in spring-mvc-app. It demonstrates the session-based use of the 
+PDP. The reactive streams returned by the Policy Decision Points of the SAPL policy engine are subscribed to in the server session of the
+application. The frontend is only updated upon new requests (polling). This applies to both simple requests and multi-requests. The variant 
+accessed via the second button uses multi-requests wherever possible. The corresponding performance improvement compared to the single requests 
+is clearly noticeable when using the remote PDP.
 
-The buttons labeled `Show Reactive View (single requests)` and `Show Reactive View (multi-request)` show a page that connects data 
-streams (pulse rate and blood pressure data) to the authorization decision streams of the PDP (non-blocking). This makes changes
-in the authorization decisions immediately visible without the application having to poll. Simple time-dependent policies are used
+The buttons labeled `Show Live-Data View (reactive frontend, single requests)` and `Show Live-Data View (reactive frontend, multi-request)`show 
+a view that connects data streams (pulse rate and blood pressure data) to the authorization decision streams of the PDP. Changes in the 
+authorization decisions lead to immediate update of the UI without the application having to poll. Simple time-dependent policies are used
 to demonstrate this. Doctors and nurses get to see pulse rate data when the number of seconds of the current time is greater than 4.
 Blood pressure data is always displayed when the number of seconds of the current time is less than 31 or greater than 35. Visitors
-only see pulse rate data, and also less frequently than doctors and nurses.
+only see pulse rate data, and also less frequently than doctors and nurses. A time scheduler panel, which is updated every two seconds, 
+demonstrates the usage of reactive authorization streams with resource filtering. Nurses and visitors see blackend schedule data for doctors.
 
 If the PDP configuration file `pdp.json` and/or the policy files are not stored in the classpath, but in any directory of the filesystem
 (`io.sapl.pdp-config-type=filesystem`, `io.sapl.prp-type=filesystem`, see above), it is possible in all four variants to modify the 
