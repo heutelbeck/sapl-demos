@@ -20,8 +20,9 @@ import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * Abstract base class for patient forms. Concrete subclasses demonstrating
- * the usage of SAPL single requests and SAPL multi-requests must implement
- * the methods controlling the visibility and enabling of form fields.
+ * the usage of session based SAPL single requests and SAPL multi-requests
+ * must implement the methods controlling the visibility and enabling of
+ * form fields.
  */
 public abstract class AbstractPatientForm extends FormLayout {
 

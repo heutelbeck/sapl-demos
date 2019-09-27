@@ -33,6 +33,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * Abstract base class of live data views. Concrete subclasses demonstrating the
+ * usage of SAPL single requests and SAPL multi-requests directly updating the
+ * frontend must implement the method {@link #getCombinedFluxForNonFilteredResources()}.
+ */
 @Slf4j
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
 
@@ -132,6 +137,14 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		schedulerCard.addComponents(schedulerLabel, timeScheduleDataLabel, timeScheduleAccessDenied);
 	}
 
+	/**
+	 * Subscribes to the streams providing non filtered data (heart beat and blood pressure)
+	 * and filtered data (time schedule). Both streams combine data streams returned by data
+	 * services and authorization streams returned by the policy decision point.
+	 * The subscriptions are stored for later disposal when leaving the view.
+	 *
+	 * @param event the view-change-event (not used).
+	 */
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
 		subscription1 = getCombinedFluxForNonFilteredResources().subscribe(
@@ -145,6 +158,11 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		);
 	}
 
+	/**
+	 * Disposes the two subscriptions created on {@link #enter(ViewChangeListener.ViewChangeEvent)}.
+	 *
+	 * @param event the view-before-leave-event used to navigate to the target view.
+	 */
 	@Override
 	public void beforeLeave(ViewBeforeLeaveEvent event) {
 		subscription1.dispose();
@@ -152,24 +170,38 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		event.navigate();
 	}
 
+	/**
+	 * @return a stream providing heart beat data.
+	 */
 	protected Flux<Integer> getHeartBeatDataFlux() {
 		return heartBeatService.getHeartBeatData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
 	}
 
+	/**
+	 * @return a stream providing diastolic blood pressure data.
+	 */
 	protected Flux<Integer> getDiastolicBloodPressureDataFlux() {
 		return bloodPressureService.getDiastolicBloodPressureData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
 	}
 
+	/**
+	 * @return a stream providing systolic blood pressure data.
+	 */
 	protected Flux<Integer> getSystolicBloodPressureDataFlux() {
 		return bloodPressureService.getSystolicBloodPressureData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
 	}
 
+	/**
+	 * @return a stream providing combined values needed for updating the heart beat panel
+	 *         and the blood pressure panel. The combined data consists of heart beat and
+	 *         blood pressure data and related authorization decisions.
+	 */
 	protected abstract Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources();
 
 	private void updateUIForNonFilteredResources(NonFilteredResourcesData data) {

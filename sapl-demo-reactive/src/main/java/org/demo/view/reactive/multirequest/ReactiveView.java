@@ -16,6 +16,12 @@ import io.sapl.api.pdp.multirequest.MultiResponse;
 import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
+/**
+ * Concrete reactive view implementation demonstrating the usage of
+ * SAPL multi-requests for controlling access to heart beat and blood
+ * pressure data directly updating the frontend upon authorization
+ * decision changes.
+ */
 @SpringView(name = "reactiveMultiRequest")
 @SpringComponent("reactiveMultiRequestView")
 public class ReactiveView extends AbstractReactiveView {
