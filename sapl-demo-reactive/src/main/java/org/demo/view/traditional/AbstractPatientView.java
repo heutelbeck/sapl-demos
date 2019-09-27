@@ -33,8 +33,7 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 		setMargin(true);
 	}
 
-	protected abstract AbstractPatientForm createForm(UIController uiController,
-			RefreshCallback refreshCallback);
+	protected abstract AbstractPatientForm createForm(UIController uiController, RefreshCallback refreshCallback);
 
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
@@ -53,8 +52,7 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 				form.hide();
 			}
 			else {
-				final Optional<Patient> patient = controller
-						.getPatient(selection.getValue().getId());
+				final Optional<Patient> patient = controller.getPatient(selection.getValue().getId());
 				patient.ifPresent(form::show);
 			}
 		});

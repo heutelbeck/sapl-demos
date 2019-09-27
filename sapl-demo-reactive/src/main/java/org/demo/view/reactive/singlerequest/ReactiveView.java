@@ -16,10 +16,9 @@ import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**
- * Concrete reactive view implementation demonstrating the usage of
- * SAPL single requests for controlling access to heart beat and blood
- * pressure data directly updating the frontend upon authorization
- * decision changes.
+ * Concrete reactive view implementation demonstrating the usage of SAPL single requests
+ * for controlling access to heart beat and blood pressure data directly updating the
+ * frontend upon authorization decision changes.
  */
 @SpringView(name = "reactive")
 @SpringComponent("reactiveView")
@@ -37,15 +36,12 @@ public class ReactiveView extends AbstractReactiveView {
 	protected Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
-		final Flux<Decision> heartBeatAccessDecisionFlux = pep
-				.enforce(authentication, "read", "heartBeatData")
+		final Flux<Decision> heartBeatAccessDecisionFlux = pep.enforce(authentication, "read", "heartBeatData")
 				.subscribeOn(nonUIThread);
-		final Flux<Decision> bloodPressureAccessDecisionFlux = pep
-				.enforce(authentication, "read", "bloodPressureData")
+		final Flux<Decision> bloodPressureAccessDecisionFlux = pep.enforce(authentication, "read", "bloodPressureData")
 				.subscribeOn(nonUIThread);
 
-		return Flux.combineLatest(heartBeatAccessDecisionFlux,
-				bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
+		return Flux.combineLatest(heartBeatAccessDecisionFlux, bloodPressureAccessDecisionFlux, getHeartBeatDataFlux(),
 				getDiastolicBloodPressureDataFlux(), getSystolicBloodPressureDataFlux(),
 				this::getNonFilteredResourcesDataFrom);
 	}

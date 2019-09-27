@@ -21,11 +21,10 @@ public class TimeScheduleService {
 
 	private final Random rnd = new Random();
 
-	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter
-			.ofPattern("dd.MM.yyyy HH:mm");
+	private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-	private final String[] names = new String[] { "Peter", "Alina", "Julia",
-			"Brigitte", "Janosch", "Janina", "Thomas" };
+	private final String[] names = new String[] { "Peter", "Alina", "Julia", "Brigitte", "Janosch", "Janina",
+			"Thomas" };
 
 	private final Set<String> doctors = new HashSet<>(Arrays.asList("Peter", "Alina", "Julia"));
 

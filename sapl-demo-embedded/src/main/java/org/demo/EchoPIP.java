@@ -12,9 +12,9 @@ import reactor.core.publisher.Flux;
 @PolicyInformationPoint(name = "echo", description = "PIP echoing the input value")
 public class EchoPIP {
 
-    @Attribute(name = "echo")
-    public Flux<JsonNode> echo(@Text JsonNode value,
-                                       Map<String, JsonNode> variables) {
-        return Flux.just(value);
-    }
+	@Attribute(name = "echo")
+	public Flux<JsonNode> echo(@Text JsonNode value, Map<String, JsonNode> variables) {
+		return Flux.just(value);
+	}
+
 }

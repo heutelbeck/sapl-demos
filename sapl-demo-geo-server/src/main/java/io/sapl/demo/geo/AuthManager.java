@@ -47,8 +47,7 @@ public class AuthManager implements AuthenticationManager {
 
 		List<GrantedAuthority> userAuthorities = new ArrayList<>();
 		userAuthorities.add(new SimpleGrantedAuthority(flightAttendant.getRole()));
-		return new UsernamePasswordAuthenticationToken(username,
-				flightAttendant.getPassword(), userAuthorities);
+		return new UsernamePasswordAuthenticationToken(username, flightAttendant.getPassword(), userAuthorities);
 	}
 
 }

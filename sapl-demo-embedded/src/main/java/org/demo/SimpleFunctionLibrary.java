@@ -25,8 +25,7 @@ public class SimpleFunctionLibrary {
 		}
 		else {
 			throw new FunctionException(
-					"length() parameter must be a string or an array, found "
-							+ parameter.getNodeType() + ".");
+					"length() parameter must be a string or an array, found " + parameter.getNodeType() + ".");
 		}
 		return result;
 	}

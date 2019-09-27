@@ -11,8 +11,7 @@ import com.vaadin.server.VaadinSession;
  * in the Vaadin Session if a Vaadin Session has already been established, or in a
  * ThreadLocal if no Vaadin Session is available.
  */
-public class VaadinSessionSecurityContextHolderStrategy
-		implements SecurityContextHolderStrategy {
+public class VaadinSessionSecurityContextHolderStrategy implements SecurityContextHolderStrategy {
 
 	private static final ThreadLocal<SecurityContext> contextHolder = new ThreadLocal<>();
 

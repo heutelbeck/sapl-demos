@@ -19,7 +19,7 @@ public class PatientView extends AbstractPatientView {
 
 	@Override
 	protected AbstractPatientForm createForm(UIController uiController,
-    		AbstractPatientForm.RefreshCallback refreshCallback) {
+			AbstractPatientForm.RefreshCallback refreshCallback) {
 		return new PatientForm(uiController, refreshCallback);
 	}
 

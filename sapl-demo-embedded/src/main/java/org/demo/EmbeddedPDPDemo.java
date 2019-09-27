@@ -68,11 +68,9 @@ public class EmbeddedPDPDemo {
 
 	private static final String RESOURCE = "something";
 
-	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ,
-			RESOURCE);
+	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ, RESOURCE);
 
-	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE,
-			RESOURCE);
+	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 25_000;
 
@@ -96,43 +94,40 @@ public class EmbeddedPDPDemo {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
 		}
-		catch (ParseException | IOException | AttributeException | FunctionException
-				| URISyntaxException | PolicyEvaluationException | PDPConfigurationException e) {
+		catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
+				| PolicyEvaluationException | PDPConfigurationException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
 		}
 
 	}
 
-	private static void runDemo(String path) throws IOException, AttributeException,
-			FunctionException, URISyntaxException, PolicyEvaluationException, PDPConfigurationException {
+	private static void runDemo(String path) throws IOException, AttributeException, FunctionException,
+			URISyntaxException, PolicyEvaluationException, PDPConfigurationException {
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
 		if (path != null) {
-			builder = builder.withFilesystemPolicyRetrievalPoint(path,
-					Builder.IndexType.SIMPLE);
+			builder = builder.withFilesystemPolicyRetrievalPoint(path, Builder.IndexType.SIMPLE);
 		}
-		builder.withPolicyInformationPoint(new EchoPIP())
-				.withFunctionLibrary(new SimpleFunctionLibrary());
+		builder.withPolicyInformationPoint(new EchoPIP()).withFunctionLibrary(new SimpleFunctionLibrary());
 		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
 
 		// to compare single requests with multi-requests, only run one of the following
-		// methods at once to avoid later methods benefit from earlier methods (e.g. class loading)
+		// methods at once to avoid later methods benefit from earlier methods (e.g. class
+		// loading)
 		runPerformanceDemoSingle(pdp);
-//		runPerformanceDemoMulti(pdp);
-//		runPerformanceDemoMultiAll(pdp);
+		// runPerformanceDemoMulti(pdp);
+		// runPerformanceDemoMultiAll(pdp);
 	}
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
 		final Response readResponse = pdp.decide(READ_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'read': {}",
-				readResponse != null ? readResponse.getDecision() : "null");
+		LOGGER.info("Decision for action 'read': {}", readResponse != null ? readResponse.getDecision() : "null");
 		final Response writeResponse = pdp.decide(WRITE_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'write': {}",
-				writeResponse != null ? writeResponse.getDecision() : "null");
+		LOGGER.info("Decision for action 'write': {}", writeResponse != null ? writeResponse.getDecision() : "null");
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
@@ -157,8 +152,8 @@ public class EmbeddedPDPDemo {
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_REQUEST).take(1).subscribe(resp -> count[0]++);
-			//pdp.decide(READ_REQUEST).blockFirst();
-			//count[0]++;
+			// pdp.decide(READ_REQUEST).blockFirst();
+			// count[0]++;
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Single");
@@ -179,7 +174,7 @@ public class EmbeddedPDPDemo {
 		int[] count = { 0 };
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			//pdp.decide(multiRequest).take(1).subscribe(resp -> count[0]++);
+			// pdp.decide(multiRequest).take(1).subscribe(resp -> count[0]++);
 			pdp.decide(multiRequest).blockFirst();
 			count[0]++;
 		}
@@ -203,8 +198,8 @@ public class EmbeddedPDPDemo {
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decideAll(multiRequest).take(1).subscribe(resp -> count[0]++);
-			//pdp.decideAll(multiRequest).blockFirst();
-			//count[0]++;
+			// pdp.decideAll(multiRequest).blockFirst();
+			// count[0]++;
 		}
 		long end = System.nanoTime();
 		LOGGER.info("Multi All");
@@ -225,8 +220,7 @@ public class EmbeddedPDPDemo {
 	private static Request buildRequest(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),
-				mapper.valueToTree(resource), null);
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
 	}
 
 }

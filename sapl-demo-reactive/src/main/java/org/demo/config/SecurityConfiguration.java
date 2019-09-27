@@ -20,8 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	static {
-		SecurityContextHolder.setStrategyName(
-				VaadinSessionSecurityContextHolderStrategy.class.getName());
+		SecurityContextHolder.setStrategyName(VaadinSessionSecurityContextHolderStrategy.class.getName());
 	}
 
 	@Override
@@ -31,8 +30,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMem = auth
-				.inMemoryAuthentication();
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMem = auth.inMemoryAuthentication();
 		DemoData.loadUsers(inMem, passwordEncoder());
 	}
 

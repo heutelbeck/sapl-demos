@@ -92,8 +92,8 @@ public class Benchmark {
 	}
 
 	private static List<String> getExportHeader() {
-		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)",
-				"Execution Time (ms)", "Request String", "Response String (ms)");
+		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
+				"Response String (ms)");
 	}
 
 	private static double extractMin(List<XlsRecord> data) {
@@ -125,8 +125,7 @@ public class Benchmark {
 	}
 
 	private static double extractMdn(List<XlsRecord> data) {
-		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted()
-				.collect(Collectors.toList());
+		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
 		int index = list.size() / 2;
 		if (list.size() % 2 == 0) {
 			return (list.get(index) + list.get(index - 1)) / 2;
@@ -168,8 +167,7 @@ public class Benchmark {
 		ObjectMapper mapper = new ObjectMapper();
 		TestSuite suite = null;
 		try {
-			suite = mapper.readValue(Resources.getResource("tests.json"),
-					TestSuite.class);
+			suite = mapper.readValue(Resources.getResource("tests.json"), TestSuite.class);
 		}
 		catch (IOException e) {
 			LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
@@ -188,8 +186,7 @@ public class Benchmark {
 		List<PolicyGeneratorConfiguration> configs = suite.getCases();
 		List<String> identifier = new LinkedList<>();
 		for (PolicyGeneratorConfiguration config : configs) {
-			benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues,
-					mdnValues, identifier, config);
+			benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues, mdnValues, identifier, config);
 		}
 
 		writeOverviewChart(path, chart);
@@ -199,9 +196,8 @@ public class Benchmark {
 		writeExcelFile(path, data);
 	}
 
-	private static void benchmarkConfiguration(String path, List<XlsRecord> data,
-			XYChart chart, List<Double> minValues, List<Double> maxValues,
-			List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
+	private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
+			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
 			PolicyGeneratorConfiguration config) throws URISyntaxException {
 		identifier.add(config.getName());
 		List<XlsRecord> results = null;
@@ -226,9 +222,7 @@ public class Benchmark {
 		details.addSeries(config.getName(), times);
 
 		try {
-			BitmapEncoder.saveBitmap(details,
-					path + config.getName().replaceAll("[^a-zA-Z0-9]", ""),
-					BitmapFormat.PNG);
+			BitmapEncoder.saveBitmap(details, path + config.getName().replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
 		}
 		catch (IOException e) {
 			LOGGER.error(ERROR_WRITING_BITMAP, e);
@@ -257,9 +251,8 @@ public class Benchmark {
 		}
 	}
 
-	private static void writeHistogram(String path, List<Double> minValues,
-			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues,
-			List<String> identifier) {
+	private static void writeHistogram(String path, List<Double> minValues, List<Double> maxValues,
+			List<Double> avgValues, List<Double> mdnValues, List<String> identifier) {
 		CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		histogram.setTitle("Aggregates");
 		histogram.setXAxisTitle("Run");
@@ -289,8 +282,7 @@ public class Benchmark {
 		}
 	}
 
-	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config,
-			String path)
+	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
 			throws IOException, URISyntaxException, PolicyEvaluationException {
 
 		PolicyGenerator generator = new PolicyGenerator(config);
@@ -300,7 +292,8 @@ public class Benchmark {
 
 		final Path dir = Paths.get(path, subfolder);
 		Files.createDirectories(dir);
-		Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"), StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+		Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"),
+				StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
 
 		List<XlsRecord> results = new LinkedList<>();
 
@@ -309,8 +302,7 @@ public class Benchmark {
 				long begin = System.nanoTime();
 				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
 						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE)
-						.withFilesystemPDPConfigurationProvider(path + subfolder)
-						.build();
+						.withFilesystemPDPConfigurationProvider(path + subfolder).build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
@@ -325,8 +317,8 @@ public class Benchmark {
 					if (response == null) {
 						throw new IOException("PDP returned null response");
 					}
-					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep,
-							diff, request.toString(), response.toString()));
+					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
+							response.toString()));
 
 					LOGGER.info("Total : {}ms", diff);
 				}

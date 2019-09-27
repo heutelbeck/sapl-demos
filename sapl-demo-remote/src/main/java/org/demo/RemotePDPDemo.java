@@ -125,18 +125,19 @@ public class RemotePDPDemo {
 	}
 
 	private static void runDemo(String host, int port, String key, String secret) throws InterruptedException {
-		RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key,
-				secret);
+		RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
 
 		final Request request = buildRequest("willi", "test-read", "something");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
+			// @formatter:off
 			pdp.decide(request).take(1)
 					.subscribe(
 					        response -> LOG.info("response: {}", response),
                             error -> LOG.error("error", error),
                             () -> LOG.info("complete")
                     );
+			// @formatter:on
 		}
 		long end = System.nanoTime();
 
@@ -152,8 +153,7 @@ public class RemotePDPDemo {
 	private static Request buildRequest(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action),
-				mapper.valueToTree(resource), null);
+		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
 	}
 
 }

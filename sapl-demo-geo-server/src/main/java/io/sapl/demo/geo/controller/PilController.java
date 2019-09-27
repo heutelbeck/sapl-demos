@@ -23,9 +23,8 @@ public class PilController {
 
 	@GetMapping(value = "/pil", produces = "application/json")
 	@ResponseBody
-	public String retrievePil(@RequestParam("dep") String dep,
-			@RequestParam("dest") String dest, @RequestParam("fltNo") String fltNo,
-			@RequestParam("date") String date,
+	public String retrievePil(@RequestParam("dep") String dep, @RequestParam("dest") String dest,
+			@RequestParam("fltNo") String fltNo, @RequestParam("date") String date,
 			@RequestParam("classification") int classification,
 			@RequestParam(value = "type", required = false) String type) {
 
@@ -34,8 +33,7 @@ public class PilController {
 		}
 		else {
 			try {
-				PilDataConstructor pil = new PilDataConstructor(classification, dep, dest,
-						fltNo, date, MIN_PASSENGER);
+				PilDataConstructor pil = new PilDataConstructor(classification, dep, dest, fltNo, date, MIN_PASSENGER);
 				return pil.getData();
 			}
 			catch (IOException e) {

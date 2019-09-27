@@ -4,9 +4,8 @@ import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 
 /**
- * Concrete patient form implementation demonstrating the usage of
- * SAPL single requests for controlling the visibility and enabling
- * of form fields.
+ * Concrete patient form implementation demonstrating the usage of SAPL single requests
+ * for controlling the visibility and enabling of form fields.
  */
 class PatientForm extends AbstractPatientForm {
 

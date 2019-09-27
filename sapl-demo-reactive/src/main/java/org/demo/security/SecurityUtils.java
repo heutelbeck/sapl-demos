@@ -27,8 +27,7 @@ public final class SecurityUtils {
 
 	public static boolean hasRole(String role) {
 		final Authentication authentication = getAuthentication();
-		return authentication != null && authentication.getAuthorities()
-				.contains(new SimpleGrantedAuthority(role));
+		return authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority(role));
 	}
 
 	public static void notifyNotAuthorized() {

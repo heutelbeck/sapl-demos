@@ -52,9 +52,8 @@ public class PolicyGenerator {
 		final double bracketChance = config.getBracketProbability();
 		final double conjunctionChance = config.getConjunctionProbability();
 
-		StringBuilder statement = new StringBuilder(DEFAULT_BUFFER).append("policy \"")
-				.append(name).append("\"").append(System.lineSeparator())
-				.append("permit ");
+		StringBuilder statement = new StringBuilder(DEFAULT_BUFFER).append("policy \"").append(name).append("\"")
+				.append(System.lineSeparator()).append("permit ");
 
 		int open = 0;
 		for (int j = 0; j < numberOfVariables; ++j) {
@@ -96,8 +95,7 @@ public class PolicyGenerator {
 		return dice.nextInt(supremum);
 	}
 
-	public void generatePolicies(String subfolder)
-			throws FileNotFoundException, UnsupportedEncodingException {
+	public void generatePolicies(String subfolder) throws FileNotFoundException, UnsupportedEncodingException {
 		String path = config.getPath() + subfolder + "/";
 
 		File folder = new File(path);
@@ -106,16 +104,14 @@ public class PolicyGenerator {
 			if (files != null) {
 				for (File file : files) {
 					if (file.getName().endsWith("sapl") && !file.delete()) {
-						System.err.println(String.format("failed to delete: %s.",
-								file.getAbsolutePath()));
+						System.err.println(String.format("failed to delete: %s.", file.getAbsolutePath()));
 					}
 				}
 			}
 		}
 		for (int i = 0; i < config.getPolicyCount(); i++) {
 			String name = "p_" + i;
-			try (PrintWriter writer = new PrintWriter(path + name + ".sapl",
-					StandardCharsets.UTF_8.name())) {
+			try (PrintWriter writer = new PrintWriter(path + name + ".sapl", StandardCharsets.UTF_8.name())) {
 				writer.println(generatePolicyString(name));
 			}
 		}
@@ -132,11 +128,9 @@ public class PolicyGenerator {
 	public Request createRequestObject() {
 		ObjectNode resource = JsonNodeFactory.instance.objectNode();
 		for (String var : getVariables()) {
-			resource = resource.put(var,
-					roll() < config.getFalseProbability() ? false : true);
+			resource = resource.put(var, roll() < config.getFalseProbability() ? false : true);
 		}
-		return new Request(NullNode.getInstance(), NullNode.getInstance(), resource,
-				NullNode.getInstance());
+		return new Request(NullNode.getInstance(), NullNode.getInstance(), resource, NullNode.getInstance());
 	}
 
 }

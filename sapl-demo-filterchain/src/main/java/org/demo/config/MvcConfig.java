@@ -10,8 +10,7 @@ public class MvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("**/favicon.ico")
-				.addResourceLocations("classpath:main/resources/static");
+		registry.addResourceHandler("**/favicon.ico").addResourceLocations("classpath:main/resources/static");
 	}
 
 	@Override

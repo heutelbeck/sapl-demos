@@ -34,9 +34,9 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Abstract base class of live data views. Concrete subclasses demonstrating the
- * usage of SAPL single requests and SAPL multi-requests directly updating the
- * frontend must implement the method {@link #getCombinedFluxForNonFilteredResources()}.
+ * Abstract base class of live data views. Concrete subclasses demonstrating the usage of
+ * SAPL single requests and SAPL multi-requests directly updating the frontend must
+ * implement the method {@link #getCombinedFluxForNonFilteredResources()}.
  */
 @Slf4j
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
@@ -103,8 +103,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		heartBeatCanvas.setWidth("350px");
 		heartBeatCanvas.setHeight("40px");
 		heartBeatCanvas.setVisible(true);
-		heartBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied,
-				heartBeatCanvas);
+		heartBeatCard.addComponents(heartBeatLabel, heartBeatAccessDenied, heartBeatCanvas);
 
 		final VerticalLayout bloodPressureCard = new VerticalLayout();
 		bloodPressureCard.setSizeFull();
@@ -112,16 +111,14 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		addComponent(bloodPressureCard);
 
 		final Label bloodPressureLabel = new Label("Blood Pressure: ");
-		bloodPressureAccessDenied = new Label(
-				"You have no access to blood pressure data.");
+		bloodPressureAccessDenied = new Label("You have no access to blood pressure data.");
 		bloodPressureAccessDenied.setStyleName(ValoTheme.LABEL_FAILURE);
 		bloodPressureAccessDenied.setVisible(false);
 		bloodPressureCanvas = new Canvas();
 		bloodPressureCanvas.setWidth("350px");
 		bloodPressureCanvas.setHeight("40px");
 		bloodPressureCanvas.setVisible(true);
-		bloodPressureCard.addComponents(bloodPressureLabel, bloodPressureAccessDenied,
-				bloodPressureCanvas);
+		bloodPressureCard.addComponents(bloodPressureLabel, bloodPressureAccessDenied, bloodPressureCanvas);
 
 		final VerticalLayout schedulerCard = new VerticalLayout();
 		schedulerCard.setSizeFull();
@@ -138,15 +135,15 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	}
 
 	/**
-	 * Subscribes to the streams providing non filtered data (heart beat and blood pressure)
-	 * and filtered data (time schedule). Both streams combine data streams returned by data
-	 * services and authorization streams returned by the policy decision point.
-	 * The subscriptions are stored for later disposal when leaving the view.
-	 *
+	 * Subscribes to the streams providing non filtered data (heart beat and blood
+	 * pressure) and filtered data (time schedule). Both streams combine data streams
+	 * returned by data services and authorization streams returned by the policy decision
+	 * point. The subscriptions are stored for later disposal when leaving the view.
 	 * @param event the view-change-event (not used).
 	 */
 	@Override
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
+		// @formatter:off
 		subscription1 = getCombinedFluxForNonFilteredResources().subscribe(
 				this::updateUIForNonFilteredResources,
 				error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
@@ -156,11 +153,12 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				this::updateUIWithFilteredResource,
 				error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
 		);
+		// @formatter:on
 	}
 
 	/**
-	 * Disposes the two subscriptions created on {@link #enter(ViewChangeListener.ViewChangeEvent)}.
-	 *
+	 * Disposes the two subscriptions created on
+	 * {@link #enter(ViewChangeListener.ViewChangeEvent)}.
 	 * @param event the view-before-leave-event used to navigate to the target view.
 	 */
 	@Override
@@ -174,33 +172,39 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	 * @return a stream providing heart beat data.
 	 */
 	protected Flux<Integer> getHeartBeatDataFlux() {
+		// @formatter:off
 		return heartBeatService.getHeartBeatData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
+		// @formatter:on
 	}
 
 	/**
 	 * @return a stream providing diastolic blood pressure data.
 	 */
 	protected Flux<Integer> getDiastolicBloodPressureDataFlux() {
+		// @formatter:off
 		return bloodPressureService.getDiastolicBloodPressureData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
+		// @formatter:on
 	}
 
 	/**
 	 * @return a stream providing systolic blood pressure data.
 	 */
 	protected Flux<Integer> getSystolicBloodPressureDataFlux() {
+		// @formatter:off
 		return bloodPressureService.getSystolicBloodPressureData()
 				.distinctUntilChanged()
 				.subscribeOn(nonUIThread);
+		// @formatter:on
 	}
 
 	/**
 	 * @return a stream providing combined values needed for updating the heart beat panel
-	 *         and the blood pressure panel. The combined data consists of heart beat and
-	 *         blood pressure data and related authorization decisions.
+	 * and the blood pressure panel. The combined data consists of heart beat and blood
+	 * pressure data and related authorization decisions.
 	 */
 	protected abstract Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources();
 
@@ -257,13 +261,11 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 
 		bloodPressureCanvas.setFillStyle("green");
 		bloodPressureCanvas.fillRect(0, 0, diastolic, 12);
-		bloodPressureCanvas.fillText("" + diastolic + " mmHg (diastolic)", diastolic + 10,
-				0, 350);
+		bloodPressureCanvas.fillText("" + diastolic + " mmHg (diastolic)", diastolic + 10, 0, 350);
 
 		bloodPressureCanvas.setFillStyle("blue");
 		bloodPressureCanvas.fillRect(0, 20, systolic, 12);
-		bloodPressureCanvas.fillText("" + systolic + " mmHg (systolic)", systolic + 10,
-				20, 350);
+		bloodPressureCanvas.fillText("" + systolic + " mmHg (systolic)", systolic + 10, 20, 350);
 
 		bloodPressureCanvas.restoreContext();
 	}
@@ -273,12 +275,11 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		// request to the PDP to transform / filter the resource.
 		// In this example there is just one resource flux. If there were more than one,
 		// we would have to execute the following lines of code for each of them. It would
-		// not make much sense to create a multi request with all the resources if only one
-		// of them has changed.
+		// not make much sense to create a multi request with all the resources if only
+		// one of them has changed.
 		final Authentication authentication = SecurityUtils.getAuthentication();
 		return timeScheduleService.getData().switchMap(
-				data -> pep.filterEnforce(authentication, "readSchedulerData", data)
-						.subscribeOn(nonUIThread));
+				data -> pep.filterEnforce(authentication, "readSchedulerData", data).subscribeOn(nonUIThread));
 	}
 
 	private void updateUIWithFilteredResource(Response response) {
@@ -308,14 +309,21 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	}
 
 	/**
-	 * Data structure holding the results emitted by the flux combining
-	 * non filtered resources and their related access decisions.
+	 * Data structure holding the results emitted by the flux combining non filtered
+	 * resources and their related access decisions.
 	 */
 	public static class NonFilteredResourcesData {
+
 		public Decision heartBeatDecision;
+
 		public Decision bloodPressureDecision;
+
 		public Integer heartBeat;
+
 		public Integer diastolic;
+
 		public Integer systolic;
+
 	}
+
 }

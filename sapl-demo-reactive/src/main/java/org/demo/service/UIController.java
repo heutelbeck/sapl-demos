@@ -27,8 +27,7 @@ public class UIController {
 	public List<PatientListItem> getPatients() {
 		final List<PatientListItem> result = new ArrayList<>();
 		final Iterable<Patient> allPatients = patientRepo.findAll();
-		allPatients.forEach(patient -> result
-				.add(new PatientListItem(patient.getId(), patient.getName())));
+		allPatients.forEach(patient -> result.add(new PatientListItem(patient.getId(), patient.getName())));
 		return result;
 	}
 
@@ -51,16 +50,13 @@ public class UIController {
 			patientRepo.updateIcd11CodeById(modifiedPatient.getIcd11Code(), modifiedPatient.getId());
 		}
 		if (!Objects.equals(modifiedPatient.getDiagnosisText(), originalPatient.getDiagnosisText())) {
-			patientRepo.updateDiagnosisTextById(modifiedPatient.getDiagnosisText(),
-					modifiedPatient.getId());
+			patientRepo.updateDiagnosisTextById(modifiedPatient.getDiagnosisText(), modifiedPatient.getId());
 		}
 		if (!Objects.equals(modifiedPatient.getAttendingDoctor(), originalPatient.getAttendingDoctor())) {
-			patientRepo.updateAttendingDoctorById(modifiedPatient.getAttendingDoctor(),
-					modifiedPatient.getId());
+			patientRepo.updateAttendingDoctorById(modifiedPatient.getAttendingDoctor(), modifiedPatient.getId());
 		}
 		if (!Objects.equals(modifiedPatient.getAttendingNurse(), originalPatient.getAttendingNurse())) {
-			patientRepo.updateAttendingNurseById(modifiedPatient.getAttendingNurse(),
-					modifiedPatient.getId());
+			patientRepo.updateAttendingNurseById(modifiedPatient.getAttendingNurse(), modifiedPatient.getId());
 		}
 		if (!Objects.equals(modifiedPatient.getPhoneNumber(), originalPatient.getPhoneNumber())) {
 			patientRepo.updatePhoneNumberById(modifiedPatient.getPhoneNumber(), modifiedPatient.getId());

@@ -77,7 +77,8 @@ public class HomeView extends VerticalLayout implements View {
 		traditionalBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useTraditionalBtn"));
 		multiRequestBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useMultiRequestBtn"));
 		reactiveBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveBtn"));
-		reactiveMultiRequestBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
+		reactiveMultiRequestBtn
+				.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
 	}
 
 }

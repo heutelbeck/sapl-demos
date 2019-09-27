@@ -99,8 +99,8 @@ public class PilDataConstructor {
 
 	private int actNumPax;
 
-	public PilDataConstructor(int level, String from, String to, String flightNumber,
-			String dateOfFlight, int minSeats) throws IOException {
+	public PilDataConstructor(int level, String from, String to, String flightNumber, String dateOfFlight, int minSeats)
+			throws IOException {
 		rand = new SecureRandom();
 		data = new PilData();
 		actNumPax = minSeats + rand.nextInt(TTL_MAX - minSeats);
@@ -136,8 +136,8 @@ public class PilDataConstructor {
 	}
 
 	private PilMetaInf constructMetaInf() {
-		return PilMetaInf.builder().arrAp(arrAp).depAp(depAp).fltNo(fltNo).date(date)
-				.acType(AC_TYPE).classification(classification).build();
+		return PilMetaInf.builder().arrAp(arrAp).depAp(depAp).fltNo(fltNo).date(date).acType(AC_TYPE)
+				.classification(classification).build();
 	}
 
 	private PilPaxInf constructRandomPaxInf() {
@@ -181,17 +181,16 @@ public class PilDataConstructor {
 			yAct = tempPaxCount;
 		}
 
-		return PilPaxInf.builder().fAct(fAct).fMax(F_MAX).cAct(cAct).cMax(C_MAX)
-				.eAct(eAct).eMax(E_MAX).yAct(yAct).yMax(Y_MAX).build();
+		return PilPaxInf.builder().fAct(fAct).fMax(F_MAX).cAct(cAct).cMax(C_MAX).eAct(eAct).eMax(E_MAX).yAct(yAct)
+				.yMax(Y_MAX).build();
 	}
 
 	private PilPassenger[] constructRandomPaxDetails() {
 		PilPassenger[] pax = new PilPassenger[actNumPax];
 		for (int i = 0; i < actNumPax; i++) {
 			int gender = rand.nextInt(GENDER);
-			pax[i] = PilPassenger.builder().name(randomName(gender)).bdate(randomBdate())
-					.gender(gender == MALE ? M : F).seat(String.valueOf(i))
-					.special(SPECIALS[rand.nextInt(SPECIALS.length - 1)]).build();
+			pax[i] = PilPassenger.builder().name(randomName(gender)).bdate(randomBdate()).gender(gender == MALE ? M : F)
+					.seat(String.valueOf(i)).special(SPECIALS[rand.nextInt(SPECIALS.length - 1)]).build();
 		}
 		return pax;
 	}
@@ -216,8 +215,7 @@ public class PilDataConstructor {
 
 	private static String[] getNameList(String file) throws IOException {
 		InputStreamReader fileReader = new InputStreamReader(
-				Files.newInputStream(Paths.get(FILE_PATH, FilenameUtils.getName(file)),
-						StandardOpenOption.READ),
+				Files.newInputStream(Paths.get(FILE_PATH, FilenameUtils.getName(file)), StandardOpenOption.READ),
 				StandardCharsets.UTF_8);
 
 		List<String> result = new ArrayList<>();

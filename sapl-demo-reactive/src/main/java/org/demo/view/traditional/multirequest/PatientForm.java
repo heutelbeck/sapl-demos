@@ -8,9 +8,8 @@ import org.springframework.security.core.Authentication;
 import io.sapl.api.pdp.multirequest.MultiRequest;
 
 /**
- * Concrete patient form implementation demonstrating the usage of
- * SAPL multi-requests for controlling the visibility and enabling
- * of form fields.
+ * Concrete patient form implementation demonstrating the usage of SAPL multi-requests for
+ * controlling the visibility and enabling of form fields.
  */
 class PatientForm extends AbstractPatientForm {
 
@@ -39,8 +38,7 @@ class PatientForm extends AbstractPatientForm {
 
 	private MultiRequest createMultiRequestForFieldVisibility() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiRequest()
-				.addRequest("readMrn", authentication, "read", medicalRecordNumber.getData())
+		return new MultiRequest().addRequest("readMrn", authentication, "read", medicalRecordNumber.getData())
 				.addRequest("readName", authentication, "read", name.getData())
 				.addRequest("readDiagnosis", authentication, "read", diagnosisText.getData())
 				.addRequest("readIcd11", authentication, "read", icd11Code.getData())
@@ -67,8 +65,7 @@ class PatientForm extends AbstractPatientForm {
 
 	private MultiRequest createMultiRequestForFieldEnabling() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiRequest()
-				.addRequest("editMrn", authentication, "edit", medicalRecordNumber.getData())
+		return new MultiRequest().addRequest("editMrn", authentication, "edit", medicalRecordNumber.getData())
 				.addRequest("editName", authentication, "edit", name.getData())
 				.addRequest("editDiagnosis", authentication, "edit", diagnosisText.getData())
 				.addRequest("editIcd11", authentication, "edit", icd11Code.getData())

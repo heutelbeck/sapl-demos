@@ -25,10 +25,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class)
-				.authorizeRequests().and().formLogin().loginPage("/login").permitAll()
-				.and().logout().logoutUrl("/logout").logoutSuccessUrl("/login")
-				.permitAll().and().httpBasic().and().csrf().disable();
+		http.addFilterAfter(policyEnforcementFilter, FilterSecurityInterceptor.class).authorizeRequests().and()
+				.formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
+				.logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
 	}
 
 }
