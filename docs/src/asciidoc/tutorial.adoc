@@ -22,17 +22,12 @@ We tried not to reinvent the wheel and respect as far as possible the opinionate
 
 Therefore inspecting the framework we found several starting-points to integrate SAPL with springsecurity:
 
-* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects] you find two ways to use SAPL.
-The direct way of calling the SAPLAuthorizer-Bean (e.g. in a MVC-Controller, writing the response in
+* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/spring-mvc-app[spring-mvc-app] you find two ways to use SAPL.
+The direct way of calling the PolicyEnforcementPoint-Bean (e.g. in a MVC-Controller, writing the response in
 the model). And the perhaps a little bit more sophisticated way of using aspects and SAPL-specific annotations.
-* The sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice] is based on the authorizationaspects-project and shows how to use obligation and advice handlers.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] we inject a SAPL-specific filter into the springsecurity-Filterchain. The filter protects a classic MVC-controller as well as a ReST-Controller.
-The demo also uses the direct way of calling the SAPLAuthorizer-Bean.
-* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt] we show how to use JSON Web tokens together with an annotation that uses Sapl Policies.
-* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator]
-we make  extensive use of the https://docs.spring.io/spring-security/site/docs/current/reference/htmlsingle/#el-permission-evaluator[PermissionEvaluator Interface] from Spring Security.
-* In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip] we show how to use a SAPL-PolicyInformationPoint to gain additional information required by some policies to make an authorization decision.
-* In the sub-project https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-voter[sapl-demo-voter] we show how to use a SaplVoter that can be used together with other voters in the `AccessDecisionManager` of Spring Security.
+The demo also uses the direct way of calling the PolicyEnforcementPoint-Bean.
+* In the sub-project https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-reactive[sapl-demo-reactive] we demonstrate different ways of taking advantage from the new reactive API of the Policy Decision Point. Please read the according README.md file of this sub-project.
 
 All these demos make use of SAPL-specific features provided by the project sapl-spring. In particular every project makes use of a spring-fashioned auto-starter that offers default SAPL-functionality in form of beans and the like. The functionality is kept configurable and overridable as possible to support various use cases. 
 
@@ -54,20 +49,17 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 * Build the project at the root level with `mvn install`.
 
 * Go to sub-projects like +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects[sapl-demo-authorizationaspects], +
+ https://github.com/heutelbeck/sapl-demos/blob/master/spring-mvc-app[spring-mvc-app], +
  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-jwt[sapl-demo-jwt], +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice[sapl-demo-obligation-advice], +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-permissionevaluator[sapl-demo-permissionevaluator], +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-pip[sapl-demo-pip], +
- https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-voter[sapl-demo-voter] +
+ https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-reactive[sapl-demo-reactive] +
  and start the application with `mvn spring-boot:run`. +
   In your favorite IDE  run as SpringBootApp or run the main class of the sub-project.
 
-* default usernames of vistors  are :   Dominic +
-  default usernames of doctors  are :   Julia, Peter, Alina, Horst +
-  default usernames of nurses  are : Thomas, Brigitte, Janosch, Janina +
-  default password of all user is:  password
+* default usernames of vistors are: Dominic +
+  default usernames of doctors are: Julia, Peter, Alina +
+  default usernames of nurses are: Thomas, Brigitte, Janosch, Janina +
+  default usernames of admins are: Horst +
+  default password of all user is: password
 
 
 == Getting started
@@ -91,41 +83,46 @@ Add the following maven dependency to integrate the https://github.com/heutelbec
 First of all, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] adds a `Policy Decision Point` (`PDP`) to your application. You can configure the `PDP` in your `application.properties`. Here is a simple example for the configuration of an embedded PDP:
 
 ```java
-pdp.type=EMBEDDED
-pdp.embedded.policyPath=classpath:policies
+io.sapl.pdp-type=embedded
+io.sapl.pdp-config-type=resources
+io.sapl.resources.config-path=/policies
+io.sapl.prp-type=resources
+io.sapl.resources.policies-path=/policies
 ```
 
-Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] allows you to use all features that are presented in the demo projects of this repository like the `SAPLAuthorizer`, the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, the `SAPLPermissionEvaluator` and the `SaplBasedVoter`. For more information on these features just have a look at the corresponding demo projects.
+Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] allows you to use all features that are presented in the demo projects of this repository like the `PolicyEnforcementPoint`, the `@PreEnforce` and `@PostEnforce` annotations, the `PolicyEnforcementFilter`, the `SAPLPermissionEvaluator` and the `SaplBasedVoter`. For more information on these features just have a look at the corresponding demo projects.
 
-=== The SAPLAuthorizer
+=== The PolicyEnforcementPoint
 
-The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/SAPLAuthorizer.java[SAPLAuthorizer] receives `SaplRequest`, does the mapping and sends the request to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling. For more information about the mapping, see below. For more information about `Obligation` and `Advice` handling have a look at  https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-obligation-advice/README.md[sapl-demo-obligation-advice] .
+The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/PolicyEnforcementPoint.java[PolicyEnforcementPoint] receives a SAPL `Request` and sends it to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling.
 
-The `SAPLAuthorizer` provides four methods to evaluate responses. With `authorize` you receive a `boolean` that is true if the decision was `permit` and false if it was `deny`. With `getResponse` you can get the complete PDP response. This is useful if you need an element of the response like for example a blackened resource. Both of this methods can be called with or without `environment`. This piece of code shows all options:
+The `PolicyEnforcementPoint` provides methods to evaluate SAPL responses. With `enforce` you receive a flux emitting authorization decisions (`PERMIT` or `DENY`). With `filterEnforce` you can get the complete PDP response. This is useful if you need an element of the response like for example a blackened resource. Both of these methods can be called with or without `environment`. There is also a variant of `filterEnforce` accepting a multi-request and returning a flux emitting responses to the individual requests of the multi-request as soon as they are available. An additional method `filterEnforceAll` also accepts a multi-request, but returns a flux emitting multi-responses containing responses for all the requests of the multi-request. This piece of code shows all options:
 
 ```java
 
 @Autowired
-SAPLAuthorizer sapl
+PolicyEnforcementPoint pep;
 
-sapl.wouldAuthorize(subject, action, resource)
+Flux<Decision> decisionFlux = pep.enforce(subject, action, resource);
 
-sapl.wouldAuthorize(subject, action, resource, environment)
+Flux<Decision> decisionFlux = pep.enforce(subject, action, resource, environment);
 
-sapl.authorize(subject, action, resource)
+Flux<Response> responseFlux = pep.filterEnforce(subject, action, resource);
 
-sapl.authorize(subject, action, resource, environment)
+Flux<Response> responseFlux = pep.filterEnforce(subject, action, resource, environment);
 
-sapl.getResponse(subject, action, resource)
+Flux<IdentifiableResponse> responseFlux = pep.filterEnforce(multiRequest);
 
-sapl.getResponse(subject, action, resource, environment)
+Flux<MultiResponse> responseFlux = pep.filterEnforceAll(multiRequest);
 ```
 
-You can call these methods in your code, but the `SAPLAuthorizer` is also used by all features presented in this demo repository like the `@PdpAuthorize` annotation, the `PolicyEnforcementFilter`, etc.
+You can call these methods in your code, but the `PolicyEnforcementPoint` is also used by all features presented in this demo repository like the `@PreEnforce` and `@PostEnforce` annotations, the `PolicyEnforcementFilterPEP`, etc.
 
 
 
-=== The Sapl Mapper
+=== The Sapl Mapper (has been replaced by JsonSerializers)
+The SaplMapper is no longer available. It has been replaced by JsonSerializers in the `io.sapl.spring.serialization` package of the policy engine.
+
 With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
 
 ```java
@@ -203,70 +200,52 @@ and kept simple for the sake of clarity. +
 We have patients:
 
 ```java
-
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Patient {
 
-@Id
-@GeneratedValue(strategy = GenerationType.AUTO)
-int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-String name;
-String diagnosis;
-String healthRecordNumber;
-String phoneNumber;
-String attendingDoctor;
-String attendingNurse;
-String roomNumber;
+	String medicalRecordNumber;
+	String name;
+	String icd11Code;
+	String diagnosisText;
+	String attendingDoctor;
+	String attendingNurse;
+	String phoneNumber;
+	String roomNumber;
 
-
-public Patient(String name, String diagnosis, String healthRecordNumber, String phoneNumber, String attendingDoctor, String attendingNurse, String roomNumber) {
-    this.name = name;
-    this.diagnosis = diagnosis;
-    this.healthRecordNumber = healthRecordNumber;
-    this.phoneNumber = phoneNumber;
-    this.attendingDoctor = attendingDoctor;
-    this.attendingNurse = attendingNurse;
-    this.roomNumber = roomNumber;
-}
 }
 
 ```
-There are user:
-
-```java
-public class User implements Serializable {
-
-    private static final long serialVersionUID = 1;
-
-    @Id
-    String name;
-
-    String password;
-    boolean disabled;
-    ArrayList<String> functions; // DOCTOR , NURSE , VISITOR, ADMIN
-
-}
-```
-`VISITOR, DOCTOR , NURSE, ADMIN` characterize `Authorities` in the context of `Spring Security`.
-
-
+There are user having a username, password and roles like `VISITOR, DOCTOR , NURSE, ADMIN` characterizing `Authorities` in the context of `Spring Security`.
 
 Relations are modeled between patients and user:
 
 ```java
+@Data
+@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Relation {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	int id;
+	Long id;
 
 	String username;
-	int patientid;
 
-	public Relation (String username, int patientid) {
+	Long patientid;
+
+	public Relation(String username, Long patientid) {
 		this.username = username;
 		this.patientid = patientid;
 	}
+
 }
 
 ```
@@ -277,9 +256,9 @@ User rights are constantly refined and captured with human readable phrases with
 Here is a small excerpt of access permissions to `Patient` fields  for  particular authorities:
 
 - `VISITOR` +
-can only read phoneNumber and name; is not allowed for  updating and deleting;
+can only read phoneNumber and name; is not allowed for updating and deleting;
 - `NURSE` +
-can read phoneNumber, name, a blackened  healthRecordNumber; can read diagnosis only if she is attendingNurse;
+can read phoneNumber, name, a blackened icd11Code; can read diagnosis only if she is attendingNurse;
 is allowed for updating name, phoneNumber;
 is allowed for updating attendingNurse; is not allowed for deleting;
 - `DOCTOR` +
@@ -291,10 +270,10 @@ The following table gives an overview of all current user rights:
 .User rights
 [frame="topbot",options="header"]
 |=============================================================================================================================================================
-|User Role| see name|see phone|see HRN   |see diagnosis   |update diagnosis|create patient|update patient    |delete patient|change att. doctor|change att. nurse|see room number    |
-|Doctor   |    X    |     X   |   X      |X (only att.doc)|X (only att.doc)|       X      |        X         |      X       |         X        |                 | X (only relatives)|
-|Nurse    |    X    |     X   |blacken(1)|X (only att.nur)|                |              |X (name and phone)|              |                  |         X       | X (only relatives)|
-|Visitor  |    X    |     X   |          |                |                |              |                  |              |                  |                 | X (only relatives)|
+|User Role| see name|see phone|see icd11Code|see diagnosis   |update diagnosis|create patient|update patient    |delete patient|change att. doctor|change att. nurse|see room number    |
+|Doctor   |    X    |     X   |      X      |X (only att.doc)|X (only att.doc)|       X      |        X         |      X       |         X        |                 | X (only relatives)|
+|Nurse    |    X    |     X   |  blacken(1) |X (only att.nur)|                |              |X (name and phone)|              |                  |         X       | X (only relatives)|
+|Visitor  |    X    |     X   |             |                |                |              |                  |              |                  |                 | X (only relatives)|
 |=============================================================================================================================================================
 
 == Spring Features
