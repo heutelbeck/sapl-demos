@@ -15,9 +15,9 @@ where
     !("ROLE_ANONYMOUS" in subject..authority);
 
 
-policy "every logged in user may use the 'Show Patient List (Multi-Request)' button"
+policy "every logged in user may use the 'Show Patient List (Multi-Subscription)' button"
 permit
-    action == "use" & resource == "ui:view:home:showPatientListMultiRequestButton"
+    action == "use" & resource == "ui:view:home:showPatientListMultiSubscriptionButton"
 where
     !("ROLE_ANONYMOUS" in subject..authority);
 
@@ -29,9 +29,9 @@ where
     !("ROLE_ANONYMOUS" in subject..authority);
 
 
-policy "every logged in user may use the 'Show Reactive View (Multi-Request)' button"
+policy "every logged in user may use the 'Show Reactive View (Multi-Subscription)' button"
 permit
-    action == "use" & resource == "ui:view:home:showReactiveViewMultiRequestButton"
+    action == "use" & resource == "ui:view:home:showReactiveViewMultiSubscriptionButton"
 where
     !("ROLE_ANONYMOUS" in subject..authority);
 
@@ -63,8 +63,8 @@ where
 
 /*
  * This policy uses the possibility to provide additional information about the context
- * of the request via the request variable 'environment'. In this case 'environment'
- * holds the ID of the currently selected patient.
+ * of the authorization subscription via the variable 'environment'. In this case
+ * 'environment' holds the ID of the currently selected patient.
  */
 policy "attending doctors can use the button to delete patient data"
 permit
@@ -97,8 +97,8 @@ where
 
 /*
  * This policy uses the possibility to provide additional information about the context
- * of the request via the request variable 'environment'. In this case 'environment'
- * holds the ID of the currently selected patient.
+ * of the authorization subscription via the variable 'environment'. In this case
+ * 'environment' holds the ID of the currently selected patient.
  */
 policy "visiting relatives may read the room number"
 permit

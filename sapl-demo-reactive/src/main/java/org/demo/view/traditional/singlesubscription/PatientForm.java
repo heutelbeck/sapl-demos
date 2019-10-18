@@ -1,10 +1,10 @@
-package org.demo.view.traditional.singlerequest;
+package org.demo.view.traditional.singlesubscription;
 
 import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 
 /**
- * Concrete patient form implementation demonstrating the usage of SAPL single requests
+ * Concrete patient form implementation demonstrating the usage of SAPL single subscriptions
  * for controlling the visibility and enabling of form fields.
  */
 class PatientForm extends AbstractPatientForm {

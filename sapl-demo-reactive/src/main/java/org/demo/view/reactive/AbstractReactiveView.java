@@ -24,8 +24,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
+import io.sapl.api.pdp.AuthDecision;
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.Response;
 import io.sapl.spring.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
@@ -35,7 +35,7 @@ import reactor.core.scheduler.Schedulers;
 
 /**
  * Abstract base class of live data views. Concrete subclasses demonstrating the usage of
- * SAPL single requests and SAPL multi-requests directly updating the frontend must
+ * SAPL single subscriptions and SAPL multi-subscriptions directly updating the frontend must
  * implement the method {@link #getCombinedFluxForNonFilteredResources()}.
  */
 @Slf4j
@@ -270,22 +270,22 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		bloodPressureCanvas.restoreContext();
 	}
 
-	private Flux<Response> getFilteredResourceFlux() {
+	private Flux<AuthDecision> getFilteredResourceFlux() {
 		// Each time the data flux emits a new resource, we have to send an authorization
-		// request to the PDP to transform / filter the resource.
+		// subscription to the PDP to transform / filter the resource.
 		// In this example there is just one resource flux. If there were more than one,
 		// we would have to execute the following lines of code for each of them. It would
-		// not make much sense to create a multi request with all the resources if only
+		// not make much sense to create a multi subscription with all the resources if only
 		// one of them has changed.
 		final Authentication authentication = SecurityUtils.getAuthentication();
 		return timeScheduleService.getData().switchMap(
 				data -> pep.filterEnforce(authentication, "readSchedulerData", data).subscribeOn(nonUIThread));
 	}
 
-	private void updateUIWithFilteredResource(Response response) {
-		final Decision decision = response.getDecision();
+	private void updateUIWithFilteredResource(AuthDecision authDecision) {
+		final Decision decision = authDecision.getDecision();
 		final TimeScheduleData[] timeScheduleDataHolder = new TimeScheduleData[] { new TimeScheduleData() };
-		final Optional<JsonNode> resource = response.getResource();
+		final Optional<JsonNode> resource = authDecision.getResource();
 		if (resource.isPresent()) {
 			try {
 				timeScheduleDataHolder[0] = mapper.treeToValue(resource.get(), TimeScheduleData.class);

@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.sapl.api.pdp.Request;
+import io.sapl.api.pdp.AuthSubscription;
 
 public class PolicyGenerator {
 
@@ -125,12 +125,12 @@ public class PolicyGenerator {
 		return variables;
 	}
 
-	public Request createRequestObject() {
+	public AuthSubscription createAuthSubscriptionObject() {
 		ObjectNode resource = JsonNodeFactory.instance.objectNode();
 		for (String var : getVariables()) {
 			resource = resource.put(var, roll() < config.getFalseProbability() ? false : true);
 		}
-		return new Request(NullNode.getInstance(), NullNode.getInstance(), resource, NullNode.getInstance());
+		return new AuthSubscription(NullNode.getInstance(), NullNode.getInstance(), resource, NullNode.getInstance());
 	}
 
 }

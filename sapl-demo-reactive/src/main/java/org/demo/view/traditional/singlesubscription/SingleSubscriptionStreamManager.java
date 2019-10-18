@@ -1,4 +1,4 @@
-package org.demo.view.traditional.singlerequest;
+package org.demo.view.traditional.singlesubscription;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,11 +17,11 @@ import reactor.core.Disposable;
 
 /**
  * Manages subscriptions to streams returned by the Policy Enforcement Point for single
- * requests. It keeps the subscriptions and updates the decisions in the session until
+ * authorization subscriptions. It keeps the subscriptions and updates the decisions in the session until
  * {@link #dispose()} is called.
  */
 @Slf4j
-public class SingleRequestStreamManager {
+public class SingleSubscriptionStreamManager {
 
 	private PolicyEnforcementPoint pep;
 
@@ -32,22 +32,22 @@ public class SingleRequestStreamManager {
 	private Map<String, Decision> decisionsByKey = new HashMap<>();
 
 	/**
-	 * Creates a new {@code SingleRequestStreamManager} instance delegating to the given
+	 * Creates a new {@code SingleSubscriptionStreamManager} instance delegating to the given
 	 * Policy Enforcement Point.
 	 * @param pep the Policy Enforcement Point to be used.
 	 */
-	public SingleRequestStreamManager(PolicyEnforcementPoint pep) {
+	public SingleSubscriptionStreamManager(PolicyEnforcementPoint pep) {
 		this.pep = pep;
 	}
 
 	/**
-	 * Returns {@code true} if the current authorization decision for the request
+	 * Returns {@code true} if the current authorization decision for the authorization subscription
 	 * containing the current Spring authentication as its subject and then given action
 	 * and resource is PERMIT, {@code false} otherwise. If a subscription to the stream
-	 * returned by the PEP for this request does not yet exist, a new one is created.
-	 * @param action the action of the request
-	 * @param resource the resource of the request
-	 * @return {@code true} if the current authorization decision for the request is
+	 * returned by the PEP for this authorization subscription does not yet exist, a new one is created.
+	 * @param action the action of the authorization subscription
+	 * @param resource the resource of the authorization subscription
+	 * @return {@code true} if the current authorization decision for the authorization subscription is
 	 * PERMIT, {@code false} otherwise.
 	 */
 	public boolean isAccessPermitted(Object action, Object resource) {
@@ -55,15 +55,15 @@ public class SingleRequestStreamManager {
 	}
 
 	/**
-	 * Returns {@code true} if the current authorization decision for the request
+	 * Returns {@code true} if the current authorization decision for the authorization subscription
 	 * containing the current Spring authentication as its subject and then given action,
 	 * resource and environment is PERMIT, {@code false} otherwise. If a subscription to
-	 * the stream returned by the PEP for this request does not yet exist, a new one is
+	 * the stream returned by the PEP for this authorization subscription does not yet exist, a new one is
 	 * created.
-	 * @param action the action of the request
-	 * @param resource the resource of the request
-	 * @param environment the environment of the request
-	 * @return {@code true} if the current authorization decision for the request is
+	 * @param action the action of the authorization subscription
+	 * @param resource the resource of the authorization subscription
+	 * @param environment the environment of the authorization subscription
+	 * @return {@code true} if the current authorization decision for the authorization subscription is
 	 * PERMIT, {@code false} otherwise.
 	 */
 	public boolean isAccessPermitted(Object action, Object resource, Object environment) {
@@ -90,7 +90,7 @@ public class SingleRequestStreamManager {
 	}
 
 	/**
-	 * Disposes all subscriptions to single request streams returned by the PEP.
+	 * Disposes all subscriptions to single authorization subscription streams returned by the PEP.
 	 */
 	public void dispose() {
 		LOGGER.debug("disposing {} subscriptions", subscriptions.size());

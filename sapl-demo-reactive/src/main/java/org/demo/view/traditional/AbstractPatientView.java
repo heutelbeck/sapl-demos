@@ -9,7 +9,7 @@ import org.demo.model.PatientListItem;
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm.RefreshCallback;
-import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
+import org.demo.view.traditional.singlesubscription.SingleSubscriptionStreamManager;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.vaadin.navigator.View;
@@ -84,7 +84,7 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 	}
 
 	private boolean isPermitted(String action, AbstractComponent resource) {
-		final SingleRequestStreamManager streamManager = getSession().getAttribute(SingleRequestStreamManager.class);
+		final SingleSubscriptionStreamManager streamManager = getSession().getAttribute(SingleSubscriptionStreamManager.class);
 		return streamManager.isAccessPermitted(action, resource.getData());
 	}
 

@@ -1,4 +1,4 @@
-package org.demo.view.reactive.multirequest;
+package org.demo.view.reactive.multisubscription;
 
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
@@ -11,25 +11,25 @@ import org.springframework.security.core.Authentication;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-import io.sapl.api.pdp.multirequest.MultiRequest;
-import io.sapl.api.pdp.multirequest.MultiResponse;
+import io.sapl.api.pdp.multisubscription.MultiAuthDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
 import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**
- * Concrete reactive view implementation demonstrating the usage of SAPL multi-requests
+ * Concrete reactive view implementation demonstrating the usage of SAPL multi-subscriptions
  * for controlling access to heart beat and blood pressure data directly updating the
  * frontend upon authorization decision changes.
  */
-@SpringView(name = "reactiveMultiRequest")
-@SpringComponent("reactiveMultiRequestView")
+@SpringView(name = "reactiveMultiSubscription")
+@SpringComponent("reactiveMultiSubscriptionView")
 public class ReactiveView extends AbstractReactiveView {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final String READ_HEART_BEAT_DATA_REQUEST_ID = "readHeartBeatData";
+	private static final String READ_HEART_BEAT_DATA_SUBSCRIPTION_ID = "readHeartBeatData";
 
-	private static final String READ_BLOOD_PRESSURE_DATA_REQUEST_ID = "readBloodPressureData";
+	private static final String READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID = "readBloodPressureData";
 
 	@Autowired
 	public ReactiveView(PolicyEnforcementPoint pep, HeartBeatService heartBeatService,
@@ -41,21 +41,21 @@ public class ReactiveView extends AbstractReactiveView {
 	protected Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
-		final MultiRequest multiRequest = new MultiRequest()
-				.addRequest(READ_HEART_BEAT_DATA_REQUEST_ID, authentication, "read", "heartBeatData")
-				.addRequest(READ_BLOOD_PRESSURE_DATA_REQUEST_ID, authentication, "read", "bloodPressureData");
+		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
+				.addAuthSubscription(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID, authentication, "read", "heartBeatData")
+				.addAuthSubscription(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID, authentication, "read", "bloodPressureData");
 
-		final Flux<MultiResponse> accessDecisionFlux = pep.filterEnforceAll(multiRequest).subscribeOn(nonUIThread);
+		final Flux<MultiAuthDecision> accessDecisionFlux = pep.filterEnforceAll(multiSubscription).subscribeOn(nonUIThread);
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
 				getSystolicBloodPressureDataFlux(), this::getNonFilteredResourcesDataFrom);
 	}
 
 	private NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
-		final MultiResponse multiResponse = (MultiResponse) fluxValues[0];
+		final MultiAuthDecision multiDecision = (MultiAuthDecision) fluxValues[0];
 		final NonFilteredResourcesData data = new NonFilteredResourcesData();
-		data.heartBeatDecision = multiResponse.getDecisionForRequestWithId(READ_HEART_BEAT_DATA_REQUEST_ID);
-		data.bloodPressureDecision = multiResponse.getDecisionForRequestWithId(READ_BLOOD_PRESSURE_DATA_REQUEST_ID);
+		data.heartBeatDecision = multiDecision.getDecisionForSubscriptionWithId(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID);
+		data.bloodPressureDecision = multiDecision.getDecisionForSubscriptionWithId(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID);
 		data.heartBeat = (Integer) fluxValues[1];
 		data.diastolic = (Integer) fluxValues[2];
 		data.systolic = (Integer) fluxValues[3];

@@ -99,17 +99,17 @@ you also have to adjust the URLs in the remote policy files.
 The demo application shows how a [Vaadin](https://vaadin.com/framework) web application can be integrated with
 [Spring Security](https://spring.io/projects/spring-security) and the [SAPL Policy Engine](https://github.com/heutelbeck/sapl-policy-engine).
 It presents the use of the reactive Policy Decision Point and the reactive Policy Enforcement Point, as well as the use of reactive
-multi-requests.
+multi-subscriptions.
 
 After the user has logged in with the password `password`, four buttons are presented on the initial page of the application. The first
-two buttons `Show Patient View (session based, single requests)` and `Show Patient View (session based, multi-requests)` lead to the 
+two buttons `Show Patient View (session based, single subscriptions)` and `Show Patient View (session based, multi-subscriptions)` lead to the 
 fictitious healthcare scenario, which is also the basis of the demo application in spring-mvc-app. It demonstrates the session-based use of the 
 PDP. The reactive streams returned by the Policy Decision Points of the SAPL policy engine are subscribed to in the server session of the
-application. The frontend is only updated upon new requests (polling). This applies to both simple requests and multi-requests. The variant 
-accessed via the second button uses multi-requests wherever possible. The corresponding performance improvement compared to the single requests 
+application. The frontend is only updated upon new requests (polling). This applies to both simple authorization subscriptions and multi-subscriptions. The variant 
+accessed via the second button uses multi-subscriptions wherever possible. The corresponding performance improvement compared to the single authorization subscriptions 
 is clearly noticeable when using the remote PDP.
 
-The buttons labeled `Show Live-Data View (reactive frontend, single requests)` and `Show Live-Data View (reactive frontend, multi-request)`show 
+The buttons labeled `Show Live-Data View (reactive frontend, single subscriptions)` and `Show Live-Data View (reactive frontend, multi-subscription)`show 
 a view that connects data streams (pulse rate and blood pressure data) to the authorization decision streams of the PDP. Changes in the 
 authorization decisions lead to immediate update of the UI without the application having to poll. Simple time-dependent policies are used
 to demonstrate this. Doctors and nurses get to see pulse rate data when the number of seconds of the current time is greater than 4.

@@ -32,13 +32,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.AuthDecision;
+import io.sapl.api.pdp.AuthSubscription;
 import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.api.pdp.Request;
-import io.sapl.api.pdp.Response;
-import io.sapl.api.pdp.multirequest.IdentifiableResponse;
-import io.sapl.api.pdp.multirequest.MultiRequest;
-import io.sapl.api.pdp.multirequest.MultiResponse;
+import io.sapl.api.pdp.multisubscription.IdentifiableAuthDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
@@ -68,9 +68,9 @@ public class EmbeddedPDPDemo {
 
 	private static final String RESOURCE = "something";
 
-	private static final Request READ_REQUEST = buildRequest(SUBJECT, ACTION_READ, RESOURCE);
+	private static final AuthSubscription READ_SUBSCRIPTION = buildAuthSubscription(SUBJECT, ACTION_READ, RESOURCE);
 
-	private static final Request WRITE_REQUEST = buildRequest(SUBJECT, ACTION_WRITE, RESOURCE);
+	private static final AuthSubscription WRITE_SUBSCRIPTION = buildAuthSubscription(SUBJECT, ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 25_000;
 
@@ -114,7 +114,7 @@ public class EmbeddedPDPDemo {
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
 
-		// to compare single requests with multi-requests, only run one of the following
+		// to compare single authorization subscriptions with multi-subscriptions, only run one of the following
 		// methods at once to avoid later methods benefit from earlier methods (e.g. class
 		// loading)
 		runPerformanceDemoSingle(pdp);
@@ -124,35 +124,35 @@ public class EmbeddedPDPDemo {
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final Response readResponse = pdp.decide(READ_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'read': {}", readResponse != null ? readResponse.getDecision() : "null");
-		final Response writeResponse = pdp.decide(WRITE_REQUEST).blockFirst();
-		LOGGER.info("Decision for action 'write': {}", writeResponse != null ? writeResponse.getDecision() : "null");
+		final AuthDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+		LOGGER.info("Decision for action 'read': {}", readDecision != null ? readDecision.getDecision() : "null");
+		final AuthDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
+		LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<Response> readResponse = pdp.decide(READ_REQUEST);
-		readResponse.subscribe(response -> handleResponse(ACTION_READ, response));
-		final Flux<Response> writeResponse = pdp.decide(WRITE_REQUEST);
-		writeResponse.subscribe(response -> handleResponse(ACTION_WRITE, response));
+		final Flux<AuthDecision> readDecision = pdp.decide(READ_SUBSCRIPTION);
+		readDecision.subscribe(authDecision -> handleAuthDecision(ACTION_READ, authDecision));
+		final Flux<AuthDecision> writeDecision = pdp.decide(WRITE_SUBSCRIPTION);
+		writeDecision.subscribe(authDecision -> handleAuthDecision(ACTION_WRITE, authDecision));
 	}
 
-	private static void handleResponse(String action, Response response) {
-		LOGGER.info("Decision for action '{}': {}", action, response.getDecision());
+	private static void handleAuthDecision(String action, AuthDecision authDecision) {
+		LOGGER.info("Decision for action '{}': {}", action, authDecision.getDecision());
 	}
 
 	private static void runPerformanceDemoSingle(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Single...");
 
-		final Response response = pdp.decide(READ_REQUEST).blockFirst();
-		LOGGER.info("{}", response);
+		final AuthDecision authDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+		LOGGER.info("{}", authDecision);
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(READ_REQUEST).take(1).subscribe(resp -> count[0]++);
-			// pdp.decide(READ_REQUEST).blockFirst();
+			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe(decision -> count[0]++);
+			// pdp.decide(READ_SUBSCRIPTION).blockFirst();
 			// count[0]++;
 		}
 		long end = System.nanoTime();
@@ -166,16 +166,16 @@ public class EmbeddedPDPDemo {
 	private static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi...");
 
-		final MultiRequest multiRequest = new MultiRequest();
-		multiRequest.addRequest("req", SUBJECT, ACTION_READ, RESOURCE);
-		final IdentifiableResponse identifiableResponse = pdp.decide(multiRequest).blockFirst();
-		LOGGER.info("{}", identifiableResponse.getResponse());
+		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription();
+		multiSubscription.addAuthSubscription("sub", SUBJECT, ACTION_READ, RESOURCE);
+		final IdentifiableAuthDecision identifiableAuthDecision = pdp.decide(multiSubscription).blockFirst();
+		LOGGER.info("{}", identifiableAuthDecision.getAuthDecision());
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			// pdp.decide(multiRequest).take(1).subscribe(resp -> count[0]++);
-			pdp.decide(multiRequest).blockFirst();
+			// pdp.decide(multiSubscription).take(1).subscribe(decision -> count[0]++);
+			pdp.decide(multiSubscription).blockFirst();
 			count[0]++;
 		}
 		long end = System.nanoTime();
@@ -189,16 +189,16 @@ public class EmbeddedPDPDemo {
 	private static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi All...");
 
-		final MultiRequest multiRequest = new MultiRequest();
-		multiRequest.addRequest("read", SUBJECT, ACTION_READ, RESOURCE);
-		final MultiResponse multiResponse = pdp.decideAll(multiRequest).blockFirst();
-		LOGGER.info("{}", multiResponse.getResponseForRequestWithId("read"));
+		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription();
+		multiSubscription.addAuthSubscription("read", SUBJECT, ACTION_READ, RESOURCE);
+		final MultiAuthDecision multiDecision = pdp.decideAll(multiSubscription).blockFirst();
+		LOGGER.info("{}", multiDecision.getAuthDecisionForSubscriptionWithId("read"));
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decideAll(multiRequest).take(1).subscribe(resp -> count[0]++);
-			// pdp.decideAll(multiRequest).blockFirst();
+			pdp.decideAll(multiSubscription).take(1).subscribe(decision -> count[0]++);
+			// pdp.decideAll(multiSubscription).blockFirst();
 			// count[0]++;
 		}
 		long end = System.nanoTime();
@@ -217,10 +217,10 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	private static Request buildRequest(Object subject, Object action, Object resource) {
+	private static AuthSubscription buildAuthSubscription(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new Request(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
 	}
 
 }

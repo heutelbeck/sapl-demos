@@ -23,7 +23,7 @@ We tried not to reinvent the wheel and respect as far as possible the opinionate
 Therefore inspecting the framework we found several starting-points to integrate SAPL with springsecurity:
 
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/spring-mvc-app[spring-mvc-app] you find two ways to use SAPL.
-The direct way of calling the PolicyEnforcementPoint-Bean (e.g. in a MVC-Controller, writing the response in
+The direct way of calling the PolicyEnforcementPoint-Bean (e.g. in a MVC-Controller, writing the authorization decision in
 the model). And the perhaps a little bit more sophisticated way of using aspects and SAPL-specific annotations.
 * In the sub-project https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-filterchain[sapl-demo-filterchain] we inject a SAPL-specific filter into the springsecurity-Filterchain. The filter protects a classic MVC-controller as well as a ReST-Controller.
 The demo also uses the direct way of calling the PolicyEnforcementPoint-Bean.
@@ -64,7 +64,7 @@ import the whole project into your favorite IDE (everything works with _Eclipse_
 
 == Getting started
 In this section you will find elements of the SAPL Spring Integration which are used in all sub-projects. You also will obtain knowledge about using this API when integrating SAPL into your own Spring Project.
-The basic things you have to understand first is how to add the `sapl-spring-boot-starter` to your project and how to use the `SAPLAuthorizer` and the `SaplMapper`.
+The basic things you have to understand first is how to add the `sapl-spring-boot-starter` to your project and how to use the `PolicyEnforcementPoint`.
 
 === sapl-spring-boot-starter
 
@@ -90,13 +90,13 @@ io.sapl.prp-type=resources
 io.sapl.resources.policies-path=/policies
 ```
 
-Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] allows you to use all features that are presented in the demo projects of this repository like the `PolicyEnforcementPoint`, the `@PreEnforce` and `@PostEnforce` annotations, the `PolicyEnforcementFilter`, the `SAPLPermissionEvaluator` and the `SaplBasedVoter`. For more information on these features just have a look at the corresponding demo projects.
+Furthermore, the https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter[sapl-spring-boot-starter] allows you to use all features that are presented in the demo projects of this repository like the `PolicyEnforcementPoint`, the `@PreEnforce` and `@PostEnforce` annotations and the `PolicyEnforcementFilterPEP`. For more information on these features just have a look at the corresponding demo projects.
 
 === The PolicyEnforcementPoint
 
-The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/PolicyEnforcementPoint.java[PolicyEnforcementPoint] receives a SAPL `Request` and sends it to the `PDP`. After receiving the response, it also cares about the `Obligation` and `Advice` handling.
+The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src/main/java/io/sapl/spring/PolicyEnforcementPoint.java[PolicyEnforcementPoint] receives a SAPL `Authorization Subscription` and sends it to the `PDP`. After receiving the authorization decision, it also cares about the `Obligation` and `Advice` handling.
 
-The `PolicyEnforcementPoint` provides methods to evaluate SAPL responses. With `enforce` you receive a flux emitting authorization decisions (`PERMIT` or `DENY`). With `filterEnforce` you can get the complete PDP response. This is useful if you need an element of the response like for example a blackened resource. Both of these methods can be called with or without `environment`. There is also a variant of `filterEnforce` accepting a multi-request and returning a flux emitting responses to the individual requests of the multi-request as soon as they are available. An additional method `filterEnforceAll` also accepts a multi-request, but returns a flux emitting multi-responses containing responses for all the requests of the multi-request. This piece of code shows all options:
+The `PolicyEnforcementPoint` provides methods to evaluate SAPL authorization decisions. With `enforce` you receive a flux emitting authorization decisions (`PERMIT` or `DENY`). With `filterEnforce` you can get the complete PDP authorization decision. This is useful if you need an element of the authorization decision like for example a blackened resource. Both of these methods can be called with or without `environment`. There is also a variant of `filterEnforce` accepting a multi-subscription and returning a flux emitting authorization decisions to the individual authorization subscriptions of the multi-subscription as soon as they are available. An additional method `filterEnforceAll` also accepts a multi-subscription, but returns a flux emitting multi-decisions containing authorization decisions for all the authorization subscriptions of the multi-subscription. This piece of code shows all options:
 
 ```java
 
@@ -107,13 +107,13 @@ Flux<Decision> decisionFlux = pep.enforce(subject, action, resource);
 
 Flux<Decision> decisionFlux = pep.enforce(subject, action, resource, environment);
 
-Flux<Response> responseFlux = pep.filterEnforce(subject, action, resource);
+Flux<AuthDecision> authDecisionFlux = pep.filterEnforce(subject, action, resource);
 
-Flux<Response> responseFlux = pep.filterEnforce(subject, action, resource, environment);
+Flux<AuthDecision> authDecisionFlux = pep.filterEnforce(subject, action, resource, environment);
 
-Flux<IdentifiableResponse> responseFlux = pep.filterEnforce(multiRequest);
+Flux<IdentifiableAuthDecision> identifiableAuthDecisionFlux = pep.filterEnforce(multiSubscription);
 
-Flux<MultiResponse> responseFlux = pep.filterEnforceAll(multiRequest);
+Flux<MultiAuthDecision> multiAuthDecisionFlux = pep.filterEnforceAll(multiSubscription);
 ```
 
 You can call these methods in your code, but the `PolicyEnforcementPoint` is also used by all features presented in this demo repository like the `@PreEnforce` and `@PostEnforce` annotations, the `PolicyEnforcementFilterPEP`, etc.
@@ -123,7 +123,7 @@ You can call these methods in your code, but the `PolicyEnforcementPoint` is als
 === The Sapl Mapper (has been replaced by JsonSerializers)
 The SaplMapper is no longer available. It has been replaced by JsonSerializers in the `io.sapl.spring.serialization` package of the policy engine.
 
-With the Sapl Mapper you can map every class to something you want to use in your Sapl Request. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
+With the Sapl Mapper you can map every class to something you want to use in your Sapl Authorization Subscription. To map a certain class you have to create a `SaplClassMapper`. The class mapper has to override two methods. The method `getMappedClass` just has to return the class which should be mapped. The method `map` does the actual mapping and returns the result of the mapping. Here you can see an example of a class mapper:
 
 ```java
 public class AuthenticationMapper implements SaplClassMapper {
@@ -192,7 +192,7 @@ The https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-spring/src
 == Domain Model
 
 All sub-projects  share the same domain model.
-We are using terms from the medical field and healthcare to illustrate how a user (doctor, nurse, vistor, admin) is allowed to get access to patient data.
+We are using terms from the medical field and health care to illustrate how a user (doctor, nurse, visitor, admin) is allowed to get access to patient data.
 
 
 Our domain model is implemented in the module https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-domain[sapl-demo-domain]
@@ -253,7 +253,7 @@ public class Relation {
 == User Rights
 
 User rights are constantly refined and captured with human readable phrases within SAPL Policies.
-Here is a small excerpt of access permissions to `Patient` fields  for  particular authorities:
+Here is a small excerpt of access permissions to `Patient` fields for particular authorities:
 
 - `VISITOR` +
 can only read phoneNumber and name; is not allowed for updating and deleting;

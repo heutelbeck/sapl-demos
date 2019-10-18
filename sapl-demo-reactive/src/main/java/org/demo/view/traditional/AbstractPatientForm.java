@@ -3,7 +3,7 @@ package org.demo.view.traditional;
 import org.demo.domain.Patient;
 import org.demo.security.SecurityUtils;
 import org.demo.service.UIController;
-import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
+import org.demo.view.traditional.singlesubscription.SingleSubscriptionStreamManager;
 import org.springframework.security.access.AccessDeniedException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +20,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * Abstract base class for patient forms. Concrete subclasses demonstrating the usage of
- * session based SAPL single requests and SAPL multi-requests must implement the methods
+ * session based SAPL single subscriptions and SAPL multi-subscriptions must implement the methods
  * controlling the visibility and enabling of form fields.
  */
 public abstract class AbstractPatientForm extends FormLayout {
@@ -227,7 +227,7 @@ public abstract class AbstractPatientForm extends FormLayout {
 	 * @return {@code true} if the last authorisation decision was PERMIT.
 	 */
 	protected boolean isPermitted(String action, AbstractComponent uiComponent) {
-		return getSession().getAttribute(SingleRequestStreamManager.class).isAccessPermitted(action,
+		return getSession().getAttribute(SingleSubscriptionStreamManager.class).isAccessPermitted(action,
 				uiComponent.getData());
 	}
 
@@ -237,11 +237,11 @@ public abstract class AbstractPatientForm extends FormLayout {
 	 * was PERMIT, {@code false} otherwise.
 	 * @param action the action to perform on the given UI component.
 	 * @param uiComponent the UI component acting as the resource.
-	 * @param environment additional environment data for the SAPL request.
+	 * @param environment additional environment data for the SAPL authorization subscription.
 	 * @return {@code true} if the last authorisation decision was PERMIT.
 	 */
 	protected boolean isPermitted(String action, AbstractComponent uiComponent, Object environment) {
-		return getSession().getAttribute(SingleRequestStreamManager.class).isAccessPermitted(action,
+		return getSession().getAttribute(SingleSubscriptionStreamManager.class).isAccessPermitted(action,
 				uiComponent.getData(), environment);
 	}
 

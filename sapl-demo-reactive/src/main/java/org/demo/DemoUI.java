@@ -3,8 +3,8 @@ package org.demo;
 import org.demo.security.SecurityUtils;
 import org.demo.view.AccessDeniedView;
 import org.demo.view.ErrorView;
-import org.demo.view.traditional.singlerequest.SingleRequestStreamManager;
-import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
+import org.demo.view.traditional.multisubscription.MultiSubscriptionStreamManager;
+import org.demo.view.traditional.singlesubscription.SingleSubscriptionStreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -123,8 +123,8 @@ public class DemoUI extends UI {
 		VaadinService.reinitializeSession(VaadinService.getCurrentRequest());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		getSession().setAttribute(SingleRequestStreamManager.class, new SingleRequestStreamManager(pep));
-		getSession().setAttribute(MultiRequestStreamManager.class, new MultiRequestStreamManager(pep));
+		getSession().setAttribute(SingleSubscriptionStreamManager.class, new SingleSubscriptionStreamManager(pep));
+		getSession().setAttribute(MultiSubscriptionStreamManager.class, new MultiSubscriptionStreamManager(pep));
 
 		getPushConfiguration().setTransport(Transport.WEBSOCKET);
 		getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
@@ -135,8 +135,8 @@ public class DemoUI extends UI {
 	private void logout() {
 		// navigate to the home view to make sure beforeLeave() is called on the reactive views
 		getNavigator().navigateTo("");
-		getSession().getAttribute(SingleRequestStreamManager.class).dispose();
-		getSession().getAttribute(MultiRequestStreamManager.class).dispose();
+		getSession().getAttribute(SingleSubscriptionStreamManager.class).dispose();
+		getSession().getAttribute(MultiSubscriptionStreamManager.class).dispose();
 		getSession().close();
 		SecurityContextHolder.clearContext();
 	}

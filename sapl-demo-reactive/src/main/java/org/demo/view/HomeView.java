@@ -1,7 +1,7 @@
 package org.demo.view;
 
 import org.demo.security.SecurityUtils;
-import org.demo.view.traditional.multirequest.MultiRequestStreamManager;
+import org.demo.view.traditional.multisubscription.MultiSubscriptionStreamManager;
 import org.springframework.security.core.Authentication;
 
 import com.vaadin.navigator.View;
@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.pdp.multirequest.MultiRequest;
+import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
@@ -39,46 +39,46 @@ public class HomeView extends VerticalLayout implements View {
 		grid.setHideEmptyRowsAndColumns(false);
 		addComponent(grid);
 
-		final Button traditionalBtn = new Button("Show Patient View (session based, single requests)",
+		final Button traditionalBtn = new Button("Show Patient View (session based, single subscriptions)",
 				click -> getUI().getNavigator().navigateTo("traditional"));
 		traditionalBtn.setData("ui:view:home:showPatientListTraditionalButton");
 		traditionalBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(traditionalBtn, 0, 0);
 
-		final Button multiRequestBtn = new Button("Show Patient View (session based, multi-request)",
-				click -> getUI().getNavigator().navigateTo("multiRequest"));
-		multiRequestBtn.setData("ui:view:home:showPatientListMultiRequestButton");
-		multiRequestBtn.setWidth(BUTTON_WIDTH);
-		grid.addComponent(multiRequestBtn, 0, 1);
+		final Button multiSubscriptionBtn = new Button("Show Patient View (session based, multi-subscriptions)",
+				click -> getUI().getNavigator().navigateTo("multiSubscription"));
+		multiSubscriptionBtn.setData("ui:view:home:showPatientListMultiSubscriptionButton");
+		multiSubscriptionBtn.setWidth(BUTTON_WIDTH);
+		grid.addComponent(multiSubscriptionBtn, 0, 1);
 
-		final Button reactiveBtn = new Button("Show Live-Data View (reactive frontend, single requests)",
+		final Button reactiveBtn = new Button("Show Live-Data View (reactive frontend, single subscriptions)",
 				click -> getUI().getNavigator().navigateTo("reactive"));
 		reactiveBtn.setData("ui:view:home:showReactiveViewButton");
 		reactiveBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveBtn, 0, 3);
 
-		final Button reactiveMultiRequestBtn = new Button("Show Live-Data View (reactive frontend, multi-request)",
-				click -> getUI().getNavigator().navigateTo("reactiveMultiRequest"));
-		reactiveMultiRequestBtn.setData("ui:view:home:showReactiveViewMultiRequestButton");
-		reactiveMultiRequestBtn.setWidth(BUTTON_WIDTH);
-		grid.addComponent(reactiveMultiRequestBtn, 0, 4);
+		final Button reactiveMultiSubscriptionBtn = new Button("Show Live-Data View (reactive frontend, multi-subscriptions)",
+				click -> getUI().getNavigator().navigateTo("reactiveMultiSubscription"));
+		reactiveMultiSubscriptionBtn.setData("ui:view:home:showReactiveViewMultiSubscriptionButton");
+		reactiveMultiSubscriptionBtn.setWidth(BUTTON_WIDTH);
+		grid.addComponent(reactiveMultiSubscriptionBtn, 0, 4);
 
-		final MultiRequestStreamManager streamManager = getSession().getAttribute(MultiRequestStreamManager.class);
-		if (!streamManager.hasMultiRequestSubscriptionFor("homeViewButtons")) {
+		final MultiSubscriptionStreamManager streamManager = getSession().getAttribute(MultiSubscriptionStreamManager.class);
+		if (!streamManager.hasSubscriptionFor("homeViewButtons")) {
 			final Authentication authentication = SecurityUtils.getAuthentication();
-			final MultiRequest multiRequest = new MultiRequest()
-					.addRequest("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
-					.addRequest("useMultiRequestBtn", authentication, "use", multiRequestBtn.getData())
-					.addRequest("useReactiveBtn", authentication, "use", reactiveBtn.getData())
-					.addRequest("useReactiveMultiRequestBtn", authentication, "use", reactiveMultiRequestBtn.getData());
-			streamManager.setupNewMultiRequest("homeViewButtons", multiRequest);
+			final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
+					.addAuthSubscription("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
+					.addAuthSubscription("useMultiSubscriptionBtn", authentication, "use", multiSubscriptionBtn.getData())
+					.addAuthSubscription("useReactiveBtn", authentication, "use", reactiveBtn.getData())
+					.addAuthSubscription("useReactiveMultiSubscriptionBtn", authentication, "use", reactiveMultiSubscriptionBtn.getData());
+			streamManager.setupNewMultiSubscription("homeViewButtons", multiSubscription);
 		}
 
-		traditionalBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useTraditionalBtn"));
-		multiRequestBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useMultiRequestBtn"));
-		reactiveBtn.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveBtn"));
-		reactiveMultiRequestBtn
-				.setEnabled(streamManager.isAccessPermittedForRequestWithId("useReactiveMultiRequestBtn"));
+		traditionalBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useTraditionalBtn"));
+		multiSubscriptionBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useMultiSubscriptionBtn"));
+		reactiveBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveBtn"));
+		reactiveMultiSubscriptionBtn
+				.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveMultiSubscriptionBtn"));
 	}
 
 }

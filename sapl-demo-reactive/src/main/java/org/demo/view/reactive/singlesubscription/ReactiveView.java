@@ -1,4 +1,4 @@
-package org.demo.view.reactive.singlerequest;
+package org.demo.view.reactive.singlesubscription;
 
 import org.demo.security.SecurityUtils;
 import org.demo.service.BloodPressureService;
@@ -16,7 +16,7 @@ import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**
- * Concrete reactive view implementation demonstrating the usage of SAPL single requests
+ * Concrete reactive view implementation demonstrating the usage of SAPL single subscriptions
  * for controlling access to heart beat and blood pressure data directly updating the
  * frontend upon authorization decision changes.
  */

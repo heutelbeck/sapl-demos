@@ -1,4 +1,4 @@
-package org.demo.view.traditional.multirequest;
+package org.demo.view.traditional.singlesubscription;
 
 import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-@SpringView(name = "multiRequest")
-@SpringComponent("multiRequestPatientView")
+@SpringView(name = "traditional")
+@SpringComponent("traditionalPatientView")
 public class PatientView extends AbstractPatientView {
 
 	@Autowired
