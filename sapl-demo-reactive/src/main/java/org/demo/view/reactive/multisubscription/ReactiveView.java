@@ -17,9 +17,9 @@ import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**
- * Concrete reactive view implementation demonstrating the usage of SAPL multi-subscriptions
- * for controlling access to heart beat and blood pressure data directly updating the
- * frontend upon authorization decision changes.
+ * Concrete reactive view implementation demonstrating the usage of SAPL
+ * multi-subscriptions for controlling access to heart beat and blood pressure data
+ * directly updating the frontend upon authorization decision changes.
  */
 @SpringView(name = "reactiveMultiSubscription")
 @SpringComponent("reactiveMultiSubscriptionView")
@@ -43,9 +43,11 @@ public class ReactiveView extends AbstractReactiveView {
 
 		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
 				.addAuthSubscription(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID, authentication, "read", "heartBeatData")
-				.addAuthSubscription(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID, authentication, "read", "bloodPressureData");
+				.addAuthSubscription(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID, authentication, "read",
+						"bloodPressureData");
 
-		final Flux<MultiAuthDecision> accessDecisionFlux = pep.filterEnforceAll(multiSubscription).subscribeOn(nonUIThread);
+		final Flux<MultiAuthDecision> accessDecisionFlux = pep.filterEnforceAll(multiSubscription)
+				.subscribeOn(nonUIThread);
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
 				getSystolicBloodPressureDataFlux(), this::getNonFilteredResourcesDataFrom);
@@ -55,7 +57,8 @@ public class ReactiveView extends AbstractReactiveView {
 		final MultiAuthDecision multiDecision = (MultiAuthDecision) fluxValues[0];
 		final NonFilteredResourcesData data = new NonFilteredResourcesData();
 		data.heartBeatDecision = multiDecision.getDecisionForSubscriptionWithId(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID);
-		data.bloodPressureDecision = multiDecision.getDecisionForSubscriptionWithId(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID);
+		data.bloodPressureDecision = multiDecision
+				.getDecisionForSubscriptionWithId(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID);
 		data.heartBeat = (Integer) fluxValues[1];
 		data.diastolic = (Integer) fluxValues[2];
 		data.systolic = (Integer) fluxValues[3];

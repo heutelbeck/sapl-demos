@@ -35,8 +35,8 @@ import reactor.core.scheduler.Schedulers;
 
 /**
  * Abstract base class of live data views. Concrete subclasses demonstrating the usage of
- * SAPL single subscriptions and SAPL multi-subscriptions directly updating the frontend must
- * implement the method {@link #getCombinedFluxForNonFilteredResources()}.
+ * SAPL single subscriptions and SAPL multi-subscriptions directly updating the frontend
+ * must implement the method {@link #getCombinedFluxForNonFilteredResources()}.
  */
 @Slf4j
 public abstract class AbstractReactiveView extends VerticalLayout implements View {
@@ -275,7 +275,8 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		// subscription to the PDP to transform / filter the resource.
 		// In this example there is just one resource flux. If there were more than one,
 		// we would have to execute the following lines of code for each of them. It would
-		// not make much sense to create a multi subscription with all the resources if only
+		// not make much sense to create a multi subscription with all the resources if
+		// only
 		// one of them has changed.
 		final Authentication authentication = SecurityUtils.getAuthentication();
 		return timeScheduleService.getData().switchMap(

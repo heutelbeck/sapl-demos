@@ -84,7 +84,8 @@ public abstract class AbstractPatientView extends VerticalLayout implements View
 	}
 
 	private boolean isPermitted(String action, AbstractComponent resource) {
-		final SingleSubscriptionStreamManager streamManager = getSession().getAttribute(SingleSubscriptionStreamManager.class);
+		final SingleSubscriptionStreamManager streamManager = getSession()
+				.getAttribute(SingleSubscriptionStreamManager.class);
 		return streamManager.isAccessPermitted(action, resource.getData());
 	}
 

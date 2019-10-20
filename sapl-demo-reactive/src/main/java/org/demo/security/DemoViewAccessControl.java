@@ -11,7 +11,8 @@ public class DemoViewAccessControl implements ViewAccessControl {
 
 	@Override
 	public boolean isAccessGranted(UI ui, String beanName) {
-		final SingleSubscriptionStreamManager streamManager = ui.getSession().getAttribute(SingleSubscriptionStreamManager.class);
+		final SingleSubscriptionStreamManager streamManager = ui.getSession()
+				.getAttribute(SingleSubscriptionStreamManager.class);
 		return streamManager.isAccessPermitted("access", beanName);
 	}
 

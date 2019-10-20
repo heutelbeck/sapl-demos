@@ -8,8 +8,8 @@ import org.springframework.security.core.Authentication;
 import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
 
 /**
- * Concrete patient form implementation demonstrating the usage of SAPL multi-subscriptions for
- * controlling the visibility and enabling of form fields.
+ * Concrete patient form implementation demonstrating the usage of SAPL
+ * multi-subscriptions for controlling the visibility and enabling of form fields.
  */
 class PatientForm extends AbstractPatientForm {
 
@@ -21,7 +21,8 @@ class PatientForm extends AbstractPatientForm {
 
 	@Override
 	protected void updateFieldVisibility() {
-		final MultiSubscriptionStreamManager streamManager = getSession().getAttribute(MultiSubscriptionStreamManager.class);
+		final MultiSubscriptionStreamManager streamManager = getSession()
+				.getAttribute(MultiSubscriptionStreamManager.class);
 		if (!streamManager.hasSubscriptionFor("fieldVisibility")) {
 			streamManager.setupNewMultiSubscription("fieldVisibility", createMultiSubscriptionForFieldVisibility());
 		}
@@ -38,7 +39,8 @@ class PatientForm extends AbstractPatientForm {
 
 	private MultiAuthSubscription createMultiSubscriptionForFieldVisibility() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiAuthSubscription().addAuthSubscription("readMrn", authentication, "read", medicalRecordNumber.getData())
+		return new MultiAuthSubscription()
+				.addAuthSubscription("readMrn", authentication, "read", medicalRecordNumber.getData())
 				.addAuthSubscription("readName", authentication, "read", name.getData())
 				.addAuthSubscription("readDiagnosis", authentication, "read", diagnosisText.getData())
 				.addAuthSubscription("readIcd11", authentication, "read", icd11Code.getData())
@@ -49,11 +51,13 @@ class PatientForm extends AbstractPatientForm {
 
 	@Override
 	protected void updateFieldEnabling() {
-		final MultiSubscriptionStreamManager streamManager = getSession().getAttribute(MultiSubscriptionStreamManager.class);
+		final MultiSubscriptionStreamManager streamManager = getSession()
+				.getAttribute(MultiSubscriptionStreamManager.class);
 		if (!streamManager.hasSubscriptionFor("fieldEnabling")) {
 			streamManager.setupNewMultiSubscription("fieldEnabling", createMultiSubscriptionForFieldEnabling());
 		}
-		medicalRecordNumber.setEnabled(isNewPatient() && streamManager.isAccessPermittedForAuthSubscriptionWithId("editMrn"));
+		medicalRecordNumber
+				.setEnabled(isNewPatient() && streamManager.isAccessPermittedForAuthSubscriptionWithId("editMrn"));
 		name.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editName"));
 		icd11Code.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editIcd11"));
 		diagnosisText.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editDiagnosis"));
@@ -65,7 +69,8 @@ class PatientForm extends AbstractPatientForm {
 
 	private MultiAuthSubscription createMultiSubscriptionForFieldEnabling() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiAuthSubscription().addAuthSubscription("editMrn", authentication, "edit", medicalRecordNumber.getData())
+		return new MultiAuthSubscription()
+				.addAuthSubscription("editMrn", authentication, "edit", medicalRecordNumber.getData())
 				.addAuthSubscription("editName", authentication, "edit", name.getData())
 				.addAuthSubscription("editDiagnosis", authentication, "edit", diagnosisText.getData())
 				.addAuthSubscription("editIcd11", authentication, "edit", icd11Code.getData())

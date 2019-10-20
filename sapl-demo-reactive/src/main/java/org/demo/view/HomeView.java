@@ -57,28 +57,33 @@ public class HomeView extends VerticalLayout implements View {
 		reactiveBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveBtn, 0, 3);
 
-		final Button reactiveMultiSubscriptionBtn = new Button("Show Live-Data View (reactive frontend, multi-subscriptions)",
+		final Button reactiveMultiSubscriptionBtn = new Button(
+				"Show Live-Data View (reactive frontend, multi-subscriptions)",
 				click -> getUI().getNavigator().navigateTo("reactiveMultiSubscription"));
 		reactiveMultiSubscriptionBtn.setData("ui:view:home:showReactiveViewMultiSubscriptionButton");
 		reactiveMultiSubscriptionBtn.setWidth(BUTTON_WIDTH);
 		grid.addComponent(reactiveMultiSubscriptionBtn, 0, 4);
 
-		final MultiSubscriptionStreamManager streamManager = getSession().getAttribute(MultiSubscriptionStreamManager.class);
+		final MultiSubscriptionStreamManager streamManager = getSession()
+				.getAttribute(MultiSubscriptionStreamManager.class);
 		if (!streamManager.hasSubscriptionFor("homeViewButtons")) {
 			final Authentication authentication = SecurityUtils.getAuthentication();
 			final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
 					.addAuthSubscription("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
-					.addAuthSubscription("useMultiSubscriptionBtn", authentication, "use", multiSubscriptionBtn.getData())
+					.addAuthSubscription("useMultiSubscriptionBtn", authentication, "use",
+							multiSubscriptionBtn.getData())
 					.addAuthSubscription("useReactiveBtn", authentication, "use", reactiveBtn.getData())
-					.addAuthSubscription("useReactiveMultiSubscriptionBtn", authentication, "use", reactiveMultiSubscriptionBtn.getData());
+					.addAuthSubscription("useReactiveMultiSubscriptionBtn", authentication, "use",
+							reactiveMultiSubscriptionBtn.getData());
 			streamManager.setupNewMultiSubscription("homeViewButtons", multiSubscription);
 		}
 
 		traditionalBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useTraditionalBtn"));
-		multiSubscriptionBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useMultiSubscriptionBtn"));
+		multiSubscriptionBtn
+				.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useMultiSubscriptionBtn"));
 		reactiveBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveBtn"));
-		reactiveMultiSubscriptionBtn
-				.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveMultiSubscriptionBtn"));
+		reactiveMultiSubscriptionBtn.setEnabled(
+				streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveMultiSubscriptionBtn"));
 	}
 
 }

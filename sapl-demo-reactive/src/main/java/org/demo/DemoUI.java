@@ -133,7 +133,8 @@ public class DemoUI extends UI {
 	}
 
 	private void logout() {
-		// navigate to the home view to make sure beforeLeave() is called on the reactive views
+		// navigate to the home view to make sure beforeLeave() is called on the reactive
+		// views
 		getNavigator().navigateTo("");
 		getSession().getAttribute(SingleSubscriptionStreamManager.class).dispose();
 		getSession().getAttribute(MultiSubscriptionStreamManager.class).dispose();

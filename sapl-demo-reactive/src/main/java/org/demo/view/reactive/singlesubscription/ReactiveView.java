@@ -16,9 +16,9 @@ import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**
- * Concrete reactive view implementation demonstrating the usage of SAPL single subscriptions
- * for controlling access to heart beat and blood pressure data directly updating the
- * frontend upon authorization decision changes.
+ * Concrete reactive view implementation demonstrating the usage of SAPL single
+ * subscriptions for controlling access to heart beat and blood pressure data directly
+ * updating the frontend upon authorization decision changes.
  */
 @SpringView(name = "reactive")
 @SpringComponent("reactiveView")

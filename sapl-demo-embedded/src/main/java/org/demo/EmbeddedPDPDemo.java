@@ -114,7 +114,8 @@ public class EmbeddedPDPDemo {
 		blockingUsageDemo(pdp);
 		reactiveUsageDemo(pdp);
 
-		// to compare single authorization subscriptions with multi-subscriptions, only run one of the following
+		// to compare single authorization subscriptions with multi-subscriptions, only
+		// run one of the following
 		// methods at once to avoid later methods benefit from earlier methods (e.g. class
 		// loading)
 		runPerformanceDemoSingle(pdp);
@@ -220,7 +221,8 @@ public class EmbeddedPDPDemo {
 	private static AuthSubscription buildAuthSubscription(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
+				mapper.valueToTree(resource), null);
 	}
 
 }

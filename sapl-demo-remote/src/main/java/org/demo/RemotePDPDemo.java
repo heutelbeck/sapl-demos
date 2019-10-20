@@ -153,7 +153,8 @@ public class RemotePDPDemo {
 	private static AuthSubscription buildAuthSubscription(Object subject, Object action, Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action), mapper.valueToTree(resource), null);
+		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
+				mapper.valueToTree(resource), null);
 	}
 
 }
