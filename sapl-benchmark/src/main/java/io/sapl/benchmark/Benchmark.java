@@ -48,8 +48,8 @@ import com.google.common.io.Resources;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.AuthDecision;
-import io.sapl.api.pdp.AuthSubscription;
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pip.AttributeException;
@@ -306,19 +306,19 @@ public class Benchmark {
 				double prep = nanoToMs(System.nanoTime() - begin);
 
 				for (int j = 0; j < RUNS; j++) {
-					AuthSubscription request = generator.createAuthSubscriptionObject();
+					AuthorizationSubscription request = generator.createAuthorizationSubscriptionObject();
 
 					long start = System.nanoTime();
-					AuthDecision authDecision = pdp.decide(request).blockFirst();
+					AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();
 					long end = System.nanoTime();
 
 					double diff = nanoToMs(end - start);
 
-					if (authDecision == null) {
-						throw new IOException("PDP returned null authDecision");
+					if (authzDecision == null) {
+						throw new IOException("PDP returned null authzDecision");
 					}
 					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
-							authDecision.toString()));
+							authzDecision.toString()));
 
 					LOGGER.info("Total : {}ms", diff);
 				}

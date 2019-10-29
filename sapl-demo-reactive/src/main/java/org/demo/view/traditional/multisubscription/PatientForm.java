@@ -5,7 +5,7 @@ import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.security.core.Authentication;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 
 /**
  * Concrete patient form implementation demonstrating the usage of SAPL
@@ -26,27 +26,29 @@ class PatientForm extends AbstractPatientForm {
 		if (!streamManager.hasSubscriptionFor("fieldVisibility")) {
 			streamManager.setupNewMultiSubscription("fieldVisibility", createMultiSubscriptionForFieldVisibility());
 		}
-		medicalRecordNumber.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readMrn"));
-		name.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readName"));
-		diagnosisText.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readDiagnosis"));
-		icd11Code.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readIcd11"));
-		attendingDoctor.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readAttendingDoctor"));
-		attendingNurse.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readAttendingNurse"));
-		phoneNumber.setVisible(streamManager.isAccessPermittedForAuthSubscriptionWithId("readPhoneNumber"));
+		medicalRecordNumber.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readMrn"));
+		name.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readName"));
+		diagnosisText.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readDiagnosis"));
+		icd11Code.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readIcd11"));
+		attendingDoctor
+				.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readAttendingDoctor"));
+		attendingNurse
+				.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readAttendingNurse"));
+		phoneNumber.setVisible(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("readPhoneNumber"));
 
 		roomNumber.setVisible(isPermitted("read", roomNumber, patient.getId()));
 	}
 
-	private MultiAuthSubscription createMultiSubscriptionForFieldVisibility() {
+	private MultiAuthorizationSubscription createMultiSubscriptionForFieldVisibility() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiAuthSubscription()
-				.addAuthSubscription("readMrn", authentication, "read", medicalRecordNumber.getData())
-				.addAuthSubscription("readName", authentication, "read", name.getData())
-				.addAuthSubscription("readDiagnosis", authentication, "read", diagnosisText.getData())
-				.addAuthSubscription("readIcd11", authentication, "read", icd11Code.getData())
-				.addAuthSubscription("readAttendingDoctor", authentication, "read", attendingDoctor.getData())
-				.addAuthSubscription("readAttendingNurse", authentication, "read", attendingNurse.getData())
-				.addAuthSubscription("readPhoneNumber", authentication, "read", phoneNumber.getData());
+		return new MultiAuthorizationSubscription()
+				.addAuthorizationSubscription("readMrn", authentication, "read", medicalRecordNumber.getData())
+				.addAuthorizationSubscription("readName", authentication, "read", name.getData())
+				.addAuthorizationSubscription("readDiagnosis", authentication, "read", diagnosisText.getData())
+				.addAuthorizationSubscription("readIcd11", authentication, "read", icd11Code.getData())
+				.addAuthorizationSubscription("readAttendingDoctor", authentication, "read", attendingDoctor.getData())
+				.addAuthorizationSubscription("readAttendingNurse", authentication, "read", attendingNurse.getData())
+				.addAuthorizationSubscription("readPhoneNumber", authentication, "read", phoneNumber.getData());
 	}
 
 	@Override
@@ -56,28 +58,30 @@ class PatientForm extends AbstractPatientForm {
 		if (!streamManager.hasSubscriptionFor("fieldEnabling")) {
 			streamManager.setupNewMultiSubscription("fieldEnabling", createMultiSubscriptionForFieldEnabling());
 		}
-		medicalRecordNumber
-				.setEnabled(isNewPatient() && streamManager.isAccessPermittedForAuthSubscriptionWithId("editMrn"));
-		name.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editName"));
-		icd11Code.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editIcd11"));
-		diagnosisText.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editDiagnosis"));
-		attendingDoctor.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editAttendingDoctor"));
-		attendingNurse.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editAttendingNurse"));
-		phoneNumber.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editPhoneNumber"));
-		roomNumber.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("editRoomNumber"));
+		medicalRecordNumber.setEnabled(
+				isNewPatient() && streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editMrn"));
+		name.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editName"));
+		icd11Code.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editIcd11"));
+		diagnosisText.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editDiagnosis"));
+		attendingDoctor
+				.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editAttendingDoctor"));
+		attendingNurse
+				.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editAttendingNurse"));
+		phoneNumber.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editPhoneNumber"));
+		roomNumber.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("editRoomNumber"));
 	}
 
-	private MultiAuthSubscription createMultiSubscriptionForFieldEnabling() {
+	private MultiAuthorizationSubscription createMultiSubscriptionForFieldEnabling() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
-		return new MultiAuthSubscription()
-				.addAuthSubscription("editMrn", authentication, "edit", medicalRecordNumber.getData())
-				.addAuthSubscription("editName", authentication, "edit", name.getData())
-				.addAuthSubscription("editDiagnosis", authentication, "edit", diagnosisText.getData())
-				.addAuthSubscription("editIcd11", authentication, "edit", icd11Code.getData())
-				.addAuthSubscription("editAttendingDoctor", authentication, "edit", attendingDoctor.getData())
-				.addAuthSubscription("editAttendingNurse", authentication, "edit", attendingNurse.getData())
-				.addAuthSubscription("editPhoneNumber", authentication, "edit", phoneNumber.getData())
-				.addAuthSubscription("editRoomNumber", authentication, "edit", roomNumber.getData());
+		return new MultiAuthorizationSubscription()
+				.addAuthorizationSubscription("editMrn", authentication, "edit", medicalRecordNumber.getData())
+				.addAuthorizationSubscription("editName", authentication, "edit", name.getData())
+				.addAuthorizationSubscription("editDiagnosis", authentication, "edit", diagnosisText.getData())
+				.addAuthorizationSubscription("editIcd11", authentication, "edit", icd11Code.getData())
+				.addAuthorizationSubscription("editAttendingDoctor", authentication, "edit", attendingDoctor.getData())
+				.addAuthorizationSubscription("editAttendingNurse", authentication, "edit", attendingNurse.getData())
+				.addAuthorizationSubscription("editPhoneNumber", authentication, "edit", phoneNumber.getData())
+				.addAuthorizationSubscription("editRoomNumber", authentication, "edit", roomNumber.getData());
 	}
 
 }

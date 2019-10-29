@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {
@@ -68,22 +68,23 @@ public class HomeView extends VerticalLayout implements View {
 				.getAttribute(MultiSubscriptionStreamManager.class);
 		if (!streamManager.hasSubscriptionFor("homeViewButtons")) {
 			final Authentication authentication = SecurityUtils.getAuthentication();
-			final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
-					.addAuthSubscription("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
-					.addAuthSubscription("useMultiSubscriptionBtn", authentication, "use",
+			final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription()
+					.addAuthorizationSubscription("useTraditionalBtn", authentication, "use", traditionalBtn.getData())
+					.addAuthorizationSubscription("useMultiSubscriptionBtn", authentication, "use",
 							multiSubscriptionBtn.getData())
-					.addAuthSubscription("useReactiveBtn", authentication, "use", reactiveBtn.getData())
-					.addAuthSubscription("useReactiveMultiSubscriptionBtn", authentication, "use",
+					.addAuthorizationSubscription("useReactiveBtn", authentication, "use", reactiveBtn.getData())
+					.addAuthorizationSubscription("useReactiveMultiSubscriptionBtn", authentication, "use",
 							reactiveMultiSubscriptionBtn.getData());
 			streamManager.setupNewMultiSubscription("homeViewButtons", multiSubscription);
 		}
 
-		traditionalBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useTraditionalBtn"));
-		multiSubscriptionBtn
-				.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useMultiSubscriptionBtn"));
-		reactiveBtn.setEnabled(streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveBtn"));
+		traditionalBtn
+				.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("useTraditionalBtn"));
+		multiSubscriptionBtn.setEnabled(
+				streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("useMultiSubscriptionBtn"));
+		reactiveBtn.setEnabled(streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("useReactiveBtn"));
 		reactiveMultiSubscriptionBtn.setEnabled(
-				streamManager.isAccessPermittedForAuthSubscriptionWithId("useReactiveMultiSubscriptionBtn"));
+				streamManager.isAccessPermittedForAuthorizationSubscriptionWithId("useReactiveMultiSubscriptionBtn"));
 	}
 
 }

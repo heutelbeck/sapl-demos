@@ -32,13 +32,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.AuthDecision;
-import io.sapl.api.pdp.AuthSubscription;
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.api.pdp.multisubscription.IdentifiableAuthDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
+import io.sapl.api.pdp.multisubscription.IdentifiableAuthorizationDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
@@ -68,9 +68,11 @@ public class EmbeddedPDPDemo {
 
 	private static final String RESOURCE = "something";
 
-	private static final AuthSubscription READ_SUBSCRIPTION = buildAuthSubscription(SUBJECT, ACTION_READ, RESOURCE);
+	private static final AuthorizationSubscription READ_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+			ACTION_READ, RESOURCE);
 
-	private static final AuthSubscription WRITE_SUBSCRIPTION = buildAuthSubscription(SUBJECT, ACTION_WRITE, RESOURCE);
+	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+			ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 25_000;
 
@@ -125,29 +127,29 @@ public class EmbeddedPDPDemo {
 
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Blocking...");
-		final AuthDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+		final AuthorizationDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		LOGGER.info("Decision for action 'read': {}", readDecision != null ? readDecision.getDecision() : "null");
-		final AuthDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
+		final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
 		LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
 	}
 
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("Reactive...");
-		final Flux<AuthDecision> readDecision = pdp.decide(READ_SUBSCRIPTION);
-		readDecision.subscribe(authDecision -> handleAuthDecision(ACTION_READ, authDecision));
-		final Flux<AuthDecision> writeDecision = pdp.decide(WRITE_SUBSCRIPTION);
-		writeDecision.subscribe(authDecision -> handleAuthDecision(ACTION_WRITE, authDecision));
+		final Flux<AuthorizationDecision> readDecision = pdp.decide(READ_SUBSCRIPTION);
+		readDecision.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
+		final Flux<AuthorizationDecision> writeDecision = pdp.decide(WRITE_SUBSCRIPTION);
+		writeDecision.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
 	}
 
-	private static void handleAuthDecision(String action, AuthDecision authDecision) {
-		LOGGER.info("Decision for action '{}': {}", action, authDecision.getDecision());
+	private static void handleAuthorizationDecision(String action, AuthorizationDecision authzDecision) {
+		LOGGER.info("Decision for action '{}': {}", action, authzDecision.getDecision());
 	}
 
 	private static void runPerformanceDemoSingle(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Single...");
 
-		final AuthDecision authDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
-		LOGGER.info("{}", authDecision);
+		final AuthorizationDecision authzDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+		LOGGER.info("{}", authzDecision);
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
@@ -167,10 +169,10 @@ public class EmbeddedPDPDemo {
 	private static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi...");
 
-		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription();
-		multiSubscription.addAuthSubscription("sub", SUBJECT, ACTION_READ, RESOURCE);
-		final IdentifiableAuthDecision identifiableAuthDecision = pdp.decide(multiSubscription).blockFirst();
-		LOGGER.info("{}", identifiableAuthDecision.getAuthDecision());
+		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
+		multiSubscription.addAuthorizationSubscription("sub", SUBJECT, ACTION_READ, RESOURCE);
+		final IdentifiableAuthorizationDecision identifiableAuthzDecision = pdp.decide(multiSubscription).blockFirst();
+		LOGGER.info("{}", identifiableAuthzDecision.getAuthorizationDecision());
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
@@ -190,10 +192,10 @@ public class EmbeddedPDPDemo {
 	private static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi All...");
 
-		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription();
-		multiSubscription.addAuthSubscription("read", SUBJECT, ACTION_READ, RESOURCE);
-		final MultiAuthDecision multiDecision = pdp.decideAll(multiSubscription).blockFirst();
-		LOGGER.info("{}", multiDecision.getAuthDecisionForSubscriptionWithId("read"));
+		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
+		multiSubscription.addAuthorizationSubscription("read", SUBJECT, ACTION_READ, RESOURCE);
+		final MultiAuthorizationDecision multiDecision = pdp.decideAll(multiSubscription).blockFirst();
+		LOGGER.info("{}", multiDecision.getAuthorizationDecisionForSubscriptionWithId("read"));
 
 		int[] count = { 0 };
 		long start = System.nanoTime();
@@ -218,10 +220,11 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	private static AuthSubscription buildAuthSubscription(Object subject, Object action, Object resource) {
+	private static AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
+			Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
+		return new AuthorizationSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
 				mapper.valueToTree(resource), null);
 	}
 

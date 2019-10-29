@@ -24,7 +24,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.pdp.AuthDecision;
+import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.Decision;
 import io.sapl.spring.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
@@ -270,7 +270,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 		bloodPressureCanvas.restoreContext();
 	}
 
-	private Flux<AuthDecision> getFilteredResourceFlux() {
+	private Flux<AuthorizationDecision> getFilteredResourceFlux() {
 		// Each time the data flux emits a new resource, we have to send an authorization
 		// subscription to the PDP to transform / filter the resource.
 		// In this example there is just one resource flux. If there were more than one,
@@ -283,10 +283,10 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				data -> pep.filterEnforce(authentication, "readSchedulerData", data).subscribeOn(nonUIThread));
 	}
 
-	private void updateUIWithFilteredResource(AuthDecision authDecision) {
-		final Decision decision = authDecision.getDecision();
+	private void updateUIWithFilteredResource(AuthorizationDecision authzDecision) {
+		final Decision decision = authzDecision.getDecision();
 		final TimeScheduleData[] timeScheduleDataHolder = new TimeScheduleData[] { new TimeScheduleData() };
-		final Optional<JsonNode> resource = authDecision.getResource();
+		final Optional<JsonNode> resource = authzDecision.getResource();
 		if (resource.isPresent()) {
 			try {
 				timeScheduleDataHolder[0] = mapper.treeToValue(resource.get(), TimeScheduleData.class);

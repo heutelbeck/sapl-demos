@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
-import io.sapl.api.pdp.multisubscription.MultiAuthDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
 import io.sapl.spring.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
@@ -29,7 +29,7 @@ public class MultiSubscriptionStreamManager {
 
 	private Set<String> multiSubscriptionIdsWithSubscription = new HashSet<>();
 
-	private Map<String, Decision> decisionsByAuthSubscriptionId = new HashMap<>();
+	private Map<String, Decision> decisionsByAuthorizationSubscriptionId = new HashMap<>();
 
 	/**
 	 * Creates a new {@code MultiSubscriptionStreamManager} instance delegating to the
@@ -48,25 +48,26 @@ public class MultiSubscriptionStreamManager {
 	 * @param multiSubscription the multi-subscription for which a subscription has to be
 	 * set up.
 	 */
-	public void setupNewMultiSubscription(String multiSubscriptionId, MultiAuthSubscription multiSubscription) {
+	public void setupNewMultiSubscription(String multiSubscriptionId,
+			MultiAuthorizationSubscription multiSubscription) {
 		if (!hasSubscriptionFor(multiSubscriptionId)) {
 			LOGGER.debug("setup multi-subscription for multiSubscriptionId {}", multiSubscriptionId);
-			final MultiAuthDecision multiAuthDecision = pep.filterEnforceAll(multiSubscription).blockFirst();
-			if (multiAuthDecision != null) {
-				multiAuthDecision.forEach(ir -> decisionsByAuthSubscriptionId.put(ir.getAuthSubscriptionId(),
-						ir.getAuthDecision().getDecision()));
+			final MultiAuthorizationDecision multiAuthzDecision = pep.filterEnforceAll(multiSubscription).blockFirst();
+			if (multiAuthzDecision != null) {
+				multiAuthzDecision.forEach(ir -> decisionsByAuthorizationSubscriptionId
+						.put(ir.getAuthorizationSubscriptionId(), ir.getAuthorizationDecision().getDecision()));
 				multiSubscriptionIdsWithSubscription.add(multiSubscriptionId);
 			}
 			final Disposable subscription = pep.filterEnforce(multiSubscription)
-					.subscribe(ir -> decisionsByAuthSubscriptionId.put(ir.getAuthSubscriptionId(),
-							ir.getAuthDecision().getDecision()));
+					.subscribe(ir -> decisionsByAuthorizationSubscriptionId.put(ir.getAuthorizationSubscriptionId(),
+							ir.getAuthorizationDecision().getDecision()));
 			subscriptions.add(subscription);
 		}
 	}
 
 	/**
 	 * Returns {@code true} if a multi-subscription with the given ID has already been
-	 * {@link #setupNewMultiSubscription(String, MultiAuthSubscription) set up},
+	 * {@link #setupNewMultiSubscription(String, MultiAuthorizationSubscription) set up},
 	 * {@code false} otherwise.
 	 * @param multiSubscriptionId the ID of the multi-subscription
 	 * @return {@code true} if a multi-subscription with the given ID has already been set
@@ -79,12 +80,12 @@ public class MultiSubscriptionStreamManager {
 	/**
 	 * Returns {@code true} if the current authorization decision for the authorization
 	 * subscription with the given ID is PERMIT, {@code false} otherwise.
-	 * @param authSubscriptionId the ID of the single authorization subscription.
+	 * @param authzSubscriptionId the ID of the single authorization subscription.
 	 * @return {@code true} if the current authorization decision for the authorization
 	 * subscription with the given ID is PERMIT.
 	 */
-	public boolean isAccessPermittedForAuthSubscriptionWithId(String authSubscriptionId) {
-		return decisionsByAuthSubscriptionId.get(authSubscriptionId) == Decision.PERMIT;
+	public boolean isAccessPermittedForAuthorizationSubscriptionWithId(String authzSubscriptionId) {
+		return decisionsByAuthorizationSubscriptionId.get(authzSubscriptionId) == Decision.PERMIT;
 	}
 
 	/**
@@ -95,7 +96,7 @@ public class MultiSubscriptionStreamManager {
 		LOGGER.debug("disposing {} subscriptions", subscriptions.size());
 		subscriptions.forEach(Disposable::dispose);
 		multiSubscriptionIdsWithSubscription.clear();
-		decisionsByAuthSubscriptionId.clear();
+		decisionsByAuthorizationSubscriptionId.clear();
 	}
 
 }

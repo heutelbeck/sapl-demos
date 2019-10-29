@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 
-import io.sapl.api.pdp.AuthSubscription;
+import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 
 public class RemotePDPDemo {
@@ -127,13 +127,14 @@ public class RemotePDPDemo {
 	private static void runDemo(String host, int port, String key, String secret) throws InterruptedException {
 		RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
 
-		final AuthSubscription authSubscription = buildAuthSubscription("willi", "test-read", "something");
+		final AuthorizationSubscription authzSubscription = buildAuthorizationSubscription("willi", "test-read",
+				"something");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			// @formatter:off
-			pdp.decide(authSubscription).take(1)
+			pdp.decide(authzSubscription).take(1)
 					.subscribe(
-					        authDecision -> LOG.info("authDecision: {}", authDecision),
+					        authzDecision -> LOG.info("authzDecision: {}", authzDecision),
                             error -> LOG.error("error", error),
                             () -> LOG.info("complete")
                     );
@@ -150,10 +151,11 @@ public class RemotePDPDemo {
 		Thread.sleep(1000);
 	}
 
-	private static AuthSubscription buildAuthSubscription(Object subject, Object action, Object resource) {
+	private static AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
+			Object resource) {
 		ObjectMapper mapper = new ObjectMapper();
 		mapper.registerModule(new Jdk8Module());
-		return new AuthSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
+		return new AuthorizationSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
 				mapper.valueToTree(resource), null);
 	}
 

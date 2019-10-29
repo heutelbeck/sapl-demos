@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthSubscription;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 import io.sapl.spring.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
@@ -41,12 +41,13 @@ public class ReactiveView extends AbstractReactiveView {
 	protected Flux<NonFilteredResourcesData> getCombinedFluxForNonFilteredResources() {
 		final Authentication authentication = SecurityUtils.getAuthentication();
 
-		final MultiAuthSubscription multiSubscription = new MultiAuthSubscription()
-				.addAuthSubscription(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID, authentication, "read", "heartBeatData")
-				.addAuthSubscription(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID, authentication, "read",
+		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription()
+				.addAuthorizationSubscription(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID, authentication, "read",
+						"heartBeatData")
+				.addAuthorizationSubscription(READ_BLOOD_PRESSURE_DATA_SUBSCRIPTION_ID, authentication, "read",
 						"bloodPressureData");
 
-		final Flux<MultiAuthDecision> accessDecisionFlux = pep.filterEnforceAll(multiSubscription)
+		final Flux<MultiAuthorizationDecision> accessDecisionFlux = pep.filterEnforceAll(multiSubscription)
 				.subscribeOn(nonUIThread);
 
 		return Flux.combineLatest(accessDecisionFlux, getHeartBeatDataFlux(), getDiastolicBloodPressureDataFlux(),
@@ -54,7 +55,7 @@ public class ReactiveView extends AbstractReactiveView {
 	}
 
 	private NonFilteredResourcesData getNonFilteredResourcesDataFrom(Object[] fluxValues) {
-		final MultiAuthDecision multiDecision = (MultiAuthDecision) fluxValues[0];
+		final MultiAuthorizationDecision multiDecision = (MultiAuthorizationDecision) fluxValues[0];
 		final NonFilteredResourcesData data = new NonFilteredResourcesData();
 		data.heartBeatDecision = multiDecision.getDecisionForSubscriptionWithId(READ_HEART_BEAT_DATA_SUBSCRIPTION_ID);
 		data.bloodPressureDecision = multiDecision
