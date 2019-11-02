@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-demo-domain</artifactId>
-			<version>${version.sapl.policy.engine}</version>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
