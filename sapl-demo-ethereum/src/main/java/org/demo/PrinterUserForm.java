@@ -2,10 +2,10 @@ package org.demo;
 
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -17,13 +17,7 @@ public class PrinterUserForm extends FormLayout {
 
 	private Binder<PrinterUser> binder = new Binder<>(PrinterUser.class);
 
-	private TextField firstName = new TextField("First name");
-
-	private TextField lastName = new TextField("Last name");
-
 	private TextField ethereumAddress = new TextField("Ethereum address");
-
-	private DatePicker birthDate = new DatePicker("Birthdate");
 
 	private Button save = new Button("Save");
 
@@ -31,7 +25,8 @@ public class PrinterUserForm extends FormLayout {
 
 	private MainView mainView;
 
-	private PrinterUserService service = PrinterUserService.getInstance();
+	@Autowired
+	private PrinterUserService service;
 
 	public PrinterUserForm(MainView mainView) {
 		this.mainView = mainView;
@@ -45,7 +40,7 @@ public class PrinterUserForm extends FormLayout {
 
 		HorizontalLayout buttons = new HorizontalLayout(save, delete);
 
-		add(firstName, lastName, ethereumAddress, birthDate, buttons);
+		add(ethereumAddress, buttons);
 
 	}
 
@@ -57,7 +52,7 @@ public class PrinterUserForm extends FormLayout {
 		}
 		else {
 			setVisible(true);
-			firstName.focus();
+			ethereumAddress.focus();
 		}
 	}
 

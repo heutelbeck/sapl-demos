@@ -1,5 +1,7 @@
 package org.demo;
 
+import java.util.Collections;
+
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ public class MainView extends VerticalLayout {
 
 	private PrinterUserForm form = new PrinterUserForm(this);
 
-	private PrinterUserService printerUserService = PrinterUserService.getInstance();
+	private PrinterUserService printerUserService;
 
 	private Grid<PrinterUser> grid = new Grid<>(PrinterUser.class);
 
@@ -43,7 +45,8 @@ public class MainView extends VerticalLayout {
 
 	private Button addUserButton = new Button("Add new user");
 
-	public MainView(@Autowired PrintService service) {
+	public MainView(@Autowired PrintService service, @Autowired PrinterUserService printerUserService) {
+		this.printerUserService = printerUserService;
 
 		TextField textField = new TextField("Issue certificate");
 		textField.setPlaceholder("Enter Ethereum address...");
@@ -53,7 +56,7 @@ public class MainView extends VerticalLayout {
 		button.setEnabled(false);
 		button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-		grid.setColumns("firstName", "lastName", "ethereumAddress", "birthDate");
+		grid.setColumns("username", "ethereumAddress");
 		grid.asSingleSelect().addValueChangeListener(event -> form.setPrinterUser(grid.asSingleSelect().getValue()));
 		updateList();
 
@@ -66,7 +69,7 @@ public class MainView extends VerticalLayout {
 
 		addUserButton.addClickListener(e -> {
 			grid.asSingleSelect().clear();
-			form.setPrinterUser(new PrinterUser());
+			form.setPrinterUser(new PrinterUser("", "", "", Collections.emptyList()));
 		});
 
 		HorizontalLayout searchAndAdd = new HorizontalLayout(gridFilterText, addUserButton);

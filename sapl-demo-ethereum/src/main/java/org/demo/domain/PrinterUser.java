@@ -1,34 +1,25 @@
 package org.demo.domain;
 
-import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class PrinterUser implements Serializable, Cloneable {
+public class PrinterUser extends User {
 
-	private static final long serialVersionUID = -8397038584366614376L;
-
-	private String firstName;
-
-	private String lastName;
+	private static final long serialVersionUID = -6541109260884369275L;
 
 	private String ethereumAddress;
 
-	private LocalDate birthDate;
-
-	public PrinterUser() {
-
-	}
-
-	public PrinterUser(String firstName, String lastName, String ethereumAddress, LocalDate birthDate) {
-		setFirstName(firstName);
-		setLastName(lastName);
+	public PrinterUser(String userName, String password, String ethereumAddress,
+			Collection<? extends GrantedAuthority> authorities) {
+		super(userName, password, authorities);
 		setEthereumAddress(ethereumAddress);
-		setBirthDate(birthDate);
 	}
 
 	@Override
