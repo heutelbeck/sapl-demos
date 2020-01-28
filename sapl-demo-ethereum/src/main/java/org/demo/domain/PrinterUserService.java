@@ -43,11 +43,15 @@ public class PrinterUserService implements UserDetailsService {
 	}
 
 	private void createDemoData() {
-		allPrinterUsers.put("Alice", new PrinterUser("Alice", passwordEncoder.encode("Greenfield"), "0x12345",
-				Arrays.asList(new SimpleGrantedAuthority("USER"))));
+		allPrinterUsers.put("Alice", new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
+				"0xE5a72C7Fa4991920619edCf25eD8828793045A53", Arrays.asList(new SimpleGrantedAuthority("USER"))));
 		allPrinterUsers.put("Bob", new PrinterUser("Bob", passwordEncoder.encode("Springsteen"), "0x54321",
 				Arrays.asList(new SimpleGrantedAuthority("USER"))));
 
+	}
+
+	public PrinterUser loadUser(String username) {
+		return allPrinterUsers.get(username);
 	}
 
 	@Override

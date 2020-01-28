@@ -13,7 +13,7 @@ import com.vaadin.flow.data.binder.Binder;
 
 public class PrinterUserForm extends FormLayout {
 
-	private static final long serialVersionUID = -7109927158545674141L;
+	private static final long serialVersionUID = 1949849828168713357L;
 
 	private Binder<PrinterUser> binder = new Binder<>(PrinterUser.class);
 

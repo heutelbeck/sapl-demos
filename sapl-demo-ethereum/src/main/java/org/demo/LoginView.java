@@ -13,7 +13,7 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Login")
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
-	private static final long serialVersionUID = 5937519713416835194L;
+	private static final long serialVersionUID = -5760865537697352923L;
 
 	public static final String ROUTE = "login";
 
@@ -28,11 +28,11 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 	}
 
 	@Override
-	public void beforeEnter(BeforeEnterEvent event) { //
+	public void beforeEnter(BeforeEnterEvent event) {
 
 		if (!event.getLocation().getQueryParameters().getParameters().getOrDefault("error", Collections.emptyList())
 				.isEmpty()) {
-			login.setError(true); //
+			login.setError(true);
 
 		}
 	}
