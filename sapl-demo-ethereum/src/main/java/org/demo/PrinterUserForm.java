@@ -1,73 +1,44 @@
 package org.demo;
 
+import static org.demo.helper.AccessCertificate.issueCertificate;
+import static org.demo.helper.AccessCertificate.revokeCertificate;
+
 import org.demo.domain.PrinterUser;
-import org.demo.domain.PrinterUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
-public class PrinterUserForm extends FormLayout {
+public class PrinterUserForm extends VerticalLayout {
 
 	private static final long serialVersionUID = 1949849828168713357L;
 
-	private Binder<PrinterUser> binder = new Binder<>(PrinterUser.class);
+	private Button issue = new Button("Issue Certificate");
 
-	private TextField ethereumAddress = new TextField("Ethereum address");
+	private Button revoke = new Button("Revoke Certificate");
 
-	private Button save = new Button("Save");
+	public PrinterUserForm(PrinterUser user) {
+		String username = user.getUsername();
+		String address = user.getEthereumAddress();
 
-	private Button delete = new Button("Delete");
+		H2 userWelcome = new H2("Welcome " + username);
+		Paragraph showAddress = new Paragraph("Your registered Ethereum address: " + address);
 
-	private MainView mainView;
+		VerticalLayout userShow = new VerticalLayout(userWelcome, showAddress);
 
-	@Autowired
-	private PrinterUserService service;
+		issue.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-	public PrinterUserForm(MainView mainView) {
-		this.mainView = mainView;
+		issue.addClickListener(event -> issueCertificate(address));
 
-		save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-		save.addClickListener(event -> save());
+		revoke.addClickListener(event -> revokeCertificate(address));
 
-		delete.addClickListener(event -> delete());
+		HorizontalLayout buttons = new HorizontalLayout(issue, revoke);
 
-		binder.bindInstanceFields(this);
+		add(userShow, buttons);
 
-		HorizontalLayout buttons = new HorizontalLayout(save, delete);
-
-		add(ethereumAddress, buttons);
-
-	}
-
-	public void setPrinterUser(PrinterUser printerUser) {
-		binder.setBean(printerUser);
-
-		if (printerUser == null) {
-			setVisible(false);
-		}
-		else {
-			setVisible(true);
-			ethereumAddress.focus();
-		}
-	}
-
-	private void save() {
-		PrinterUser printerUser = binder.getBean();
-		service.save(printerUser);
-		mainView.updateList();
-		setPrinterUser(null);
-	}
-
-	private void delete() {
-		PrinterUser printerUser = binder.getBean();
-		service.delete(printerUser);
-		mainView.updateList();
-		setPrinterUser(null);
 	}
 
 }

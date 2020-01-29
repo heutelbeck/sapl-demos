@@ -1,9 +1,15 @@
 set "printerPolicies"
 deny-unless-permit
 
-
 policy "canPrint"
 permit
   action=="print" & resource=="printer3D"
 where
   subject.<printer.certified>;
+  
+policy "crowdTemplate"
+permit
+  action=="access" & resource=="crowdTemplate"
+where
+  var request = {"address":subject.<ethereum.coinbase>};
+  request.<ethereum.balance> >= 103000000000000000000;
