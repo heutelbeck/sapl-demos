@@ -7,22 +7,21 @@ import java.net.URISyntaxException;
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
 import org.demo.pip.EthereumPrinterPip;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.component.progressbar.ProgressBar;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
@@ -33,21 +32,17 @@ import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.PDPConfigurationException;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.interpreter.pip.EthereumPolicyInformationPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 /**
- * A sample Vaadin view class.
- * <p>
- * To implement a Vaadin view just extend any Vaadin component and use @Route annotation to announce it in a URL as a
- * Spring managed bean. Use the @PWA annotation make the application installable on phones, tablets and some desktop
- * browsers.
- * <p>
- * A new instance of this class is created for every new user and every browser tab/window.
+ * The main view groups together all features of the demo application.
  */
 @Push
 @Slf4j
@@ -58,6 +53,14 @@ import reactor.core.publisher.Flux;
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 public class MainView extends VerticalLayout {
 
+	public static final String GRAFTEN = "Graften One";
+
+	public static final String ULTIMAKER = "Ultimaker 2 Extended+";
+
+	public static final String ZMORPH = "Zmorph VX";
+
+	private static final long serialVersionUID = -5506530757803376574L;
+
 	private static final String BALL = "Ball";
 
 	private static final String ROCKET = "Rocket";
@@ -66,11 +69,13 @@ public class MainView extends VerticalLayout {
 
 	private static final String ROBOT = "Robot";
 
-	private static final long serialVersionUID = -5506530757803376574L;
-
 	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	private static final String PRINTER_IMAGE = "https://cdn.pixabay.com/photo/2016/06/13/21/33/printer-1455166_960_720.jpg";
+	private static final String GRAFTEN_IMAGE = "https://cdn.pixabay.com/photo/2017/10/13/15/39/printer-2847967_960_720.jpg";
+
+	private static final String ULTIMAKER_IMAGE = "https://cdn.pixabay.com/photo/2016/06/13/21/33/printer-1455169_960_720.jpg";
+
+	private static final String ZMORPH_IMAGE = "https://cdn.pixabay.com/photo/2019/07/19/07/18/printer-4348151_960_720.jpg";
 
 	private static final String ROBOT_IMAGE = "https://cdn.pixabay.com/photo/2019/02/10/06/10/robot-3986545_960_720.jpg";
 
@@ -80,31 +85,43 @@ public class MainView extends VerticalLayout {
 
 	private static final String BALL_IMAGE = "https://cdn.pixabay.com/photo/2015/01/12/18/15/ball-597523_960_720.jpg";
 
-	private PrinterUserService printerUserService;
+	private static final ObjectMapper mapper = new ObjectMapper();
 
-	private Grid<PrinterUser> grid = new Grid<>(PrinterUser.class);
+	private PrinterUser user;
 
-	public MainView(@Autowired PrintService service, @Autowired PrinterUserService printerUserService) {
+	private String currentPrinterImage;
+
+	private Button printerButton;
+
+	private Select<String> printerSelect;
+
+	private Select<String> templateSelect;
+
+	private Disposable printerDisposable;
+
+	private PolicyDecisionPoint pdp;
+
+	public MainView(PrintService service, PrinterUserService printerUserService) {
+		addClassName("main-view");
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String currentUserName = authentication.getName();
-		PrinterUser user = printerUserService.loadUser(currentUserName);
+		user = printerUserService.loadUser(currentUserName);
 
-		this.printerUserService = printerUserService;
-		addClassName("main-view");
+		currentPrinterImage = ULTIMAKER_IMAGE;
 
 		H1 header = new H1("3D Printer Control Panel");
 		header.getElement().getThemeList().add("dark");
 		add(header);
 
 		Image printerImage = new Image();
-		printerImage.setSrc(PRINTER_IMAGE);
+		printerImage.setSrc(currentPrinterImage);
 		printerImage.setSizeFull();
 
 		PrinterUserForm puForm = new PrinterUserForm(user);
 		CrowdfundingForm cfForm = new CrowdfundingForm(user);
 
-		Select<String> templateSelect = new Select<>();
+		templateSelect = new Select<>();
 		templateSelect.setPlaceholder("Select template...");
 		templateSelect.setItems(ROBOT, BOAT, ROCKET, BALL);
 		templateSelect.setItemEnabledProvider(item -> !BALL.equals(item));
@@ -124,71 +141,65 @@ public class MainView extends VerticalLayout {
 				printerImage.setSrc(BALL_IMAGE);
 				break;
 			default:
-				printerImage.setSrc(PRINTER_IMAGE);
+				printerImage.setSrc(currentPrinterImage);
 			}
 
 		});
 
-		ProgressBar printerProgress = new ProgressBar();
-		printerProgress.setVisible(false);
+		printerSelect = new Select<>();
+		printerSelect.setItems(ULTIMAKER, GRAFTEN, ZMORPH);
+		printerSelect.setValue(ULTIMAKER);
+		printerSelect.addValueChangeListener(event -> {
+			String printer = event.getValue();
+			switch (printer) {
+			case ULTIMAKER:
+				printerDisposable = printerAccessDecision();
+				currentPrinterImage = ULTIMAKER_IMAGE;
+				printerImage.setSrc(currentPrinterImage);
+				templateSelect.setValue("");
+				break;
+			case GRAFTEN:
+				printerDisposable = printerAccessDecision();
+				currentPrinterImage = GRAFTEN_IMAGE;
+				printerImage.setSrc(currentPrinterImage);
+				templateSelect.setValue("");
+				break;
+			case ZMORPH:
+				printerDisposable = printerAccessDecision();
+				currentPrinterImage = ZMORPH_IMAGE;
+				printerImage.setSrc(currentPrinterImage);
+				templateSelect.setValue("");
+				break;
+			default:
+				printerImage.setSrc(currentPrinterImage);
+				templateSelect.setValue("");
+				break;
 
-		Button printerButton = new Button("Start printer", e -> {
+			}
+		});
+
+		printerButton = new Button("Start printer", e -> {
 			service.print(templateSelect.getValue());
-			printerImage.setSrc(PRINTER_IMAGE);
+			printerImage.setSrc(currentPrinterImage);
 			templateSelect.setValue("");
 		});
 		printerButton.setEnabled(false);
 		printerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 		VerticalLayout userAndCrowd = new VerticalLayout(puForm, cfForm);
-		VerticalLayout imageProgress = new VerticalLayout(printerImage, printerProgress);
 		HorizontalLayout buttonField = new HorizontalLayout(templateSelect, printerButton);
-		HorizontalLayout imageAndUser = new HorizontalLayout(imageProgress, userAndCrowd);
+		VerticalLayout printerForm = new VerticalLayout(printerSelect, buttonField);
+		HorizontalLayout imageAndUser = new HorizontalLayout(printerImage, userAndCrowd);
 
 		add(imageAndUser);
-		add(buttonField);
+		add(printerForm);
+		printerImage.setSizeFull();
 		setSizeFull();
 
 		try {
-			EmbeddedPolicyDecisionPoint pdp = getPdp();
-
-			AuthorizationSubscription printerAccess = new AuthorizationSubscription(
-					JSON.textNode(user.getEthereumAddress()), JSON.textNode("print"), JSON.textNode("printer3D"), null);
-
-			final Flux<AuthorizationDecision> printerAccessDecision = pdp.decide(printerAccess);
-
-			printerAccessDecision.subscribe(decision -> {
-				LOGGER.info("New printer access decision: {}", decision.getDecision());
-				getUI().ifPresent(ui -> ui.access(() -> {
-					if (Decision.PERMIT.equals(decision.getDecision())) {
-						printerButton.setEnabled(true);
-						ui.push();
-					}
-					else {
-						printerButton.setEnabled(false);
-						ui.push();
-					}
-				}));
-			});
-
-			AuthorizationSubscription crowdAccess = new AuthorizationSubscription(
-					JSON.textNode(user.getEthereumAddress()), JSON.textNode("access"), JSON.textNode("crowdTemplate"),
-					null);
-			final Flux<AuthorizationDecision> crowdAccessDecision = pdp.decide(crowdAccess);
-			crowdAccessDecision.subscribe(decision -> {
-				LOGGER.info("New crowdfunding access decision: {}", decision.getDecision());
-				getUI().ifPresent(ui -> ui.access(() -> {
-					if (Decision.PERMIT.equals(decision.getDecision())) {
-						templateSelect.setItemEnabledProvider(null);
-						ui.push();
-					}
-					else {
-						templateSelect.setItemEnabledProvider(item -> !BALL.equals(item));
-						ui.push();
-					}
-				}));
-			});
-
+			pdp = getPdp();
+			printerDisposable = printerAccessDecision();
+			crowdAccessDecision();
 		}
 		catch (IOException | URISyntaxException | PolicyEvaluationException | PDPConfigurationException
 				| AttributeException | FunctionException e1) {
@@ -197,8 +208,23 @@ public class MainView extends VerticalLayout {
 
 	}
 
-	public void updateList() {
-		grid.setItems(printerUserService.findAll());
+	private void crowdAccessDecision() {
+		AuthorizationSubscription sub = new AuthorizationSubscription(JSON.textNode(user.getEthereumAddress()),
+				JSON.textNode("access"), JSON.textNode("crowdTemplate"), null);
+		final Flux<AuthorizationDecision> crowdAccess = pdp.decide(sub);
+		crowdAccess.subscribe(decision -> {
+			LOGGER.info("New crowdfunding access decision: {}", decision.getDecision());
+			getUI().ifPresent(ui -> ui.access(() -> {
+				if (Decision.PERMIT.equals(decision.getDecision())) {
+					templateSelect.setItemEnabledProvider(null);
+					ui.push();
+				}
+				else {
+					templateSelect.setItemEnabledProvider(item -> !BALL.equals(item));
+					ui.push();
+				}
+			}));
+		});
 	}
 
 	private EmbeddedPolicyDecisionPoint getPdp() throws IOException, URISyntaxException, PolicyEvaluationException,
@@ -211,6 +237,30 @@ public class MainView extends VerticalLayout {
 				.withFilesystemPolicyRetrievalPoint(absolutePath + "/policies", IndexType.SIMPLE)
 				.withPolicyInformationPoint(new EthereumPrinterPip())
 				.withPolicyInformationPoint(new EthereumPolicyInformationPoint()).build();
+	}
+
+	private Disposable printerAccessDecision() {
+		if (printerDisposable != null)
+			printerDisposable.dispose();
+		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),
+				JSON.textNode("start"), JSON.textNode(printerSelect.getValue()), null);
+		LOGGER.info("New printer subscription: {}", sub);
+		final Flux<AuthorizationDecision> printerAccessDecision = pdp.decide(sub);
+		Disposable disposable = printerAccessDecision.subscribe(decision -> {
+			LOGGER.info("New printer access decision: {}", decision.getDecision());
+			getUI().ifPresent(ui -> ui.access(() -> {
+				if (Decision.PERMIT.equals(decision.getDecision())) {
+					printerButton.setEnabled(true);
+					ui.push();
+				}
+				else {
+					printerButton.setEnabled(false);
+					ui.push();
+				}
+			}));
+		});
+		return disposable;
+
 	}
 
 }

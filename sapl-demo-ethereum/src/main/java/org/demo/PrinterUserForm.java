@@ -8,7 +8,7 @@ import org.demo.domain.PrinterUser;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
@@ -25,9 +25,12 @@ public class PrinterUserForm extends VerticalLayout {
 		String address = user.getEthereumAddress();
 
 		H2 userWelcome = new H2("Welcome " + username);
-		Paragraph showAddress = new Paragraph("Your registered Ethereum address: " + address);
+		Span showAddress = new Span("Your registered Ethereum address: " + address);
+		Span certExplain = new Span(
+				"With the following buttons you can issue or revoke a certificate on the blockchain "
+						+ "for the selected printer.");
 
-		VerticalLayout userShow = new VerticalLayout(userWelcome, showAddress);
+		VerticalLayout userShow = new VerticalLayout(userWelcome, showAddress, certExplain);
 
 		issue.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

@@ -1,11 +1,26 @@
 set "printerPolicies"
 deny-unless-permit
 
-policy "canPrint"
+policy "printWithUltimaker"
 permit
-  action=="print" & resource=="printer3D"
+  action=="start" & resource=="Ultimaker 2 Extended+"
 where
-  subject.<printer.certified>;
+  var request = {"address":subject.ethereumAddress, "printer":resource}
+  request.<printer.certified>;
+  
+policy "printWithGraftenOne"
+permit
+  action=="start" & resource=="Graften One"
+where
+  var request = {"address":subject.ethereumAddress, "printer":resource}
+  request.<printer.certified>;
+  
+policy "printWithZmorphVX"
+permit
+  action=="start" & resource=="Zmorph VX"
+where
+  var request = {"address":subject.ethereumAddress, "printer":resource}
+  request.<printer.certified>;
   
 policy "crowdTemplate"
 permit

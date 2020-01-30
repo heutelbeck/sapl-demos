@@ -31,8 +31,8 @@ public class EthRevokeCertificate {
 				new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
 
 		try {
-			String status1 = contract.revokeCertificate(GRADUATE).send().getStatus();
-			LOGGER.info("Status1", status1);
+			contract.revokeCertificate(GRADUATE).send().getStatus();
+
 		}
 		catch (Exception e) {
 			LOGGER.info("Exception occurred", e);
