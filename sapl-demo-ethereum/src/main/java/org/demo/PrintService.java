@@ -17,7 +17,7 @@ public class PrintService implements Serializable {
 		}
 		else {
 			try {
-				Thread.sleep(5000L);
+				Thread.sleep(3000L);
 			}
 			catch (InterruptedException e) {
 				Notification.show("Error while printing");

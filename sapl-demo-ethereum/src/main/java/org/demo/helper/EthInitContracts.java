@@ -13,7 +13,7 @@ import org.web3j.tx.gas.StaticGasProvider;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class EthRevokeCertificate {
+public class EthInitContracts {
 
 	private static final String ACCREDITATION_AUTHORITY_PRIVATE_KEY = "7bb90c8b20c4bfdc5833c5e94b36ec3fa050346f04441878a323eec3483960c4";
 

@@ -144,6 +144,7 @@ public class MainView extends VerticalLayout {
 		});
 
 		printerSelect = new Select<>();
+		printerSelect.setLabel("Printer");
 		printerSelect.setItems(ULTIMAKER, GRAFTEN, ZMORPH);
 		printerSelect.setValue(ULTIMAKER);
 		printerSelect.addValueChangeListener(event -> {

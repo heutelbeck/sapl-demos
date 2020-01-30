@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
@@ -23,17 +24,20 @@ public class EthConnect {
 
 	private static final String BOB_PRIVATE_KEY = "a5e729c5ad3500fd6b8a5ecc7ab7a21190fe2f4595aa52e6c3b8615420e6ddfe";
 
-	public static void makeDonation(String address, String value) {
+	public static TransactionReceipt makeDonation(String address, String value) {
 		Web3j web3j = Web3j.build(new HttpService());
 		Credentials credentials = getCredentials(address);
 		BigDecimal amount = new BigDecimal(value);
 		System.out.println(amount);
 
 		try {
-			Transfer.sendFunds(web3j, credentials, ACCREDITATION_AUTHORITY, amount, Convert.Unit.ETHER).send();
+			TransactionReceipt receipt = Transfer
+					.sendFunds(web3j, credentials, ACCREDITATION_AUTHORITY, amount, Convert.Unit.ETHER).send();
+			return receipt;
 		}
 		catch (Exception e) {
 			LOGGER.info("Donation failed {}", e);
+			return null;
 		}
 
 	}
