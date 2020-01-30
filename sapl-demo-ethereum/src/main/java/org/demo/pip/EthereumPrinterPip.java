@@ -54,7 +54,7 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 		return loadContractInformation(requestNode, variables).map(j -> j.get(0).get("value"));
 	}
 
-	private String getContractAddress(String printer) {
+	public static String getContractAddress(String printer) {
 		if (MainView.ULTIMAKER.equals(printer))
 			return ULTIMAKER_CONTRACT;
 		if (MainView.GRAFTEN.equals(printer))

@@ -118,9 +118,6 @@ public class MainView extends VerticalLayout {
 		printerImage.setSrc(currentPrinterImage);
 		printerImage.setSizeFull();
 
-		PrinterUserForm puForm = new PrinterUserForm(user);
-		CrowdfundingForm cfForm = new CrowdfundingForm(user);
-
 		templateSelect = new Select<>();
 		templateSelect.setPlaceholder("Select template...");
 		templateSelect.setItems(ROBOT, BOAT, ROCKET, BALL);
@@ -177,6 +174,9 @@ public class MainView extends VerticalLayout {
 
 			}
 		});
+
+		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect);
+		CrowdfundingForm cfForm = new CrowdfundingForm(user);
 
 		printerButton = new Button("Start printer", e -> {
 			service.print(templateSelect.getValue());

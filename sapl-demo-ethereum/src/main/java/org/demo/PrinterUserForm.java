@@ -11,6 +11,7 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 
 public class PrinterUserForm extends VerticalLayout {
 
@@ -20,7 +21,7 @@ public class PrinterUserForm extends VerticalLayout {
 
 	private Button revoke = new Button("Revoke Certificate");
 
-	public PrinterUserForm(PrinterUser user) {
+	public PrinterUserForm(PrinterUser user, Select<String> printerSelect) {
 		String username = user.getUsername();
 		String address = user.getEthereumAddress();
 
@@ -34,9 +35,9 @@ public class PrinterUserForm extends VerticalLayout {
 
 		issue.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-		issue.addClickListener(event -> issueCertificate(address));
+		issue.addClickListener(event -> issueCertificate(address, printerSelect.getValue()));
 
-		revoke.addClickListener(event -> revokeCertificate(address));
+		revoke.addClickListener(event -> revokeCertificate(address, printerSelect.getValue()));
 
 		HorizontalLayout buttons = new HorizontalLayout(issue, revoke);
 
