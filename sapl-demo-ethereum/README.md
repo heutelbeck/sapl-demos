@@ -14,4 +14,4 @@ Start the ganache client and select **New workspace**. Select the tab **Server**
 ```
 defense decade prosper portion dove educate sing auction camera minute sing loyal
 ```
-This way you will create the accounts used for the demo application.
+This way you will create the accounts used for the demo application. Then click on **Save Workspace** to and the blockchain will be started automatically.

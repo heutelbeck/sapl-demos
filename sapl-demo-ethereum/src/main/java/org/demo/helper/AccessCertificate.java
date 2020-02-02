@@ -41,7 +41,7 @@ public class AccessCertificate {
 		contract.revokeCertificate(address).sendAsync();
 	}
 
-	public static String getContractAddress(String printer) {
+	private static String getContractAddress(String printer) {
 		if (MainView.ULTIMAKER.equals(printer))
 			return ULTIMAKER_CONTRACT;
 		if (MainView.GRAFTEN.equals(printer))
