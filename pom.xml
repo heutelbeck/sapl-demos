@@ -48,6 +48,7 @@
 		<module>sapl-demo-pip-server</module>
 		<module>sapl-demo-reactive</module>
 		<module>sapl-demo-remote</module>
+		<module>sapl-demo-ethereum</module>
 	</modules>
 
 </project>
