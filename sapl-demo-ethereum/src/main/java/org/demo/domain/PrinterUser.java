@@ -21,7 +21,7 @@ public class PrinterUser extends User {
 	public PrinterUser(String userName, String password, String ethereumAddress,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(userName, password, authorities);
-		setEthereumAddress(ethereumAddress);
+		this.ethereumAddress = ethereumAddress;
 	}
 
 	@Override

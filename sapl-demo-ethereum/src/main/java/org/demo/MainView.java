@@ -3,8 +3,8 @@ package org.demo;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
@@ -35,7 +35,6 @@ import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.PDPConfigurationException;
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.interpreter.pip.EthereumPolicyInformationPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
@@ -94,7 +93,7 @@ public class MainView extends VerticalLayout {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
-	private List<String> disabledItems = new ArrayList<>();
+	private Set<String> disabledItems = new LinkedHashSet<>();
 
 	private PrinterUser user;
 
@@ -110,13 +109,10 @@ public class MainView extends VerticalLayout {
 
 	private Disposable printerDisposable;
 
-	private Disposable crowdDisposable;
-
-	private Disposable paidDisposable;
-
-	private PolicyDecisionPoint pdp;
+	private EmbeddedPolicyDecisionPoint pdp;
 
 	public MainView(PrintService service, PrinterUserService printerUserService) {
+
 		addClassName("main-view");
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -129,9 +125,6 @@ public class MainView extends VerticalLayout {
 		Button logout = new Button("Logout");
 		logout.setWidth("10%");
 		logout.addClickListener(e -> {
-			printerDisposable.dispose();
-			crowdDisposable.dispose();
-			paidDisposable.dispose();
 			getUI().ifPresent(ui -> {
 				ui.getPage().setLocation("/logout");
 				ui.getSession().close();
@@ -238,8 +231,8 @@ public class MainView extends VerticalLayout {
 		try {
 			pdp = getPdp();
 			printerDisposable = printerAccessDecision();
-			crowdDisposable = crowdAccessDecision();
-			paidDisposable = paidAccessDecision();
+			crowdAccessDecision();
+			paidAccessDecision();
 		}
 		catch (IOException | URISyntaxException | PolicyEvaluationException | PDPConfigurationException
 				| AttributeException | FunctionException e1) {
@@ -248,14 +241,14 @@ public class MainView extends VerticalLayout {
 
 	}
 
-	public Disposable paidAccessDecision() {
+	public final Disposable paidAccessDecision() {
 		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),
 				JSON.textNode("access"), JSON.textNode("paidTemplate"), null);
 		final Flux<AuthorizationDecision> paidAccess = pdp.decide(sub);
 		Disposable dis = paidAccess.subscribe(decision -> {
 			LOGGER.info("New paid access decision: {}", decision.getDecision());
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT.equals(decision.getDecision())) {
+				if (Decision.PERMIT == decision.getDecision()) {
 					while (disabledItems.contains(CUBES)) {
 						disabledItems.remove(CUBES);
 					}
@@ -275,7 +268,7 @@ public class MainView extends VerticalLayout {
 		Disposable dis = crowdAccess.subscribe(decision -> {
 			LOGGER.info("New crowdfunding access decision: {}", decision.getDecision());
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT.equals(decision.getDecision())) {
+				if (Decision.PERMIT == decision.getDecision()) {
 					disabledItems.remove(BALL);
 					templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
 					ui.push();
@@ -312,7 +305,7 @@ public class MainView extends VerticalLayout {
 		Disposable disposable = printerAccessDecision.subscribe(decision -> {
 			LOGGER.info("New printer access decision: {}", decision.getDecision());
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT.equals(decision.getDecision())) {
+				if (Decision.PERMIT == decision.getDecision()) {
 					printerButton.setEnabled(true);
 					printerStatus.setText("You are certified for the current printer.");
 					printerStatus.getStyle().set("color", "green");

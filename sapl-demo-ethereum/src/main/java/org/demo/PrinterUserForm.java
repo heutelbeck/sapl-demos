@@ -17,10 +17,6 @@ public class PrinterUserForm extends VerticalLayout {
 
 	private static final long serialVersionUID = 1949849828168713357L;
 
-	private Button issue = new Button("Issue Certificate");
-
-	private Button revoke = new Button("Revoke Certificate");
-
 	public PrinterUserForm(PrinterUser user, Select<String> printerSelect) {
 		String username = user.getUsername();
 		String address = user.getEthereumAddress();
@@ -33,10 +29,11 @@ public class PrinterUserForm extends VerticalLayout {
 
 		VerticalLayout userShow = new VerticalLayout(userWelcome, showAddress, certExplain);
 
+		Button issue = new Button("Issue Certificate");
 		issue.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
 		issue.addClickListener(event -> issueCertificate(address, printerSelect.getValue()));
 
+		Button revoke = new Button("Revoke Certificate");
 		revoke.addClickListener(event -> revokeCertificate(address, printerSelect.getValue()));
 
 		HorizontalLayout buttons = new HorizontalLayout(issue, revoke);

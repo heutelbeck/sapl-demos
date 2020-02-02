@@ -1,7 +1,7 @@
 package org.demo.domain;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -44,10 +44,14 @@ public class PrinterUserService implements UserDetailsService {
 	}
 
 	private void createDemoData(PasswordEncoder passwordEncoder) {
-		allPrinterUsers.put("Alice", new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
-				"0xE5a72C7Fa4991920619edCf25eD8828793045A53", Arrays.asList(new SimpleGrantedAuthority("USER"))));
-		allPrinterUsers.put("Bob", new PrinterUser("Bob", passwordEncoder.encode("Springsteen"),
-				"0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8", Arrays.asList(new SimpleGrantedAuthority("USER"))));
+		allPrinterUsers.put("Alice",
+				new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
+						"0xE5a72C7Fa4991920619edCf25eD8828793045A53",
+						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
+		allPrinterUsers.put("Bob",
+				new PrinterUser("Bob", passwordEncoder.encode("Springsteen"),
+						"0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8",
+						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
 
 	}
 
