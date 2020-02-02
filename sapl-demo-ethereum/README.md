@@ -1,24 +1,17 @@
-# Project Base for Vaadin and Spring Boot
+# SAPL Ethereum Demo
+This documentation shows how to start the SAPL Ethereum Demo and explains its features.
 
-This project can be used as a starting point to create your own Vaadin application with Spring Boot.
-It contains all the necessary configuration and some placeholder files to get you started.
+## Getting started
+First, you should clone this repository with
 
-The best way to create your own project based on this starter is [start.vaadin.com](https://start.vaadin.com/) - you can get only the necessary parts and choose the package naming you want to use.
+```
+git clone https://github.com/heutelbeck/sapl-demos.git
+```
 
-## Running the Application
+Then you have to download the Ganache client from [here](https://www.trufflesuite.com/ganache).
+Start the ganache client and select **New workspace**. Select the tab **Server** and set the portnumber to 8545. Then select the **Accounts & Keys** tab and enter the following mnemonic:
 
-Import the project to the IDE of your choosing as a Maven project.
-
-Run the application using `mvn spring-boot:run` or by running the `Application` class directly from your IDE.
-
-Open http://localhost:8080/ in your browser.
-
-If you want to run the application locally in the production mode, run `mvn spring-boot:run -Pproduction`.
-
-To run Integration Tests, execute `mvn verify -Pintegration-tests`.
-
-## More Information
-
-- [Vaadin Flow](https://vaadin.com/flow) documentation
-- [Using Vaadin and Spring](https://vaadin.com/docs/v14/flow/spring/tutorial-spring-basic.html) article
-
+```
+defense decade prosper portion dove educate sing auction camera minute sing loyal
+```
+This way you will create the accounts used for the demo application.
