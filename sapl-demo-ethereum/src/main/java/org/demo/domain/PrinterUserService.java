@@ -8,19 +8,20 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.vaadin.flow.spring.annotation.SpringComponent;
+
 @Service
+@SpringComponent
 public class PrinterUserService implements UserDetailsService {
 
 	private final HashMap<String, PrinterUser> allPrinterUsers = new HashMap<>();
 
-	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-	public PrinterUserService() {
-		createDemoData();
+	public PrinterUserService(PasswordEncoder passwordEncoder) {
+		if (allPrinterUsers.isEmpty())
+			createDemoData(passwordEncoder);
 	}
 
 	public synchronized void delete(PrinterUser value) {
@@ -42,7 +43,7 @@ public class PrinterUserService implements UserDetailsService {
 		return allPrinterUsers.values();
 	}
 
-	private void createDemoData() {
+	private void createDemoData(PasswordEncoder passwordEncoder) {
 		allPrinterUsers.put("Alice", new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
 				"0xE5a72C7Fa4991920619edCf25eD8828793045A53", Arrays.asList(new SimpleGrantedAuthority("USER"))));
 		allPrinterUsers.put("Bob", new PrinterUser("Bob", passwordEncoder.encode("Springsteen"),

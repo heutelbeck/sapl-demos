@@ -40,6 +40,7 @@ public class PrinterUserForm extends VerticalLayout {
 		revoke.addClickListener(event -> revokeCertificate(address, printerSelect.getValue()));
 
 		HorizontalLayout buttons = new HorizontalLayout(issue, revoke);
+		buttons.getStyle().set("margin-left", "20px");
 
 		add(userShow, buttons);
 

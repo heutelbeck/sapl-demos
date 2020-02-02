@@ -27,4 +27,16 @@ permit
   action=="access" & resource=="crowdTemplate"
 where
   var request = {"address":subject.<ethereum.coinbase>};
-  request.<ethereum.balance> >= 103000000000000000000;
+  request.<ethereum.balance> >= 118000000000000000000;
+  
+policy "paidTemplate"
+permit
+  action=="access" & resource=="paidTemplate"
+where
+  var request = {
+                 "transactionHash":subject.transactionHash,
+                 "fromAccount":subject.ethereumAddress,
+                 "toAccount":subject.<ethereum.coinbase>,
+                 "transactionValue":1000000000000000000
+                 };
+  request.<ethereum.transaction>;

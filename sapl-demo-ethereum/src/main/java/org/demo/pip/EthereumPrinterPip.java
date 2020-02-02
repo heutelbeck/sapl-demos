@@ -19,12 +19,6 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 
 	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	private static final String ULTIMAKER_CONTRACT = "0x1Ac704bD40B82E12c4a1808618F4d62a3A457869";
-
-	private static final String GRAFTEN_CONTRACT = "0x6B74dc232B0035A9f6E725B406572A6D9583fa61";
-
-	private static final String ZMORPH_CONTRACT = "0x5ef552965503CFf922c781b3178f5e4FB3519Fee";
-
 	private static final String ADDRESS = "address";
 
 	private static final String BOOL = "bool";
@@ -37,7 +31,7 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 	public Flux<JsonNode> certified(JsonNode saplObject, Map<String, JsonNode> variables) {
 		String address = saplObject.get("address").textValue();
 		String printer = saplObject.get("printer").textValue();
-		String contractAddress = getContractAddress(printer);
+		String contractAddress = getContractAddress(printer, variables);
 
 		ObjectNode requestNode = JSON.objectNode();
 		requestNode.put("contractAddress", contractAddress);
@@ -54,13 +48,13 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 		return loadContractInformation(requestNode, variables).map(j -> j.get(0).get("value"));
 	}
 
-	public static String getContractAddress(String printer) {
+	public static String getContractAddress(String printer, Map<String, JsonNode> variables) {
 		if (MainView.ULTIMAKER.equals(printer))
-			return ULTIMAKER_CONTRACT;
+			return variables.get(MainView.ULTIMAKER).textValue();
 		if (MainView.GRAFTEN.equals(printer))
-			return GRAFTEN_CONTRACT;
+			return variables.get(MainView.GRAFTEN).textValue();
 		if (MainView.ZMORPH.equals(printer))
-			return ZMORPH_CONTRACT;
+			return variables.get(MainView.ZMORPH).textValue();
 		return "";
 	}
 

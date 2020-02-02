@@ -16,6 +16,8 @@ public class PrinterUser extends User {
 
 	private String ethereumAddress;
 
+	private String transactionHash;
+
 	public PrinterUser(String userName, String password, String ethereumAddress,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(userName, password, authorities);

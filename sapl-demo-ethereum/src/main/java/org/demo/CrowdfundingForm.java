@@ -5,6 +5,7 @@ import static org.demo.helper.EthConnect.makeDonation;
 import org.demo.domain.PrinterUser;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Input;
 import com.vaadin.flow.component.html.Label;
@@ -20,13 +21,16 @@ public class CrowdfundingForm extends VerticalLayout {
 
 		H2 crowdfunding = new H2("Crowdfunding");
 		Paragraph explanation = new Paragraph(
-				"We also need your help to maintain our printer service. Once our donation goal is reached, we will unlock a new template for the community.");
+				"We also need your help to maintain our printer service. Once our donation goal has been reached, we will unlock a "
+						+ "new template for the community.");
 
 		Input donationField = new Input();
 		Label unit = new Label("ETH");
+		unit.getStyle().set("margin-top", "10px");
 
 		Button donate = new Button("Donate");
-		donate.addClickListener(event -> makeDonation(user.getEthereumAddress(), donationField.getValue()));
+		donate.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		donate.addClickListener(event -> makeDonation(user, donationField.getValue()));
 
 		HorizontalLayout donation = new HorizontalLayout(donationField, unit, donate);
 
