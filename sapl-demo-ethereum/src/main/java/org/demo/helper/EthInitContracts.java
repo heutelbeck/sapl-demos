@@ -1,7 +1,10 @@
 package org.demo.helper;
 
+import static org.demo.helper.AccessCertificate.getContractAddress;
+
 import java.math.BigInteger;
 
+import org.demo.MainView;
 import org.demo.helper.contracts.GraftenOneCertificate;
 import org.demo.helper.contracts.Ultimaker2ExtendedCertificate;
 import org.demo.helper.contracts.ZmorphVXCertificate;
@@ -19,12 +22,6 @@ public class EthInitContracts {
 
 	private static final String ACCREDITATION_AUTHORITY = "0x3924F456CC0196ff89AAbbD6192289a9B37De73A";
 
-	private static final String ULTIMAKER_CONTRACT = "0x1Ac704bD40B82E12c4a1808618F4d62a3A457869";
-
-	private static final String GRAFTEN_CONTRACT = "0x6B74dc232B0035A9f6E725B406572A6D9583fa61";
-
-	private static final String ZMORPH_CONTRACT = "0x5ef552965503CFf922c781b3178f5e4FB3519Fee";
-
 	private static final BigInteger GAS_PRICE = BigInteger.valueOf(20000000000L);
 
 	private static final BigInteger GAS_LIMIT = BigInteger.valueOf(6721975L);
@@ -33,11 +30,12 @@ public class EthInitContracts {
 		Web3j web3j = Web3j.build(new HttpService());
 
 		Credentials credentials = Credentials.create(ACCREDITATION_AUTHORITY_PRIVATE_KEY);
-		Ultimaker2ExtendedCertificate ultimaker = Ultimaker2ExtendedCertificate.load(ULTIMAKER_CONTRACT, web3j,
-				credentials, new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
-		GraftenOneCertificate graften = GraftenOneCertificate.load(GRAFTEN_CONTRACT, web3j, credentials,
+		Ultimaker2ExtendedCertificate ultimaker = Ultimaker2ExtendedCertificate.load(
+				getContractAddress(MainView.ULTIMAKER), web3j, credentials,
 				new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
-		ZmorphVXCertificate zmorph = ZmorphVXCertificate.load(ZMORPH_CONTRACT, web3j, credentials,
+		GraftenOneCertificate graften = GraftenOneCertificate.load(getContractAddress(MainView.GRAFTEN), web3j,
+				credentials, new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
+		ZmorphVXCertificate zmorph = ZmorphVXCertificate.load(getContractAddress(MainView.ZMORPH), web3j, credentials,
 				new StaticGasProvider(GAS_PRICE, GAS_LIMIT));
 
 		try {

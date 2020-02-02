@@ -1,6 +1,8 @@
 package org.demo.helper;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Path;
 
 import org.demo.MainView;
 import org.demo.helper.contracts.Device_Operator_Certificate;
@@ -9,19 +11,26 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.StaticGasProvider;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class AccessCertificate {
 
-	private static final String ULTIMAKER_CONTRACT = "0x1Ac704bD40B82E12c4a1808618F4d62a3A457869";
-
-	private static final String GRAFTEN_CONTRACT = "0x6B74dc232B0035A9f6E725B406572A6D9583fa61";
-
-	private static final String ZMORPH_CONTRACT = "0x5ef552965503CFf922c781b3178f5e4FB3519Fee";
+	private static final Path CONFIG_PATH = Path.of("src/main/resources/policies/pdp.json");
 
 	private static final String ACCREDITATION_AUTHORITY_PRIVATE_KEY = "7bb90c8b20c4bfdc5833c5e94b36ec3fa050346f04441878a323eec3483960c4";
 
 	private static final BigInteger GAS_PRICE = BigInteger.valueOf(20000000000L);
 
 	private static final BigInteger GAS_LIMIT = BigInteger.valueOf(6721975L);
+
+	private static final ObjectMapper mapper = new ObjectMapper();
+
+	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
 	public static void issueCertificate(String address, String printer) {
 		Web3j web3j = Web3j.build(new HttpService());
@@ -41,13 +50,25 @@ public class AccessCertificate {
 		contract.revokeCertificate(address).sendAsync();
 	}
 
-	private static String getContractAddress(String printer) {
-		if (MainView.ULTIMAKER.equals(printer))
-			return ULTIMAKER_CONTRACT;
-		if (MainView.GRAFTEN.equals(printer))
-			return GRAFTEN_CONTRACT;
-		if (MainView.ZMORPH.equals(printer))
-			return ZMORPH_CONTRACT;
+	public static String getContractAddress(String printer) {
+		JsonNode variables = JSON.objectNode();
+		try {
+			JsonNode config = mapper.readValue(CONFIG_PATH.toFile(), JsonNode.class);
+			LOGGER.info("{}", config);
+			variables = config.get("variables");
+			LOGGER.info("{}", variables);
+			if (MainView.ULTIMAKER.equals(printer)) {
+				return variables.get(MainView.ULTIMAKER).textValue();
+			}
+			if (MainView.GRAFTEN.equals(printer))
+				return variables.get(MainView.GRAFTEN).textValue();
+			if (MainView.ZMORPH.equals(printer))
+				return variables.get(MainView.ZMORPH).textValue();
+		}
+		catch (IOException e) {
+			LOGGER.info("Conifguration file for contracts not found.");
+		}
+
 		return "";
 	}
 }
