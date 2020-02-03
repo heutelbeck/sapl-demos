@@ -149,3 +149,4 @@ With the **coinbase** method, we can get the address of the application owner ru
 
 ### The domain specific PIP
 Maybe you noticed, that the first policy uses another PIP than the other policies. This PIP called **printer** is a domain-specific PIP for our demo application. Since the EthereumPIP provides general functions, it can be useful to implement such a domain-specific PIP to avoid complicated authentication requests. We can easily save the non-changing values of the request there and then call a functoin of the EthereumPIP. Moreover, this way we can adapt the names of PIP and attributes to fit in our domain.
+
