@@ -249,9 +249,7 @@ public class MainView extends VerticalLayout {
 			LOGGER.info("New paid access decision: {}", decision.getDecision());
 			getUI().ifPresent(ui -> ui.access(() -> {
 				if (Decision.PERMIT == decision.getDecision()) {
-					while (disabledItems.contains(CUBES)) {
-						disabledItems.remove(CUBES);
-					}
+					disabledItems.remove(CUBES);
 					System.out.println(disabledItems);
 					templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
 					ui.push();

@@ -25,8 +25,13 @@ public class PrinterUser extends User {
 	}
 
 	@Override
-	public PrinterUser clone() throws CloneNotSupportedException {
-		return (PrinterUser) super.clone();
+	public boolean equals(Object user) {
+		PrinterUser printerUser = (PrinterUser) user;
+		if (this.ethereumAddress.equals(printerUser.ethereumAddress)
+				&& this.transactionHash.equals(printerUser.transactionHash))
+			return super.equals(user);
+		return false;
+
 	}
 
 }
