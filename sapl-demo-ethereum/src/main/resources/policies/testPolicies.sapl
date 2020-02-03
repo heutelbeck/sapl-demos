@@ -27,7 +27,7 @@ permit
   action=="access" & resource=="crowdTemplate"
 where
   var request = {"address":subject.<ethereum.coinbase>};
-  request.<ethereum.balance> >= 118000000000000000000;
+  request.<ethereum.balance> >= 105000000000000000000;
   
 policy "paidTemplate"
 permit
