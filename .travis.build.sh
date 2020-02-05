@@ -5,7 +5,9 @@ if [ -z "${TRAVIS}" ]; then
     TRAVIS_BRANCH="local"
     TRAVIS_PULL_REQUEST="false"
 fi
-
+cd sapl-demo-web-editor
+mvn com.github.eirslett:frontend-maven-plugin:1.7.6:install-node-and-npm -DnodeVersion="v12.14.0"
+cd ..
 if [ "${TRAVIS_BRANCH}" == "master" ]; then
     if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
         echo "Building master"
@@ -15,6 +17,6 @@ if [ "${TRAVIS_BRANCH}" == "master" ]; then
         mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify --batch-mode
     fi
 else
-    echo "Building branch ${TRAVIS_BRANCH}"
+    echo "Building branch ${TRAVIS_BRANCH}"     
     mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify --batch-mode
 fi
