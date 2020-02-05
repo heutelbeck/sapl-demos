@@ -10,7 +10,6 @@ android:
      - build-tools-26.0.2
 jdk:
   - openjdk8
-#  - openjdk12
 # skip "mvn install -skipTexts=true" before building
 install: true
 env:

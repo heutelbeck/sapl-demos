@@ -2,10 +2,10 @@ package org.demo.helper;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.file.Path;
 
 import org.demo.MainView;
 import org.demo.helper.contracts.Device_Operator_Certificate;
+import org.springframework.util.ResourceUtils;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AccessCertificate {
 
-	private static final Path CONFIG_PATH = Path.of("src/main/resources/policies/pdp.json");
+	private static final String CONFIG_PATH = "classpath:policies/pdp.json";
 
 	private static final String ACCREDITATION_AUTHORITY_PRIVATE_KEY = "7bb90c8b20c4bfdc5833c5e94b36ec3fa050346f04441878a323eec3483960c4";
 
@@ -53,7 +53,7 @@ public class AccessCertificate {
 	public static String getContractAddress(String printer) {
 		JsonNode variables = JSON.objectNode();
 		try {
-			JsonNode config = mapper.readValue(CONFIG_PATH.toFile(), JsonNode.class);
+			JsonNode config = mapper.readValue(ResourceUtils.getFile(CONFIG_PATH), JsonNode.class);
 			LOGGER.info("{}", config);
 			variables = config.get("variables");
 			LOGGER.info("{}", variables);
@@ -64,8 +64,7 @@ public class AccessCertificate {
 				return variables.get(MainView.GRAFTEN).textValue();
 			if (MainView.ZMORPH.equals(printer))
 				return variables.get(MainView.ZMORPH).textValue();
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			LOGGER.info("Conifguration file for contracts not found.");
 		}
 
