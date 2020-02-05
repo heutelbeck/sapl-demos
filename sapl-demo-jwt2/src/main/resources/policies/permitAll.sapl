@@ -1,5 +1,0 @@
-/*
- * This policy permits access to all resources
- */
-policy "permitAll"
-permit
