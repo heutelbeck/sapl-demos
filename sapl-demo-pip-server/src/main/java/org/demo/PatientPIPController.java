@@ -1,7 +1,5 @@
 package org.demo;
 
-import java.util.Map;
-
 import org.demo.pip.PatientPIP;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

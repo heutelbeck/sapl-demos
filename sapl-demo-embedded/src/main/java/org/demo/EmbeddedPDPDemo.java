@@ -166,7 +166,7 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
 
-	private static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
+	protected static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi...");
 
 		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
@@ -189,7 +189,7 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
 	}
 
-	private static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
+	protected static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
 		LOGGER.info("Performance Multi All...");
 
 		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
