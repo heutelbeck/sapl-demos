@@ -25,9 +25,36 @@ public class PrinterUser extends User {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		return super.equals(o);
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((ethereumAddress == null) ? 0 : ethereumAddress.hashCode());
+		result = prime * result + ((transactionHash == null) ? 0 : transactionHash.hashCode());
+		return result;
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PrinterUser other = (PrinterUser) obj;
+		if (ethereumAddress == null) {
+			if (other.ethereumAddress != null)
+				return false;
+		}
+		else if (!ethereumAddress.equals(other.ethereumAddress))
+			return false;
+		if (transactionHash == null) {
+			if (other.transactionHash != null)
+				return false;
+		}
+		else if (!transactionHash.equals(other.transactionHash))
+			return false;
+		return true;
 	}
 
 }
