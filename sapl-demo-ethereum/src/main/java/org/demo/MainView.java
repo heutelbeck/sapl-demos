@@ -99,10 +99,8 @@ public class MainView extends VerticalLayout {
 
 	private Disposable printerDisposable;
 
-	private PolicyDecisionPoint pdp;
-
 	public MainView(PrintService service, PrinterUserService printerUserService, PolicyDecisionPoint pdp) {
-		this.pdp = pdp;
+
 		addClassName("main-view");
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -168,19 +166,19 @@ public class MainView extends VerticalLayout {
 			String printer = event.getValue();
 			switch (printer) {
 			case ULTIMAKER:
-				printerDisposable = printerAccessDecision();
+				printerDisposable = printerAccessDecision(pdp);
 				currentPrinterImage = ULTIMAKER_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
 				break;
 			case GRAFTEN:
-				printerDisposable = printerAccessDecision();
+				printerDisposable = printerAccessDecision(pdp);
 				currentPrinterImage = GRAFTEN_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
 				break;
 			case ZMORPH:
-				printerDisposable = printerAccessDecision();
+				printerDisposable = printerAccessDecision(pdp);
 				currentPrinterImage = ZMORPH_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
@@ -206,7 +204,7 @@ public class MainView extends VerticalLayout {
 
 		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect);
 		CrowdfundingForm cfForm = new CrowdfundingForm(user);
-		PayForm payForm = new PayForm(user, this);
+		PayForm payForm = new PayForm(user, this, pdp);
 
 		VerticalLayout userAndCrowd = new VerticalLayout(puForm, printerStatus, payForm, cfForm);
 		HorizontalLayout buttonField = new HorizontalLayout(templateSelect, printerButton);
@@ -218,13 +216,13 @@ public class MainView extends VerticalLayout {
 		printerImage.setSizeFull();
 		setSizeFull();
 
-		printerDisposable = printerAccessDecision();
-		crowdAccessDecision();
-		paidAccessDecision();
+		printerDisposable = printerAccessDecision(pdp);
+		crowdAccessDecision(pdp);
+		paidAccessDecision(pdp);
 
 	}
 
-	public final Disposable paidAccessDecision() {
+	public final Disposable paidAccessDecision(PolicyDecisionPoint pdp) {
 		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),
 				JSON.textNode("access"), JSON.textNode("paidTemplate"), null);
 		final Flux<AuthorizationDecision> paidAccess = pdp.decide(sub);
@@ -242,7 +240,7 @@ public class MainView extends VerticalLayout {
 		return dis;
 	}
 
-	private Disposable crowdAccessDecision() {
+	private Disposable crowdAccessDecision(PolicyDecisionPoint pdp) {
 		AuthorizationSubscription sub = new AuthorizationSubscription(JSON.textNode(user.getEthereumAddress()),
 				JSON.textNode("access"), JSON.textNode("crowdTemplate"), null);
 		final Flux<AuthorizationDecision> crowdAccess = pdp.decide(sub);
@@ -276,7 +274,7 @@ public class MainView extends VerticalLayout {
 //				.withPolicyInformationPoint(new EthereumPolicyInformationPoint()).build();
 //	}
 
-	private Disposable printerAccessDecision() {
+	private Disposable printerAccessDecision(PolicyDecisionPoint pdp) {
 		if (printerDisposable != null)
 			printerDisposable.dispose();
 		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),

@@ -14,7 +14,7 @@
         <vaadin.version>14.1.5</vaadin.version>
         <drivers.dir>${project.basedir}/drivers</drivers.dir>
         <drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
-        <sonar.exclusions>src/main/java/org/demo/helper/contracts/*</sonar.exclusions>
+        <sonar.exclusions>**/org/demo/helper/contracts/*.java</sonar.exclusions>
     </properties>
 
     <parent>
