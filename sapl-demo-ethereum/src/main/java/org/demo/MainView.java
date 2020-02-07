@@ -1,14 +1,10 @@
 package org.demo;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
-import org.demo.pip.EthereumPrinterPip;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -29,16 +25,10 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PDPConfigurationException;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.interpreter.pip.EthereumPolicyInformationPoint;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -109,10 +99,10 @@ public class MainView extends VerticalLayout {
 
 	private Disposable printerDisposable;
 
-	private EmbeddedPolicyDecisionPoint pdp;
+	private PolicyDecisionPoint pdp;
 
-	public MainView(PrintService service, PrinterUserService printerUserService) {
-
+	public MainView(PrintService service, PrinterUserService printerUserService, PolicyDecisionPoint pdp) {
+		this.pdp = pdp;
 		addClassName("main-view");
 
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -228,16 +218,9 @@ public class MainView extends VerticalLayout {
 		printerImage.setSizeFull();
 		setSizeFull();
 
-		try {
-			pdp = getPdp();
-			printerDisposable = printerAccessDecision();
-			crowdAccessDecision();
-			paidAccessDecision();
-		}
-		catch (IOException | URISyntaxException | PolicyEvaluationException | PDPConfigurationException
-				| AttributeException | FunctionException e1) {
-			LOGGER.info("Connection to Policy Decision Point failed. Policy features not available.");
-		}
+		printerDisposable = printerAccessDecision();
+		crowdAccessDecision();
+		paidAccessDecision();
 
 	}
 
@@ -281,17 +264,17 @@ public class MainView extends VerticalLayout {
 		return dis;
 	}
 
-	private EmbeddedPolicyDecisionPoint getPdp() throws IOException, URISyntaxException, PolicyEvaluationException,
-			PDPConfigurationException, AttributeException, FunctionException {
-		String path = "src/main/resources";
-		File file = new File(path);
-		String absolutePath = file.getAbsolutePath();
-
-		return EmbeddedPolicyDecisionPoint.builder().withFilesystemPDPConfigurationProvider(absolutePath + "/policies")
-				.withFilesystemPolicyRetrievalPoint(absolutePath + "/policies", IndexType.SIMPLE)
-				.withPolicyInformationPoint(new EthereumPrinterPip())
-				.withPolicyInformationPoint(new EthereumPolicyInformationPoint()).build();
-	}
+//	private EmbeddedPolicyDecisionPoint getPdp() throws IOException, URISyntaxException, PolicyEvaluationException,
+//			PDPConfigurationException, AttributeException, FunctionException {
+//		String path = "src/main/resources";
+//		File file = new File(path);
+//		String absolutePath = file.getAbsolutePath();
+//
+//		return EmbeddedPolicyDecisionPoint.builder().withFilesystemPDPConfigurationProvider(absolutePath + "/policies")
+//				.withFilesystemPolicyRetrievalPoint(absolutePath + "/policies", IndexType.SIMPLE)
+//				.withPolicyInformationPoint(new EthereumPrinterPip())
+//				.withPolicyInformationPoint(new EthereumPolicyInformationPoint()).build();
+//	}
 
 	private Disposable printerAccessDecision() {
 		if (printerDisposable != null)

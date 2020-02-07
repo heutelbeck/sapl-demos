@@ -131,14 +131,15 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-ethereum</artifactId>
+			<artifactId>sapl-spring-boot-starter</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-pdp-embedded</artifactId>
+			<artifactId>sapl-ethereum</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
@@ -180,16 +181,15 @@
                 </executions> -->
             </plugin>
             
- <!--           <plugin>
+            <plugin>
                 <groupId>org.jacoco</groupId>
 			    <artifactId>jacoco-maven-plugin</artifactId>
-			    <version>0.8.5</version>
 			    <configuration>
     				<excludes>
         				<exclude>org/demo/helper/contracts/*</exclude>
 					</excludes>
 				</configuration>
-			</plugin> -->
+			</plugin>
             
         </plugins>
     </build>
