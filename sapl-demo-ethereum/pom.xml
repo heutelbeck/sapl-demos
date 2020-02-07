@@ -120,7 +120,7 @@
 		<dependency>
     		<groupId>org.springframework.security</groupId>
     		<artifactId>spring-security-config</artifactId>
-		</dependency>
+		</dependency>	
         <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-testbench</artifactId>
@@ -179,6 +179,18 @@
                     </execution>
                 </executions> -->
             </plugin>
+            
+            <plugin>
+                <groupId>org.jacoco</groupId>
+			    <artifactId>jacoco-maven-plugin</artifactId>
+			    <version>0.8.5</version>
+			    <configuration>
+    				<excludes>
+        				<exclude>org/demo/helper/contracts/*</exclude>
+				    </excludes>
+				</configuration>
+			</plugin>
+            
         </plugins>
     </build>
 
