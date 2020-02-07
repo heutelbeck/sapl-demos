@@ -217,7 +217,7 @@ public class MainView extends VerticalLayout {
 
 	}
 
-	public void paidAccessDecision(PrinterDecisionHandler handler, PrinterUser user) {
+	private void paidAccessDecision(PrinterDecisionHandler handler, PrinterUser user) {
 		Flux<Decision> decisionFlux = handler.paidAccessDecision(user);
 		decisionFlux.subscribe(decision -> {
 			LOGGER.info("New paid access decision: {}", decision);
