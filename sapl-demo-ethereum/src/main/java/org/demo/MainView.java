@@ -1,16 +1,16 @@
 package org.demo;
 
+import static org.demo.helper.EthConnect.makePayment;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.demo.decision.PrinterDecisionHandler;
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -25,12 +25,8 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 
-import io.sapl.api.pdp.AuthorizationDecision;
-import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 
 /**
@@ -63,8 +59,6 @@ public class MainView extends VerticalLayout {
 
 	private static final String CUBES = "Cubes";
 
-	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
-
 	private static final String GRAFTEN_IMAGE = "https://cdn.pixabay.com/photo/2017/10/13/15/39/printer-2847967_960_720.jpg";
 
 	private static final String ULTIMAKER_IMAGE = "https://cdn.pixabay.com/photo/2016/06/13/21/33/printer-1455169_960_720.jpg";
@@ -81,8 +75,6 @@ public class MainView extends VerticalLayout {
 
 	private static final String CUBES_IMAGE = "https://cdn.pixabay.com/photo/2019/04/17/17/55/calibration-cube-4134916_960_720.jpg";
 
-	private static final ObjectMapper mapper = new ObjectMapper();
-
 	private Set<String> disabledItems = new LinkedHashSet<>();
 
 	private PrinterUser user;
@@ -97,9 +89,7 @@ public class MainView extends VerticalLayout {
 
 	private Span printerStatus;
 
-	private Disposable printerDisposable;
-
-	public MainView(PrintService service, PrinterUserService printerUserService, PolicyDecisionPoint pdp) {
+	public MainView(PrintService service, PrinterUserService printerUserService, PrinterDecisionHandler handler) {
 
 		addClassName("main-view");
 
@@ -166,19 +156,19 @@ public class MainView extends VerticalLayout {
 			String printer = event.getValue();
 			switch (printer) {
 			case ULTIMAKER:
-				printerDisposable = printerAccessDecision(pdp);
+				printerAccessDecision(handler, user);
 				currentPrinterImage = ULTIMAKER_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
 				break;
 			case GRAFTEN:
-				printerDisposable = printerAccessDecision(pdp);
+				printerAccessDecision(handler, user);
 				currentPrinterImage = GRAFTEN_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
 				break;
 			case ZMORPH:
-				printerDisposable = printerAccessDecision(pdp);
+				printerAccessDecision(handler, user);
 				currentPrinterImage = ZMORPH_IMAGE;
 				printerImage.setSrc(currentPrinterImage);
 				templateSelect.setValue("");
@@ -204,7 +194,12 @@ public class MainView extends VerticalLayout {
 
 		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect);
 		CrowdfundingForm cfForm = new CrowdfundingForm(user);
-		PayForm payForm = new PayForm(user, this, pdp);
+		PayForm payForm = new PayForm(user);
+		Button pay = payForm.getPay();
+		pay.addClickListener(event -> {
+			makePayment(user, "1");
+			paidAccessDecision(handler, user);
+		});
 
 		VerticalLayout userAndCrowd = new VerticalLayout(puForm, printerStatus, payForm, cfForm);
 		HorizontalLayout buttonField = new HorizontalLayout(templateSelect, printerButton);
@@ -216,20 +211,18 @@ public class MainView extends VerticalLayout {
 		printerImage.setSizeFull();
 		setSizeFull();
 
-		printerDisposable = printerAccessDecision(pdp);
-		crowdAccessDecision(pdp);
-		paidAccessDecision(pdp);
+		printerAccessDecision(handler, user);
+		crowdAccessDecision(handler, user);
+		paidAccessDecision(handler, user);
 
 	}
 
-	public final Disposable paidAccessDecision(PolicyDecisionPoint pdp) {
-		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),
-				JSON.textNode("access"), JSON.textNode("paidTemplate"), null);
-		final Flux<AuthorizationDecision> paidAccess = pdp.decide(sub);
-		Disposable dis = paidAccess.subscribe(decision -> {
-			LOGGER.info("New paid access decision: {}", decision.getDecision());
+	public void paidAccessDecision(PrinterDecisionHandler handler, PrinterUser user) {
+		Flux<Decision> decisionFlux = handler.paidAccessDecision(user);
+		decisionFlux.subscribe(decision -> {
+			LOGGER.info("New paid access decision: {}", decision);
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT == decision.getDecision()) {
+				if (Decision.PERMIT == decision) {
 					disabledItems.remove(CUBES);
 					System.out.println(disabledItems);
 					templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
@@ -237,17 +230,14 @@ public class MainView extends VerticalLayout {
 				}
 			}));
 		});
-		return dis;
 	}
 
-	private Disposable crowdAccessDecision(PolicyDecisionPoint pdp) {
-		AuthorizationSubscription sub = new AuthorizationSubscription(JSON.textNode(user.getEthereumAddress()),
-				JSON.textNode("access"), JSON.textNode("crowdTemplate"), null);
-		final Flux<AuthorizationDecision> crowdAccess = pdp.decide(sub);
-		Disposable dis = crowdAccess.subscribe(decision -> {
-			LOGGER.info("New crowdfunding access decision: {}", decision.getDecision());
+	private void crowdAccessDecision(PrinterDecisionHandler handler, PrinterUser user) {
+		Flux<Decision> decisionFlux = handler.crowdAccessDecision(user);
+		decisionFlux.subscribe(decision -> {
+			LOGGER.info("New crowdfunding access decision: {}", decision);
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT == decision.getDecision()) {
+				if (Decision.PERMIT == decision) {
 					disabledItems.remove(BALL);
 					templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
 					ui.push();
@@ -259,32 +249,14 @@ public class MainView extends VerticalLayout {
 				}
 			}));
 		});
-		return dis;
 	}
 
-//	private EmbeddedPolicyDecisionPoint getPdp() throws IOException, URISyntaxException, PolicyEvaluationException,
-//			PDPConfigurationException, AttributeException, FunctionException {
-//		String path = "src/main/resources";
-//		File file = new File(path);
-//		String absolutePath = file.getAbsolutePath();
-//
-//		return EmbeddedPolicyDecisionPoint.builder().withFilesystemPDPConfigurationProvider(absolutePath + "/policies")
-//				.withFilesystemPolicyRetrievalPoint(absolutePath + "/policies", IndexType.SIMPLE)
-//				.withPolicyInformationPoint(new EthereumPrinterPip())
-//				.withPolicyInformationPoint(new EthereumPolicyInformationPoint()).build();
-//	}
-
-	private Disposable printerAccessDecision(PolicyDecisionPoint pdp) {
-		if (printerDisposable != null)
-			printerDisposable.dispose();
-		AuthorizationSubscription sub = new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class),
-				JSON.textNode("start"), JSON.textNode(printerSelect.getValue()), null);
-		LOGGER.info("New printer subscription: {}", sub);
-		final Flux<AuthorizationDecision> printerAccessDecision = pdp.decide(sub);
-		Disposable disposable = printerAccessDecision.subscribe(decision -> {
-			LOGGER.info("New printer access decision: {}", decision.getDecision());
+	private void printerAccessDecision(PrinterDecisionHandler handler, PrinterUser user) {
+		Flux<Decision> decisionFlux = handler.printerAccessDecision(user, printerSelect.getValue());
+		decisionFlux.subscribe(decision -> {
+			LOGGER.info("New printer access decision: {}", decision);
 			getUI().ifPresent(ui -> ui.access(() -> {
-				if (Decision.PERMIT == decision.getDecision()) {
+				if (Decision.PERMIT == decision) {
 					printerButton.setEnabled(true);
 					printerStatus.setText("You are certified for the current printer.");
 					printerStatus.getStyle().set("color", "green");
@@ -298,7 +270,6 @@ public class MainView extends VerticalLayout {
 				}
 			}));
 		});
-		return disposable;
 
 	}
 

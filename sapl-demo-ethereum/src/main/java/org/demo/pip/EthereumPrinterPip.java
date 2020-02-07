@@ -3,6 +3,7 @@ package org.demo.pip;
 import java.util.Map;
 
 import org.demo.MainView;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -14,6 +15,7 @@ import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.interpreter.pip.EthereumPolicyInformationPoint;
 import reactor.core.publisher.Flux;
 
+@Component
 @PolicyInformationPoint(name = "printer", description = "Domain specific PIP for printer usage")
 public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 
