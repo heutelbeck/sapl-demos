@@ -104,6 +104,7 @@ public class MainView extends VerticalLayout {
 		logout.setWidth("10%");
 		logout.addClickListener(e -> {
 			getUI().ifPresent(ui -> {
+				SecurityContextHolder.clearContext();
 				ui.getPage().setLocation("/logout");
 				ui.getSession().close();
 			});
