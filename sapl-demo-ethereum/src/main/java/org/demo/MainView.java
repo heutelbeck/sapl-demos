@@ -119,7 +119,7 @@ public class MainView extends VerticalLayout {
 
 		Image printerImage = new Image();
 		printerImage.setSrc(currentPrinterImage);
-		printerImage.setSizeFull();
+		printerImage.setClassName("image-size");
 
 		templateSelect = new Select<>();
 		templateSelect.setPlaceholder("Select template...");
@@ -204,14 +204,15 @@ public class MainView extends VerticalLayout {
 			paidAccessDecision(handler, user);
 		});
 
+		printerSelect.setWidth("210px");
+		templateSelect.getStyle().set("margin-top", "33px");
+		printerButton.getStyle().set("margin-top", "37px");
 		VerticalLayout userAndCrowd = new VerticalLayout(puForm, printerStatus, payForm, cfForm);
-		HorizontalLayout buttonField = new HorizontalLayout(templateSelect, printerButton);
-		VerticalLayout printerForm = new VerticalLayout(printerSelect, buttonField);
-		HorizontalLayout imageAndUser = new HorizontalLayout(printerImage, userAndCrowd);
+		HorizontalLayout buttonField = new HorizontalLayout(printerSelect, templateSelect, printerButton);
+		VerticalLayout imageAndSelect = new VerticalLayout(printerImage, buttonField);
+		HorizontalLayout imageAndUser = new HorizontalLayout(imageAndSelect, userAndCrowd);
 
 		add(imageAndUser);
-		add(printerForm);
-		printerImage.setSizeFull();
 		setSizeFull();
 
 		printerAccessDecision(handler, user);

@@ -9,3 +9,8 @@
 	padding: 16px;
 	width: 100%;
 }
+
+.main-view .image-size {
+	max-height: 700px;
+	
+}
