@@ -9,40 +9,16 @@ First, you should clone this repository with
 ```
 git clone https://github.com/heutelbeck/sapl-demos.git
 ```
+
 ### Basic requirements
 To run this demo, you should have node.js and npm installed on your system. Furthermore, an actual version of maven is required.
 
-### Installing truffle
-For deploying our contracts we will use truffle, since it combines very vell with Ganache. You can install the truffle suite as stated [here](https://www.trufflesuite.com/truffle). Once installed, create an empty directory for your truffle workspace. Change to this directory in a terminal and run 
-
-```
-truffle init
-```
-Now there should have appeared various folders in your truffle workspace and a `truffle-config.js` file. Open this file and replace the contents with:
-
-```javascript
-module.exports = {
-  networks: {
-    development: {
-      host: "127.0.0.1",
-      port: 8545,
-      network_id: "*"
-    }
-  }
-};
-```
-
-Now go into the `sapl-demos` repository and open the `sapl-demo-ethereum` folder. 
-- There you will find a folder called `solidity`. Copy all contract files (ending with .sol) in there into the folder `contracts` of your truffle workspace. 
-- In the `solidity` folder there also is a folder called `truffle_migrations`. Copy the file in there into the `migrations` folder of your truffle workspace. 
-
 ### Setting up the testnet with Ganache
-Then you have to download the Ganache client from [here](https://www.trufflesuite.com/ganache).
+For our application to work properly, we need a local testnet.
+Therefore you must download the Ganache client from [here](https://www.trufflesuite.com/ganache).
 
 - Start the ganache client and select **New workspace**. 
-- Choose a name for your workspace. 
-- Click on the **Add project** button below. 
-- Select the **truffle-config.js** file you just modified and confirm. 
+- Choose a name for your workspace.
 - Then select the tab **Server** and set the portnumber to 8545. 
 - After that, select the **Accounts & Keys** tab and enter the following mnemonic:
 
@@ -51,40 +27,33 @@ defense decade prosper portion dove educate sing auction camera minute sing loya
 ```
 This way you will create the accounts used for the demo application. Then click on **Save Workspace** and the blockchain will be started automatically.
 
-### Deploying the contracts with truffle
+### Start the application
 
-
-Now go to the truffle workspace in a terminal and run
-
-```
-truffle migrate
-```
-This will deploy the contracts to the blockchain.
-
-While we could create the correct accounts with the mnemonic, addresses of the deployed contracts cannot be predicted. Therefore, we need to add them manually to our configuration. Open the following file in the repository:
-
-```
-sapl-demos/sapl-demo-ethereum/src/main/resources/policies/pdp.json
-```
-You will find entries for the printers of the demo application here. We need to replace the contract addresses with the ones from our new blockchain. Navigate to the contracts tab in Ganache. You will find the deployed contracts here. Click on each contract and then copy the **address** into the corresponding field of the `pdp.json`.
-
-Now we nearly finished our configuration. The last thing we have to do, is to appoint our accreditation authority, so that it also can be an issuer of certificates. To do so, navigate to the `sapl-demo-ethereum` project in a terminal and first run
-
-```
-mvn clean install
-```
-Once completed, run
-
-```
-mvn exec:java -Dexec.mainClass="org.demo.helper.EthInitContracts"
-```
-to set up the contracts correctly.
-
-Now finally we can start the demo application with
+Now we can start the demo application with by navigating to the `sapl-demo-ethereum` folder in the repository and then entering:
 
 ```
 mvn spring-boot:run
 ```
+
+Of course you can also launch the application from an IDE of your choice like Eclipse or IntelliJ.
+
+### Advanced: Deploying and using your own contracts
+This section is not necessary to run the demo application. It is important in the case that the application should be used with another demo application or if you simply wish to have persistent certificates.
+
+The demo application will generate new contracts on the blockchain each time it is started. Therefore issued certificates will not persist between runs. But the application also provides the possibility to always use the same contracts. To do so, you have to save the addresses of your deployed contracts in the `variables` of the `pdp.json` configuration file of the PDP, which you can find under `src/main/resources`. Please use the printer names provided in the [MainView](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-ethereum/src/main/java/org/demo/MainView.java). A correct configuration could look like this:
+
+```json
+{
+  "algorithm": "DENY_UNLESS_PERMIT",
+  "variables": {  
+                  "ethPollingInterval":100,
+                  "Ultimaker 2 Extended+":"0x1Ac704bD40B82E12c4a1808618F4d62a3A457869",
+                  "Graften One":"0x6B74dc232B0035A9f6E725B406572A6D9583fa61",
+                  "Zmorph VX":"0x5ef552965503CFf922c781b3178f5e4FB3519Fee"
+                }
+}
+```
+Now the application will load the contracts from the given addresses instead of deploying new ones. The contracts can be found in the `solidity` folder of the application. You can deploy them with [Truffle](https://www.trufflesuite.com/truffle) or any other way you like. Please make sure, that you deploy them with the first address in the Ganache testnet `0x3924F456CC0196ff89AAbbD6192289a9B37De73A`. The application relies on this address being the accreditation authority. Furthermore, you have to add this same address as an issuer to each contract if you want the `Issue Certificate` and `Revoke Certificate` buttons in the demo to work.
 
 ## Domain of the demo application
 The scenario of the demo is, that a service for 3D printers wants to verify, that the user of the printers also have a valid certificate to use them. These certificates are created by an accreditation authority, which in turn can name issuers that are allowed to issue certificates. In this demo application, we simply assume, that the accrediation authority is in charge of all three contracts. In a real world scenario, there would be different authorities for each certificate. For simplification, we also have set up the accreditation authority to be the issuer of certificates.
