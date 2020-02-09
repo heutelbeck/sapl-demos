@@ -40,7 +40,7 @@ Of course you can also launch the application from an IDE of your choice like Ec
 ### Advanced: Deploying and using your own contracts
 This section is not necessary to run the demo application. It is important in the case that the application should be used with another demo application or if you simply wish to have persistent certificates.
 
-The demo application will generate new contracts on the blockchain each time it is started. Therefore issued certificates will not persist between runs. But the application also provides the possibility to always use the same contracts. To do so, you have to save the addresses of your deployed contracts in the `variables` of the `pdp.json` configuration file of the PDP, which you can find under `src/main/resources`. Please use the printer names provided in the [MainView](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-ethereum/src/main/java/org/demo/MainView.java). A correct configuration could look like this:
+The demo application will generate new contracts on the blockchain each time it is started. Therefore issued certificates will not persist between runs. But the application also provides the possibility to always use the same contracts. To do so, you have to save the addresses of your deployed contracts in the `variables` of the `pdp.json` configuration file of the PDP, which you can find under `src/main/resources/policies`. Please use the printer names provided in the [MainView](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-ethereum/src/main/java/org/demo/MainView.java). A correct configuration could look like this:
 
 ```json
 {
@@ -56,11 +56,11 @@ The demo application will generate new contracts on the blockchain each time it 
 Now the application will load the contracts from the given addresses instead of deploying new ones. The contracts can be found in the `solidity` folder of the application. You can deploy them with [Truffle](https://www.trufflesuite.com/truffle) or any other way you like. Please make sure, that you deploy them with the first address in the Ganache testnet `0x3924F456CC0196ff89AAbbD6192289a9B37De73A`. The application relies on this address being the accreditation authority. Furthermore, you have to add this same address as an issuer to each contract if you want the `Issue Certificate` and `Revoke Certificate` buttons in the demo to work.
 
 ## Domain of the demo application
-The scenario of the demo is, that a service for 3D printers wants to verify, that the user of the printers also have a valid certificate to use them. These certificates are created by an accreditation authority, which in turn can name issuers that are allowed to issue certificates. In this demo application, we simply assume, that the accrediation authority is in charge of all three contracts. In a real world scenario, there would be different authorities for each certificate. For simplification, we also have set up the accreditation authority to be the issuer of certificates.
+The scenario of the demo is, that a service for 3D printers wants to verify if the users of the printers also have valid certificates to use them. These certificates are created by an accreditation authority, which in turn can name issuers that are allowed to issue certificates. In this demo application, we simply assume, that the accrediation authority is in charge of all three contracts. In a real world scenario, there would be different authorities for each certificate. For simplification, we also have set up the accreditation authority to be the issuer of certificates.
 
 The user in our application can choose from different printers and from different templates.
 
-This demo application can be combined with another demo, which is still in development, so that the certificates are issued by this other application. It can also be standalone because the certificates can be issued directly from the user interface.
+This demo application can be combined with another demo, which is still in development, so that the certificates are issued by this other application. It can also be standalone because the certificates can be issued and revoked directly from the user interface.
 
 ## Features of the demo application
 In this section we will present all features the demo application has to offer. After starting the application as described above, open a browser and navigate to `localhost:8080`. You will find a login screen. There are two users that can log into the demo application:
