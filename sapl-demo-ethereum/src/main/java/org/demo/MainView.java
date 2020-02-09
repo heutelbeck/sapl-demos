@@ -8,6 +8,7 @@ import java.util.Set;
 import org.demo.decision.PrinterDecisionHandler;
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
+import org.demo.helper.AccessCertificate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -30,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * The main view groups together all features of the demo application.
+ * In the main view one can see all features of the demo application.
  */
 @Push
 @Slf4j
@@ -89,7 +90,8 @@ public class MainView extends VerticalLayout {
 
 	private Span printerStatus;
 
-	public MainView(PrintService service, PrinterUserService printerUserService, PrinterDecisionHandler handler) {
+	public MainView(PrintService service, PrinterUserService printerUserService, PrinterDecisionHandler handler,
+			AccessCertificate accessCertificate) {
 
 		addClassName("main-view");
 
@@ -193,7 +195,7 @@ public class MainView extends VerticalLayout {
 		printerButton.setEnabled(false);
 		printerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect);
+		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect, accessCertificate);
 		CrowdfundingForm cfForm = new CrowdfundingForm(user);
 		PayForm payForm = new PayForm(user);
 		Button pay = payForm.getPay();

@@ -1,8 +1,6 @@
 {
   "algorithm": "DENY_UNLESS_PERMIT",
-  "variables": {"ethPollingInterval":100,
-                "Ultimaker 2 Extended+":"0x1Ac704bD40B82E12c4a1808618F4d62a3A457869",
-                "Graften One":"0x6B74dc232B0035A9f6E725B406572A6D9583fa61",
-                "Zmorph VX":"0x5ef552965503CFf922c781b3178f5e4FB3519Fee"
+  "variables": {  
+                  "ethPollingInterval":100
                 }
 }

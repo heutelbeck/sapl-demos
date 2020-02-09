@@ -7,6 +7,8 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.http.HttpService;
 
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
 public class Application extends SpringBootServletInitializer {
@@ -18,6 +20,11 @@ public class Application extends SpringBootServletInitializer {
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public Web3j web3j() {
+		return Web3j.build(new HttpService());
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -52,7 +53,7 @@ public class PrinterUserService implements UserDetailsService {
 		PrinterUser user = allPrinterUsers.get(username);
 		UserBuilder builder = null;
 		if (user != null) {
-			builder = org.springframework.security.core.userdetails.User.withUsername(username);
+			builder = User.withUsername(username);
 			builder.password(passwordEncoder.encode(user.getPassword()));
 			builder.authorities((user.getAuthorities()));
 		}

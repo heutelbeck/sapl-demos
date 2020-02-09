@@ -1,9 +1,7 @@
 package org.demo;
 
-import static org.demo.helper.AccessCertificate.issueCertificate;
-import static org.demo.helper.AccessCertificate.revokeCertificate;
-
 import org.demo.domain.PrinterUser;
+import org.demo.helper.AccessCertificate;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -17,7 +15,7 @@ public class PrinterUserForm extends VerticalLayout {
 
 	private static final long serialVersionUID = 1949849828168713357L;
 
-	public PrinterUserForm(PrinterUser user, Select<String> printerSelect) {
+	public PrinterUserForm(PrinterUser user, Select<String> printerSelect, AccessCertificate accessCertificate) {
 		String username = user.getUsername();
 		String address = user.getEthereumAddress();
 
@@ -31,10 +29,10 @@ public class PrinterUserForm extends VerticalLayout {
 
 		Button issue = new Button("Issue Certificate");
 		issue.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-		issue.addClickListener(event -> issueCertificate(address, printerSelect.getValue()));
+		issue.addClickListener(event -> accessCertificate.issueCertificate(address, printerSelect.getValue()));
 
 		Button revoke = new Button("Revoke Certificate");
-		revoke.addClickListener(event -> revokeCertificate(address, printerSelect.getValue()));
+		revoke.addClickListener(event -> accessCertificate.revokeCertificate(address, printerSelect.getValue()));
 
 		HorizontalLayout buttons = new HorizontalLayout(issue, revoke);
 		buttons.getStyle().set("margin-left", "20px");

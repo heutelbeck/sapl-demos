@@ -3,6 +3,8 @@ package org.demo.pip;
 import java.util.Map;
 
 import org.demo.MainView;
+import org.demo.helper.CertificateAddressProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -29,6 +31,9 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 
 	private static final String OUTPUT_PARAMS = "outputParams";
 
+	@Autowired
+	private CertificateAddressProvider addressProvider;
+
 	@Attribute(name = "certified", docs = "Checks, if the given address has a valid printer certificate.")
 	public Flux<JsonNode> certified(JsonNode saplObject, Map<String, JsonNode> variables) {
 		String address = saplObject.get("address").textValue();
@@ -50,13 +55,25 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 		return loadContractInformation(requestNode, variables).map(j -> j.get(0).get("value"));
 	}
 
-	public static String getContractAddress(String printer, Map<String, JsonNode> variables) {
-		if (MainView.ULTIMAKER.equals(printer))
-			return variables.get(MainView.ULTIMAKER).textValue();
-		if (MainView.GRAFTEN.equals(printer))
-			return variables.get(MainView.GRAFTEN).textValue();
-		if (MainView.ZMORPH.equals(printer))
-			return variables.get(MainView.ZMORPH).textValue();
+	public String getContractAddress(String printer, Map<String, JsonNode> variables) {
+		if (MainView.ULTIMAKER.equals(printer)) {
+			JsonNode address = variables.get(MainView.ULTIMAKER);
+			if (address != null)
+				return address.textValue();
+			return addressProvider.getUltimakerAddress();
+		}
+		if (MainView.GRAFTEN.equals(printer)) {
+			JsonNode address = variables.get(MainView.GRAFTEN);
+			if (address != null)
+				return address.textValue();
+			return addressProvider.getGraftenAddress();
+		}
+		if (MainView.ZMORPH.equals(printer)) {
+			JsonNode address = variables.get(MainView.ZMORPH);
+			if (address != null)
+				return address.textValue();
+			return addressProvider.getZmorphAddress();
+		}
 		return "";
 	}
 
