@@ -14,7 +14,6 @@
         <vaadin.version>14.1.5</vaadin.version>
         <drivers.dir>${project.basedir}/drivers</drivers.dir>
         <drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
-        <sonar.exclusions>**/org/demo/helper/contracts/**/*</sonar.exclusions>
     </properties>
 
     <parent>
@@ -179,16 +178,6 @@
                     </execution>
                 </executions> -->
             </plugin>
-            
-            <plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<configuration>
-				    <excludes>
-				        <exclude>**/org/demo/helper/contracts/**/*</exclude>
-				    </excludes>
-				</configuration>		
-			</plugin>
                
         </plugins>
     </build>
