@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>sapl-demo-ethereum</artifactId>
-    <name>sapl-demo-ethereum</name>
+    <name>SAPL Demo Ethereum</name>
     <version>2.0-SNAPSHOT</version>
 
 
@@ -148,7 +148,7 @@
     </dependencies>
 
     <build>
-        <defaultGoal>spring-boot:run</defaultGoal>
+        <defaultGoal>spring-boot:run</defaultGoal>  
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -178,8 +178,110 @@
                     </execution>
                 </executions> -->
             </plugin>
-               
+            
+            <plugin>
+			    <groupId>org.web3j</groupId>
+			    <artifactId>web3j-maven-plugin</artifactId>
+			    <version>4.5.11</version>
+			    <configuration>
+			        <packageName>org.demo.helper.contracts</packageName>
+			        <sourceDestination>target/generated-sources/contracts</sourceDestination>
+			        <nativeJavaType>true</nativeJavaType>
+			        <outputFormat>java</outputFormat>
+			        <soliditySourceFiles>
+			            <directory>src/main/resources/solidity</directory>
+			            <includes>
+			                <include>**/*.sol</include>
+			            </includes>
+			        </soliditySourceFiles>
+			    </configuration>
+			    <executions>
+			    	<execution>
+			    		<id>generate-contracts</id>
+			    		<phase>generate-sources</phase>
+			    		<goals>
+			    			<goal>generate-sources</goal>
+			    		</goals>
+			    	</execution>		    
+			    </executions>
+			</plugin>
+			
+			<plugin>
+		        <groupId>org.codehaus.mojo</groupId>
+		        <artifactId>build-helper-maven-plugin</artifactId>
+		        <version>1.9.1</version>
+		        <executions>
+		        	<execution>
+		            	<id>add-contracts</id>
+		            	<phase>initialize</phase>
+		            	<goals>
+		                	<goal>add-source</goal>
+		            	</goals>
+		            	<configuration>
+		                	<sources>
+		                 		<source>target/generated-sources/contracts</source>
+		              		</sources>
+		           		</configuration>
+		          	</execution>
+		       	</executions>
+		    </plugin>   
         </plugins>
+        <pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.web3j
+										</groupId>
+										<artifactId>
+											web3j-maven-plugin
+										</artifactId>
+										<versionRange>
+											[4.5.11,)
+										</versionRange>
+										<goals>
+											<goal>generate-sources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.codehaus.mojo
+										</groupId>
+										<artifactId>
+											build-helper-maven-plugin
+										</artifactId>
+										<versionRange>
+											[1.9.1,)
+										</versionRange>
+										<goals>
+											<goal>add-source</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>true</runOnIncremental>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
     </build>
 
     <profiles>
