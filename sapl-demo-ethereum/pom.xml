@@ -185,11 +185,11 @@
 			    <version>4.5.11</version>
 			    <configuration>
 			        <packageName>org.demo.helper.contracts</packageName>
-			        <sourceDestination>target/generated-sources/contracts</sourceDestination>
+			        <sourceDestination>/${project.basedir}/target/generated-sources/contracts</sourceDestination>
 			        <nativeJavaType>true</nativeJavaType>
 			        <outputFormat>java</outputFormat>
 			        <soliditySourceFiles>
-			            <directory>src/main/resources/solidity</directory>
+			            <directory>/${project.basedir}/src/main/resources/solidity</directory>
 			            <includes>
 			                <include>**/*.sol</include>
 			            </includes>
