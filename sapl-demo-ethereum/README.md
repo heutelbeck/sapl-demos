@@ -4,14 +4,21 @@ If you are using the preconfigured Virtual Box Image, you can skip the Getting s
 
 
 ## Getting started
+To run this demo, you should have Git, node.js and npm installed on your system. Furthermore, an actual version of maven is required.
+
 First, you should clone this repository with
 
 ```
 git clone https://github.com/heutelbeck/sapl-demos.git
 ```
 
-### Basic requirements
-To run this demo, you should have node.js and npm installed on your system. Furthermore, an actual version of maven is required.
+Navigate to the `sapl-demo-ethereum` folder in a terminal or IDE and run 
+
+```
+mvn install
+```
+
+
 
 ### Setting up the testnet with Ganache
 For our application to work properly, we need a local testnet.
