@@ -21,6 +21,8 @@ import reactor.core.publisher.Flux;
 @PolicyInformationPoint(name = "printer", description = "Domain specific PIP for printer usage")
 public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 
+	private static final String ETH_PIP_CONFIG = "ethPipConfig";
+
 	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
 	private static final String ADDRESS = "address";
@@ -57,21 +59,30 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 
 	public String getContractAddress(String printer, Map<String, JsonNode> variables) {
 		if (MainView.ULTIMAKER.equals(printer)) {
-			JsonNode address = variables.get(MainView.ULTIMAKER);
-			if (address != null)
-				return address.textValue();
+			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			if (ethPipConfig != null) {
+				JsonNode address = ethPipConfig.get(MainView.ULTIMAKER);
+				if (address != null)
+					return address.textValue();
+			}
 			return addressProvider.getUltimakerAddress();
 		}
 		if (MainView.GRAFTEN.equals(printer)) {
-			JsonNode address = variables.get(MainView.GRAFTEN);
-			if (address != null)
-				return address.textValue();
+			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			if (ethPipConfig != null) {
+				JsonNode address = ethPipConfig.get(MainView.GRAFTEN);
+				if (address != null)
+					return address.textValue();
+			}
 			return addressProvider.getGraftenAddress();
 		}
 		if (MainView.ZMORPH.equals(printer)) {
-			JsonNode address = variables.get(MainView.ZMORPH);
-			if (address != null)
-				return address.textValue();
+			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			if (ethPipConfig != null) {
+				JsonNode address = ethPipConfig.get(MainView.ZMORPH);
+				if (address != null)
+					return address.textValue();
+			}
 			return addressProvider.getZmorphAddress();
 		}
 		return "";

@@ -51,15 +51,18 @@ public class CertificateAddressProvider {
 
 		JsonNode variables = getVariables();
 		if (variables != null) {
-			JsonNode uAddress = variables.get(MainView.ULTIMAKER);
-			if (uAddress != null)
-				ultimakerAddress = uAddress.textValue();
-			JsonNode gAddress = variables.get(MainView.GRAFTEN);
-			if (gAddress != null)
-				graftenAddress = gAddress.textValue();
-			JsonNode zAddress = variables.get(MainView.ZMORPH);
-			if (zAddress != null)
-				zmorphAddress = zAddress.textValue();
+			JsonNode ethPipConfig = variables.get("ethPipConfig");
+			if (ethPipConfig != null) {
+				JsonNode uAddress = ethPipConfig.get(MainView.ULTIMAKER);
+				if (uAddress != null)
+					ultimakerAddress = uAddress.textValue();
+				JsonNode gAddress = ethPipConfig.get(MainView.GRAFTEN);
+				if (gAddress != null)
+					graftenAddress = gAddress.textValue();
+				JsonNode zAddress = ethPipConfig.get(MainView.ZMORPH);
+				if (zAddress != null)
+					zmorphAddress = zAddress.textValue();
+			}
 		}
 
 		if (ultimakerAddress == null)
