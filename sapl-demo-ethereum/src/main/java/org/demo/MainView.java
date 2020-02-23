@@ -97,6 +97,10 @@ public class MainView extends VerticalLayout {
 
 	private Span printerStatus;
 
+	private Button logout;
+
+	private Image printerImage;
+
 	public MainView(PrintService service, PrinterUserService printerUserService, AccessCertificate accessCertificate,
 			PolicyDecisionPoint pdp, ObjectMapper mapper, EthConnect ethConnect) {
 		this.mapper = mapper;
@@ -104,72 +108,17 @@ public class MainView extends VerticalLayout {
 
 		user = SecurityUtils.getUser();
 
-		H1 title = new H1("3D Printer Control Panel");
-		Button logout = createLogoutButton();
-		HorizontalLayout header = new HorizontalLayout(title, logout);
-		header.getThemeList().add("dark");
-		header.addClassName("main-header");
-		add(header);
-
-		currentPrinterImage = ULTIMAKER_IMAGE;
-		Image printerImage = new Image();
-		printerImage.setSrc(currentPrinterImage);
-		printerImage.setClassName("image-size");
-
-		templateSelect = new Select<>();
-		templateSelect.setPlaceholder("Select template...");
-		templateSelect.getStyle().set("margin-top", "33px");
-		templateSelect.setItems(ROBOT, BOAT, ROCKET, CUBES, BALL);
-		disabledItems.add(CUBES);
-		disabledItems.add(BALL);
-		templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
-		templateSelect.addValueChangeListener(event -> {
-			String template = event.getValue();
-			switch (template) {
-			case ROBOT:
-				printerImage.setSrc(ROBOT_IMAGE);
-				break;
-			case BOAT:
-				printerImage.setSrc(BOAT_IMAGE);
-				break;
-			case ROCKET:
-				printerImage.setSrc(ROCKET_IMAGE);
-				break;
-			case CUBES:
-				printerImage.setSrc(CUBES_IMAGE);
-				break;
-			case BALL:
-				printerImage.setSrc(BALL_IMAGE);
-				break;
-			default:
-				printerImage.setSrc(currentPrinterImage);
-			}
-
-		});
-
-		printerSelect = new Select<>();
-		printerSelect.setLabel("Printer");
-		printerSelect.setItems(ULTIMAKER, GRAFTEN, ZMORPH);
-		printerSelect.setValue(ULTIMAKER);
-		printerSelect.setWidth("210px");
-
-		printerStatus = new Span();
-		printerStatus.getStyle().set("margin-left", "33px");
-
-		printerButton = new Button("Start printer", e -> {
-			service.print(templateSelect.getValue());
-			printerImage.setSrc(currentPrinterImage);
-			templateSelect.setValue("");
-		});
-		printerButton.setEnabled(false);
-		printerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		addHeader();
+		setupPrinterImage();
+		setupTemplateSelect();
+		setupPrinterSelect();
+		setupPrinterStatus();
+		setupPrinterButton(service);
 
 		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect, accessCertificate);
 		CrowdfundingForm cfForm = new CrowdfundingForm(user, ethConnect);
 		PayForm payForm = new PayForm(user);
-		Button pay = payForm.getPay();
 
-		printerButton.getStyle().set("margin-top", "37px");
 		VerticalLayout userAndCrowd = new VerticalLayout(puForm, printerStatus, payForm, cfForm);
 		HorizontalLayout buttonField = new HorizontalLayout(printerSelect, templateSelect, printerButton);
 		VerticalLayout imageAndSelect = new VerticalLayout(printerImage, buttonField);
@@ -178,53 +127,20 @@ public class MainView extends VerticalLayout {
 		add(imageAndUser);
 		setSizeFull();
 
-		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<Select<String>>(templateSelect, paidSub(), pdp,
-				UI.getCurrent());
-		paymentPep.onPermit((component, decision) -> {
-			LOGGER.info("New paid access decision: {}", decision.getDecision());
-			disabledItems.remove(CUBES);
-			component.setItemEnabledProvider(this::itemEnabledCheck);
-		});
-		paymentPep.onDeny((component, decision) -> {
-			LOGGER.info("New paid access decision: {}", decision.getDecision());
-		});
+		VaadinPEP<Select<String>> paymentPep = createPaymentPep(pdp);
 		paymentPep.enforce();
-
+		Button pay = payForm.getPay();
 		pay.addClickListener(event -> {
 			ethConnect.makePayment(user, "1");
 			paymentPep.newSub(paidSub());
 			paymentPep.enforce();
 		});
 
-		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<Select<String>>(templateSelect, crowdSub(), pdp,
-				UI.getCurrent());
-		crowdPep.onPermit((component, decision) -> {
-			LOGGER.info("New crowd access decision: {}", decision.getDecision());
-			disabledItems.remove(BALL);
-			component.setItemEnabledProvider(this::itemEnabledCheck);
-		});
-		crowdPep.onDeny((component, decision) -> {
-			LOGGER.info("New crowd access decision: {}", decision.getDecision());
-		});
+		VaadinPEP<Select<String>> crowdPep = createCrowdPep(pdp);
 		crowdPep.enforce();
 
-		VaadinPEP<Button> printerPep = new VaadinPEP<Button>(printerButton, printerSub(printerSelect.getValue()), pdp,
-				UI.getCurrent());
-		printerPep.onPermit((component, decision) -> {
-			LOGGER.info("New printer access decision: {}", decision.getDecision());
-			component.setEnabled(true);
-			printerStatus.setText("You are certified for the current printer.");
-			printerStatus.getStyle().set("color", "green");
-
-		});
-		printerPep.onDeny((component, decision) -> {
-			LOGGER.info("New printer access decision: {}", decision.getDecision());
-			component.setEnabled(false);
-			printerStatus.setText("You are not certified for the current printer.");
-			printerStatus.getStyle().set("color", "red");
-		});
+		VaadinPEP<Button> printerPep = createPrinterPep(pdp);
 		printerPep.enforce();
-
 		printerSelect.addValueChangeListener(event -> {
 			String printer = event.getValue();
 			switch (printer) {
@@ -271,9 +187,130 @@ public class MainView extends VerticalLayout {
 
 	}
 
-	private AuthorizationSubscription buildSubscription(String action, String resource) {
-		return new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class), JSON.textNode(action),
-				JSON.textNode(resource), null);
+	private VaadinPEP<Button> createPrinterPep(PolicyDecisionPoint pdp) {
+		VaadinPEP<Button> printerPep = new VaadinPEP<Button>(printerButton, printerSub(printerSelect.getValue()), pdp,
+				UI.getCurrent());
+		printerPep.onPermit((component, decision) -> {
+			LOGGER.info("New printer access decision: {}", decision.getDecision());
+			component.setEnabled(true);
+			printerStatus.setText("You are certified for the current printer.");
+			printerStatus.getStyle().set("color", "green");
+
+		});
+		printerPep.onDeny((component, decision) -> {
+			LOGGER.info("New printer access decision: {}", decision.getDecision());
+			component.setEnabled(false);
+			printerStatus.setText("You are not certified for the current printer.");
+			printerStatus.getStyle().set("color", "red");
+		});
+		return printerPep;
+	}
+
+	private VaadinPEP<Select<String>> createCrowdPep(PolicyDecisionPoint pdp) {
+		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<Select<String>>(templateSelect, crowdSub(), pdp,
+				UI.getCurrent());
+		crowdPep.onPermit((component, decision) -> {
+			LOGGER.info("New crowd access decision: {}", decision.getDecision());
+			disabledItems.remove(BALL);
+			component.setItemEnabledProvider(this::itemEnabledCheck);
+		});
+		crowdPep.onDeny((component, decision) -> {
+			LOGGER.info("New crowd access decision: {}", decision.getDecision());
+		});
+		return crowdPep;
+	}
+
+	private VaadinPEP<Select<String>> createPaymentPep(PolicyDecisionPoint pdp) {
+		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<Select<String>>(templateSelect, paidSub(), pdp,
+				UI.getCurrent());
+		paymentPep.onPermit((component, decision) -> {
+			LOGGER.info("New paid access decision: {}", decision.getDecision());
+			disabledItems.remove(CUBES);
+			component.setItemEnabledProvider(this::itemEnabledCheck);
+		});
+		paymentPep.onDeny((component, decision) -> {
+			LOGGER.info("New paid access decision: {}", decision.getDecision());
+		});
+		return paymentPep;
+	}
+
+	private void setupPrinterButton(PrintService service) {
+		printerButton = new Button("Start printer", e -> {
+			service.print(templateSelect.getValue());
+			printerImage.setSrc(currentPrinterImage);
+			templateSelect.setValue("");
+		});
+		printerButton.setEnabled(false);
+		printerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		printerButton.getStyle().set("margin-top", "37px");
+
+	}
+
+	private void setupPrinterStatus() {
+		printerStatus = new Span();
+		printerStatus.getStyle().set("margin-left", "33px");
+
+	}
+
+	private void setupPrinterSelect() {
+		printerSelect = new Select<>();
+		printerSelect.setLabel("Printer");
+		printerSelect.setItems(ULTIMAKER, GRAFTEN, ZMORPH);
+		printerSelect.setValue(ULTIMAKER);
+		printerSelect.setWidth("210px");
+
+	}
+
+	private void setupTemplateSelect() {
+		templateSelect = new Select<>();
+		templateSelect.setPlaceholder("Select template...");
+		templateSelect.getStyle().set("margin-top", "33px");
+		templateSelect.setItems(ROBOT, BOAT, ROCKET, CUBES, BALL);
+		disabledItems.add(CUBES);
+		disabledItems.add(BALL);
+		templateSelect.setItemEnabledProvider(this::itemEnabledCheck);
+		templateSelect.addValueChangeListener(event -> {
+			String template = event.getValue();
+			switch (template) {
+			case ROBOT:
+				printerImage.setSrc(ROBOT_IMAGE);
+				break;
+			case BOAT:
+				printerImage.setSrc(BOAT_IMAGE);
+				break;
+			case ROCKET:
+				printerImage.setSrc(ROCKET_IMAGE);
+				break;
+			case CUBES:
+				printerImage.setSrc(CUBES_IMAGE);
+				break;
+			case BALL:
+				printerImage.setSrc(BALL_IMAGE);
+				break;
+			default:
+				printerImage.setSrc(currentPrinterImage);
+			}
+
+		});
+
+	}
+
+	private void setupPrinterImage() {
+		currentPrinterImage = ULTIMAKER_IMAGE;
+		printerImage = new Image();
+		printerImage.setSrc(currentPrinterImage);
+		printerImage.setClassName("image-size");
+
+	}
+
+	private void addHeader() {
+		H1 title = new H1("3D Printer Control Panel");
+		logout = createLogoutButton();
+		HorizontalLayout header = new HorizontalLayout(title, logout);
+		header.getThemeList().add("dark");
+		header.addClassName("main-header");
+		add(header);
+
 	}
 
 	private boolean itemEnabledCheck(String item) {
@@ -286,6 +323,11 @@ public class MainView extends VerticalLayout {
 		Button logout = new Button("Logout");
 		logout.setWidth("10%");
 		return logout;
+	}
+
+	private AuthorizationSubscription buildSubscription(String action, String resource) {
+		return new AuthorizationSubscription(mapper.convertValue(user, JsonNode.class), JSON.textNode(action),
+				JSON.textNode(resource), null);
 	}
 
 	private AuthorizationSubscription paidSub() {
