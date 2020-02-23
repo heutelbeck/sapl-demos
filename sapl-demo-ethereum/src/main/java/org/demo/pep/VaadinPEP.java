@@ -41,6 +41,8 @@ public class VaadinPEP<Component> {
 	}
 
 	public void enforce() {
+		if (decisionFlux != null)
+			dispose();
 		this.decisionFlux = pdp.decide(subscription).subscribe(this::onDecision);
 	}
 
