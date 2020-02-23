@@ -24,7 +24,7 @@ public class Application extends SpringBootServletInitializer {
 
 	@Bean
 	public Web3j web3j() {
-		return Web3j.build(new HttpService());
+		return Web3j.build(new HttpService("http://localhost:7545"));
 	}
 
 }

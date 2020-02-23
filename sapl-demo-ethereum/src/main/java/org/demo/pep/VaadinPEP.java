@@ -85,7 +85,7 @@ public class VaadinPEP<Component> {
 		this.indeterminateListener = indeterminateListener;
 	}
 
-	public void OnNotApplicable(BiConsumer<Component, AuthorizationDecision> notApplicableListener) {
+	public void onNotApplicable(BiConsumer<Component, AuthorizationDecision> notApplicableListener) {
 		this.notApplicableListener = notApplicableListener;
 	}
 

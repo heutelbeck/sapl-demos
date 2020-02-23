@@ -1,8 +1,7 @@
 package org.demo;
 
-import static org.demo.helper.EthConnect.makeDonation;
-
 import org.demo.domain.PrinterUser;
+import org.demo.helper.EthConnect;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -17,7 +16,7 @@ public class CrowdfundingForm extends VerticalLayout {
 
 	private static final long serialVersionUID = 8878184008835129794L;
 
-	public CrowdfundingForm(PrinterUser user) {
+	public CrowdfundingForm(PrinterUser user, EthConnect ethConnect) {
 
 		H2 crowdfunding = new H2("Crowdfunding");
 		Paragraph explanation = new Paragraph(
@@ -30,7 +29,7 @@ public class CrowdfundingForm extends VerticalLayout {
 
 		Button donate = new Button("Donate");
 		donate.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-		donate.addClickListener(event -> makeDonation(user, donationField.getValue()));
+		donate.addClickListener(event -> ethConnect.makeDonation(user, donationField.getValue()));
 
 		HorizontalLayout donation = new HorizontalLayout(donationField, unit, donate);
 

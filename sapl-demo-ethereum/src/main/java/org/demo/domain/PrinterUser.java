@@ -18,7 +18,7 @@ public class PrinterUser extends User {
 
 	private String transactionHash;
 
-	public PrinterUser(String userName, String password, String ethereumAddress,
+	public PrinterUser(String userName, String password, String ethereumAddress, String transactionHash,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(userName, password, authorities);
 		this.ethereumAddress = ethereumAddress;
@@ -55,6 +55,11 @@ public class PrinterUser extends User {
 		else if (!transactionHash.equals(other.transactionHash))
 			return false;
 		return true;
+	}
+
+	public PrinterUser copy() {
+		return new PrinterUser(this.getUsername(), this.getPassword(), this.getEthereumAddress(),
+				this.getTransactionHash(), this.getAuthorities());
 	}
 
 }

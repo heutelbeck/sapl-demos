@@ -26,7 +26,6 @@ Therefore you must download the Ganache client from [here](https://www.trufflesu
 
 - Start the ganache client and select **New workspace**. 
 - Choose a name for your workspace.
-- Then select the tab **Server** and set the portnumber to 8545. 
 - After that, select the **Accounts & Keys** tab and enter the following mnemonic:
 
 ```

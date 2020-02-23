@@ -3,16 +3,17 @@ package org.demo.helper;
 import java.math.BigDecimal;
 
 import org.demo.domain.PrinterUser;
+import org.springframework.stereotype.Component;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.Transfer;
 import org.web3j.utils.Convert;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Component
 public class EthConnect {
 
 	private static final String ACCREDITATION_AUTHORITY = "0x3924F456CC0196ff89AAbbD6192289a9B37De73A";
@@ -25,8 +26,13 @@ public class EthConnect {
 
 	private static final String BOB_PRIVATE_KEY = "a5e729c5ad3500fd6b8a5ecc7ab7a21190fe2f4595aa52e6c3b8615420e6ddfe";
 
-	public static void makeDonation(PrinterUser user, String value) {
-		Web3j web3j = Web3j.build(new HttpService());
+	private Web3j web3j;
+
+	public EthConnect(Web3j web3j) {
+		this.web3j = web3j;
+	}
+
+	public void makeDonation(PrinterUser user, String value) {
 		String address = user.getEthereumAddress();
 		Credentials credentials = getCredentials(address);
 		BigDecimal amount = new BigDecimal(value);
@@ -42,8 +48,7 @@ public class EthConnect {
 
 	}
 
-	public static void makePayment(PrinterUser user, String value) {
-		Web3j web3j = Web3j.build(new HttpService());
+	public void makePayment(PrinterUser user, String value) {
 		String address = user.getEthereumAddress();
 		Credentials credentials = getCredentials(address);
 		BigDecimal amount = new BigDecimal(value);
@@ -55,7 +60,7 @@ public class EthConnect {
 			user.setTransactionHash(receipt.getTransactionHash());
 		}
 		catch (Exception e) {
-			LOGGER.info("Donation failed", e);
+			LOGGER.info("Payment failed", e);
 		}
 
 	}

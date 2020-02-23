@@ -1,15 +1,14 @@
 package org.demo;
 
-import static org.demo.helper.EthConnect.makePayment;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.demo.domain.PrinterUser;
 import org.demo.domain.PrinterUserService;
 import org.demo.helper.AccessCertificate;
+import org.demo.helper.EthConnect;
 import org.demo.pep.VaadinPEP;
-import org.springframework.security.core.Authentication;
+import org.demo.security.SecurityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -105,14 +104,12 @@ public class MainView extends VerticalLayout {
 	private VaadinPEP<Button> printerPep;
 
 	public MainView(PrintService service, PrinterUserService printerUserService, AccessCertificate accessCertificate,
-			PolicyDecisionPoint pdp, ObjectMapper mapper) {
+			PolicyDecisionPoint pdp, ObjectMapper mapper, EthConnect ethConnect) {
 
 		this.mapper = mapper;
 		addClassName("main-view");
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String currentUserName = authentication.getName();
-		user = printerUserService.loadUser(currentUserName);
+		user = SecurityUtils.getUser();
 
 		currentPrinterImage = ULTIMAKER_IMAGE;
 
@@ -205,11 +202,11 @@ public class MainView extends VerticalLayout {
 		printerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
 		PrinterUserForm puForm = new PrinterUserForm(user, printerSelect, accessCertificate);
-		CrowdfundingForm cfForm = new CrowdfundingForm(user);
+		CrowdfundingForm cfForm = new CrowdfundingForm(user, ethConnect);
 		PayForm payForm = new PayForm(user);
 		Button pay = payForm.getPay();
 		pay.addClickListener(event -> {
-			makePayment(user, "1");
+			ethConnect.makePayment(user, "1");
 			paymentPep.newSub(paidSub());
 			paymentPep.enforce();
 		});

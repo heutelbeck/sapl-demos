@@ -6,6 +6,7 @@ import org.demo.MainView;
 import org.demo.helper.CertificateAddressProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.web3j.protocol.Web3j;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -36,6 +37,10 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 	@Autowired
 	private CertificateAddressProvider addressProvider;
 
+	public EthereumPrinterPip(Web3j web3j) {
+		super(web3j);
+	}
+
 	@Attribute(name = "certified", docs = "Checks, if the given address has a valid printer certificate.")
 	public Flux<JsonNode> certified(JsonNode saplObject, Map<String, JsonNode> variables) {
 		String address = saplObject.get("address").textValue();
@@ -57,7 +62,7 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 		return loadContractInformation(requestNode, variables).map(j -> j.get(0).get("value"));
 	}
 
-	public String getContractAddress(String printer, Map<String, JsonNode> variables) {
+	private String getContractAddress(String printer, Map<String, JsonNode> variables) {
 		if (MainView.ULTIMAKER.equals(printer)) {
 			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
 			if (ethPipConfig != null) {

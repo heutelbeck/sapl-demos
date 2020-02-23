@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,10 +32,13 @@ public class PrinterUserService implements UserDetailsService {
 
 	private void createDemoData() {
 		allPrinterUsers.put("Alice",
-				new PrinterUser("Alice", "Greenfield", "0xE5a72C7Fa4991920619edCf25eD8828793045A53",
+				new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
+						"0xE5a72C7Fa4991920619edCf25eD8828793045A53", null,
 						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
-		allPrinterUsers.put("Bob", new PrinterUser("Bob", "Springsteen", "0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8",
-				Collections.singletonList(new SimpleGrantedAuthority("USER"))));
+		allPrinterUsers.put("Bob",
+				new PrinterUser("Bob", passwordEncoder.encode("Springsteen"),
+						"0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8", null,
+						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
 
 	}
 
@@ -47,21 +47,18 @@ public class PrinterUserService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public PrinterUser loadUserByUsername(String username) throws UsernameNotFoundException {
 		if (allPrinterUsers.isEmpty())
 			createDemoData();
 		PrinterUser user = allPrinterUsers.get(username);
-		UserBuilder builder = null;
+
 		if (user != null) {
-			builder = User.withUsername(username);
-			builder.password(passwordEncoder.encode(user.getPassword()));
-			builder.authorities((user.getAuthorities()));
+			return user.copy();
 		}
 		else {
 			throw new UsernameNotFoundException("User " + username + " not found.");
 		}
 
-		return builder.build();
 	}
 
 }

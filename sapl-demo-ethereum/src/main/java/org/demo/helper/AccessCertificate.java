@@ -7,7 +7,6 @@ import org.demo.helper.contracts.Device_Operator_Certificate;
 import org.springframework.stereotype.Component;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.StaticGasProvider;
 
 @Component
@@ -21,12 +20,14 @@ public class AccessCertificate {
 
 	private CertificateAddressProvider addressProvider;
 
-	public AccessCertificate(CertificateAddressProvider addressProvider) {
+	private Web3j web3j;
+
+	public AccessCertificate(CertificateAddressProvider addressProvider, Web3j web3j) {
 		this.addressProvider = addressProvider;
+		this.web3j = web3j;
 	}
 
 	public void issueCertificate(String address, String printer) {
-		Web3j web3j = Web3j.build(new HttpService());
 		Credentials credentials = Credentials.create(ACCREDITATION_AUTHORITY_PRIVATE_KEY);
 		String contractAddress = getContractAddress(printer);
 		Device_Operator_Certificate contract = Device_Operator_Certificate.load(contractAddress, web3j, credentials,
@@ -35,7 +36,6 @@ public class AccessCertificate {
 	}
 
 	public void revokeCertificate(String address, String printer) {
-		Web3j web3j = Web3j.build(new HttpService());
 		Credentials credentials = Credentials.create(ACCREDITATION_AUTHORITY_PRIVATE_KEY);
 		String contractAddress = getContractAddress(printer);
 		Device_Operator_Certificate contract = Device_Operator_Certificate.load(contractAddress, web3j, credentials,
