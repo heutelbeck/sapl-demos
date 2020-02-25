@@ -11,7 +11,7 @@ cd ..
 if [ "${TRAVIS_BRANCH}" == "master" ]; then
     if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
         echo "Building master"
-        mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar --batch-mode -Dsonar.host.url=https://sonar.ftk.de:9000  -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*
+        mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar --batch-mode -Dsonar.host.url=https://sonar.ftk.de -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*
     else
         echo "Building pull request"
         mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent verify --batch-mode
