@@ -62,14 +62,17 @@
 
 	<repositories>
 		<repository>
-			<id>sapl</id>
-			<name>SAPL Release Repository</name>
-			<url>http://repo.sapl.io/releases</url>
+			<id>openconjurer-public</id>
+			<name>OpenConjurer Nexus Maven Release Repository</name>
+			<url>https://nexus.openconjurer.org/repository/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 		<repository>
-			<id>sapl-snapshots</id>
-			<name>SAPL Snapshot Repository</name>
-			<url>http://repo.sapl.io/snapshots</url>
+			<id>openconjurer-public-snapshots</id>
+			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
+			<url>https://nexus.openconjurer.org/repository/snapshots/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
