@@ -18,6 +18,7 @@ public class JavabasedViewView extends Div {
         
         SaplEditorConfiguration config = new SaplEditorConfiguration();
         config.HasLineNumbers = false;
+        config.TextUpdateDelay = 2000;
         
         SaplEditor editor = new SaplEditor(config);
         
