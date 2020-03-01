@@ -6,6 +6,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import io.sapl.vaadin.SaplEditor;
+import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
@@ -14,12 +15,16 @@ public class JavabasedViewView extends Div {
 
     public JavabasedViewView() {
         setId("javabased-view-view");
-        SaplEditor editor = new SaplEditor();
+        
+        SaplEditorConfiguration config = new SaplEditorConfiguration();
+        config.HasLineNumbers = false;
+        
+        SaplEditor editor = new SaplEditor(config);
+        
         editor.addDocumentChangedListener(new SaplEditor.DocumentChangedListener() {
 			@Override
 			public void onDocumentChanged(String newValue) {
 				System.out.println("value changed: " + newValue);
-				
 			}
 		});
         
