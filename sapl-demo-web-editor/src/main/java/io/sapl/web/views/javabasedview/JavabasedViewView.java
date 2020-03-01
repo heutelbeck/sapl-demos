@@ -21,16 +21,14 @@ public class JavabasedViewView extends Div {
         config.TextUpdateDelay = 2000;
         
         SaplEditor editor = new SaplEditor(config);
-        
-        editor.addDocumentChangedListener(new SaplEditor.DocumentChangedListener() {
-			@Override
-			public void onDocumentChanged(String newValue) {
-				System.out.println("value changed: " + newValue);
-			}
-		});
+        editor.getDocumentChangedFlux().subscribe(this::onEditorDocumentChanged);
         
         add(editor);
         editor.setValue("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
+    }
+    
+    public void onEditorDocumentChanged(String newValue) {
+    	System.out.println("value changed: " + newValue);
     }
 
 }
