@@ -1,5 +1,8 @@
 package io.sapl.web.views.javabasedview;
 
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.router.PageTitle;
@@ -19,7 +22,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
         setId("javabased-view-view");
         
         SaplEditorConfiguration config = new SaplEditorConfiguration();
-        config.HasLineNumbers = false;
+        config.HasLineNumbers = true;
         config.TextUpdateDelay = 2000;
         
         SaplEditor editor = new SaplEditor(config);
@@ -27,6 +30,16 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
         
         add(editor);
         editor.setValue("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
+        
+        Button validateButton = new Button();
+        validateButton.setText("Validate Document");
+        validateButton.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+			@Override
+			public void onComponentEvent(ClickEvent<Button> event) {
+				editor.validateDocument();
+			}
+		});
+        add(validateButton);
     }
     
 	@Override
