@@ -15,7 +15,7 @@ import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
-@CssImport("styles/views/javabasedview/javabased-view-view.css")
+@CssImport("./styles/views/javabasedview/javabased-view-view.css")
 public class JavabasedViewView extends Div implements DocumentChangedListener {
 
     public JavabasedViewView() {
