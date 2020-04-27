@@ -22,8 +22,8 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
         setId("javabased-view-view");
         
         SaplEditorConfiguration config = new SaplEditorConfiguration();
-        config.HasLineNumbers = true;
-        config.TextUpdateDelay = 2000;
+        config.setHasLineNumbers(true);
+        config.setTextUpdateDelay(500);
         
         SaplEditor editor = new SaplEditor(config);
         editor.addListener(this);
