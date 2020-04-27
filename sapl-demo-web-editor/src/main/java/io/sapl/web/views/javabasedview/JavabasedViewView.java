@@ -10,13 +10,16 @@ import com.vaadin.flow.router.Route;
 
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.DocumentChangedListener;
+import io.sapl.vaadin.Issue;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
+import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.ValidationFinishedListener;
 import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-public class JavabasedViewView extends Div implements DocumentChangedListener {
+public class JavabasedViewView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
     public JavabasedViewView() {
         setId("javabased-view-view");
@@ -26,7 +29,8 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
         config.setTextUpdateDelay(500);
         
         SaplEditor editor = new SaplEditor(config);
-        editor.addListener(this);
+        editor.addListener((DocumentChangedListener) this);
+        editor.addListener((ValidationFinishedListener) this);
         
         add(editor);
         editor.setValue("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
@@ -45,6 +49,16 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 	@Override
 	public void onDocumentChanged(DocumentChangedEvent event) {
 		System.out.println("value changed: " + event.getNewValue());
+	}
+
+	@Override
+	public void onValidationFinished(ValidationFinishedEvent event) {
+		System.out.println("validation finished");
+		Issue[] issues = event.getIssues();
+		System.out.println("issue count: " + issues.length);
+		for (Issue issue : issues) {
+			System.out.println(issue.getDescription());
+		}
 	}
 
 }
