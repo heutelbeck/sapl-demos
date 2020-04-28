@@ -3,8 +3,6 @@ package io.sapl.web.views.javabasedview;
 import java.nio.charset.Charset;
 import java.util.Random;
 
-import com.vaadin.flow.component.ClickEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -17,9 +15,9 @@ import io.sapl.vaadin.Issue;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
-import io.sapl.vaadin.ValidationFinishedListener;
 import io.sapl.web.MainView;
 
+@SuppressWarnings("serial")
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
@@ -28,7 +26,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
 	private SaplEditor editor;
-	
+
 	public JavabasedViewView() {
 		setId("javabased-view-view");
 
@@ -57,7 +55,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 			editor.setDocument(document);
 		});
 		add(setDocumentButton);
-		
+
 		addDocumentChangedListenerButton = new Button();
 		addDocumentChangedListenerButton.setText("Add Change Listener");
 		addDocumentChangedListenerButton.addClickListener(e -> {
@@ -67,7 +65,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 		});
 		addDocumentChangedListenerButton.setEnabled(false);
 		add(addDocumentChangedListenerButton);
-		
+
 		removeDocumentChangedListenerButton = new Button();
 		removeDocumentChangedListenerButton.setText("Remove Change Listener");
 		removeDocumentChangedListenerButton.addClickListener(e -> {
@@ -76,7 +74,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
 		add(removeDocumentChangedListenerButton);
-		
+
 		editor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
 	}
 
