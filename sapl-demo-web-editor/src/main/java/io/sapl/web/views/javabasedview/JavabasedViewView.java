@@ -23,8 +23,12 @@ import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-public class JavabasedViewView extends Div {
+public class JavabasedViewView extends Div implements DocumentChangedListener {
 
+	private Button addDocumentChangedListenerButton;
+	private Button removeDocumentChangedListenerButton;
+	private SaplEditor editor;
+	
 	public JavabasedViewView() {
 		setId("javabased-view-view");
 
@@ -32,32 +36,51 @@ public class JavabasedViewView extends Div {
 		config.setHasLineNumbers(true);
 		config.setTextUpdateDelay(500);
 
-		SaplEditor editor = new SaplEditor(config);
-		editor.addDocumentChangedListener(this::onDocumentChanged);
+		editor = new SaplEditor(config);
+		editor.addDocumentChangedListener(this);
 		editor.addValidationFinishedListener(this::onValidationFinished);
-
 		add(editor);
+
+		Button getDocumentButton = new Button();
+		getDocumentButton.setText("Get Document");
+		getDocumentButton.addClickListener(e -> {
+			String document = editor.getDocument();
+			System.out.println("Get Document: " + document);
+		});
+		add(getDocumentButton);
+
+		Button setDocumentButton = new Button();
+		setDocumentButton.setText("Set Document");
+		setDocumentButton.addClickListener(e -> {
+			String document = getRandomString();
+			System.out.println("Set Document: " + document);
+			editor.setDocument(document);
+		});
+		add(setDocumentButton);
+		
+		addDocumentChangedListenerButton = new Button();
+		addDocumentChangedListenerButton.setText("Add Change Listener");
+		addDocumentChangedListenerButton.addClickListener(e -> {
+			editor.addDocumentChangedListener(this);
+			addDocumentChangedListenerButton.setEnabled(false);
+			removeDocumentChangedListenerButton.setEnabled(true);
+		});
+		addDocumentChangedListenerButton.setEnabled(false);
+		add(addDocumentChangedListenerButton);
+		
+		removeDocumentChangedListenerButton = new Button();
+		removeDocumentChangedListenerButton.setText("Remove Change Listener");
+		removeDocumentChangedListenerButton.addClickListener(e -> {
+			editor.removeDocumentChangedListener(this);
+			addDocumentChangedListenerButton.setEnabled(true);
+			removeDocumentChangedListenerButton.setEnabled(false);
+		});
+		add(removeDocumentChangedListenerButton);
+		
 		editor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
-
-		Button getValueButton = new Button();
-		getValueButton.setText("Get Value");
-		getValueButton.addClickListener(e -> {
-			// String value = editor.GetValue();
-			// System.out.println("Get Value: " + value);
-		});
-		add(getValueButton);
-
-		Button setValueButton = new Button();
-		setValueButton.setText("Set Value");
-		setValueButton.addClickListener(e -> {
-			String value = getRandomString();
-			System.out.println("Set Value: " + value);
-			editor.setDocument(value);
-		});
-		add(setValueButton);
 	}
 
-	private void onDocumentChanged(DocumentChangedEvent event) {
+	public void onDocumentChanged(DocumentChangedEvent event) {
 		System.out.println("value changed: " + event.getNewValue());
 	}
 
