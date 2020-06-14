@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.AttributeException;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.api.validation.Number;
+import io.sapl.grammar.sapl.impl.Val;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
@@ -33,22 +33,21 @@ public class PatientPIP {
 	private final PatientRepository patientRepo;
 
 	@Attribute(name = "relatives")
-	public Flux<JsonNode> getRelations(@Number JsonNode value, Map<String, JsonNode> variables) {
-		final List<Relation> relations = relationRepo.findByPatientid(value.asLong());
+	public Flux<Val> getRelations(@Number Val value, Map<String, JsonNode> variables) {
+		final List<Relation> relations = relationRepo.findByPatientid(value.get().asLong());
 		final List<String> relationNames = relations.stream().map(Relation::getUsername).collect(Collectors.toList());
 		final JsonNode jsonNode = mapper.convertValue(relationNames, JsonNode.class);
-		return Flux.just(jsonNode);
+		return Flux.just(Val.of(jsonNode));
 	}
 
 	@Attribute(name = "patientRecord")
-	public Flux<JsonNode> getPatientRecord(@Number JsonNode patientId, Map<String, JsonNode> variables) {
+	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, JsonNode> variables) {
 		try {
-			final Patient patient = patientRepo.findById(patientId.asLong()).orElseThrow(AttributeException::new);
+			final Patient patient = patientRepo.findById(patientId.get().asLong()).orElseThrow(AttributeException::new);
 			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
-			return Flux.just(jsonNode);
-		}
-		catch (IllegalArgumentException | AttributeException e) {
-			return Flux.just(JsonNodeFactory.instance.nullNode());
+			return Flux.just(Val.of(jsonNode));
+		} catch (IllegalArgumentException | AttributeException e) {
+			return Flux.just(Val.ofNull());
 		}
 	}
 

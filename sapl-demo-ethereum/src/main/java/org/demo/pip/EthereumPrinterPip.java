@@ -15,6 +15,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
+import io.sapl.api.validation.JsonObject;
+import io.sapl.grammar.sapl.impl.Val;
 import io.sapl.interpreter.pip.EthereumPolicyInformationPoint;
 import reactor.core.publisher.Flux;
 
@@ -42,9 +44,9 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 	}
 
 	@Attribute(name = "certified", docs = "Checks, if the given address has a valid printer certificate.")
-	public Flux<JsonNode> certified(JsonNode saplObject, Map<String, JsonNode> variables) {
-		String address = saplObject.get("address").textValue();
-		String printer = saplObject.get("printer").textValue();
+	public Flux<Val> certified(@JsonObject Val saplObject, Map<String, JsonNode> variables) {
+		String address = saplObject.get().get("address").textValue();
+		String printer = saplObject.get().get("printer").textValue();
 		String contractAddress = getContractAddress(printer, variables);
 
 		ObjectNode requestNode = JSON.objectNode();
@@ -59,7 +61,8 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 		ArrayNode outputParams = JSON.arrayNode();
 		outputParams.add(BOOL);
 		requestNode.set(OUTPUT_PARAMS, outputParams);
-		return loadContractInformation(requestNode, variables).map(j -> j.get(0).get("value"));
+		return loadContractInformation(Val.of(requestNode), variables).map(j -> j.get().get(0).get("value"))
+				.map(Val::of);
 	}
 
 	private String getContractAddress(String printer, Map<String, JsonNode> variables) {

@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.sapl.grammar.sapl.impl.Val;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 /**
- * REST controller providing endpoints for the policy information point providing patient
- * attributes. The endpoints can be connected using the client
+ * REST controller providing endpoints for the policy information point
+ * providing patient attributes. The endpoints can be connected using the client
  * {@code HttpPolicyInformationPoint} of the SAPL policy engine.
  */
 @RestController
@@ -34,14 +34,15 @@ public class PatientPIPController {
 
 	/**
 	 * Delegates to {@link PatientPIP#getRelations(JsonNode, Map)}.
+	 * 
 	 * @param id the id of the patient whose relatives should be returned.
-	 * @return a flux emitting an object containing the current list of names of users
-	 * being related to the patient with the given id.
+	 * @return a flux emitting an object containing the current list of names of
+	 *         users being related to the patient with the given id.
 	 * @see PatientPIP#getRelations(JsonNode, Map)
 	 */
 	@GetMapping(value = "{id}/relatives", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<JsonNode> getRelations(@PathVariable String id) {
-		final Flux<JsonNode> relations = patientPIP.getRelations(JsonNodeFactory.instance.textNode(id), null);
+		final Flux<JsonNode> relations = patientPIP.getRelations(Val.of(id), null).map(Val::get);
 		// PatientPIP.getRelations(id) returns a Flux emitting ArrayNodes containing the
 		// names of all relatives. When ArrayNodes are serialized for a Flux
 		// (mediaType=application/stream+json), Spring's Jackson2Tokenizer passes each
@@ -50,9 +51,11 @@ public class PatientPIPController {
 		// dataBuffers, jsonFactory, tokenizeArrayElements)).
 		// This results in a stream of names instead of a stream of arrays containing
 		// names. Expressions like 'subject.name in pipUrl.<http.get>' in the
-		// policies will not work, because 'pipUrl.<http.get>' is a string, not an array.
+		// policies will not work, because 'pipUrl.<http.get>' is a string, not an
+		// array.
 		// As it is not possible to configure the Jackson2Tokenizer to not treat
-		// ArrayNodes like this, we have to work around the problem by wrapping the array
+		// ArrayNodes like this, we have to work around the problem by wrapping the
+		// array
 		// with an object before serializing it. The expressions in the policies must
 		// then be adjusted to 'subject.name in pipUrl.<http.get>.relatives'.
 		return relations.map(jsonNode -> {
@@ -65,15 +68,17 @@ public class PatientPIPController {
 
 	/**
 	 * Delegates to {@link PatientPIP#getPatientRecord(JsonNode, Map)}.
+	 * 
 	 * @param id the id of the patient whose data record should be returned.
-	 * @return a flux emitting the current data record of the patient identified by the
-	 * given id.
+	 * @return a flux emitting the current data record of the patient identified by
+	 *         the given id.
 	 * @see PatientPIP#getPatientRecord(JsonNode, Map)
 	 */
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<JsonNode> getPatientRecord(@PathVariable String id) {
-		return patientPIP.getPatientRecord(JsonNodeFactory.instance.textNode(id), null)
-				.doOnNext(jsonNode -> LOGGER.trace("PatientPIPController.getPatientRecord() returns {}", jsonNode));
+		return patientPIP.getPatientRecord(Val.of(id), null)
+				.doOnNext(jsonNode -> LOGGER.trace("PatientPIPController.getPatientRecord() returns {}", jsonNode))
+				.map(Val::get);
 	}
 
 }

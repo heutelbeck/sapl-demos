@@ -17,7 +17,6 @@ import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
 import io.sapl.web.MainView;
 
-@SuppressWarnings("serial")
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
