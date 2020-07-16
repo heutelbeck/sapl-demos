@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -69,7 +70,7 @@ public class Benchmark {
 
 	private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
 
-	private static final String DEFAULT_PATH = "C:/sapl";
+	private static final String DEFAULT_PATH = "/Users/marclucasbaur/sapl/";
 
 	private static final String HELP_DOC = "print this message";
 
@@ -86,6 +87,8 @@ public class Benchmark {
 	private static final int RUNS = 30;
 
 	private static final double MILLION = 1000000.0D;
+
+	private static final IndexType INDEX_TYPE = SIMPLE;
 
 	private static double nanoToMs(long nanoseconds) {
 		return nanoseconds / MILLION;
@@ -301,7 +304,7 @@ public class Benchmark {
 			for (int i = 0; i < ITERATIONS; i++) {
 				long begin = System.nanoTime();
 				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
-						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE)
+						.withFilesystemPolicyRetrievalPoint(path + subfolder, INDEX_TYPE)
 						.withFilesystemPDPConfigurationProvider(path + subfolder).build();
 				double prep = nanoToMs(System.nanoTime() - begin);
 
