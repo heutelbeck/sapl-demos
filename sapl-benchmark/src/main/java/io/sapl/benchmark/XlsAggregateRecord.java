@@ -18,18 +18,16 @@ package io.sapl.benchmark;
 import lombok.Value;
 
 @Value
-public class XlsRecord {
-
-    int number;
+public class XlsAggregateRecord {
 
     String name;
 
-    double preparation;
+    double min;
 
-    double duration;
+    double max;
 
-    String request;
+    double avg;
 
-    String response;
+    double mdn;
 
 }
