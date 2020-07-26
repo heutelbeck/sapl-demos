@@ -15,28 +15,19 @@
  ******************************************************************************/
 package io.sapl.benchmark;
 
-import lombok.Builder;
+import lombok.Value;
 
-import java.util.ArrayList;
-import java.util.List;
+@Value
+public class XlsAggregateRecord {
 
-@Builder
-public class TestSuite {
+    String name;
 
-    private List<PolicyGeneratorConfiguration> cases = new ArrayList<>();
+    double min;
 
-    public TestSuite() {
-    }
+    double max;
 
-    public TestSuite(List<PolicyGeneratorConfiguration> cases) {
-        this.cases = cases;
-    }
+    double avg;
 
-    public List<PolicyGeneratorConfiguration> getCases() {
-        return cases;
-    }
+    double mdn;
 
-    public void setCases(List<PolicyGeneratorConfiguration> cases) {
-        this.cases = cases;
-    }
 }

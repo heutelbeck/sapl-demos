@@ -36,6 +36,7 @@
 	<modules>
 		<module>docs</module>
 		<module>sapl-benchmark</module>
+		<module>sapl-benchmark-springboot</module>
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-domain</module>

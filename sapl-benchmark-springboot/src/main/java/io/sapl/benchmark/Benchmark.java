@@ -38,6 +38,8 @@ import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.XYChart;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -59,7 +61,8 @@ import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
 @Slf4j
-public class Benchmark {
+@Component
+public class Benchmark implements CommandLineRunner {
 
     private static final int DEFAULT_HEIGHT = 1080;
 
@@ -113,8 +116,9 @@ public class Benchmark {
 
     private static final Gson GSON = new Gson();
 
-    public static void main(String[] args) throws URISyntaxException {
-
+    @Override
+    public void run(String... args) throws Exception {
+        LOGGER.info("command line runner started");
         Options options = new Options();
 
         options.addOption(PATH, true, PATH_DOC);
