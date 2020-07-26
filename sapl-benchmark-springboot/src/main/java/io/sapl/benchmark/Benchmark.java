@@ -24,8 +24,11 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pip.AttributeException;
+import io.sapl.db.BenchmarkResult;
+import io.sapl.db.BenchmarkResultRepository;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -49,7 +52,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,6 +64,7 @@ import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class Benchmark implements CommandLineRunner {
 
     private static final int DEFAULT_HEIGHT = 1080;
@@ -106,19 +109,36 @@ public class Benchmark implements CommandLineRunner {
 
     private static final double MILLION = 1000000.0D;
 
-    private static IndexType indexType = FAST;
+    private String path = DEFAULT_PATH;
 
-    private static boolean reuseExistingPolicies = true;
+    private IndexType indexType = FAST;
 
-    private static String testFilePath = DEFAULT_PATH + "tests/tests.json";
+    private boolean reuseExistingPolicies = true;
 
-    private static String filePrefix;
+    private String testFilePath = DEFAULT_PATH + "tests/tests.json";
+
+    private String filePrefix;
 
     private static final Gson GSON = new Gson();
+
+    private final BenchmarkResultRepository repository;
 
     @Override
     public void run(String... args) throws Exception {
         LOGGER.info("command line runner started");
+
+        parseCommandLineArguments(args);
+        filePrefix = String.format("%s_%s/", LocalDateTime.now(), indexType);
+
+        LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}", indexType, reuseExistingPolicies,
+                testFilePath, filePrefix);
+
+        runBenchmark(path);
+
+        System.exit(0);
+    }
+
+    private void parseCommandLineArguments(String... args) {
         Options options = new Options();
 
         options.addOption(PATH, true, PATH_DOC);
@@ -133,139 +153,136 @@ public class Benchmark implements CommandLineRunner {
             if (cmd.hasOption(HELP)) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp(USAGE, options);
-            } else {
-                String path = cmd.getOptionValue(PATH);
-                if (Strings.isNullOrEmpty(path)) {
-                    path = DEFAULT_PATH;
-                }
-
-                String reuseOption = cmd.getOptionValue(REUSE);
-                if (!Strings.isNullOrEmpty(reuseOption)) {
-                    switch (reuseOption.toUpperCase()) {
-                        case "TRUE":
-                            reuseExistingPolicies = true;
-                            break;
-                        case "FALSE":
-                            reuseExistingPolicies = false;
-                            break;
-                        default:
-                            HelpFormatter formatter = new HelpFormatter();
-                            formatter.printHelp(USAGE, options);
-                            throw new IllegalArgumentException("invalid policy reuse option provided");
-                    }
-                }
-
-                String indexOption = cmd.getOptionValue(INDEX);
-
-                if (!Strings.isNullOrEmpty(indexOption)) {
-                    LOGGER.info("using index {}", indexOption);
-                    switch (indexOption.toUpperCase()) {
-                        case "FAST":
-                            indexType = FAST;
-                            break;
-                        case "IMPROVED":
-                            indexType = IMPROVED;
-                            break;
-                        case "SIMPLE":
-                            indexType = SIMPLE;
-                            break;
-                        default:
-                            HelpFormatter formatter = new HelpFormatter();
-                            formatter.printHelp(USAGE, options);
-                            throw new IllegalArgumentException("invalid index option provided");
-                    }
-                }
-
-                String testOption = cmd.getOptionValue(TEST);
-                if (!Strings.isNullOrEmpty(testOption)) {
-                    if (!Files.exists(Paths.get(testOption))) {
-                        throw new IllegalArgumentException("test file provided does not exists");
-                    }
-                    testFilePath = testOption;
-                }
-
-                filePrefix = String.format("%s_%s/", LocalDateTime.now(), indexType);
-                LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}", indexType, reuseExistingPolicies,
-                        testFilePath, filePrefix);
-
-                runBenchmark(path);
+                return;
             }
+
+            String pathOption = cmd.getOptionValue(PATH);
+            if (!Strings.isNullOrEmpty(pathOption)) {
+                if (!Files.exists(Paths.get(pathOption))) {
+                    throw new IllegalArgumentException("path provided does not exists");
+                }
+                path = pathOption;
+            }
+
+            String reuseOption = cmd.getOptionValue(REUSE);
+            if (!Strings.isNullOrEmpty(reuseOption)) {
+                switch (reuseOption.toUpperCase()) {
+                    case "TRUE":
+                        reuseExistingPolicies = true;
+                        break;
+                    case "FALSE":
+                        reuseExistingPolicies = false;
+                        break;
+                    default:
+                        HelpFormatter formatter = new HelpFormatter();
+                        formatter.printHelp(USAGE, options);
+                        throw new IllegalArgumentException("invalid policy reuse option provided");
+                }
+            }
+
+            String indexOption = cmd.getOptionValue(INDEX);
+
+            if (!Strings.isNullOrEmpty(indexOption)) {
+                LOGGER.info("using index {}", indexOption);
+                switch (indexOption.toUpperCase()) {
+                    case "FAST":
+                        indexType = FAST;
+                        break;
+                    case "IMPROVED":
+                        indexType = IMPROVED;
+                        break;
+                    case "SIMPLE":
+                        indexType = SIMPLE;
+                        break;
+                    default:
+                        HelpFormatter formatter = new HelpFormatter();
+                        formatter.printHelp(USAGE, options);
+                        throw new IllegalArgumentException("invalid index option provided");
+                }
+            }
+
+            String testOption = cmd.getOptionValue(TEST);
+            if (!Strings.isNullOrEmpty(testOption)) {
+                if (!Files.exists(Paths.get(testOption))) {
+                    throw new IllegalArgumentException("test file provided does not exists");
+                }
+                testFilePath = testOption;
+            }
+
+
         } catch (ParseException e) {
             LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
             System.exit(1);
         }
 
-        System.exit(0);
     }
 
-    public static void runBenchmark(String path) throws URISyntaxException {
-        TestSuite suite = null;
-
+    public void runBenchmark(String path) throws URISyntaxException {
         String resultPath = path + filePrefix;
+
         try {
+            final Path dir = Paths.get(path, filePrefix);
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
+        }
+
+        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
+        BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType.toString(),
+                reuseExistingPolicies, ITERATIONS, RUNS);
+
+        TestSuite suite = generateTestSuite();
+        List<PolicyGeneratorConfiguration> configs = suite.getCases();
+
+        for (PolicyGeneratorConfiguration config : configs) {
+            benchmarkConfiguration(path, chart, benchmarkDataContainer, config);
+        }
+
+        writeOverviewChart(resultPath, chart);
+
+        writeHistogram(resultPath, benchmarkDataContainer);
+
+        writeExcelFile(resultPath, benchmarkDataContainer.getData());
+
+        buildAggregateData(benchmarkDataContainer);
+        writeExcelFileAggregates(resultPath, benchmarkDataContainer.getAggregateData());
+        persistAggregates(benchmarkDataContainer);
+    }
+
+    private TestSuite generateTestSuite() {
 //            File testFile = new File(testFilePath);
 //            LOGGER.info("using testfile: {}", testFile);
 //            List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
 //            String allLinesAsString = StringUtils.join(allLines, "");
 //            suite = GSON.fromJson(allLinesAsString, TestSuite.class);
-            suite = TestSuiteGenerator.generate();
+        TestSuite suite = TestSuiteGenerator.generate();
 
-            Objects.requireNonNull(suite, "test suite is null");
-            Objects.requireNonNull(suite.getCases(), "test cases are null");
-            LOGGER.info("suite contains {} test cases", suite.getCases().size());
-            assert !suite.getCases().isEmpty() : "at least one test case must be present";
+        Objects.requireNonNull(suite, "test suite is null");
+        Objects.requireNonNull(suite.getCases(), "test cases are null");
+        LOGGER.info("suite contains {} test cases", suite.getCases().size());
+        assert !suite.getCases().isEmpty() : "at least one test case must be present";
 
-            final Path dir = Paths.get(path, filePrefix);
-            Files.createDirectories(dir);
-
-        } catch (IOException e) {
-            LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
-            System.exit(1);
-        }
-
-        List<XlsRecord> data = new ArrayList<>();
-
-        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-
-        List<Double> minValues = new LinkedList<>();
-        List<Double> maxValues = new LinkedList<>();
-        List<Double> avgValues = new LinkedList<>();
-        List<Double> mdnValues = new LinkedList<>();
-
-        List<PolicyGeneratorConfiguration> configs = suite.getCases();
-        List<String> identifier = new LinkedList<>();
-        for (PolicyGeneratorConfiguration config : configs) {
-            benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues, mdnValues, identifier, config);
-        }
-
-        writeOverviewChart(resultPath, chart);
-
-        writeHistogram(resultPath, minValues, maxValues, avgValues, mdnValues, identifier);
-
-        writeExcelFile(resultPath, data);
-
-        List<XlsAggregateRecord> aggregateData = buildAggregateData(minValues, maxValues, avgValues, mdnValues,
-                identifier);
-        writeExcelFileAggregates(resultPath, aggregateData);
+        return suite;
     }
 
-    private static List<XlsAggregateRecord> buildAggregateData(List<Double> minValues, List<Double> maxValues,
-                                                               List<Double> avgValues, List<Double> mdnValues,
-                                                               List<String> identifier) {
-        List<XlsAggregateRecord> records = new LinkedList<>();
-
-        for (int i = 0; i < identifier.size(); i++) {
-            records.add(new XlsAggregateRecord(identifier.get(i), minValues.get(i), maxValues.get(i), avgValues
-                    .get(i), mdnValues.get(i)));
-        }
-
-        return records;
+    private void persistAggregates(BenchmarkDataContainer dataContainer) {
+        dataContainer.getAggregateData().stream()
+                .map(aggregateRecord -> new BenchmarkResult(dataContainer, aggregateRecord))
+                .forEach(repository::save);
     }
 
-    private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
-                                               List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
-                                               PolicyGeneratorConfiguration config) throws URISyntaxException {
-        identifier.add(config.getName());
+    private void buildAggregateData(BenchmarkDataContainer benchmarkDataContainer) {
+        for (int i = 0; i < benchmarkDataContainer.getIdentifier().size(); i++) {
+            benchmarkDataContainer.getAggregateData().add(new XlsAggregateRecord(benchmarkDataContainer.getIdentifier().get(i),
+                    benchmarkDataContainer.getMinValues().get(i), benchmarkDataContainer.getMaxValues().get(i),
+                    benchmarkDataContainer.getAvgValues().get(i), benchmarkDataContainer.getMdnValues().get(i)));
+        }
+    }
+
+    private void benchmarkConfiguration(String path, XYChart chart, BenchmarkDataContainer benchmarkDataContainer,
+                                        PolicyGeneratorConfiguration config) throws URISyntaxException {
+        benchmarkDataContainer.getIdentifier().add(config.getName());
         List<XlsRecord> results = null;
         try {
             results = runTest(config, path);
@@ -296,16 +313,16 @@ public class Benchmark implements CommandLineRunner {
             System.exit(1);
         }
 
-        minValues.add(extractMin(results));
-        maxValues.add(extractMax(results));
-        avgValues.add(extractAvg(results));
-        mdnValues.add(extractMdn(results));
+        benchmarkDataContainer.getMinValues().add(extractMin(results));
+        benchmarkDataContainer.getMaxValues().add(extractMax(results));
+        benchmarkDataContainer.getAvgValues().add(extractAvg(results));
+        benchmarkDataContainer.getMdnValues().add(extractMdn(results));
 
         chart.addSeries(config.getName(), times);
-        data.addAll(results);
+        benchmarkDataContainer.getData().addAll(results);
     }
 
-    private static void writeOverviewChart(String path, XYChart chart) {
+    private void writeOverviewChart(String path, XYChart chart) {
         chart.setTitle("Evaluation Time");
         chart.setXAxisTitle("Run");
         chart.setYAxisTitle("ms");
@@ -317,17 +334,16 @@ public class Benchmark implements CommandLineRunner {
         }
     }
 
-    private static void writeHistogram(String path, List<Double> minValues, List<Double> maxValues,
-                                       List<Double> avgValues, List<Double> mdnValues, List<String> identifier) {
+    private void writeHistogram(String path, BenchmarkDataContainer benchmarkDataContainer) {
 
         CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         histogram.setTitle("Aggregates");
         histogram.setXAxisTitle("Run");
         histogram.setYAxisTitle("ms");
-        histogram.addSeries("min", identifier, minValues);
-        histogram.addSeries("max", identifier, maxValues);
-        histogram.addSeries("avg", identifier, avgValues);
-        histogram.addSeries("mdn", identifier, mdnValues);
+        histogram.addSeries("min", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMinValues());
+        histogram.addSeries("max", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMaxValues());
+        histogram.addSeries("avg", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getAvgValues());
+        histogram.addSeries("mdn", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMdnValues());
 
         try {
             BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
@@ -337,7 +353,7 @@ public class Benchmark implements CommandLineRunner {
         }
     }
 
-    private static void writeExcelFile(String path, List<XlsRecord> data) {
+    private void writeExcelFile(String path, List<XlsRecord> data) {
         try (OutputStream os = Files.newOutputStream(Paths.get(path, "overview.xls"))) {
             SimpleExporter exp = new SimpleExporter();
             exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
@@ -347,7 +363,7 @@ public class Benchmark implements CommandLineRunner {
         }
     }
 
-    private static void writeExcelFileAggregates(String path, List<XlsAggregateRecord> data) {
+    private void writeExcelFileAggregates(String path, List<XlsAggregateRecord> data) {
         try (OutputStream os = Files.newOutputStream(Paths.get(path, "histogram.xls"))) {
             SimpleExporter exp = new SimpleExporter();
             exp.gridExport(getExportHeaderAggregates(), data, EXPORT_PROPERTIES_AGGREGATES, os);
@@ -357,7 +373,7 @@ public class Benchmark implements CommandLineRunner {
         }
     }
 
-    private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
+    private List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
             throws IOException, URISyntaxException, PolicyEvaluationException {
 
 
@@ -408,21 +424,21 @@ public class Benchmark implements CommandLineRunner {
         return results;
     }
 
-    private static double nanoToMs(long nanoseconds) {
+    private double nanoToMs(long nanoseconds) {
         return nanoseconds / MILLION;
     }
 
-    private static List<String> getExportHeader() {
+    private List<String> getExportHeader() {
         return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
                 "Response String (ms)");
     }
 
-    private static List<String> getExportHeaderAggregates() {
+    private List<String> getExportHeaderAggregates() {
         return Arrays.asList("Test Case", "Minimum Time (ms)", "Maximum Time (ms)", "Average Time (ms)",
                 "Median Time (ms)");
     }
 
-    private static double extractMin(List<XlsRecord> data) {
+    private double extractMin(List<XlsRecord> data) {
         double min = Double.MAX_VALUE;
         for (XlsRecord item : data) {
             if (item.getDuration() < min) {
@@ -432,7 +448,7 @@ public class Benchmark implements CommandLineRunner {
         return min;
     }
 
-    private static double extractMax(List<XlsRecord> data) {
+    private double extractMax(List<XlsRecord> data) {
         double max = Double.MIN_VALUE;
         for (XlsRecord item : data) {
             if (item.getDuration() > max) {
@@ -442,7 +458,7 @@ public class Benchmark implements CommandLineRunner {
         return max;
     }
 
-    private static double extractAvg(List<XlsRecord> data) {
+    private double extractAvg(List<XlsRecord> data) {
         double sum = 0;
         for (XlsRecord item : data) {
             sum += item.getDuration();
@@ -450,7 +466,7 @@ public class Benchmark implements CommandLineRunner {
         return sum / data.size();
     }
 
-    private static double extractMdn(List<XlsRecord> data) {
+    private double extractMdn(List<XlsRecord> data) {
         List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
         int index = list.size() / 2;
         if (list.size() % 2 == 0) {
