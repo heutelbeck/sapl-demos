@@ -56,6 +56,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
@@ -97,11 +98,15 @@ public class Benchmark implements CommandLineRunner {
 
     private static final String TEST_DOC = "JSON file containing test definition";
 
-    private static final String USAGE = "java -jar sapl-benchmark-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
+    private static final String USAGE = "java -jar sapl-benchmark-springboot-1.0.0-SNAPSHOT.jar";
 
     private static final String PATH = "path";
 
     private static final String PATH_DOC = "path for output files";
+
+    private static final String COMPARISION_ID = "cid";
+
+    private static final String COMPARISION_ID_DOC = "id to group benchmarks using same policies";
 
     private static final int ITERATIONS = 10;
 
@@ -119,6 +124,8 @@ public class Benchmark implements CommandLineRunner {
 
     private String filePrefix;
 
+    private String comparisionId = UUID.randomUUID().toString();
+
     private static final Gson GSON = new Gson();
 
     private final BenchmarkResultRepository repository;
@@ -130,8 +137,8 @@ public class Benchmark implements CommandLineRunner {
         parseCommandLineArguments(args);
         filePrefix = String.format("%s_%s/", LocalDateTime.now(), indexType);
 
-        LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}", indexType, reuseExistingPolicies,
-                testFilePath, filePrefix);
+        LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}, comparisonId={}", indexType, reuseExistingPolicies,
+                testFilePath, filePrefix, comparisionId);
 
         runBenchmark(path);
 
@@ -146,6 +153,7 @@ public class Benchmark implements CommandLineRunner {
         options.addOption(REUSE, true, REUSE_DOC);
         options.addOption(INDEX, true, INDEX_DOC);
         options.addOption(TEST, true, TEST_DOC);
+        options.addOption(COMPARISION_ID, true, COMPARISION_ID_DOC);
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -153,7 +161,7 @@ public class Benchmark implements CommandLineRunner {
             if (cmd.hasOption(HELP)) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp(USAGE, options);
-                return;
+                System.exit(-1);
             }
 
             String pathOption = cmd.getOptionValue(PATH);
@@ -209,6 +217,11 @@ public class Benchmark implements CommandLineRunner {
                 testFilePath = testOption;
             }
 
+            String cidOption = cmd.getOptionValue(COMPARISION_ID);
+            if (!Strings.isNullOrEmpty(cidOption)) {
+                comparisionId = cidOption;
+            }
+
 
         } catch (ParseException e) {
             LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
@@ -230,7 +243,7 @@ public class Benchmark implements CommandLineRunner {
         XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
         BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType.toString(),
-                reuseExistingPolicies, ITERATIONS, RUNS);
+                reuseExistingPolicies, ITERATIONS, RUNS, comparisionId);
 
         TestSuite suite = generateTestSuite();
         List<PolicyGeneratorConfiguration> configs = suite.getCases();
@@ -274,9 +287,11 @@ public class Benchmark implements CommandLineRunner {
 
     private void buildAggregateData(BenchmarkDataContainer benchmarkDataContainer) {
         for (int i = 0; i < benchmarkDataContainer.getIdentifier().size(); i++) {
-            benchmarkDataContainer.getAggregateData().add(new XlsAggregateRecord(benchmarkDataContainer.getIdentifier().get(i),
-                    benchmarkDataContainer.getMinValues().get(i), benchmarkDataContainer.getMaxValues().get(i),
-                    benchmarkDataContainer.getAvgValues().get(i), benchmarkDataContainer.getMdnValues().get(i)));
+            benchmarkDataContainer.getAggregateData()
+                    .add(new XlsAggregateRecord(benchmarkDataContainer.getIdentifier().get(i),
+                            benchmarkDataContainer.getMinValues().get(i), benchmarkDataContainer.getMaxValues().get(i),
+                            benchmarkDataContainer.getAvgValues().get(i), benchmarkDataContainer.getMdnValues()
+                            .get(i)));
         }
     }
 

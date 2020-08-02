@@ -39,6 +39,7 @@ public class PolicyGenerator {
 
     private final PolicyGeneratorConfiguration config;
 
+
     public PolicyGenerator(PolicyGeneratorConfiguration config) {
         this.config = config;
         dice = new Random(config.getSeed());
@@ -115,6 +116,7 @@ public class PolicyGenerator {
                 writer.println(generatePolicyString(name));
             }
         }
+
     }
 
 

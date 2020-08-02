@@ -18,6 +18,7 @@ public class BenchmarkResult {
     final String benchmarkId;
     final long benchmarkTimestamp;
     final String runtimeInfo;
+    String comparisonId;
 
     final String indexType;
     final boolean newPoliciesGenerated;
@@ -45,6 +46,7 @@ public class BenchmarkResult {
         this.newPoliciesGenerated = benchmarkDataContainer.isNewPoliciesGenerated();
         this.iterations = benchmarkDataContainer.getIterations();
         this.runs = benchmarkDataContainer.getRuns();
+        this.comparisonId = benchmarkDataContainer.getComparisonId();
 
         this.name = aggregateRecord.getName();
         this.min = aggregateRecord.getMin();

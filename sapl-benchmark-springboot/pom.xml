@@ -11,6 +11,8 @@
 
     <groupId>io.sapl</groupId>
     <artifactId>sapl-benchmark-springboot</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
     <name>sapl-benchmark-springboot</name>
     <description>SAPL Benchmark Spring Boot</description>
 
