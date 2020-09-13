@@ -1,13 +1,13 @@
 package org.demo.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -15,30 +15,42 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Patient {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-	String medicalRecordNumber;
+    String medicalRecordNumber;
 
-	String name;
+    String name;
 
-	String icd11Code;
+    String icd11Code;
 
-	String diagnosisText;
+    String diagnosisText;
 
-	String attendingDoctor;
+//	String attendingDoctor;
+//
+//	String attendingNurse;
 
-	String attendingNurse;
+    String phoneNumber;
 
-	String phoneNumber;
+    String roomNumber;
 
-	String roomNumber;
+    String gender;
 
-	public static Patient clone(Patient template) {
-		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
-				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
-				template.roomNumber);
-	}
+    String dateOfBirth;
+
+    String address;
+
+    String insurance;
+
+    public static Patient clone(Patient template) {
+//		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
+//				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
+//				template.roomNumber);
+        return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
+                template.diagnosisText, template.phoneNumber, template.roomNumber, template.gender,
+                template.dateOfBirth, template.address, template.insurance);
+    }
+
 
 }
