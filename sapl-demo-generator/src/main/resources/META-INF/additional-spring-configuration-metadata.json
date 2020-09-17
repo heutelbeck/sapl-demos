@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "sapl.count.general.roles",
+      "type": "java.lang.String",
+      "description": "Description for sapl.count.general.roles."
+  }
+] }
