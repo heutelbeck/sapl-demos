@@ -1,11 +1,9 @@
 package io.sapl.demo.generator;
 
-import io.sapl.demo.generator.example.ExampleProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 @Slf4j
 @Configuration
@@ -25,19 +23,10 @@ public class DomainGeneratorConfig {
 
 
     @Bean
-    public DomainParameter domainParameter() {
-          return DomainParameter.builder()
-                  .numberOfGeneralRoles(2)
-                  .numberOfGeneralResources(2)
-                  .numberOfDepartments(5)
-                  .build();
+    public DomainData domainParameter() {
+        return new DomainData(numberOfGeneralRoles, numberOfGeneralResources, numberOfDepartments);
     }
 
-    @Bean
-    @DependsOn("domainParameter")
-    public ExampleProvider domainRoleProvider(DomainParameter domainParameter) {
-        return new ExampleProvider(domainParameter);
-    }
 
     @Bean
     public GeneratorUtility generatorUtility() {

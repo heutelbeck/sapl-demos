@@ -1,7 +1,6 @@
 package io.sapl.demo.generator;
 
 import io.sapl.demo.generator.example.Department;
-import io.sapl.demo.generator.example.ExampleProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DomainGenerator {
 
-    private final ExampleProvider domainRoleProvider;
-
-    private final DomainParameter domainParameter;
+    private final DomainData domainData;
 
     private final GeneratorUtility generatorUtility;
 
@@ -25,7 +22,7 @@ public class DomainGenerator {
 
     public void generateDomainPolicies() {
 
-        for (Department department : domainParameter.getDepartmentList()) {
+        for (Department department : domainData.getDepartments()) {
             domainPolicies.addAll(generatePoliciesForDepartment(department));
         }
 
@@ -38,7 +35,7 @@ public class DomainGenerator {
         LOGGER.info("generating policies for department: {}", department.getDepartmentName());
         List<DomainPolicy> policiesForDepartment = new ArrayList<>();
 
-        for (String departmentResource : department.getDepartmentResources()) {
+        for (DomainResource departmentResource : department.getDepartmentResources()) {
             policiesForDepartment.add(generateSystemPolicyForResource(departmentResource)); //SYSTEM
             policiesForDepartment.add(generateAdministratorPolicyForResource(departmentResource)); //ADMIN
 
@@ -50,7 +47,7 @@ public class DomainGenerator {
         return policiesForDepartment;
     }
 
-    private List<DomainPolicy> generatePoliciesForInternal(Department department, String departmentResource) {
+    private List<DomainPolicy> generatePoliciesForInternal(Department department, DomainResource departmentResource) {
         List<DomainPolicy> policies = new ArrayList<>();
 
         if (department.isInternalAccessUnrestricted()) {
@@ -64,7 +61,7 @@ public class DomainGenerator {
         return policies;
     }
 
-    private List<DomainPolicy> generatePoliciesForPublic(Department department, String departmentResource) {
+    private List<DomainPolicy> generatePoliciesForPublic(Department department, DomainResource departmentResource) {
         List<DomainPolicy> policies = new ArrayList<>();
 
         if (department.isPublicAccessUnrestricted()) {
@@ -78,7 +75,8 @@ public class DomainGenerator {
         return policies;
     }
 
-    private List<DomainPolicy> generatePoliciesForSpecialActions(Department department, String departmentResource) {
+    private List<DomainPolicy> generatePoliciesForSpecialActions(Department department,
+                                                                 DomainResource departmentResource) {
         List<DomainPolicy> policies = new ArrayList<>();
 
         policies.add(generateActionSpecificResourceAccessPolicyForRoles(departmentResource, department
@@ -87,39 +85,39 @@ public class DomainGenerator {
         return policies;
     }
 
-
-    private DomainPolicy generateSystemPolicyForResource(String resourceName) {
-        return generateUnrestrictedResourceAccessPolicyForRoles(resourceName,
-                Collections.singletonList(DomainRole.ROLE_SYSTEM.getRoleName()));
+    private DomainPolicy generateSystemPolicyForResource(DomainResource resource) {
+        return generateUnrestrictedResourceAccessPolicyForRoles(resource,
+                Collections.singletonList(DomainRole.ROLE_SYSTEM));
     }
 
-    private DomainPolicy generateAdministratorPolicyForResource(String resourceName) {
-        return generateUnrestrictedResourceAccessPolicyForRoles(resourceName,
-                Collections.singletonList(DomainRole.ROLE_ADMIN.getRoleName()));
+    private DomainPolicy generateAdministratorPolicyForResource(DomainResource resource) {
+        return generateUnrestrictedResourceAccessPolicyForRoles(resource,
+                Collections.singletonList(DomainRole.ROLE_ADMIN));
     }
 
-    private StringBuilder generateBasePolicyStringForResource(String policyName, String resourceName) {
+    private StringBuilder generateBasePolicyStringForResource(String policyName, DomainResource resource) {
         return new StringBuilder().append("policy \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
                 .append("permit ")
-                .append(String.format("(resource == %s)", resourceName));
+                .append(String.format("(resource == %s)", resource.getResourceName()));
     }
 
-    private DomainPolicy generateUnrestrictedResourceAccessPolicyForRoles(String resourceName,
-                                                                          List<String> subjectRoles) {
-        String policyName = String.format("%s full access on $s", subjectRoles, resourceName);
+    private DomainPolicy generateUnrestrictedResourceAccessPolicyForRoles(DomainResource resource,
+                                                                          List<DomainRole> subjectRoles) {
+        String policyName = String.format("%s full access on %s", subjectRoles, resource);
 
-        StringBuilder policyBuilder = generateBasePolicyStringForResource(policyName, resourceName);
+        StringBuilder policyBuilder = generateBasePolicyStringForResource(policyName, resource);
         addSubjectRolesToTargetExpression(policyBuilder, subjectRoles);
 
         return new DomainPolicy(policyName, policyBuilder.toString());
     }
 
-    private DomainPolicy generateActionSpecificResourceAccessPolicyForRoles(String resourceName, List<String> actions,
-                                                                            List<String> subjectRoles) {
-        String policyName = String.format("%s can perform %s on %s", subjectRoles, actions, resourceName);
+    private DomainPolicy generateActionSpecificResourceAccessPolicyForRoles(DomainResource resource,
+                                                                            List<String> actions,
+                                                                            List<DomainRole> subjectRoles) {
+        String policyName = String.format("%s can perform %s on %s", subjectRoles, actions, resource);
 
-        StringBuilder policyBuilder = generateBasePolicyStringForResource(policyName, resourceName);
+        StringBuilder policyBuilder = generateBasePolicyStringForResource(policyName, resource);
         addSubjectRolesToTargetExpression(policyBuilder, subjectRoles);
         addActionsToTargetExpression(policyBuilder, actions);
 
@@ -143,12 +141,12 @@ public class DomainGenerator {
         return String.format("action == \"%s\"", action);
     }
 
-    private void addSubjectRolesToTargetExpression(StringBuilder policyBuilder, List<String> subjectRoles) {
+    private void addSubjectRolesToTargetExpression(StringBuilder policyBuilder, List<DomainRole> subjectRoles) {
         if (subjectRoles.isEmpty()) return;
 
         policyBuilder.append(System.lineSeparator()).append(" && ").append("(");
         boolean firstRole = true;
-        for (String subjectRole : subjectRoles) {
+        for (DomainRole subjectRole : subjectRoles) {
             if (firstRole) firstRole = false;
             else policyBuilder.append(" || ");
             policyBuilder.append(generateRoleString(subjectRole));
@@ -156,8 +154,8 @@ public class DomainGenerator {
         policyBuilder.append(")");
     }
 
-    private String generateRoleString(String role) {
-        return String.format("(\"%s\" in subject..authority)", role);
+    private String generateRoleString(DomainRole role) {
+        return String.format("(\"%s\" in subject..authority)", role.getRoleName());
     }
 
 }

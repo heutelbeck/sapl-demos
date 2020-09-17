@@ -1,6 +1,8 @@
 package io.sapl.demo.generator.example;
 
 import io.sapl.demo.generator.CRUD;
+import io.sapl.demo.generator.DomainResource;
+import io.sapl.demo.generator.DomainRole;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,15 +25,15 @@ public class Department {
     private final CRUD crudInternal;
     private final CRUD crudPublic;
 
-    private List<String> departmentRoles = new ArrayList<>();
-    private List<String> departmentResources = new ArrayList<>();
+    private List<DomainRole> departmentRoles = new ArrayList<>();
+    private List<DomainResource> departmentResources = new ArrayList<>();
 
     private List<String> departmentInternalActions = new ArrayList<>();
     private List<String> departmentPublicActions = new ArrayList<>();
     private List<String> departmentSpecialActions = new ArrayList<>();
 
-    private List<String> rolesForPublicActions = new ArrayList<>();
-    private List<String> rolesForSpecialActions = new ArrayList<>();
+    private List<DomainRole> rolesForPublicActions = new ArrayList<>();
+    private List<DomainRole> rolesForSpecialActions = new ArrayList<>();
 
 
     public static Department buildDepartmentWithDefaultValues(String departmentName) {
@@ -42,15 +44,15 @@ public class Department {
 
     @PostConstruct
     private void init() {
-        departmentRoles.add("ROLE_" + departmentName);
+        departmentRoles.add(new DomainRole("ROLE_" + departmentName));
 
         for (int i = 0; i < numberOfAdditionalDepartmentSpecificRoles; i++) {
-            departmentRoles.add("ROLE_" + departmentName + "_" + i);
+            departmentRoles.add(new DomainRole("ROLE_" + departmentName + "_" + i));
         }
 
-        departmentResources.add("resource." + departmentName);
+        departmentResources.add(new DomainResource("resource." + departmentName));
         for (int i = 0; i < numberOfAdditionalDepartmentSpecificResources; i++) {
-            departmentResources.add("resource." + departmentName + i);
+            departmentResources.add(new DomainResource("resource." + departmentName + i));
         }
 
         createInternalActions();
@@ -68,22 +70,23 @@ public class Department {
     }
 
     private void createPublicActions() {
-        for (String departmentResource : departmentResources) {
-            departmentPublicActions.addAll(crudPublic.generateActionsWithName(departmentResource));
+        for (DomainResource departmentResource : departmentResources) {
+            departmentPublicActions.addAll(crudPublic.generateActionsWithName(departmentResource.getResourceName()));
         }
     }
 
     private void createInternalActions() {
-        for (String departmentResource : departmentResources) {
-            departmentInternalActions.addAll(crudInternal.generateActionsWithName(departmentResource));
+        for (DomainResource departmentResource : departmentResources) {
+            departmentInternalActions
+                    .addAll(crudInternal.generateActionsWithName(departmentResource.getResourceName()));
         }
     }
 
-    public void addRolesForPublicActions(String... roles) {
+    public void addRolesForPublicActions(DomainRole... roles) {
         rolesForPublicActions.addAll(Arrays.asList(roles.clone()));
     }
 
-    public void addRolesForSpecialActions(String... roles) {
+    public void addRolesForSpecialActions(DomainRole... roles) {
         rolesForSpecialActions.addAll(Arrays.asList(roles.clone()));
     }
 
