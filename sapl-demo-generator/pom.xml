@@ -76,6 +76,14 @@
             <version>1.4</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>29.0-jre</version>
+        </dependency>
+
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -118,7 +126,7 @@
                     </execution>
                 </executions>
             </plugin>
-<!--            <plugin>-->
+            <!--            <plugin>-->
             <!--                <groupId>org.graalvm.nativeimage</groupId>-->
             <!--                <artifactId>native-image-maven-plugin</artifactId>-->
             <!--                <version>${graalvm.version}</version>-->

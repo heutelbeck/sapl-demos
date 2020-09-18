@@ -72,7 +72,7 @@ public class DomainGenerator {
         //extended full access
         policies.addAll(hospital.getExtendedRolesWithGeneralFullAccess().stream().map(role ->
                 generateActionSpecificExtendedPolicy(hospitalResource,
-                        DomainActions.ALL.generateActionsForResource(hospitalResource.getResourceName()), role))
+                        DomainActions.CRUD.generateActionsForResource(hospitalResource.getResourceName()), role))
                 .collect(Collectors.toList())
         );
 

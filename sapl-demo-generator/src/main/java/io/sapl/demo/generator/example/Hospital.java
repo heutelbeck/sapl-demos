@@ -19,13 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class Hospital {
 
-    //TODO generalize hospital general:
-    // - no of rolesWithGeneralFullAccess, rolesWithGeneralReadAccess,
-    // extendedRolesWithGeneralFullAccess, extendedRolesWithGeneralReadAccess
 
-    //TODO generalize hospital resource specific:
-    // - no of map entries per resource
-    // - access modes per role
 
     private final String name;
     private final int numberOfGeneralRoles;

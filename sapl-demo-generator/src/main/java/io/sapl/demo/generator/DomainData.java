@@ -34,7 +34,6 @@ public class DomainData {
     private final int numberOfGeneralResources;
     private final int numberOfDepartments;
 
-
     private final double probabilityOfAdditionalRoles;
     private final double probabilityOfAdditionalResources;
 
@@ -58,6 +57,13 @@ public class DomainData {
         this.hospitalRoles = hospital.getHospitalRoles();
         this.hospitalResources = hospital.getHospitalResources();
 
+        //TODO generalize hospital general:
+        // - no of rolesWithGeneralFullAccess, rolesWithGeneralReadAccess,
+        // extendedRolesWithGeneralFullAccess, extendedRolesWithGeneralReadAccess
+
+        //TODO generalize hospital resource specific:
+        // - no of map entries per resource
+        // - access modes per role
 
         createHospitalGeneralAccess();
         createHospitalResourceSpecificRoleAccess();
@@ -74,7 +80,7 @@ public class DomainData {
                 ExtendedDomainRole.builder()
                         .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_PATIENT))
                         .body(DomainUtil.OWN_DATA_BODY)
-                        .build(), DomainActions.ALL,
+                        .build(), DomainActions.CRUD,
                 //Relatives have read access on personal details
                 ExtendedDomainRole.builder()
                         .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_VISITOR))
@@ -101,7 +107,7 @@ public class DomainData {
                 //Visitors can read room information
                 DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_VISITOR), DomainActions.READ_ONLY,
                 // Nurse has full access on rooms in addition to general read permission
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.ALL
+                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.CRUD
         ));
 
         //PERSONAL DETAILS
@@ -109,7 +115,7 @@ public class DomainData {
                 .findByName(hospitalResources, ResourcePersonalDetails.NAME);
         resourceSpecificRoleAccess.put(personalDetailsResource, Map.of(
                 // Nurse has full access on personal details in addition to general read permission
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.ALL
+                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.CRUD
         ));
 
         //MEDICATION
@@ -177,10 +183,12 @@ public class DomainData {
             } catch (IndexOutOfBoundsException ignored) {
                 departmentName = "DEPARTMENT" + i;
             }
+
             Department department = Department.builder()
                     .departmentName(departmentName)
                     .numberOfSpecialActions(5)
-                    .domainActionsInternal(DomainActions.ALL)
+                    //TODO different domain actions
+                    .domainActionsInternal(DomainActions.CRUD)
                     .domainActionsPublic(DomainActions.READ_ONLY)
                     //TODO specials
 //                    .additionalDepartmentRoles(additionalRoles ? dice.nextInt(3) + 1 : 0)

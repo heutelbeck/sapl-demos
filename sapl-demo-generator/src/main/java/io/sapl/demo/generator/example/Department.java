@@ -62,7 +62,8 @@ public class Department {
     }
 
     private void createDepartmentRoles() {
-        departmentRoles.add(new DomainRole("ROLE_" + departmentName));
+        departmentRoles.add(new DomainRole(ExampleProvider.DEPARTMENT_ROLE_MAP.getOrDefault(departmentName,
+                "ROLE_" + departmentName)));
 
         for (int i = 0; i < additionalDepartmentRoles; i++) {
             departmentRoles.add(new DomainRole("ROLE_" + departmentName + "_" + i));
@@ -77,7 +78,8 @@ public class Department {
 
     private void createPublicActions() {
         for (DomainResource departmentResource : departmentResources) {
-            departmentPublicActions.addAll(domainActionsPublic.generateActionsForResource(departmentResource.getResourceName()));
+            departmentPublicActions
+                    .addAll(domainActionsPublic.generateActionsForResource(departmentResource.getResourceName()));
         }
     }
 
@@ -105,11 +107,11 @@ public class Department {
     }
 
     public boolean isInternalAccessUnrestricted() {
-        return domainActionsInternal == DomainActions.ALL;
+        return domainActionsInternal.isUnrestrictedAccess();
     }
 
     public boolean isPublicAccessUnrestricted() {
-        return domainActionsPublic == DomainActions.ALL;
+        return domainActionsPublic.isUnrestrictedAccess();
     }
 
     public String departmentDetails() {

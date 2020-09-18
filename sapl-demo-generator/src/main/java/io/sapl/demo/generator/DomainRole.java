@@ -4,6 +4,7 @@ import io.sapl.demo.generator.DomainPolicy.DomainPolicyAdvice;
 import io.sapl.demo.generator.DomainPolicy.DomainPolicyBody;
 import io.sapl.demo.generator.DomainPolicy.DomainPolicyObligation;
 import io.sapl.demo.generator.DomainPolicy.DomainPolicyTransformation;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class DomainRole {
 
     @Getter
     @Builder
+    @AllArgsConstructor
     public static class ExtendedDomainRole {
 
         private DomainRole role;
