@@ -3,57 +3,49 @@ package io.sapl.demo.generator.example;
 import io.sapl.demo.generator.CRUD;
 import io.sapl.demo.generator.DomainResource;
 import io.sapl.demo.generator.DomainRole;
+import io.sapl.demo.generator.DomainRole.ExtendedDomainRole;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Data
 @Slf4j
-@RequiredArgsConstructor
+@Builder
 public class Department {
 
-    private final String departmentName;
-    private final int numberOfAdditionalDepartmentSpecificRoles;
-    private final int numberOfAdditionalDepartmentSpecificResources;
-    private final int numberOfSpecialActions;
+    //TODO add resources only available internally (internalResources)
 
-    private final CRUD crudInternal;
-    private final CRUD crudPublic;
+    private String departmentName;
+    private int additionalDepartmentRoles;
+    private int additionalDepartmentResources;
+    private int numberOfSpecialActions;
 
-    private List<DomainRole> departmentRoles = new ArrayList<>();
-    private List<DomainResource> departmentResources = new ArrayList<>();
+    private CRUD crudInternal;
+    private CRUD crudPublic;
 
-    private List<String> departmentInternalActions = new ArrayList<>();
-    private List<String> departmentPublicActions = new ArrayList<>();
-    private List<String> departmentSpecialActions = new ArrayList<>();
+    private List<DomainRole> departmentRoles;
+    private List<DomainResource> departmentResources;
 
-    private List<DomainRole> rolesForPublicActions = new ArrayList<>();
-    private List<DomainRole> rolesForSpecialActions = new ArrayList<>();
+    //CRUD actions
+    private List<String> departmentInternalActions;
+    private List<String> departmentPublicActions;
+    //additional actions (specialAction1,...)
+    private List<String> departmentSpecialActions;
 
 
-    public static Department buildDepartmentWithDefaultValues(String departmentName) {
-        return new Department(departmentName, 0,
-                0,
-                0, CRUD.ALL, CRUD.READ_ONLY);
-    }
+    private List<DomainRole> rolesForPublicActions;
+    private List<DomainRole> rolesForSpecialActions;
+
+    private List<ExtendedDomainRole> extendedRolesForPublicActions;
+    private List<ExtendedDomainRole> extendedRolesForSpecialActions;
 
     @PostConstruct
     private void init() {
-        departmentRoles.add(new DomainRole("ROLE_" + departmentName));
-
-        for (int i = 0; i < numberOfAdditionalDepartmentSpecificRoles; i++) {
-            departmentRoles.add(new DomainRole("ROLE_" + departmentName + "_" + i));
-        }
-
-        departmentResources.add(new DomainResource("resource." + departmentName));
-        for (int i = 0; i < numberOfAdditionalDepartmentSpecificResources; i++) {
-            departmentResources.add(new DomainResource("resource." + departmentName + i));
-        }
+        createDepartmentRoles();
+        createDepartmentResources();
 
         createInternalActions();
         createPublicActions();
@@ -62,6 +54,20 @@ public class Department {
         LOGGER.info("initialized department: {}", departmentDetails());
     }
 
+    private void createDepartmentResources() {
+        departmentResources.add(new DomainResource("resource." + departmentName));
+        for (int i = 0; i < additionalDepartmentResources; i++) {
+            departmentResources.add(new DomainResource("resource." + departmentName + i));
+        }
+    }
+
+    private void createDepartmentRoles() {
+        departmentRoles.add(new DomainRole("ROLE_" + departmentName));
+
+        for (int i = 0; i < additionalDepartmentRoles; i++) {
+            departmentRoles.add(new DomainRole("ROLE_" + departmentName + "_" + i));
+        }
+    }
 
     private void createSpecialActions() {
         for (int i = 0; i < numberOfSpecialActions; i++) {
@@ -82,12 +88,20 @@ public class Department {
         }
     }
 
-    public void addRolesForPublicActions(DomainRole... roles) {
-        rolesForPublicActions.addAll(Arrays.asList(roles.clone()));
+    public void addRolesForPublicActions(List<DomainRole> roles) {
+        rolesForPublicActions.addAll(roles);
     }
 
-    public void addRolesForSpecialActions(DomainRole... roles) {
-        rolesForSpecialActions.addAll(Arrays.asList(roles.clone()));
+    public void addExtendedRolesForPublicActions(List<ExtendedDomainRole> rolesForAction) {
+        extendedRolesForPublicActions.addAll(rolesForAction);
+    }
+
+    public void addRolesForSpecialActions(List<DomainRole> roles) {
+        rolesForSpecialActions.addAll(roles);
+    }
+
+    public void addExtendedRolesForSpecialActions(List<ExtendedDomainRole> rolesForAction) {
+        extendedRolesForSpecialActions.addAll(rolesForAction);
     }
 
     public boolean isInternalAccessUnrestricted() {
@@ -102,10 +116,9 @@ public class Department {
         return "Department{" +
                 "departmentName='" + departmentName + '\'' +
                 ", departmentRoles=" + departmentRoles +
-                ", rolesForPublicActions=" + rolesForPublicActions +
-                ", rolesForSpecialActions=" + rolesForSpecialActions +
-                ", isInternalAccessUnrestricted=" + isInternalAccessUnrestricted() +
-                ", isPublicAccessUnrestricted=" + isPublicAccessUnrestricted() +
+                ", departmentResources=" + departmentResources +
                 '}';
     }
+
+
 }

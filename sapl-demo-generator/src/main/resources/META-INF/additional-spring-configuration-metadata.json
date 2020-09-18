@@ -4,5 +4,30 @@
       "name": "sapl.count.general.roles",
       "type": "java.lang.String",
       "description": "Description for sapl.count.general.roles."
-  }
-] }
+    },
+    {
+      "name": "sapl.probability.department.additional.roles",
+      "type": "java.lang.String",
+      "description": "Description for sapl.probability.department.additional.roles."
+    },
+    {
+      "name": "sapl.probability.department.additional.resources",
+      "type": "java.lang.String",
+      "description": "Description for sapl.probability.department.additional.resources."
+    },
+    {
+      "name": "sapl.count.general.resources",
+      "type": "java.lang.String",
+      "description": "Description for sapl.count.general.resources."
+    },
+    {
+      "name": "sapl.count.departments",
+      "type": "java.lang.String",
+      "description": "Description for sapl.count.departments."
+    },
+    {
+      "name": "sapl.policy-directory-path",
+      "type": "java.lang.String",
+      "description": "Description for sapl.policy-directory-path."
+    }
+  ] }
