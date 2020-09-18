@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DomainGenerator {
 
+    private final static String TAB_STRING = "\t\t";
+
     private final DomainData domainData;
 
     private final DomainUtil domainUtil;
@@ -32,16 +34,21 @@ public class DomainGenerator {
     public void generateDomainPolicies() {
         // HOSPITAL
         List<DomainPolicy> domainPolicies = generatePoliciesForHospital(domainData.getHospital());
+        LOGGER.info("policies HOSPITAL: {}", domainPolicies.size());
 
+
+        List<DomainPolicy> departmentPolicies = new ArrayList<>();
         //DEPARTMENTS
         for (Department department : domainData.getDepartments()) {
-            domainPolicies.addAll(generatePoliciesForDepartment(department));
+            departmentPolicies.addAll(generatePoliciesForDepartment(department));
         }
+        LOGGER.info("policies DEPARTMENTS: {}", departmentPolicies.size());
+        domainPolicies.addAll(departmentPolicies);
 
-        LOGGER.info("generated {} policies", domainPolicies.size());
+        LOGGER.info("policies TOTAL: {}", domainPolicies.size());
 
-        domainUtil.printDomainPoliciesLimited(domainPolicies.stream().limit(10).collect(Collectors.toList()));
-//        domainUtil.writeDomainPoliciesToFilesystem(domainPolicies);
+        domainUtil.printDomainPoliciesLimited(domainPolicies);
+        domainUtil.writeDomainPoliciesToFilesystem(domainPolicies);
     }
 
     private List<DomainPolicy> generatePoliciesForHospital(Hospital hospital) {
@@ -49,11 +56,15 @@ public class DomainGenerator {
         List<DomainPolicy> policiesForHospital = new ArrayList<>();
 
         for (DomainResource hospitalResource : hospital.getHospitalResources()) {
+            List<DomainPolicy> policiesForResource = new ArrayList<>();
             /* GENERAL */
-            policiesForHospital.addAll(generatePoliciesForGeneral(hospital, hospitalResource));
+            policiesForResource.addAll(generatePoliciesForGeneral(hospital, hospitalResource));
 
             /* RESOURCE SPECIFIC */
-            policiesForHospital.addAll(generatePoliciesForResource(hospital, hospitalResource));
+            policiesForResource.addAll(generatePoliciesForRoles(hospital, hospitalResource));
+
+            LOGGER.debug("policies HOSPITAL-{}: {}", hospitalResource.getResourceName(), policiesForResource.size());
+            policiesForHospital.addAll(policiesForResource);
         }
 
         return policiesForHospital;
@@ -83,10 +94,12 @@ public class DomainGenerator {
                 .collect(Collectors.toList())
         );
 
+        LOGGER.trace("policies HOSPITAL-{}-GENERAL: {}", hospitalResource.getResourceName(), policies.size());
+
         return policies;
     }
 
-    private List<DomainPolicy> generatePoliciesForResource(Hospital hospital, DomainResource hospitalResource) {
+    private List<DomainPolicy> generatePoliciesForRoles(Hospital hospital, DomainResource hospitalResource) {
         List<DomainPolicy> policies = new ArrayList<>();
 
         Map<DomainRole, DomainActions> roleCRUDMap = hospital.getResourceSpecificRoleAccess().get(hospitalResource);
@@ -112,12 +125,13 @@ public class DomainGenerator {
                     .collect(Collectors.toList()));
         }
 
+        LOGGER.trace("policies HOSPITAL-{}-ROLES: {}", hospitalResource.getResourceName(), policies.size());
+
         return policies;
     }
 
 
     private List<DomainPolicy> generatePoliciesForDepartment(Department department) {
-        LOGGER.info("generating policies for department: {}", department.getDepartmentName());
         List<DomainPolicy> policiesForDepartment = new ArrayList<>();
 
         for (DomainResource departmentResource : department.getDepartmentResources()) {
@@ -128,6 +142,8 @@ public class DomainGenerator {
             policiesForDepartment.addAll(generatePublicPolicies(department, departmentResource)); //PUBLIC
             policiesForDepartment.addAll(generateSpecialPolicies(department, departmentResource)); //SPECIAL
         }
+
+        LOGGER.debug("policies {}: {}", department.getDepartmentName(), policiesForDepartment.size());
 
         return policiesForDepartment;
     }
@@ -143,7 +159,7 @@ public class DomainGenerator {
         StringBuilder policyBuilder = new StringBuilder(adminPolicy.getPolicyContent());
         addObligationToPolicy(policyBuilder, DomainUtil.LOGGING_OBLIGATION);
 
-        return new DomainPolicy(adminPolicy.getPolicyName(), policyBuilder.toString());
+        return new DomainPolicy(adminPolicy.getPolicyName(), policyBuilder.toString(), adminPolicy.getFileName());
     }
 
     private List<DomainPolicy> generateInternalPolicies(Department department, DomainResource departmentResource) {
@@ -196,27 +212,44 @@ public class DomainGenerator {
     }
 
 
-    private DomainPolicy generateUnrestrictedPolicy(DomainResource resource, List<DomainRole> subjectRoles) {
-        String policyName = String.format("%s full access on %s", subjectRoles, resource);
+    private DomainPolicy generateUnrestrictedPolicy(DomainResource resource, List<DomainRole> roles) {
+        String policyName = String.format("%s full access on %s",
+                DomainUtil.getRoleNames(roles), resource.getResourceName());
+
+        String fileName = String.format("%03d-%s-%s", DomainUtil.getInt(), resource.getResourceName(),
+                DomainUtil.getRoleNames(roles)).replaceAll("\\[|\\]", "")
+                .replace(",", "_");
 
         StringBuilder policyBuilder = generateBasePolicy(policyName, resource);
-        addRolesToPolicy(policyBuilder, subjectRoles);
+        addRolesToPolicy(policyBuilder, roles);
 
-        return new DomainPolicy(policyName, policyBuilder.toString());
+        return new DomainPolicy(policyName, policyBuilder.toString(), fileName);
     }
 
     private DomainPolicy generateActionSpecificPolicy(DomainResource resource, List<String> actions,
                                                       List<DomainRole> roles) {
-        String policyName = String.format("%s can perform %s on %s", roles, actions, resource);
+        String policyName = String.format("%s can perform %s on %s",
+                DomainUtil.getRoleNames(roles), actions, resource.getResourceName());
+
+        String fileName = String.format("%03d-%s-%s", DomainUtil.getInt(), resource.getResourceName(),
+                DomainUtil.getRoleNames(roles)).replaceAll("\\[|\\]", "")
+                .replace(",", "_");
+
 
         return new DomainPolicy(policyName, generateBasePolicyWithActions(policyName, resource, actions, roles)
-                .toString());
+                .toString(), fileName);
     }
 
 
     private DomainPolicy generateActionSpecificExtendedPolicy(DomainResource resource, List<String> actions,
                                                               ExtendedDomainRole extendedRole) {
-        String policyName = String.format("%s can perform %s on %s - extended", extendedRole, actions, resource);
+        String policyName = String.format("[%s] can perform %s on %s (extended: %s)",
+                extendedRole.getRole().getRoleName(), actions, resource.getResourceName(),
+                DomainUtil.getExtendedRoleIndicator(extendedRole));
+
+        String fileName = String.format("%03d-%s-%s", DomainUtil.getInt(), resource.getResourceName(),
+                extendedRole.getRole().getRoleName())
+                .replace(",", "_");
 
         StringBuilder policyBuilder = generateBasePolicyWithActions(policyName, resource, actions,
                 DomainRoles.toRole(Collections.singletonList(extendedRole)));
@@ -234,13 +267,13 @@ public class DomainGenerator {
             addTransformationToPolicy(policyBuilder, extendedRole.getTransformation());
         }
 
-        return new DomainPolicy(policyName, policyBuilder.toString());
+        return new DomainPolicy(policyName, policyBuilder.toString(), fileName);
     }
 
     private StringBuilder generateBasePolicy(String policyName, DomainResource resource) {
-        return new StringBuilder().append("policy \"").append(policyName).append("\"")
+        return new StringBuilder().append("POLICY \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
-                .append("permit ")
+                .append("PERMIT ")
                 .append(String.format("(resource == %s)", resource.getResourceName()));
     }
 
@@ -256,7 +289,7 @@ public class DomainGenerator {
     private void addRolesToPolicy(StringBuilder policyBuilder, List<DomainRole> roles) {
         if (roles.isEmpty()) return;
 
-        policyBuilder.append(System.lineSeparator()).append(" && ").append("(");
+        policyBuilder.append(System.lineSeparator()).append(TAB_STRING).append(" && ").append("(");
         boolean firstRole = true;
         for (DomainRole role : roles) {
             if (firstRole) firstRole = false;
@@ -269,7 +302,7 @@ public class DomainGenerator {
     private void addActionsToPolicy(StringBuilder policyBuilder, List<String> actions) {
         if (actions.isEmpty()) return;
 
-        policyBuilder.append(System.lineSeparator()).append(" && ").append("(");
+        policyBuilder.append(System.lineSeparator()).append(TAB_STRING).append(" && ").append("(");
         boolean firstAction = true;
         for (String action : actions) {
             if (firstAction) firstAction = false;
@@ -281,26 +314,25 @@ public class DomainGenerator {
 
     private void addBodyToPolicy(StringBuilder policyBuilder, DomainPolicyBody body) {
         policyBuilder.append(System.lineSeparator())
-                .append("where").append(System.lineSeparator())
-                .append(body.getBody());
+                .append("WHERE").append(System.lineSeparator())
+                .append(TAB_STRING).append(body.getBody());
     }
 
     private void addObligationToPolicy(StringBuilder policyBuilder, DomainPolicyObligation obligation) {
         policyBuilder.append(System.lineSeparator())
-                .append("obligation").append(System.lineSeparator())
-                .append(obligation.getObligation());
+                .append("OBLIGATION").append(System.lineSeparator())
+                .append(TAB_STRING).append(obligation.getObligation());
     }
 
     private void addAdviceToPolicy(StringBuilder policyBuilder, DomainPolicyAdvice advice) {
         policyBuilder.append(System.lineSeparator())
-                .append("advice").append(System.lineSeparator())
-                .append(advice.getAdvice());
+                .append("ADVICE").append(System.lineSeparator())
+                .append(TAB_STRING).append(advice.getAdvice());
     }
 
     private void addTransformationToPolicy(StringBuilder policyBuilder, DomainPolicyTransformation transformation) {
         policyBuilder.append(System.lineSeparator())
-                .append("transformation").append(System.lineSeparator())
-                .append(transformation.getTransformation());
+                .append("TRANSFORMATION").append(System.lineSeparator())
+                .append(TAB_STRING).append(transformation.getTransformation());
     }
-
 }

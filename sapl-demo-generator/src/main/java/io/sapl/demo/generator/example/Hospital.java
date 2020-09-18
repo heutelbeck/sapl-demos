@@ -8,18 +8,16 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @Slf4j
 @RequiredArgsConstructor
 public class Hospital {
-
-
 
     private final String name;
     private final int numberOfGeneralRoles;
@@ -42,14 +40,17 @@ public class Hospital {
 
     private Map<DomainResource, Map<ExtendedDomainRole, DomainActions>> resourceSpecificExtendedRoleAccess = new HashMap<>();
 
-    @PostConstruct
-    private void init() {
+
+    public void init() {
         generateHospitalRoles();
         generateHospitalResources();
 
     }
 
     private void generateHospitalResources() {
+        hospitalResources.addAll(ExampleProvider.EXAMPLE_MANDATORY_RESOURCE_LIST.stream()
+                .map(DomainResource::new).collect(Collectors.toList()));
+
         for (int i = 0; i < numberOfGeneralResources; i++) {
             String resourceName;
             try {
@@ -62,6 +63,8 @@ public class Hospital {
     }
 
     private void generateHospitalRoles() {
+        hospitalRoles.addAll(ExampleProvider.EXAMPLE_MANDATORY_ROLE_LIST.stream()
+                .map(DomainRole::new).collect(Collectors.toList()));
 
         for (int i = 0; i < numberOfGeneralRoles; i++) {
             String roleName;

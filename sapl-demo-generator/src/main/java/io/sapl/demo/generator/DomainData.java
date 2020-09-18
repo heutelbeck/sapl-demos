@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -38,7 +39,7 @@ public class DomainData {
     private final double probabilityOfAdditionalResources;
 
     private Hospital hospital;
-    private List<Department> departments;
+    private List<Department> departments = new ArrayList<>();
 
     private Random dice = new Random();
     private List<DomainRole> hospitalRoles;
@@ -54,6 +55,8 @@ public class DomainData {
 
     private void createHospital() {
         this.hospital = new Hospital("Demo Hospital GmbH", numberOfGeneralRoles, numberOfGeneralResources);
+        this.hospital.init();
+
         this.hospitalRoles = hospital.getHospitalRoles();
         this.hospitalResources = hospital.getHospitalResources();
 
@@ -184,16 +187,10 @@ public class DomainData {
                 departmentName = "DEPARTMENT" + i;
             }
 
-            Department department = Department.builder()
-                    .departmentName(departmentName)
-                    .numberOfSpecialActions(5)
-                    //TODO different domain actions
-                    .domainActionsInternal(DomainActions.CRUD)
-                    .domainActionsPublic(DomainActions.READ_ONLY)
-                    //TODO specials
-//                    .additionalDepartmentRoles(additionalRoles ? dice.nextInt(3) + 1 : 0)
-//                    .additionalDepartmentResources(additionalResources ? dice.nextInt(3) + 1 : 0)
-                    .build();
+            Department department = new Department(departmentName, 0, 0,
+                    5, DomainActions.CRUD, DomainActions.READ_ONLY);
+
+            department.init();
 
             createDepartmentExtraRoles(department);
 

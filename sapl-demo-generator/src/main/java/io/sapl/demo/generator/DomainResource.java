@@ -16,7 +16,7 @@ public class DomainResource {
         public static DomainResource findByName(List<DomainResource> resourceList, String resourceName) {
             return resourceList.stream()
                     .filter(domainResource -> domainResource.getResourceName().equalsIgnoreCase(resourceName))
-                    .findFirst().orElseThrow();
+                    .findFirst().orElseThrow(() -> new RuntimeException("resource not present: " + resourceName));
         }
     }
 

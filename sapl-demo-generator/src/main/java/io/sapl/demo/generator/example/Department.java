@@ -4,46 +4,46 @@ import io.sapl.demo.generator.DomainActions;
 import io.sapl.demo.generator.DomainResource;
 import io.sapl.demo.generator.DomainRole;
 import io.sapl.demo.generator.DomainRole.ExtendedDomainRole;
-import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @Slf4j
-@Builder
+@RequiredArgsConstructor
 public class Department {
 
     //TODO add resources only available internally (internalResources)
 
-    private String departmentName;
-    private int additionalDepartmentRoles;
-    private int additionalDepartmentResources;
-    private int numberOfSpecialActions;
+    private final String departmentName;
+    private final int additionalDepartmentRoles;
+    private final int additionalDepartmentResources;
+    private final int numberOfSpecialActions;
 
-    private DomainActions domainActionsInternal;
-    private DomainActions domainActionsPublic;
+    private final DomainActions domainActionsInternal;
+    private final DomainActions domainActionsPublic;
 
-    private List<DomainRole> departmentRoles;
-    private List<DomainResource> departmentResources;
+    private List<DomainRole> departmentRoles = new ArrayList<>();
+    private List<DomainResource> departmentResources = new ArrayList<>();
 
     //CRUD actions
-    private List<String> departmentInternalActions;
-    private List<String> departmentPublicActions;
+    private List<String> departmentInternalActions = new ArrayList<>();;
+    private List<String> departmentPublicActions = new ArrayList<>();;
     //additional actions (specialAction1,...)
-    private List<String> departmentSpecialActions;
+    private List<String> departmentSpecialActions = new ArrayList<>();;
 
 
-    private List<DomainRole> rolesForPublicActions;
-    private List<DomainRole> rolesForSpecialActions;
+    private List<DomainRole> rolesForPublicActions = new ArrayList<>();;
+    private List<DomainRole> rolesForSpecialActions = new ArrayList<>();;
 
-    private List<ExtendedDomainRole> extendedRolesForPublicActions;
-    private List<ExtendedDomainRole> extendedRolesForSpecialActions;
+    private List<ExtendedDomainRole> extendedRolesForPublicActions = new ArrayList<>();;
+    private List<ExtendedDomainRole> extendedRolesForSpecialActions = new ArrayList<>();;
 
-    @PostConstruct
-    private void init() {
+
+    public void init() {
         createDepartmentRoles();
         createDepartmentResources();
 
@@ -51,7 +51,7 @@ public class Department {
         createPublicActions();
         createSpecialActions();
 
-        LOGGER.info("initialized department: {}", departmentDetails());
+        LOGGER.info("initialized department: {}", departmentName);
     }
 
     private void createDepartmentResources() {

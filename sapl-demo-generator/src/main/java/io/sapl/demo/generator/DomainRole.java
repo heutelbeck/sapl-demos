@@ -21,18 +21,19 @@ public class DomainRole {
 
     public static class DomainRoles {
 
-        public static DomainRole ROLE_AUTHORIZED = new DomainRole("ROLE_AUTHORIZED");
-        public static DomainRole ROLE_ADMIN = new DomainRole("ROLE_ADMIN");
-        public static DomainRole ROLE_SYSTEM = new DomainRole("ROLE_SYSTEM");
+        public static DomainRole ROLE_AUTHORIZED = new DomainRole("authorized");
+        public static DomainRole ROLE_ADMIN = new DomainRole("admin");
+        public static DomainRole ROLE_SYSTEM = new DomainRole("system");
 
         public static DomainRole findByName(List<DomainRole> roleList, String roleName) {
             return roleList.stream()
                     .filter(domainRole -> domainRole.getRoleName().equalsIgnoreCase(roleName))
-                    .findFirst().orElseThrow();
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("missing role: " + roleName));
         }
 
         public static List<DomainRole> toRole(List<ExtendedDomainRole> rolesForAction) {
-            return rolesForAction.stream().map( ExtendedDomainRole::getRole).collect(Collectors.toList());
+            return rolesForAction.stream().map(ExtendedDomainRole::getRole).collect(Collectors.toList());
         }
 
     }
@@ -44,17 +45,22 @@ public class DomainRole {
 
         private DomainRole role;
 
-        private DomainPolicyBody body;
-        private DomainPolicyObligation obligation;
-        private DomainPolicyAdvice advice;
-        private DomainPolicyTransformation transformation;
+        @Builder.Default
+        private DomainPolicyBody body = null;
+        @Builder.Default
+        private DomainPolicyObligation obligation = null;
+        @Builder.Default
+        private DomainPolicyAdvice advice = null;
+        @Builder.Default
+        private DomainPolicyTransformation transformation = null;
 
 
-        public ExtendedDomainRole(DomainRole role){
+        public ExtendedDomainRole(DomainRole role) {
             this.role = role;
         }
 
         public boolean isBodyPresent() {
+
             return this.body != null;
         }
 

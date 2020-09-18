@@ -15,14 +15,12 @@ public class DomainGeneratorApplication implements CommandLineRunner {
 
 
     public static void main(String[] args) {
-        LOGGER.info("Starting DomainGeneratorApplication");
         SpringApplication.run(DomainGeneratorApplication.class, args);
     }
 
-
     @Override
     public void run(String... args) {
-        LOGGER.info("Generating Domain");
+        LOGGER.debug("Generating Domain");
         domainGenerator.generateDomainPolicies();
     }
 }

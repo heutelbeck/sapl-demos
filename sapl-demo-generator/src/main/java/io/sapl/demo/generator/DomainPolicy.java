@@ -7,9 +7,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DomainPolicy {
 
+
+
     private final String policyName;
 
     private final String policyContent;
+
+
+    private final String fileName;
 
     @Data
     @RequiredArgsConstructor

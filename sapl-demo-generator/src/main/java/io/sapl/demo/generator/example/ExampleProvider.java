@@ -8,20 +8,20 @@ import java.util.Map;
 public class ExampleProvider {
 
     /* ### DEPARTMENTS ### */
-    public static final String DEPARTMENT_ANESTHESIOLOGY = "ANESTHESIOLOGY";
-    public static final String DEPARTMENT_BOARD = "BOARD";
-    public static final String DEPARTMENT_CARDIOLOGY = "CARDIOLOGY";
-    public static final String DEPARTMENT_FINANCE = "FINANCE";
-    public static final String DEPARTMENT_GYNECOLOGY = "GYNECOLOGY";
-    public static final String DEPARTMENT_HUMAN_RESOURCES = "HUMAN_RESOURCES";
-    public static final String DEPARTMENT_LABORATORY = "LABORATORY";
-    public static final String DEPARTMENT_MANAGEMENT = "MANAGEMENT";
-    public static final String DEPARTMENT_NEUROLOGY = "NEUROLOGY";
-    public static final String DEPARTMENT_ONCOLOGY = "ONCOLOGY";
-    public static final String DEPARTMENT_PHARMACY = "PHARMACY";
-    public static final String DEPARTMENT_PURCHASING_SUPPLIES = "PURCHASING_SUPPLIES";
-    public static final String DEPARTMENT_RADIOLOGY = "RADIOLOGY";
-    public static final String DEPARTMENT_SURGERY = "SURGERY";
+    public static final String DEPARTMENT_ANESTHESIOLOGY = "anesthesiology";
+    public static final String DEPARTMENT_BOARD = "board";
+    public static final String DEPARTMENT_CARDIOLOGY = "cardiology";
+    public static final String DEPARTMENT_FINANCE = "finance";
+    public static final String DEPARTMENT_GYNECOLOGY = "gynecology";
+    public static final String DEPARTMENT_HUMAN_RESOURCES = "human_resources";
+    public static final String DEPARTMENT_LABORATORY = "laboratory";
+    public static final String DEPARTMENT_MANAGEMENT = "management";
+    public static final String DEPARTMENT_NEUROLOGY = "neurology";
+    public static final String DEPARTMENT_ONCOLOGY = "oncology";
+    public static final String DEPARTMENT_PHARMACY = "pharmacy";
+    public static final String DEPARTMENT_PURCHASING_SUPPLIES = "purchasing_supplies";
+    public static final String DEPARTMENT_RADIOLOGY = "radiology";
+    public static final String DEPARTMENT_SURGERY = "surgery";
 
     public static final List<String> EXAMPLE_DEPARTMENT_LIST = new ArrayList<>();
 
@@ -43,31 +43,34 @@ public class ExampleProvider {
     }
 
     /* ### PER DEPARTMENT ROLES ### */
-    public static final String ROLE_ANESTHETIST = "ROLE_ANESTHETIST";
-    public static final String ROLE_CARDIOLOGIST = "ROLE_CARDIOLOGIST";
-    public static final String ROLE_CENTRAL_BUYER = "ROLE_CENTRAL_BUYER";
-    public static final String ROLE_CLINICAL_MANAGER = "ROLE_CLINICAL_MANAGER";
-    public static final String ROLE_DIRECTOR = "ROLE_DIRECTOR";
-    public static final String ROLE_FINANCE = "ROLE_FINANCE";
-    public static final String ROLE_GYNECOLOGIST = "ROLE_GYNECOLOGIST";
-    public static final String ROLE_HUMAN_RESOURCES = "ROLE_HUMAN_RESOURCES";
-    public static final String ROLE_LAB_TECHNICIAN = "ROLE_LAB_TECHNICIAN";
-    public static final String ROLE_NEUROLOGIST = "ROLE_NEUROLOGIST";
-    public static final String ROLE_ONCOLOGIST = "ROLE_ONCOLOGIST";
-    public static final String ROLE_PHARMACIST = "ROLE_PHARMACIST";
-    public static final String ROLE_RADIOLOGIST = "ROLE_RADIOLOGIST";
-    public static final String ROLE_SURGEON = "ROLE_SURGEON";
+    public static final String ROLE_ANESTHETIST = "anesthetist";
+    public static final String ROLE_CARDIOLOGIST = "cardiologist";
+    public static final String ROLE_CENTRAL_BUYER = "central_buyer";
+    public static final String ROLE_CLINICAL_MANAGER = "clinical_manager";
+    public static final String ROLE_DIRECTOR = "director";
+    public static final String ROLE_FINANCE = "finance";
+    public static final String ROLE_GYNECOLOGIST = "gynecologist";
+    public static final String ROLE_HUMAN_RESOURCES = "human_resources";
+    public static final String ROLE_LAB_TECHNICIAN = "lab_technician";
+    public static final String ROLE_NEUROLOGIST = "neurologist";
+    public static final String ROLE_ONCOLOGIST = "oncologist";
+    public static final String ROLE_PHARMACIST = "pharmacist";
+    public static final String ROLE_RADIOLOGIST = "radiologist";
+    public static final String ROLE_SURGEON = "surgeon";
 
-    public static final String ROLE_DOCTOR = "ROLE_DOCTOR";
-    public static final String ROLE_INTERN = "ROLE_INTERN";
-    public static final String ROLE_NURSE = "ROLE_NURSE";
-    public static final String ROLE_PATIENT = "ROLE_PATIENT";
-    public static final String ROLE_STUDENT = "ROLE_STUDENT";
-    public static final String ROLE_SUPPORT = "ROLE_SUPPORT";
-    public static final String ROLE_VISITOR = "ROLE_VISITOR";
-    public static final String ROLE_VOLUNTEER = "ROLE_VOLUNTEER";
+    public static final String ROLE_DOCTOR = "doctor";
+    public static final String ROLE_INTERN = "intern";
+    public static final String ROLE_NURSE = "nurse";
+    public static final String ROLE_PATIENT = "patient";
+    public static final String ROLE_STUDENT = "student";
+    public static final String ROLE_SUPPORT = "support";
+    public static final String ROLE_VISITOR = "visitor";
+    public static final String ROLE_VOLUNTEER = "volunteer";
 
+
+    public static final List<String> EXAMPLE_MANDATORY_ROLE_LIST = new ArrayList<>();
     public static final List<String> EXAMPLE_GENERAL_ROLE_LIST = new ArrayList<>();
+
 
     public static final Map<String, String> DEPARTMENT_ROLE_MAP = new HashMap<>();
 
@@ -76,7 +79,6 @@ public class ExampleProvider {
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_CARDIOLOGIST);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_CENTRAL_BUYER);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_CLINICAL_MANAGER);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_DIRECTOR);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_FINANCE);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_GYNECOLOGIST);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_HUMAN_RESOURCES);
@@ -87,14 +89,16 @@ public class ExampleProvider {
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_RADIOLOGIST);
         EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_SURGEON);
 
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_DOCTOR);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_INTERN);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_NURSE);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_PATIENT);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_STUDENT);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_SUPPORT);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_VISITOR);
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_VOLUNTEER);
+        EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_DIRECTOR);
+        EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_DOCTOR);
+        EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_NURSE);
+        EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_PATIENT);
+        EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_VISITOR);
+
+        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_INTERN); //TODO unused
+        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_STUDENT); //TODO unused
+        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_SUPPORT); //TODO unused
+        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_VOLUNTEER); //TODO unused
 
         DEPARTMENT_ROLE_MAP.put(DEPARTMENT_ANESTHESIOLOGY, ROLE_ANESTHETIST);
         DEPARTMENT_ROLE_MAP.put(DEPARTMENT_CARDIOLOGY, ROLE_CARDIOLOGIST);
@@ -114,33 +118,40 @@ public class ExampleProvider {
 
 
     /* ### RESOURCES ### */
-    public static final String RESOURCE_DIAGNOSIS = "RESOURCE_DIAGNOSIS";
-    public static final String RESOURCE_MEDICATION = "RESOURCE_MEDICATION";
-    public static final String RESOURCE_PERSONAL_DETAILS = "RESOURCE_PERSONAL_DETAILS";
-    public static final String RESOURCE_ROOM = "RESOURCE_ROOM";
-    public static final String RESOURCE_TREATMENT = "RESOURCE_TREATMENT";
-    public static final String RESOURCE_INSURANCE = "RESOURCE_INSURANCE";
-    public static final String RESOURCE_INVOICES = "RESOURCE_INVOICES";
-    public static final String RESOURCE_STAFF = "RESOURCE_STAFF";
-    public static final String RESOURCE_DEPARTMENTS = "RESOURCE_DEPARTMENTS";
-    public static final String RESOURCE_MEDICAL_DEVICES = "RESOURCE_MEDICAL_DEVICES";
-    public static final String RESOURCE_MEDICAL_SUPPLIES = "RESOURCE_MEDICAL_SUPPLIES";
+    public static final String RESOURCE_DIAGNOSIS = "diagnosis";
+    public static final String RESOURCE_MEDICATION = "medication";
+    public static final String RESOURCE_PERSONAL_DETAILS = "personal_details";
+    public static final String RESOURCE_ROOM = "room";
+    public static final String RESOURCE_TREATMENT = "treatment";
+    public static final String RESOURCE_INSURANCE = "insurance";
+    public static final String RESOURCE_INVOICES = "invoices";
+    public static final String RESOURCE_STAFF = "staff";
+    public static final String RESOURCE_DEPARTMENTS = "departments";
+    public static final String RESOURCE_MEDICAL_DEVICES = "medical_devices";
+    public static final String RESOURCE_MEDICAL_SUPPLIES = "medical_supplies";
 
+    public static final List<String> EXAMPLE_MANDATORY_RESOURCE_LIST = new ArrayList<>();
     public static final List<String> EXAMPLE_GENERAL_RESOURCE_LIST = new ArrayList<>();
 
 
     static {
-        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
-        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICATION);
-        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
-        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_ROOM);
-        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_TREATMENT);
+//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
+//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICATION);
+//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
+//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_ROOM);
+//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_TREATMENT);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_INSURANCE);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_INVOICES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_DEPARTMENTS);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICAL_DEVICES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICAL_SUPPLIES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_STAFF);
+
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_MEDICATION);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_ROOM);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_TREATMENT);
     }
 
 

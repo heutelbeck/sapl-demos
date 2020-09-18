@@ -11,34 +11,30 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class DomainGeneratorConfig {
 
-    @Value("${sapl.policy-directory-path:#{ systemProperties['\"user.home']+'/policies'}")
+    @Value("${sapl.policy-directory-path:#systemProperties['\"user.home']+'/policies'}")
     private String policyDirectoryPath;
 
-    @Value("${sapl.count.general.roles:2")
+    @Value("${sapl.count.general.roles:2}")
     private int numberOfGeneralRoles;
 
-    @Value("${sapl.count.general.resources:2")
+    @Value("${sapl.count.general.resources:2}")
     private int numberOfGeneralResources;
 
-    @Value("${sapl.count.departments:5")
+    @Value("${sapl.count.departments:2}")
     private int numberOfDepartments;
 
-    @Value("${sapl.probability.department.additional.roles:0.0")
+    @Value("${sapl.probability.department.additional.roles:0.0}")
     private double probabilityOfAdditionalRoles;
 
-    @Value("${apl.probability.department.additional.resources:0.0")
+    @Value("${sapl.probability.department.additional.resources:0.0}")
     private double probabilityOfAdditionalResources;
 
 
     @PostConstruct
     private void logSettings() {
-        LOGGER.info("DomainData{" +
-                "numberOfGeneralRoles=" + numberOfGeneralRoles +
-                ", numberOfGeneralResources=" + numberOfGeneralResources +
-                ", numberOfDepartments=" + numberOfDepartments +
-                ", probabilityOfAdditionalRoles=" + probabilityOfAdditionalRoles +
-                ", probabilityOfAdditionalResources=" + probabilityOfAdditionalResources +
-                '}');
+        LOGGER.info("PATH: {}", policyDirectoryPath);
+        LOGGER.info("ROLES: {}, RESOURCES: {}, DEPARTMENTS: {}",
+                numberOfGeneralRoles, numberOfGeneralResources, numberOfDepartments);
     }
 
     @Bean
@@ -50,7 +46,7 @@ public class DomainGeneratorConfig {
 
     @Bean
     public DomainUtil generatorUtility() {
-        LOGGER.info("Policy directory path: {}", policyDirectoryPath);
+
         return new DomainUtil(policyDirectoryPath);
     }
 }
