@@ -1,6 +1,6 @@
 package io.sapl.demo.generator.example;
 
-import io.sapl.demo.generator.CRUD;
+import io.sapl.demo.generator.DomainActions;
 import io.sapl.demo.generator.DomainResource;
 import io.sapl.demo.generator.DomainRole;
 import io.sapl.demo.generator.DomainRole.ExtendedDomainRole;
@@ -23,8 +23,8 @@ public class Department {
     private int additionalDepartmentResources;
     private int numberOfSpecialActions;
 
-    private CRUD crudInternal;
-    private CRUD crudPublic;
+    private DomainActions domainActionsInternal;
+    private DomainActions domainActionsPublic;
 
     private List<DomainRole> departmentRoles;
     private List<DomainResource> departmentResources;
@@ -77,14 +77,14 @@ public class Department {
 
     private void createPublicActions() {
         for (DomainResource departmentResource : departmentResources) {
-            departmentPublicActions.addAll(crudPublic.generateActionsWithName(departmentResource.getResourceName()));
+            departmentPublicActions.addAll(domainActionsPublic.generateActionsForResource(departmentResource.getResourceName()));
         }
     }
 
     private void createInternalActions() {
         for (DomainResource departmentResource : departmentResources) {
             departmentInternalActions
-                    .addAll(crudInternal.generateActionsWithName(departmentResource.getResourceName()));
+                    .addAll(domainActionsInternal.generateActionsForResource(departmentResource.getResourceName()));
         }
     }
 
@@ -105,11 +105,11 @@ public class Department {
     }
 
     public boolean isInternalAccessUnrestricted() {
-        return crudInternal == CRUD.ALL;
+        return domainActionsInternal == DomainActions.ALL;
     }
 
     public boolean isPublicAccessUnrestricted() {
-        return crudPublic == CRUD.ALL;
+        return domainActionsPublic == DomainActions.ALL;
     }
 
     public String departmentDetails() {

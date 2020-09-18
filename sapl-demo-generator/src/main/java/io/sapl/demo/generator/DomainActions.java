@@ -7,13 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Value
-public class CRUD {
+public class DomainActions {
 
-    public static final CRUD ALL = new CRUD(true, true, true, true);
-
-    public static final CRUD NONE = new CRUD(false, false, false, false);
-
-    public static final CRUD READ_ONLY = new CRUD(false, true, false, false);
+    public static final DomainActions ALL = new DomainActions(true, true, true, true);
+    public static final DomainActions NONE = new DomainActions(false, false, false, false);
+    public static final DomainActions READ_ONLY = new DomainActions(false, true, false, false);
 
     boolean create;
 
@@ -23,7 +21,7 @@ public class CRUD {
 
     boolean delete;
 
-    public List<String> generateActionsWithName(String name) {
+    public List<String> generateActionsForResource(String name) {
         List<String> actions = new ArrayList<>();
         if (create) actions.add("create" + StringUtils.capitalize(name));
         if (read) actions.add("get" + StringUtils.capitalize(name));
