@@ -3,6 +3,7 @@ package io.sapl.demo.generator;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -10,7 +11,17 @@ import java.util.List;
 public class DomainResource {
 
     private final String resourceName;
+    private final boolean unrestricted;
+    private final boolean extensionRequired;
 
+    private List<DomainRole> fullAccessRoles = new ArrayList<>();
+    private List<DomainRole> readAccessRoles = new ArrayList<>();
+    private List<DomainRole> customAccessRoles = new ArrayList<>();
+
+
+    public DomainResource(String resourceName) {
+        this(resourceName, false, false);
+    }
 
     public static class DomainResources {
         public static DomainResource findByName(List<DomainResource> resourceList, String resourceName) {

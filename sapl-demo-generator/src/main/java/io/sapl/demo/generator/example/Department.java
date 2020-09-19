@@ -4,6 +4,7 @@ import io.sapl.demo.generator.DomainActions;
 import io.sapl.demo.generator.DomainResource;
 import io.sapl.demo.generator.DomainRole;
 import io.sapl.demo.generator.DomainRole.ExtendedDomainRole;
+import io.sapl.demo.generator.DomainUtil;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +31,17 @@ public class Department {
     private List<DomainResource> departmentResources = new ArrayList<>();
 
     //CRUD actions
-    private List<String> departmentInternalActions = new ArrayList<>();;
-    private List<String> departmentPublicActions = new ArrayList<>();;
+    private List<String> departmentInternalActions = new ArrayList<>();
+    private List<String> departmentPublicActions = new ArrayList<>();
     //additional actions (specialAction1,...)
-    private List<String> departmentSpecialActions = new ArrayList<>();;
+    private List<String> departmentSpecialActions = new ArrayList<>();
 
 
-    private List<DomainRole> rolesForPublicActions = new ArrayList<>();;
-    private List<DomainRole> rolesForSpecialActions = new ArrayList<>();;
+    private List<DomainRole> rolesForPublicActions = new ArrayList<>();
+    private List<DomainRole> rolesForSpecialActions = new ArrayList<>();
 
-    private List<ExtendedDomainRole> extendedRolesForPublicActions = new ArrayList<>();;
-    private List<ExtendedDomainRole> extendedRolesForSpecialActions = new ArrayList<>();;
+    private List<ExtendedDomainRole> extendedRolesForPublicActions = new ArrayList<>();
+    private List<ExtendedDomainRole> extendedRolesForSpecialActions = new ArrayList<>();
 
 
     public void init() {
@@ -51,24 +52,33 @@ public class Department {
         createPublicActions();
         createSpecialActions();
 
-        LOGGER.info("initialized department: {}", departmentName);
+        LOGGER.trace("initialized department: {}", departmentName);
     }
 
     private void createDepartmentResources() {
-        departmentResources.add(new DomainResource("resource." + departmentName));
-        for (int i = 0; i < additionalDepartmentResources; i++) {
-            departmentResources.add(new DomainResource("resource." + departmentName + i));
+        departmentResources.add(new DomainResource(String.format("resource.%s.0",
+                departmentName)));
+
+        for (int i = 1; i <= additionalDepartmentResources; i++) {
+            departmentResources.add(new DomainResource(String.format("resource.%s.%d",
+                    departmentName, i)));
         }
     }
 
     private void createDepartmentRoles() {
-        departmentRoles.add(new DomainRole(ExampleProvider.DEPARTMENT_ROLE_MAP.getOrDefault(departmentName,
-                "ROLE_" + departmentName)));
+        String mainDepartmentRoleName = ExampleProvider.DEPARTMENT_ROLE_MAP.getOrDefault(departmentName,
+                String.format("role.%03d", DomainUtil.getNextRoleCount()));
+
+        departmentRoles.add(new DomainRole(mainDepartmentRoleName));
 
         for (int i = 0; i < additionalDepartmentRoles; i++) {
-            departmentRoles.add(new DomainRole("ROLE_" + departmentName + "_" + i));
+            String roleAppendix = DomainUtil.getIOrDefault(ExampleProvider.EXAMPLE_GENERAL_ROLE_APPENDIX_LIST, i,
+                    String.format("%03d", DomainUtil.getNextAppendixCount()));
+
+            departmentRoles.add(new DomainRole(mainDepartmentRoleName + "-" + roleAppendix));
         }
     }
+
 
     private void createSpecialActions() {
         for (int i = 0; i < numberOfSpecialActions; i++) {

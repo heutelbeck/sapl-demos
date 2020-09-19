@@ -46,7 +46,7 @@ public class ExampleProvider {
     public static final String ROLE_ANESTHETIST = "anesthetist";
     public static final String ROLE_CARDIOLOGIST = "cardiologist";
     public static final String ROLE_CENTRAL_BUYER = "central_buyer";
-    public static final String ROLE_CLINICAL_MANAGER = "clinical_manager";
+    public static final String ROLE_CLINICAL_MANAGER = "manager";
     public static final String ROLE_DIRECTOR = "director";
     public static final String ROLE_FINANCE = "finance";
     public static final String ROLE_GYNECOLOGIST = "gynecologist";
@@ -59,17 +59,20 @@ public class ExampleProvider {
     public static final String ROLE_SURGEON = "surgeon";
 
     public static final String ROLE_DOCTOR = "doctor";
-    public static final String ROLE_INTERN = "intern";
     public static final String ROLE_NURSE = "nurse";
     public static final String ROLE_PATIENT = "patient";
-    public static final String ROLE_STUDENT = "student";
-    public static final String ROLE_SUPPORT = "support";
     public static final String ROLE_VISITOR = "visitor";
-    public static final String ROLE_VOLUNTEER = "volunteer";
+
+    //role appendix
+    public static final String ROLE_APPENDIX_ASSISTANCE = "assistance";
+    public static final String ROLE_APPENDIX_INTERN = "intern";
+    public static final String ROLE_APPENDIX_STUDENT = "student";
+    public static final String ROLE_APPENDIX_VOLUNTEER = "volunteer";
 
 
     public static final List<String> EXAMPLE_MANDATORY_ROLE_LIST = new ArrayList<>();
     public static final List<String> EXAMPLE_GENERAL_ROLE_LIST = new ArrayList<>();
+    public static final List<String> EXAMPLE_GENERAL_ROLE_APPENDIX_LIST = new ArrayList<>();
 
 
     public static final Map<String, String> DEPARTMENT_ROLE_MAP = new HashMap<>();
@@ -95,10 +98,10 @@ public class ExampleProvider {
         EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_PATIENT);
         EXAMPLE_MANDATORY_ROLE_LIST.add(ROLE_VISITOR);
 
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_INTERN); //TODO unused
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_STUDENT); //TODO unused
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_SUPPORT); //TODO unused
-        EXAMPLE_GENERAL_ROLE_LIST.add(ROLE_VOLUNTEER); //TODO unused
+        EXAMPLE_GENERAL_ROLE_APPENDIX_LIST.add(ROLE_APPENDIX_ASSISTANCE);
+        EXAMPLE_GENERAL_ROLE_APPENDIX_LIST.add(ROLE_APPENDIX_STUDENT);
+        EXAMPLE_GENERAL_ROLE_APPENDIX_LIST.add(ROLE_APPENDIX_INTERN);
+        EXAMPLE_GENERAL_ROLE_APPENDIX_LIST.add(ROLE_APPENDIX_VOLUNTEER);
 
         DEPARTMENT_ROLE_MAP.put(DEPARTMENT_ANESTHESIOLOGY, ROLE_ANESTHETIST);
         DEPARTMENT_ROLE_MAP.put(DEPARTMENT_CARDIOLOGY, ROLE_CARDIOLOGIST);
@@ -135,23 +138,18 @@ public class ExampleProvider {
 
 
     static {
-//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
-//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICATION);
-//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
-//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_ROOM);
-//        EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_TREATMENT);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_MEDICATION);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_TREATMENT);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
+        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_ROOM);
+
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_INSURANCE);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_INVOICES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_DEPARTMENTS);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICAL_DEVICES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_MEDICAL_SUPPLIES);
         EXAMPLE_GENERAL_RESOURCE_LIST.add(RESOURCE_STAFF);
-
-        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_DIAGNOSIS);
-        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_MEDICATION);
-        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_PERSONAL_DETAILS);
-        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_ROOM);
-        EXAMPLE_MANDATORY_RESOURCE_LIST.add(RESOURCE_TREATMENT);
     }
 
 

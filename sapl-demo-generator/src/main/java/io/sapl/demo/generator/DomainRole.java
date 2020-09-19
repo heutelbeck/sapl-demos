@@ -18,12 +18,20 @@ import java.util.stream.Collectors;
 public class DomainRole {
 
     private final String roleName;
+    private final boolean generalUnrestrictedAccess;
+    private final boolean generalReadAccess;
+    private final boolean generalCustomAccess;
+    private final boolean extensionRequired;
+
+    public DomainRole(String roleName) {
+        this(roleName, false, false, false, false);
+    }
 
     public static class DomainRoles {
 
-        public static DomainRole ROLE_AUTHORIZED = new DomainRole("authorized");
-        public static DomainRole ROLE_ADMIN = new DomainRole("admin");
-        public static DomainRole ROLE_SYSTEM = new DomainRole("system");
+        public static DomainRole ROLE_AUTHORIZED = new DomainRole("authorized", false, false, false, false);
+        public static DomainRole ROLE_ADMIN = new DomainRole("admin", true, false, false, true);
+        public static DomainRole ROLE_SYSTEM = new DomainRole("system", true, false, false, false);
 
         public static DomainRole findByName(List<DomainRole> roleList, String roleName) {
             return roleList.stream()

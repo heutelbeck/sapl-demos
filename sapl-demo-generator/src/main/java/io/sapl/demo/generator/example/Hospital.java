@@ -20,17 +20,24 @@ import java.util.stream.Collectors;
 public class Hospital {
 
     private final String name;
+
+    /* PARAMS */
     private final int numberOfGeneralRoles;
     private final int numberOfGeneralResources;
+
 
     private List<DomainRole> hospitalRoles = new ArrayList<>();
     private List<DomainResource> hospitalResources = new ArrayList<>();
 
+    /* ##### GENERAL ##### */
     private List<DomainRole> rolesWithGeneralFullAccess = new ArrayList<>();
     private List<DomainRole> rolesWithGeneralReadAccess = new ArrayList<>();
+    private List<DomainRole> rolesWithGeneralSpecialAccess = new ArrayList<>(); // some combination of DomainActions
 
     private List<ExtendedDomainRole> extendedRolesWithGeneralFullAccess = new ArrayList<>();
     private List<ExtendedDomainRole> extendedRolesWithGeneralReadAccess = new ArrayList<>();
+
+    /* ##### RESOURCE SPECIFIC ##### */
 
     //e.g. "resource.Patient.Medication => ROLE_DOCTOR => CRUD.ALL
     //e.g. "resource.Patient.Medication => ROLE_PATIENT => CRUD.READ_ONLY
@@ -44,7 +51,6 @@ public class Hospital {
     public void init() {
         generateHospitalRoles();
         generateHospitalResources();
-
     }
 
     private void generateHospitalResources() {
