@@ -128,7 +128,7 @@ public class PolicyGenerator {
         return variables;
     }
 
-    public AuthorizationSubscription createAuthorizationSubscriptionObject() {
+    public AuthorizationSubscription createSubscriptionWithAllVariables() {
         ObjectNode resource = JsonNodeFactory.instance.objectNode();
         for (String var : getVariables()) {
             resource = resource.put(var, roll() >= config.getFalseProbability());

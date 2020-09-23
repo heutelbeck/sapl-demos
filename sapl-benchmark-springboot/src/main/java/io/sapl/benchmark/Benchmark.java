@@ -17,16 +17,9 @@ package io.sapl.benchmark;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import io.sapl.api.functions.FunctionException;
+import io.sapl.analyzer.PolicyAnalyzer;
 import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.AuthorizationDecision;
-import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PDPConfigurationException;
-import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.db.BenchmarkResult;
-import io.sapl.db.BenchmarkResultRepository;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.generator.DomainGenerator;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,14 +39,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -80,7 +71,7 @@ public class Benchmark implements CommandLineRunner {
 
     private static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn";
 
-    private static final String DEFAULT_PATH = "/Users/marclucasbaur/sapl/";
+    private static final String DEFAULT_PATH = "/Users/marclucasbaur/benchmarks/";
 
     private static final String HELP_DOC = "print this message";
 
@@ -108,17 +99,15 @@ public class Benchmark implements CommandLineRunner {
 
     private static final String COMPARISION_ID_DOC = "id to group benchmarks using same policies";
 
+    private IndexType indexType = SIMPLE;
+
+    private String path = DEFAULT_PATH;
+
     private static final int ITERATIONS = 10;
 
     private static final int RUNS = 30;
 
-    private static final double MILLION = 1000000.0D;
-
-    private String path = DEFAULT_PATH;
-
-    private IndexType indexType = FAST;
-
-    private boolean reuseExistingPolicies = true;
+    private boolean reuseExistingPolicies = false;
 
     private String testFilePath = DEFAULT_PATH + "tests/tests.json";
 
@@ -128,110 +117,45 @@ public class Benchmark implements CommandLineRunner {
 
     private static final Gson GSON = new Gson();
 
-    private final BenchmarkResultRepository repository;
+    private static final TestRunner TEST_RUNNER = new TestRunner();
+
+//    private final BenchmarkResultRepository repository;
+
+    private final DomainGenerator domainGenerator;
+
+    private static final boolean performRandomBenchmark = true;
+
+    private TestSuite testSuite;
 
     @Override
     public void run(String... args) throws Exception {
         LOGGER.info("command line runner started");
 
         parseCommandLineArguments(args);
-        filePrefix = String.format("%s_%s/", LocalDateTime.now(), indexType);
 
-        LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}, comparisonId={}", indexType, reuseExistingPolicies,
-                testFilePath, filePrefix, comparisionId);
+        this.testSuite = generateTestSuite(path);
 
+        // ####### SIMPLE #######
+        indexType = SIMPLE;
+        init();
         runBenchmark(path);
+
+        // ####### IMPROVED #######
+//        indexType = IMPROVED;
+//        init();
+//        runBenchmark(path);
+
 
         System.exit(0);
     }
 
-    private void parseCommandLineArguments(String... args) {
-        Options options = new Options();
+    private void init() {
+        filePrefix = String.format("%s_%s_%s/",
+                LocalDateTime.now(), indexType, performRandomBenchmark ? "RANDOM" : "HOSPITAL");
 
-        options.addOption(PATH, true, PATH_DOC);
-        options.addOption(HELP, false, HELP_DOC);
-        options.addOption(REUSE, true, REUSE_DOC);
-        options.addOption(INDEX, true, INDEX_DOC);
-        options.addOption(TEST, true, TEST_DOC);
-        options.addOption(COMPARISION_ID, true, COMPARISION_ID_DOC);
-
-        CommandLineParser parser = new DefaultParser();
-        try {
-            CommandLine cmd = parser.parse(options, args);
-            if (cmd.hasOption(HELP)) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp(USAGE, options);
-                System.exit(-1);
-            }
-
-            String pathOption = cmd.getOptionValue(PATH);
-            if (!Strings.isNullOrEmpty(pathOption)) {
-                if (!Files.exists(Paths.get(pathOption))) {
-                    throw new IllegalArgumentException("path provided does not exists");
-                }
-                path = pathOption;
-            }
-
-            String reuseOption = cmd.getOptionValue(REUSE);
-            if (!Strings.isNullOrEmpty(reuseOption)) {
-                switch (reuseOption.toUpperCase()) {
-                    case "TRUE":
-                        reuseExistingPolicies = true;
-                        break;
-                    case "FALSE":
-                        reuseExistingPolicies = false;
-                        break;
-                    default:
-                        HelpFormatter formatter = new HelpFormatter();
-                        formatter.printHelp(USAGE, options);
-                        throw new IllegalArgumentException("invalid policy reuse option provided");
-                }
-            }
-
-            String indexOption = cmd.getOptionValue(INDEX);
-
-            if (!Strings.isNullOrEmpty(indexOption)) {
-                LOGGER.info("using index {}", indexOption);
-                switch (indexOption.toUpperCase()) {
-                    case "FAST":
-                        indexType = FAST;
-                        break;
-                    case "IMPROVED":
-                        indexType = IMPROVED;
-                        break;
-                    case "SIMPLE":
-                        indexType = SIMPLE;
-                        break;
-                    default:
-                        HelpFormatter formatter = new HelpFormatter();
-                        formatter.printHelp(USAGE, options);
-                        throw new IllegalArgumentException("invalid index option provided");
-                }
-            }
-
-            String testOption = cmd.getOptionValue(TEST);
-            if (!Strings.isNullOrEmpty(testOption)) {
-                if (!Files.exists(Paths.get(testOption))) {
-                    throw new IllegalArgumentException("test file provided does not exists");
-                }
-                testFilePath = testOption;
-            }
-
-            String cidOption = cmd.getOptionValue(COMPARISION_ID);
-            if (!Strings.isNullOrEmpty(cidOption)) {
-                comparisionId = cidOption;
-            }
-
-
-        } catch (ParseException e) {
-            LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
-            System.exit(1);
-        }
-
-    }
-
-    public void runBenchmark(String path) throws URISyntaxException {
-        String resultPath = path + filePrefix;
+        LOGGER.info("\nrandomBenchmark={},\n index={},\n seed={},\n reuse={},\n testfile={},\n filePrefix={},\n comparisonId={}",
+                performRandomBenchmark, indexType, domainGenerator.getDomainData().getSeed(), reuseExistingPolicies,
+                testFilePath, filePrefix, comparisionId);
 
         try {
             final Path dir = Paths.get(path, filePrefix);
@@ -240,18 +164,24 @@ public class Benchmark implements CommandLineRunner {
             LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
         }
 
-        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
 
-        BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType.toString(),
+    public void runBenchmark(String path) throws Exception {
+        String resultPath = path + filePrefix;
+
+        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType,
                 reuseExistingPolicies, ITERATIONS, RUNS, comparisionId);
 
-        TestSuite suite = generateTestSuite();
-        List<PolicyGeneratorConfiguration> configs = suite.getCases();
-
+        List<PolicyGeneratorConfiguration> configs = generateConfigurations();
+        LOGGER.info("running benchmarks for {} configs", configs.size());
         for (PolicyGeneratorConfiguration config : configs) {
+            LOGGER.info("running benchmark {}", config.getName());
             benchmarkConfiguration(path, chart, benchmarkDataContainer, config);
         }
 
+
+        LOGGER.info("writing charts and results to {}", resultPath);
         writeOverviewChart(resultPath, chart);
 
         writeHistogram(resultPath, benchmarkDataContainer);
@@ -263,13 +193,36 @@ public class Benchmark implements CommandLineRunner {
         persistAggregates(benchmarkDataContainer);
     }
 
-    private TestSuite generateTestSuite() {
+    private List<PolicyGeneratorConfiguration> generateConfigurations() {
+        if (performRandomBenchmark) {
+            return this.testSuite.getCases();
+        } else {
+            PolicyGeneratorConfiguration configuration;
+
+            if (reuseExistingPolicies) {
+                configuration = new PolicyAnalyzer(domainGenerator.getDomainData().getPolicyDirectoryPath())
+                        .analyzeSaplDocuments();
+            } else {
+                configuration = domainGenerator.generateDomainPolicies();
+            }
+            return Collections.singletonList(configuration);
+        }
+    }
+
+
+    private TestSuite generateTestSuite(String path) {
 //            File testFile = new File(testFilePath);
 //            LOGGER.info("using testfile: {}", testFile);
 //            List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
 //            String allLinesAsString = StringUtils.join(allLines, "");
 //            suite = GSON.fromJson(allLinesAsString, TestSuite.class);
-        TestSuite suite = TestSuiteGenerator.generate();
+
+        TestSuite suite = TestSuiteGenerator.generate(path,
+                domainGenerator.getDomainUtil().getDice());
+
+//        TestSuite suite = TestSuiteGenerator.generateN(path, 1,
+//                domainGenerator.getDomainUtil().getDice());
+
 
         Objects.requireNonNull(suite, "test suite is null");
         Objects.requireNonNull(suite.getCases(), "test cases are null");
@@ -280,9 +233,9 @@ public class Benchmark implements CommandLineRunner {
     }
 
     private void persistAggregates(BenchmarkDataContainer dataContainer) {
-        dataContainer.getAggregateData().stream()
-                .map(aggregateRecord -> new BenchmarkResult(dataContainer, aggregateRecord))
-                .forEach(repository::save);
+//        dataContainer.getAggregateData().stream()
+//                .map(aggregateRecord -> new BenchmarkResult(dataContainer, aggregateRecord))
+//                .forEach(repository::save);
     }
 
     private void buildAggregateData(BenchmarkDataContainer benchmarkDataContainer) {
@@ -296,11 +249,13 @@ public class Benchmark implements CommandLineRunner {
     }
 
     private void benchmarkConfiguration(String path, XYChart chart, BenchmarkDataContainer benchmarkDataContainer,
-                                        PolicyGeneratorConfiguration config) throws URISyntaxException {
+                                        PolicyGeneratorConfiguration config) throws Exception {
         benchmarkDataContainer.getIdentifier().add(config.getName());
         List<XlsRecord> results = null;
         try {
-            results = runTest(config, path);
+            results = performRandomBenchmark
+                    ? TEST_RUNNER.runTest(config, path, reuseExistingPolicies, benchmarkDataContainer)
+                    : TEST_RUNNER.runTestNew(config, config.getPath(), benchmarkDataContainer);
         } catch (IOException | PolicyEvaluationException e) {
             LOGGER.error("Error running test", e);
             System.exit(1);
@@ -388,60 +343,6 @@ public class Benchmark implements CommandLineRunner {
         }
     }
 
-    private List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
-            throws IOException, URISyntaxException, PolicyEvaluationException {
-
-
-        PolicyGenerator generator = new PolicyGenerator(config);
-
-        String subfolder = config.getName().replaceAll("[^a-zA-Z0-9]", "");
-        if (!reuseExistingPolicies) {
-            generator.generatePolicies(subfolder);
-
-            final Path dir = Paths.get(path, subfolder);
-            Files.createDirectories(dir);
-            Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"),
-                    StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        List<XlsRecord> results = new LinkedList<>();
-
-        try {
-            for (int i = 0; i < ITERATIONS; i++) {
-                long begin = System.nanoTime();
-                PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
-                        .withFilesystemPolicyRetrievalPoint(path + subfolder, indexType)
-                        .withFilesystemPDPConfigurationProvider(path + subfolder).build();
-                double prep = nanoToMs(System.nanoTime() - begin);
-
-                for (int j = 0; j < RUNS; j++) {
-                    AuthorizationSubscription request = generator.createAuthorizationSubscriptionObject();
-
-                    long start = System.nanoTime();
-                    AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();
-                    long end = System.nanoTime();
-
-                    double diff = nanoToMs(end - start);
-
-                    if (authzDecision == null) {
-                        throw new IOException("PDP returned null authzDecision");
-                    }
-                    results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
-                            authzDecision.toString()));
-
-                    LOGGER.debug("Total : {}ms", diff);
-                }
-            }
-        } catch (IOException | AttributeException | FunctionException | PDPConfigurationException e) {
-            LOGGER.error("Error running test", e);
-        }
-
-        return results;
-    }
-
-    private double nanoToMs(long nanoseconds) {
-        return nanoseconds / MILLION;
-    }
 
     private List<String> getExportHeader() {
         return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
@@ -489,6 +390,91 @@ public class Benchmark implements CommandLineRunner {
         } else {
             return list.get(index);
         }
+    }
+
+    private void parseCommandLineArguments(String... args) {
+        Options options = new Options();
+
+        options.addOption(PATH, true, PATH_DOC);
+        options.addOption(HELP, false, HELP_DOC);
+        options.addOption(REUSE, true, REUSE_DOC);
+        options.addOption(INDEX, true, INDEX_DOC);
+        options.addOption(TEST, true, TEST_DOC);
+        options.addOption(COMPARISION_ID, true, COMPARISION_ID_DOC);
+
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption(HELP)) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp(USAGE, options);
+                System.exit(-1);
+            }
+
+            String pathOption = cmd.getOptionValue(PATH);
+            if (!Strings.isNullOrEmpty(pathOption)) {
+                if (!Files.exists(Paths.get(pathOption))) {
+                    throw new IllegalArgumentException("path provided does not exists");
+                }
+                path = pathOption;
+            }
+
+            String reuseOption = cmd.getOptionValue(REUSE);
+            if (!Strings.isNullOrEmpty(reuseOption)) {
+                switch (reuseOption.toUpperCase()) {
+                    case "TRUE":
+                        reuseExistingPolicies = true;
+                        break;
+                    case "FALSE":
+                        reuseExistingPolicies = false;
+                        break;
+                    default:
+                        HelpFormatter formatter = new HelpFormatter();
+                        formatter.printHelp(USAGE, options);
+                        throw new IllegalArgumentException("invalid policy reuse option provided");
+                }
+            }
+
+            String indexOption = cmd.getOptionValue(INDEX);
+
+            if (!Strings.isNullOrEmpty(indexOption)) {
+                LOGGER.debug("using index {}", indexOption);
+                switch (indexOption.toUpperCase()) {
+                    case "FAST":
+                        indexType = FAST;
+                        break;
+                    case "IMPROVED":
+                        indexType = IMPROVED;
+                        break;
+                    case "SIMPLE":
+                        indexType = SIMPLE;
+                        break;
+                    default:
+                        HelpFormatter formatter = new HelpFormatter();
+                        formatter.printHelp(USAGE, options);
+                        throw new IllegalArgumentException("invalid index option provided");
+                }
+            }
+
+            String testOption = cmd.getOptionValue(TEST);
+            if (!Strings.isNullOrEmpty(testOption)) {
+                if (!Files.exists(Paths.get(testOption))) {
+                    throw new IllegalArgumentException("test file provided does not exists");
+                }
+                testFilePath = testOption;
+            }
+
+            String cidOption = cmd.getOptionValue(COMPARISION_ID);
+            if (!Strings.isNullOrEmpty(cidOption)) {
+                comparisionId = cidOption;
+            }
+
+
+        } catch (ParseException e) {
+            LOGGER.error("encountered an error running the demo: {}", e.getMessage(), e);
+            System.exit(1);
+        }
+
     }
 
 

@@ -41,7 +41,7 @@ public class BenchmarkResult {
         this.id = UUID.randomUUID().toString();
         this.benchmarkId = benchmarkDataContainer.getBenchmarkId();
         this.benchmarkTimestamp = benchmarkDataContainer.getBenchmarkTimestamp();
-        this.indexType = benchmarkDataContainer.getIndexType();
+        this.indexType = benchmarkDataContainer.getIndexType().toString();
         this.runtimeInfo = benchmarkDataContainer.getRuntimeInfo();
         this.newPoliciesGenerated = benchmarkDataContainer.isNewPoliciesGenerated();
         this.iterations = benchmarkDataContainer.getIterations();

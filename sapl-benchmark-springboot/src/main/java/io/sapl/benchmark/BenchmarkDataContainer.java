@@ -1,5 +1,6 @@
 package io.sapl.benchmark;
 
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import lombok.Getter;
 
 import java.util.LinkedList;
@@ -13,7 +14,7 @@ public class BenchmarkDataContainer {
     final long benchmarkTimestamp;
     final String runtimeInfo;
 
-    final String indexType;
+    final IndexType indexType;
     final boolean newPoliciesGenerated;
     final int iterations;
     final int runs;
@@ -28,7 +29,7 @@ public class BenchmarkDataContainer {
 
     List<XlsAggregateRecord> aggregateData = new LinkedList<>();
 
-    public BenchmarkDataContainer(String indexType, boolean reuseExistingPolicies, int iterations, int runs,
+    public BenchmarkDataContainer(IndexType indexType, boolean reuseExistingPolicies, int iterations, int runs,
                                   String comparisonId) {
         this.benchmarkId = UUID.randomUUID().toString();
         this.benchmarkTimestamp = System.currentTimeMillis();
