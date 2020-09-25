@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.sapl.api.pdp.AuthorizationSubscription;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 
+@Data
 @Slf4j
 public class PolicyGenerator {
 

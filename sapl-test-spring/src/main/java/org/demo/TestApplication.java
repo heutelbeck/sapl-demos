@@ -1,6 +1,7 @@
 package org.demo;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -23,6 +24,7 @@ import reactor.core.publisher.Flux;
         ReactiveUserDetailsServiceAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
 public class TestApplication implements CommandLineRunner {
 
+    private static final Object NULLNODE = JsonNodeFactory.instance.nullNode();
     private final PolicyDecisionPoint pdp;
 
     public static void main(String[] args) {
@@ -33,8 +35,7 @@ public class TestApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        AuthorizationSubscription authorizationSubscription =
-                buildAuthorizationSubscription("marc", "getPatients", "patients");
+        AuthorizationSubscription authorizationSubscription = createEmptySubscription();
 
         Flux<AuthorizationDecision> decisionFlux = pdp.decide(authorizationSubscription);
         AuthorizationDecision authorizationDecision = decisionFlux.blockFirst();
@@ -43,6 +44,9 @@ public class TestApplication implements CommandLineRunner {
 
     }
 
+    public AuthorizationSubscription createEmptySubscription() {
+        return buildAuthorizationSubscription(NULLNODE, NULLNODE, NULLNODE);
+    }
 
     private AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
                                                                      Object resource) {

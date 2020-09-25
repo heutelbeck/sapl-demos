@@ -24,9 +24,9 @@ public class XlsRecord {
 
     String name;
 
-    double preparation;
+    double timePreparation;
 
-    double duration;
+    double timeDuration;
 
     String request;
 

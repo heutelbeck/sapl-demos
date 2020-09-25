@@ -280,7 +280,7 @@ public class DomainGenerator {
     public StringBuilder generateEmptyPolicy(String policyName) {
         StringBuilder policyBuilder = new StringBuilder().append("policy \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
-                .append("permit ");
+                .append("deny ");
 
         return policyBuilder;
     }

@@ -16,7 +16,6 @@ public class BenchmarkDataContainer {
 
     final IndexType indexType;
     final boolean newPoliciesGenerated;
-    final int iterations;
     final int runs;
     final String comparisonId;
 
@@ -29,7 +28,7 @@ public class BenchmarkDataContainer {
 
     List<XlsAggregateRecord> aggregateData = new LinkedList<>();
 
-    public BenchmarkDataContainer(IndexType indexType, boolean reuseExistingPolicies, int iterations, int runs,
+    public BenchmarkDataContainer(IndexType indexType, boolean reuseExistingPolicies, int runs,
                                   String comparisonId) {
         this.benchmarkId = UUID.randomUUID().toString();
         this.benchmarkTimestamp = System.currentTimeMillis();
@@ -37,7 +36,6 @@ public class BenchmarkDataContainer {
                 System.getProperty("java.version"));
         this.indexType = indexType;
         this.newPoliciesGenerated = reuseExistingPolicies;
-        this.iterations = iterations;
         this.runs = runs;
         this.comparisonId = comparisonId;
 

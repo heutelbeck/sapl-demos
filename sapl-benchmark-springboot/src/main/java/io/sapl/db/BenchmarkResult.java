@@ -22,7 +22,6 @@ public class BenchmarkResult {
 
     final String indexType;
     final boolean newPoliciesGenerated;
-    final int iterations;
     final int runs;
 
     /* Test Results */
@@ -44,7 +43,6 @@ public class BenchmarkResult {
         this.indexType = benchmarkDataContainer.getIndexType().toString();
         this.runtimeInfo = benchmarkDataContainer.getRuntimeInfo();
         this.newPoliciesGenerated = benchmarkDataContainer.isNewPoliciesGenerated();
-        this.iterations = benchmarkDataContainer.getIterations();
         this.runs = benchmarkDataContainer.getRuns();
         this.comparisonId = benchmarkDataContainer.getComparisonId();
 

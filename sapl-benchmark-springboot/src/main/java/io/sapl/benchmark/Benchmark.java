@@ -51,8 +51,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
-import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
 
 @Slf4j
 @Component
@@ -102,8 +102,6 @@ public class Benchmark implements CommandLineRunner {
     private IndexType indexType = SIMPLE;
 
     private String path = DEFAULT_PATH;
-
-    private static final int ITERATIONS = 10;
 
     private static final int RUNS = 30;
 
@@ -176,7 +174,7 @@ public class Benchmark implements CommandLineRunner {
 
         XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType,
-                reuseExistingPolicies, ITERATIONS, RUNS, comparisionId);
+                reuseExistingPolicies, RUNS, comparisionId);
 
         List<PolicyGeneratorConfiguration> configs = generateConfigurations();
         LOGGER.info("running benchmarks for {} configs", configs.size());
@@ -265,7 +263,7 @@ public class Benchmark implements CommandLineRunner {
         double[] times = new double[results.size()];
         int i = 0;
         for (XlsRecord item : results) {
-            times[i] = item.getDuration();
+            times[i] = item.getTimeDuration();
             i++;
         }
 
@@ -359,8 +357,8 @@ public class Benchmark implements CommandLineRunner {
     private double extractMin(List<XlsRecord> data) {
         double min = Double.MAX_VALUE;
         for (XlsRecord item : data) {
-            if (item.getDuration() < min) {
-                min = item.getDuration();
+            if (item.getTimeDuration() < min) {
+                min = item.getTimeDuration();
             }
         }
         return min;
@@ -369,8 +367,8 @@ public class Benchmark implements CommandLineRunner {
     private double extractMax(List<XlsRecord> data) {
         double max = Double.MIN_VALUE;
         for (XlsRecord item : data) {
-            if (item.getDuration() > max) {
-                max = item.getDuration();
+            if (item.getTimeDuration() > max) {
+                max = item.getTimeDuration();
             }
         }
         return max;
@@ -379,13 +377,13 @@ public class Benchmark implements CommandLineRunner {
     private double extractAvg(List<XlsRecord> data) {
         double sum = 0;
         for (XlsRecord item : data) {
-            sum += item.getDuration();
+            sum += item.getTimeDuration();
         }
         return sum / data.size();
     }
 
     private double extractMdn(List<XlsRecord> data) {
-        List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
+        List<Double> list = data.stream().map(XlsRecord::getTimeDuration).sorted().collect(Collectors.toList());
         int index = list.size() / 2;
         if (list.size() % 2 == 0) {
             return (list.get(index) + list.get(index - 1)) / 2;
