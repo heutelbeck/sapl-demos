@@ -1,5 +1,6 @@
 package org.demo.domain;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,30 +28,18 @@ public class Patient {
 
     String diagnosisText;
 
-//	String attendingDoctor;
-//
-//	String attendingNurse;
+	String attendingDoctor;
+
+	String attendingNurse;
 
     String phoneNumber;
 
     String roomNumber;
 
-    String gender;
-
-    String dateOfBirth;
-
-    String address;
-
-    String insurance;
-
     public static Patient clone(Patient template) {
-//		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
-//				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
-//				template.roomNumber);
         return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
-                template.diagnosisText, template.phoneNumber, template.roomNumber, template.gender,
-                template.dateOfBirth, template.address, template.insurance);
+				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
+				template.roomNumber);
     }
-
 
 }
