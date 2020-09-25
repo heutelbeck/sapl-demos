@@ -1,0 +1,10 @@
+import filter.*
+
+set "TestController"
+first-applicable
+
+
+
+policy "all authenticated users may see patient list"
+permit
+    action == "getPatientss"
