@@ -1,5 +1,6 @@
 package io.sapl.benchmark;
 
+import com.google.gson.Gson;
 import io.sapl.api.functions.FunctionException;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -29,16 +30,23 @@ public class TestRunner {
 
         List<XlsRecord> results = new LinkedList<>();
 
+        LOGGER.info("running benchmark with config={}, iterations={}, runs={}",
+                config.getName(), benchmarkDataContainer.getIterations(), benchmarkDataContainer.getRuns());
+
         try {
             for (int i = 0; i < benchmarkDataContainer.getIterations(); i++) {
+                LOGGER.info("Progress {} / {}", i, benchmarkDataContainer.getIterations());
                 long begin = System.nanoTime();
                 PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
                         .withFilesystemPolicyRetrievalPoint(policyFolder, benchmarkDataContainer.getIndexType())
-                        .withFilesystemPDPConfigurationProvider(policyFolder).build();
+                        .withResourcePDPConfigurationProvider("/policies")
+//                        .withFilesystemPDPConfigurationProvider(policyFolder)
+                        .build();
                 double prep = nanoToMs(System.nanoTime() - begin);
 
                 for (int j = 0; j < benchmarkDataContainer.getRuns(); j++) {
-                    AuthorizationSubscription request = generator.createSubscriptionWithAllVariables();
+                    AuthorizationSubscription request = generator.createSubscriptionWithSingleResource();
+//                    LOGGER.trace("{}", new Gson().toJson(request));
 
                     long start = System.nanoTime();
                     AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();
@@ -92,6 +100,7 @@ public class TestRunner {
 
                 for (int j = 0; j < benchmarkDataContainer.getRuns(); j++) {
                     AuthorizationSubscription request = generator.createSubscriptionWithAllVariables();
+                    LOGGER.trace("{}", new Gson().toJson(request));
 
                     long start = System.nanoTime();
                     AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();

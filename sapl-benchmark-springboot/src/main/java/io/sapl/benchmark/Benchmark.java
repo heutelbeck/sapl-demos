@@ -123,7 +123,7 @@ public class Benchmark implements CommandLineRunner {
 
     private final DomainGenerator domainGenerator;
 
-    private static final boolean performRandomBenchmark = true;
+    private static final boolean performRandomBenchmark = false;
 
     private TestSuite testSuite;
 
@@ -135,15 +135,20 @@ public class Benchmark implements CommandLineRunner {
 
         this.testSuite = generateTestSuite(path);
 
+        if (!reuseExistingPolicies) {
+            LOGGER.info("generating domain policies");
+            domainGenerator.generateDomainPolicies();
+        }
+
         // ####### SIMPLE #######
-        indexType = SIMPLE;
-        init();
-        runBenchmark(path);
+//        indexType = SIMPLE;
+//        init();
+//        runBenchmark(path);
 
         // ####### IMPROVED #######
 //        indexType = IMPROVED;
-//        init();
-//        runBenchmark(path);
+        init();
+        runBenchmark(path);
 
 
         System.exit(0);
@@ -197,18 +202,15 @@ public class Benchmark implements CommandLineRunner {
         if (performRandomBenchmark) {
             return this.testSuite.getCases();
         } else {
-            PolicyGeneratorConfiguration configuration;
 
-            if (reuseExistingPolicies) {
-                configuration = new PolicyAnalyzer(domainGenerator.getDomainData().getPolicyDirectoryPath())
-                        .analyzeSaplDocuments();
-            } else {
-                configuration = domainGenerator.generateDomainPolicies();
-            }
+
+            PolicyGeneratorConfiguration configuration = new PolicyAnalyzer(domainGenerator.getDomainData()
+                    .getPolicyDirectoryPath())
+                    .analyzeSaplDocuments();
+
             return Collections.singletonList(configuration);
         }
     }
-
 
     private TestSuite generateTestSuite(String path) {
 //            File testFile = new File(testFilePath);
@@ -217,11 +219,11 @@ public class Benchmark implements CommandLineRunner {
 //            String allLinesAsString = StringUtils.join(allLines, "");
 //            suite = GSON.fromJson(allLinesAsString, TestSuite.class);
 
-        TestSuite suite = TestSuiteGenerator.generate(path,
-                domainGenerator.getDomainUtil().getDice());
-
-//        TestSuite suite = TestSuiteGenerator.generateN(path, 1,
+//        TestSuite suite = TestSuiteGenerator.generate(path,
 //                domainGenerator.getDomainUtil().getDice());
+
+        TestSuite suite = TestSuiteGenerator.generateN(path, 1,
+                domainGenerator.getDomainUtil().getDice());
 
 
         Objects.requireNonNull(suite, "test suite is null");

@@ -29,9 +29,9 @@ public class DomainUtil {
     private final boolean cleanDirectory;
 
     public static final DomainPolicyObligation LOG_OBLIGATION = new DomainPolicyObligation("\"logging:log_access\"");
-    public static final DomainPolicyBody TREATING_BODY = new DomainPolicyBody("subject in resource.<patient.treating>");
-    public static final DomainPolicyBody RELATIVE_BODY = new DomainPolicyBody("subject in resource.<patient.relatives>");
-    public static final DomainPolicyBody OWN_DATA_BODY = new DomainPolicyBody("subject.id == resource.patient");
+    public static final DomainPolicyBody TREATING_BODY = new DomainPolicyBody("subject in resource.<patient.treating>;");
+    public static final DomainPolicyBody RELATIVE_BODY = new DomainPolicyBody("subject in resource.<patient.relatives>;");
+    public static final DomainPolicyBody OWN_DATA_BODY = new DomainPolicyBody("subject.id == resource.patient;");
 
     private final Random dice;
 

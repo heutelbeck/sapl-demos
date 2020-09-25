@@ -1,6 +1,5 @@
 package io.sapl.generator;
 
-import io.sapl.benchmark.PolicyGeneratorConfiguration;
 import io.sapl.generator.DomainPolicy.DomainPolicyAdvice;
 import io.sapl.generator.DomainPolicy.DomainPolicyBody;
 import io.sapl.generator.DomainPolicy.DomainPolicyObligation;
@@ -33,7 +32,7 @@ public class DomainGenerator {
     private final String settingsFileContent;
 
 
-    public PolicyGeneratorConfiguration generateDomainPolicies() {
+    public void generateDomainPolicies() {
         // HOSPITAL
 //        List<DomainPolicy> domainPolicies = generatePoliciesForHospital(domainData.getHospital());
         List<DomainPolicy> domainPolicies = generateHospitalPoliciesNew();
@@ -54,12 +53,6 @@ public class DomainGenerator {
         domainUtil.writeDomainPoliciesToFilesystem(domainPolicies);
         domainUtil.writeConfigurationInfoToFile(settingsFileContent);
 
-        return PolicyGeneratorConfiguration.builder()
-                .policyCount(domainPolicies.size())
-                .variablePoolCount(0)
-                .path(domainData.getPolicyDirectoryPath())
-                .name("HOSPITAL")
-                .build();
     }
 
 //    private List<DomainPolicy> generatePoliciesForHospital(Hospital hospital) {
@@ -233,7 +226,7 @@ public class DomainGenerator {
                 DomainUtil.getRoleNames(roles));
 
         StringBuilder policyBuilder = generateBasePolicy(policyName, resources);
-        addRolesToPolicy(policyBuilder, roles);
+        addRolesToPolicy(policyBuilder, roles, resources.isEmpty());
 
         return new DomainPolicy(policyName, policyBuilder.toString(), DomainUtil.sanitizeFileName(fileName));
     }
@@ -284,12 +277,20 @@ public class DomainGenerator {
         return new DomainPolicy(policyName, policyBuilder.toString(), DomainUtil.sanitizeFileName(fileName));
     }
 
-    public StringBuilder generateGeneralBasePolicy(String policyName, List<DomainRole> roles) {
-        StringBuilder policyBuilder = new StringBuilder().append("POLICY \"").append(policyName).append("\"")
+    public StringBuilder generateEmptyPolicy(String policyName) {
+        StringBuilder policyBuilder = new StringBuilder().append("policy \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
-                .append("PERMIT ");
+                .append("permit ");
 
-        addRolesToPolicy(policyBuilder, roles);
+        return policyBuilder;
+    }
+
+    public StringBuilder generateGeneralBasePolicy(String policyName, List<DomainRole> roles) {
+        StringBuilder policyBuilder = new StringBuilder().append("policy \"").append(policyName).append("\"")
+                .append(System.lineSeparator())
+                .append("permit ");
+
+        addRolesToPolicy(policyBuilder, roles, true);
 
         return policyBuilder;
     }
@@ -303,16 +304,16 @@ public class DomainGenerator {
     }
 
     public StringBuilder generateBasePolicy(String policyName, List<DomainResource> resources) {
-        StringBuilder policyBuilder = new StringBuilder().append("POLICY \"").append(policyName).append("\"")
+        StringBuilder policyBuilder = new StringBuilder().append("policy \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
-                .append("PERMIT ");
+                .append("permit ");
 
         boolean first = true;
         policyBuilder.append("(");
         for (DomainResource resource : resources) {
             if (first) first = false;
-            else policyBuilder.append(" || ");
-            policyBuilder.append(String.format("resource == %s", resource.getResourceName()));
+            else policyBuilder.append(" | ");
+            policyBuilder.append(String.format("resource == \"%s\"", resource.getResourceName()));
         }
         policyBuilder.append(")");
 
@@ -322,20 +323,23 @@ public class DomainGenerator {
     private StringBuilder generateBasePolicyWithActions(String policyName, List<DomainResource> resources,
                                                         List<String> actions, List<DomainRole> roles) {
         StringBuilder policyBuilder = generateBasePolicy(policyName, resources);
-        addRolesToPolicy(policyBuilder, roles);
+        addRolesToPolicy(policyBuilder, roles, resources.isEmpty());
         addActionsToPolicy(policyBuilder, actions);
 
         return policyBuilder;
     }
 
-    public void addRolesToPolicy(StringBuilder policyBuilder, List<DomainRole> roles) {
+    public void addRolesToPolicy(StringBuilder policyBuilder, List<DomainRole> roles, boolean emptyPermit) {
         if (roles.isEmpty()) return;
 
-        policyBuilder.append(System.lineSeparator()).append(TAB_STRING).append(" && ").append("(");
+        policyBuilder.append(System.lineSeparator()).append(TAB_STRING);
+        if (!emptyPermit) policyBuilder.append(" & ");
+        policyBuilder.append("(");
+
         boolean firstRole = true;
         for (DomainRole role : roles) {
             if (firstRole) firstRole = false;
-            else policyBuilder.append(" || ");
+            else policyBuilder.append(" | ");
             policyBuilder.append(String.format("(\"%s\" in subject..authority)", role.getRoleName()));
         }
         policyBuilder.append(")");
@@ -344,11 +348,11 @@ public class DomainGenerator {
     public void addActionsToPolicy(StringBuilder policyBuilder, List<String> actions) {
         if (actions.isEmpty()) return;
 
-        policyBuilder.append(System.lineSeparator()).append(TAB_STRING).append(" && ").append("(");
+        policyBuilder.append(System.lineSeparator()).append(TAB_STRING).append(" & ").append("(");
         boolean firstAction = true;
         for (String action : actions) {
             if (firstAction) firstAction = false;
-            else policyBuilder.append(" || ");
+            else policyBuilder.append(" | ");
             policyBuilder.append(String.format("action == \"%s\"", action));
         }
         policyBuilder.append(")");
@@ -356,25 +360,25 @@ public class DomainGenerator {
 
     private void addBodyToPolicy(StringBuilder policyBuilder, DomainPolicyBody body) {
         policyBuilder.append(System.lineSeparator())
-                .append("WHERE").append(System.lineSeparator())
+                .append("where").append(System.lineSeparator())
                 .append(TAB_STRING).append(body.getBody());
     }
 
     private void addObligationToPolicy(StringBuilder policyBuilder, DomainPolicyObligation obligation) {
         policyBuilder.append(System.lineSeparator())
-                .append("OBLIGATION").append(System.lineSeparator())
+                .append("obligation").append(System.lineSeparator())
                 .append(TAB_STRING).append(obligation.getObligation());
     }
 
     private void addAdviceToPolicy(StringBuilder policyBuilder, DomainPolicyAdvice advice) {
         policyBuilder.append(System.lineSeparator())
-                .append("ADVICE").append(System.lineSeparator())
+                .append("advice").append(System.lineSeparator())
                 .append(TAB_STRING).append(advice.getAdvice());
     }
 
     private void addTransformationToPolicy(StringBuilder policyBuilder, DomainPolicyTransformation transformation) {
         policyBuilder.append(System.lineSeparator())
-                .append("TRANSFORMATION").append(System.lineSeparator())
+                .append("transformation").append(System.lineSeparator())
                 .append(TAB_STRING).append(transformation.getTransformation());
     }
 
@@ -451,9 +455,9 @@ public class DomainGenerator {
             if (resource.isExtensionRequired()) {
                 policyName += "_extended";
             }
-            StringBuilder policyBuilder = generateGeneralBasePolicyWithActions(policyName,
-                    DomainActions.generateCustomActionList(domainData.getNumberOfActions()), Collections
-                            .singletonList(customRole));
+            StringBuilder policyBuilder = generateBasePolicyWithActions(policyName, Collections.singletonList(resource),
+                    DomainActions.generateCustomActionList(domainData),
+                    Collections.singletonList(customRole));
 
             if (resource.isExtensionRequired()) {
                 addObligationToPolicy(policyBuilder, DomainUtil.LOG_OBLIGATION);
@@ -465,8 +469,8 @@ public class DomainGenerator {
 
     private void handleReadAccessRoles(List<DomainPolicy> policies, DomainResource resource) {
         String policyName = resource.getResourceName() + "_read_roles";
-        StringBuilder policyBuilder = generateGeneralBasePolicyWithActions(policyName,
-                DomainActions.READ_ONLY.getActionList(), resource.getReadAccessRoles());
+        StringBuilder policyBuilder = generateBasePolicyWithActions(policyName, Collections
+                .singletonList(resource), DomainActions.READ_ONLY.getActionList(), resource.getReadAccessRoles());
 
         List<DomainRole> extendedRoles = resource.getReadAccessRoles().stream()
                 .filter(DomainRole::isExtensionRequired).collect(Collectors.toList());
@@ -494,7 +498,7 @@ public class DomainGenerator {
     private void handleFullAccessRoles(List<DomainPolicy> policies, DomainResource resource) {
         String policyName = resource.getResourceName() + "_unrestricted-roles";
         StringBuilder policyBuilder = generateBasePolicy(policyName, Collections.singletonList(resource));
-        addRolesToPolicy(policyBuilder, resource.getFullAccessRoles());
+        addRolesToPolicy(policyBuilder, resource.getFullAccessRoles(), false);
 
         List<DomainRole> extendedRoles = resource.getFullAccessRoles().stream()
                 .filter(DomainRole::isExtensionRequired).collect(Collectors.toList());
@@ -588,7 +592,7 @@ public class DomainGenerator {
                     .map(customRole -> new DomainPolicy("general_custom_role_" + customRole.getRoleName(),
                             generateGeneralBasePolicyWithActions("general_custom_role_" + customRole
                                     .getRoleName(), DomainActions
-                                    .generateCustomActionList(domainData.getNumberOfActions()), readRoles
+                                    .generateCustomActionList(domainData), readRoles
                             ).toString(), "general_custom_role_" + customRole.getRoleName())
                     ).collect(Collectors.toList()));
         //TODO extendedRoles
@@ -627,7 +631,11 @@ public class DomainGenerator {
         List<DomainPolicy> policies = new ArrayList<>();
 
         for (int i = 0; i < domainData.getNumberOfSubjects(); i++) {
-            policies.add(new DomainPolicy("policy for subject " + i, "", "subject" + i));
+            String policyName = "policy for subject " + i;
+
+            StringBuilder policyBuilder = generateEmptyPolicy(policyName);
+
+            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), "subject" + i));
         }
 
         return policies;
@@ -637,7 +645,10 @@ public class DomainGenerator {
         List<DomainPolicy> policies = new ArrayList<>();
 
         for (int i = 0; i < domainData.getNumberOfLockedSubjects(); i++) {
-            policies.add(new DomainPolicy("policy for locked subject " + i, "", "subject" + i + "_locked"));
+            String policyName = "policy for locked subject " + i;
+
+            StringBuilder policyBuilder = generateEmptyPolicy(policyName);
+            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), "subject" + i + "_locked"));
         }
 
         return policies;

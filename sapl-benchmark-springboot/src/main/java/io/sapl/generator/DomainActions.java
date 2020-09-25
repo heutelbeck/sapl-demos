@@ -29,10 +29,10 @@ public class DomainActions {
     }
 
 
-    public static List<String> generateCustomActionList(int actionCount) {
+    public static List<String> generateCustomActionList(DomainData domainData) {
         List<String> actionList = new ArrayList<>();
 
-        for (int i = 0; i < new Random().nextInt(actionCount) + 1; i++) {
+        for (int i = 0; i < domainData.getDice().nextInt(domainData.getNumberOfActions()) + 1; i++) {
             actionList.add(String.format("action.%03d", new Random().nextInt(1000) + 1));
         }
 

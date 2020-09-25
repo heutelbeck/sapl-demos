@@ -15,6 +15,8 @@
  ******************************************************************************/
 package io.sapl.benchmark;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -34,6 +36,8 @@ import java.util.Random;
 public class PolicyGenerator {
 
     private static final int DEFAULT_BUFFER = 50;
+
+    private static final JsonNode NULLNODE = NullNode.getInstance();
 
     private final Random dice;
 
@@ -135,6 +139,32 @@ public class PolicyGenerator {
         }
         return new AuthorizationSubscription(NullNode.getInstance(), NullNode.getInstance(), resource,
                 NullNode.getInstance());
+    }
+
+    public AuthorizationSubscription createSubscriptionWithSingleResource() {
+        ObjectNode subject = JsonNodeFactory.instance.objectNode();
+        ArrayNode authorityNode = JsonNodeFactory.instance.arrayNode();
+        authorityNode.add("role.061");
+        subject.put("authority", authorityNode);
+        JsonNode resource = JsonNodeFactory.instance.textNode("resource.125");
+        JsonNode action = JsonNodeFactory.instance.textNode("read");
+
+
+        return new AuthorizationSubscription(subject, action, resource,
+                NullNode.getInstance());
+    }
+
+
+    public AuthorizationSubscription createEmptySubscription() {
+        return createSubscription(NULLNODE, NULLNODE, NULLNODE);
+    }
+
+    public String getResource() {
+        return "";
+    }
+
+    private AuthorizationSubscription createSubscription(JsonNode subject, JsonNode action, JsonNode resource) {
+        return new AuthorizationSubscription(subject, action, resource, NULLNODE);
     }
 
 }

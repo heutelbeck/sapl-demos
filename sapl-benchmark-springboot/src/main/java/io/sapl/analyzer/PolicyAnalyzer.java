@@ -51,7 +51,7 @@ public class PolicyAnalyzer {
             try (DirectoryStream<Path> stream = Files
                     .newDirectoryStream(Paths.get(policyPath), POLICY_FILE_GLOB_PATTERN)) {
                 for (Path filePath : stream) {
-                    LOGGER.info("load: {}", filePath);
+                    LOGGER.trace("load: {}", filePath);
                     final SAPL saplDocument = interpreter.parse(Files.newInputStream(filePath));
                     parsedDocuments.put(filePath.toString(), saplDocument);
                 }
@@ -70,9 +70,10 @@ public class PolicyAnalyzer {
         }
 
         return PolicyGeneratorConfiguration.builder()
-                .name("HOSPITAL")
+                .name("HOSPITAL p" + publishedDocuments.size() + " v" + (int) countVariables())
                 .policyCount(publishedDocuments.size())
                 .variablePoolCount((int) countVariables())
+                .path(policyPath)
                 .build();
 
     }
