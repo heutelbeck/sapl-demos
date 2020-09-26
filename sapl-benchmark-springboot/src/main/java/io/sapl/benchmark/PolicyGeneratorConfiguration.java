@@ -15,9 +15,13 @@
  ******************************************************************************/
 package io.sapl.benchmark;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 
+@Data
 @Builder
+@AllArgsConstructor
 public class PolicyGeneratorConfiguration {
 
     private String name = "";
@@ -40,99 +44,5 @@ public class PolicyGeneratorConfiguration {
 
     private String path = "";
 
-    public PolicyGeneratorConfiguration() {
-    }
 
-    public PolicyGeneratorConfiguration(String name, long seed, int policyCount, int logicalVariableCount, int variablePoolCount, double bracketProbability, double conjunctionProbability, double negationProbability, double falseProbability, String path) {
-        this.name = name;
-        this.seed = seed;
-        this.policyCount = policyCount;
-        this.logicalVariableCount = logicalVariableCount;
-        this.variablePoolCount = variablePoolCount;
-        this.bracketProbability = bracketProbability;
-        this.conjunctionProbability = conjunctionProbability;
-        this.negationProbability = negationProbability;
-        this.falseProbability = falseProbability;
-        this.path = path;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getSeed() {
-        return seed;
-    }
-
-    public void setSeed(long seed) {
-        this.seed = seed;
-    }
-
-    public int getPolicyCount() {
-        return policyCount;
-    }
-
-    public void setPolicyCount(int policyCount) {
-        this.policyCount = policyCount;
-    }
-
-    public int getLogicalVariableCount() {
-        return logicalVariableCount;
-    }
-
-    public void setLogicalVariableCount(int logicalVariableCount) {
-        this.logicalVariableCount = logicalVariableCount;
-    }
-
-    public int getVariablePoolCount() {
-        return variablePoolCount;
-    }
-
-    public void setVariablePoolCount(int variablePoolCount) {
-        this.variablePoolCount = variablePoolCount;
-    }
-
-    public double getBracketProbability() {
-        return bracketProbability;
-    }
-
-    public void setBracketProbability(double bracketProbability) {
-        this.bracketProbability = bracketProbability;
-    }
-
-    public double getConjunctionProbability() {
-        return conjunctionProbability;
-    }
-
-    public void setConjunctionProbability(double conjunctionProbability) {
-        this.conjunctionProbability = conjunctionProbability;
-    }
-
-    public double getNegationProbability() {
-        return negationProbability;
-    }
-
-    public void setNegationProbability(double negationProbability) {
-        this.negationProbability = negationProbability;
-    }
-
-    public double getFalseProbability() {
-        return falseProbability;
-    }
-
-    public void setFalseProbability(double falseProbability) {
-        this.falseProbability = falseProbability;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
 }

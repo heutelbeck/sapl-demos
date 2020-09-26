@@ -4,17 +4,18 @@ package io.sapl.analyzer;
 import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.interpreter.SAPLInterpreter;
 import io.sapl.benchmark.PolicyGeneratorConfiguration;
+import io.sapl.generator.DomainData;
 import io.sapl.grammar.sapl.Expression;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.functions.FunctionContext;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import io.sapl.prp.inmemory.indexed.Bool;
 import io.sapl.prp.inmemory.indexed.ConjunctiveClause;
 import io.sapl.prp.inmemory.indexed.DisjunctiveFormula;
 import io.sapl.prp.inmemory.indexed.Literal;
 import io.sapl.prp.inmemory.indexed.TreeWalker;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -27,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 @Slf4j
-@RequiredArgsConstructor
 public class PolicyAnalyzer {
 
     private final SAPLInterpreter interpreter = new DefaultSAPLInterpreter();
@@ -35,6 +35,7 @@ public class PolicyAnalyzer {
 
     private final FunctionContext functionCtx = new AnnotationFunctionContext();
 
+    private final DomainData domainData;
     private final String policyPath;
 
     private final Map<String, SAPL> parsedDocuments = new HashMap<>();
@@ -45,7 +46,13 @@ public class PolicyAnalyzer {
 
     private final Map<String, SAPL> unusableDocuments = new HashMap<>();
 
-    public PolicyGeneratorConfiguration analyzeSaplDocuments() {
+    public PolicyAnalyzer(DomainData domainData) {
+        this.domainData = domainData;
+        this.policyPath = domainData.getPolicyDirectoryPath();
+    }
+
+
+    public PolicyGeneratorConfiguration analyzeSaplDocuments(IndexType indexType) {
         LOGGER.info("analyzing policies in directory {}", policyPath);
         try {
             try (DirectoryStream<Path> stream = Files
@@ -70,9 +77,10 @@ public class PolicyAnalyzer {
         }
 
         return PolicyGeneratorConfiguration.builder()
-                .name("HOSPITAL p" + publishedDocuments.size() + " v" + (int) countVariables())
+                .name("Bench_" + domainData.getSeed() + "_" + indexType)
                 .policyCount(publishedDocuments.size())
                 .variablePoolCount((int) countVariables())
+                .seed(domainData.getSeed())
                 .path(policyPath)
                 .build();
 

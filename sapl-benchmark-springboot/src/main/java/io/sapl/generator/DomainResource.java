@@ -23,6 +23,12 @@ public class DomainResource {
         this(resourceName, false, false);
     }
 
+    public void clearResourceAccessRoles(){
+        fullAccessRoles.clear();
+        readAccessRoles.clear();
+        customAccessRoles.clear();
+    }
+
     public static class DomainResources {
         public static DomainResource findByName(List<DomainResource> resourceList, String resourceName) {
             return resourceList.stream()

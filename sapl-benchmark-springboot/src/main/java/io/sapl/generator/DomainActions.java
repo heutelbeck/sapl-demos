@@ -39,13 +39,13 @@ public class DomainActions {
         return new DomainActions(actionList, true).getActionList();
     }
 
-    public static DomainActions generateActionListByCount(int actionCount) {
+    public static List<String> generateActionListByCount(int actionCount) {
         List<String> actionList = new ArrayList<>();
 
         for (int i = 0; i < actionCount; i++) {
             actionList.add(String.format("action.%03d", i));
         }
 
-        return new DomainActions(actionList, true);
+        return actionList;
     }
 }

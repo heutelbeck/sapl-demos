@@ -29,12 +29,13 @@ public class DomainGenerator {
 
     private final DomainUtil domainUtil;
 
-    private final String settingsFileContent;
+    public void generateDomainPoliciesWithSeed(long newSeed, String policyPath) {
+        domainData.initDiceWithSeed(newSeed);
+        generateDomainPolicies(policyPath);
+    }
 
-
-    public void generateDomainPolicies() {
+    public void generateDomainPolicies(String policyPath) {
         // HOSPITAL
-//        List<DomainPolicy> domainPolicies = generatePoliciesForHospital(domainData.getHospital());
         List<DomainPolicy> domainPolicies = generateHospitalPoliciesNew();
         LOGGER.info("policies DOMAIN: {}", domainPolicies.size());
 
@@ -50,92 +51,8 @@ public class DomainGenerator {
 
 
         domainUtil.printDomainPoliciesLimited(domainPolicies);
-        domainUtil.writeDomainPoliciesToFilesystem(domainPolicies);
-        domainUtil.writeConfigurationInfoToFile(settingsFileContent);
-
+        domainUtil.writeDomainPoliciesToFilesystem(domainPolicies, policyPath);
     }
-
-//    private List<DomainPolicy> generatePoliciesForHospital(Hospital hospital) {
-//        LOGGER.info("generating policies for hospital");
-//        List<DomainPolicy> policiesForHospital = new ArrayList<>();
-//
-//        for (DomainResource hospitalResource : hospital.getHospitalResources()) {
-//            List<DomainPolicy> policiesForResource = new ArrayList<>();
-//            /* GENERAL */
-//            policiesForResource.addAll(generatePoliciesForGeneral(hospital, hospitalResource));
-//
-//            /* RESOURCE SPECIFIC */
-//            policiesForResource.addAll(generatePoliciesForRoles(hospital, hospitalResource));
-//
-//            LOGGER.debug("policies HOSPITAL-{}: {}", hospitalResource.getResourceName(), policiesForResource.size());
-//            policiesForHospital.addAll(policiesForResource);
-//        }
-//
-//        return policiesForHospital;
-//    }
-
-//    private List<DomainPolicy> generatePoliciesForGeneral(Hospital hospital, DomainResource hospitalResource) {
-//        List<DomainPolicy> policies = new ArrayList<>();
-//        List<DomainResource> resources = Collections.singletonList(hospitalResource);
-//
-//        //full access
-//        policies.add(generateUnrestrictedPolicy(resources, hospital.getRolesWithGeneralFullAccess()));
-//
-//        // read
-//        policies.add(generateActionSpecificPolicy(resources,
-//                DomainActions.READ_ONLY.generateActionsForResource(hospitalResource.getResourceName()),
-//                hospital.getRolesWithGeneralReadAccess()));
-//
-//        //extended full access
-//        policies.addAll(hospital.getExtendedRolesWithGeneralFullAccess().stream().map(role ->
-//                generateActionSpecificExtendedPolicy(resources,
-//                        DomainActions.CRUD.generateActionsForResource(hospitalResource.getResourceName()), role))
-//                .collect(Collectors.toList())
-//        );
-//
-//        //extended  read access
-//        policies.addAll(hospital.getExtendedRolesWithGeneralReadAccess().stream().map(role ->
-//                generateActionSpecificExtendedPolicy(resources,
-//                        DomainActions.READ_ONLY.generateActionsForResource(hospitalResource.getResourceName()), role))
-//                .collect(Collectors.toList())
-//        );
-//
-//        LOGGER.trace("policies HOSPITAL-{}-GENERAL: {}", hospitalResource.getResourceName(), policies.size());
-//
-//        return policies;
-//    }
-
-//    private List<DomainPolicy> generatePoliciesForRoles(Hospital hospital, DomainResource hospitalResource) {
-//        List<DomainPolicy> policies = new ArrayList<>();
-//        List<DomainResource> resources = Collections.singletonList(hospitalResource);
-//
-//        Map<DomainRole, DomainActions> roleCRUDMap = hospital.getResourceSpecificRoleAccess().get(hospitalResource);
-//        if (!CollectionUtils.isEmpty(roleCRUDMap)) {
-//            policies.addAll(roleCRUDMap.entrySet().stream()
-//                    .map(entry ->
-//                            generateActionSpecificPolicy(resources,
-//                                    entry.getValue().generateActionsForResource(hospitalResource.getResourceName()),
-//                                    Collections.singletonList(entry.getKey()))
-//                    )
-//                    .collect(Collectors.toList()));
-//        }
-//
-//        Map<ExtendedDomainRole, DomainActions> extendedDomainRoleCRUDMap =
-//                hospital.getResourceSpecificExtendedRoleAccess().get(hospitalResource);
-//        if (!CollectionUtils.isEmpty(extendedDomainRoleCRUDMap)) {
-//            policies.addAll(extendedDomainRoleCRUDMap.entrySet().stream()
-//                    .map(entry ->
-//                            generateActionSpecificExtendedPolicy(resources,
-//                                    entry.getValue().generateActionsForResource(hospitalResource.getResourceName()),
-//                                    entry.getKey())
-//                    )
-//                    .collect(Collectors.toList()));
-//        }
-//
-//        LOGGER.trace("policies HOSPITAL-{}-ROLES: {}", hospitalResource.getResourceName(), policies.size());
-//
-//        return policies;
-//    }
 
 
     private List<DomainPolicy> generatePoliciesForDepartment(Department department) {
@@ -277,12 +194,10 @@ public class DomainGenerator {
         return new DomainPolicy(policyName, policyBuilder.toString(), DomainUtil.sanitizeFileName(fileName));
     }
 
-    public StringBuilder generateEmptyPolicy(String policyName) {
-        StringBuilder policyBuilder = new StringBuilder().append("policy \"").append(policyName).append("\"")
+    public StringBuilder generateEmptyPolicy(String policyName, boolean permit) {
+        return new StringBuilder().append("policy \"").append(policyName).append("\"")
                 .append(System.lineSeparator())
-                .append("deny ");
-
-        return policyBuilder;
+                .append(permit ? "permit " : "deny ");
     }
 
     public StringBuilder generateGeneralBasePolicy(String policyName, List<DomainRole> roles) {
@@ -340,7 +255,7 @@ public class DomainGenerator {
         for (DomainRole role : roles) {
             if (firstRole) firstRole = false;
             else policyBuilder.append(" | ");
-            policyBuilder.append(String.format("(\"%s\" in subject..authority)", role.getRoleName()));
+            policyBuilder.append(String.format("(\"%s\" in subject.authorities)", role.getRoleName()));
         }
         policyBuilder.append(")");
     }
@@ -385,9 +300,12 @@ public class DomainGenerator {
 
     public List<DomainPolicy> generateHospitalPoliciesNew() {
 
-        List<DomainRole> allRoles = generateRoles();
-        LOGGER.debug("generated {} roles", allRoles.size());
-        List<DomainResource> allResources = generateResources();
+        List<DomainRole> allRoles = List.copyOf(domainData.getDomainRoles());
+        LOGGER.debug("allRolesCount:{}", allRoles.size());
+        List<DomainResource> allResources = List.copyOf(domainData.getDomainResources());
+        LOGGER.debug("allResources:{}", allResources.size());
+        List<DomainSubject> allSubjects = List.copyOf(domainData.getDomainSubjects());
+        LOGGER.debug("allSubjects:{}", allSubjects.size());
 
         List<DomainResource> unrestrictedResources = allResources.stream().filter(DomainResource::isUnrestricted)
                 .collect(Collectors.toList());
@@ -396,13 +314,13 @@ public class DomainGenerator {
         LOGGER.debug("generated {} resources (unrestricted={})", allResources.size(), unrestrictedResources.size());
 
         int newPolicyCount = 0;
-        List<DomainPolicy> allPolicies = new ArrayList<>(generateSubjectSpecificPolicies());
+        List<DomainPolicy> allPolicies = new ArrayList<>(generateSubjectSpecificPolicies(allSubjects));
         newPolicyCount = allPolicies.size();
         LOGGER.debug("generated {} subject specific policies", newPolicyCount);
 
-        allPolicies.addAll(generateLockedSubjectPolicies());
-        newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated {} policies for locked subjects", newPolicyCount);
+//        allPolicies.addAll(generateLockedSubjectPolicies());
+//        newPolicyCount = allPolicies.size() - newPolicyCount;
+//        LOGGER.debug("generated {} policies for locked subjects", newPolicyCount);
 
         allPolicies.addAll(generatePoliciesForGeneralAccessRoles(allRoles));
         newPolicyCount = allPolicies.size() - newPolicyCount;
@@ -410,20 +328,19 @@ public class DomainGenerator {
 
         allPolicies.addAll(generatePoliciesForUnrestrictedResources(unrestrictedResources));
         newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated policies {} for unrestricted resources", newPolicyCount);
+        LOGGER.debug("generated {} policies for unrestricted resources", newPolicyCount);
 
         allPolicies.addAll(generatePoliciesForRestrictedResources(restrictedResources, allRoles));
         newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated policies {} for restricted resources", newPolicyCount);
+        LOGGER.debug("generated {} policies for restricted resources", newPolicyCount);
 
-//        LOGGER.info("totally generated {} policies for hospital", allPolicies.size());
 
         return allPolicies;
     }
 
+
     private List<DomainPolicy> generatePoliciesForRestrictedResources(List<DomainResource> restrictedResources, List<DomainRole> allRoles) {
         List<DomainPolicy> policies = new ArrayList<>();
-        int newPolicyCount = 0;
 
         List<DomainRole> rolesWithRestrictedAccess = allRoles.stream()
                 .filter(role -> !role.isGeneralUnrestrictedAccess())
@@ -441,8 +358,7 @@ public class DomainGenerator {
             if (!resource.getCustomAccessRoles().isEmpty())
                 handleCustomAccessRoles(policies, resource);
 
-            newPolicyCount = policies.size() - newPolicyCount;
-            LOGGER.debug("generated {} policies for resource {}", newPolicyCount, resource.getResourceName());
+            resource.clearResourceAccessRoles();
         }
 
         return policies;
@@ -521,23 +437,19 @@ public class DomainGenerator {
 
     private void collectAccessingRoles(List<DomainRole> rolesWithRestrictedAccess, DomainResource resource) {
         for (DomainRole role : rolesWithRestrictedAccess) {
-            boolean fullAccessOnResource = domainUtil
+            boolean fullAccessOnResource = domainData
                     .rollIsLowerThanProbability(domainData.getProbabilityFullAccessOnResource());
             if (fullAccessOnResource) {
                 resource.getFullAccessRoles().add(role);
                 continue;
             }
-            boolean readAccessOnResource = domainUtil
+            boolean readAccessOnResource = domainData
                     .rollIsLowerThanProbability(domainData.getProbabilityReadAccessOnResource());
             if (readAccessOnResource) {
                 resource.getReadAccessRoles().add(role);
                 continue;
             }
-//            boolean customAccessOnResource = DomainUtil
-//                    .rollIsLowerThanProbability(domainData.getProbabilityCustomAccessOnResource());
-//            if (customAccessOnResource) {
             resource.getCustomAccessRoles().add(role);
-//            }
         }
     }
 
@@ -589,10 +501,10 @@ public class DomainGenerator {
 
         if (!customRoles.isEmpty())
             policies.addAll(customRoles.stream()
-                    .map(customRole -> new DomainPolicy("general_custom_role_" + customRole.getRoleName(),
-                            generateGeneralBasePolicyWithActions("general_custom_role_" + customRole
+                    .map(customRole -> new DomainPolicy("general_custom_" + customRole.getRoleName(),
+                            generateGeneralBasePolicyWithActions("general_custom_" + customRole
                                     .getRoleName(), DomainActions
-                                    .generateCustomActionList(domainData), readRoles
+                                    .generateCustomActionList(domainData), Collections.singletonList(customRole)
                             ).toString(), "general_custom_role_" + customRole.getRoleName())
                     ).collect(Collectors.toList()));
         //TODO extendedRoles
@@ -601,56 +513,37 @@ public class DomainGenerator {
     }
 
 
-    private List<DomainRole> generateRoles() {
-        List<DomainRole> roles = new ArrayList<>();
-
-        for (int i = 0; i < domainData.getNumberOfGeneralRoles(); i++) {
-            roles.add(new DomainRole(String.format("role.%03d", DomainUtil.getNextRoleCount()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfGeneralFullAccessRole()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfGeneralReadAccessRole()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfGeneralCustomAccessRole()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfExtendedRole())
-            ));
-        }
-        return roles;
-    }
-
-    private List<DomainResource> generateResources() {
-        List<DomainResource> resources = new ArrayList<>();
-
-        for (int i = 0; i < domainData.getNumberOfGeneralResources(); i++) {
-            resources.add(new DomainResource(String.format("resource.%03d", DomainUtil.getNextResourceCount()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfUnrestrictedResource()),
-                    domainUtil.rollIsLowerThanProbability(domainData.getProbabilityOfExtendedRole())
-            ));
-        }
-        return resources;
-    }
-
-    private List<DomainPolicy> generateSubjectSpecificPolicies() {
+    private List<DomainPolicy> generateSubjectSpecificPolicies(List<DomainSubject> allSubjects) {
         List<DomainPolicy> policies = new ArrayList<>();
 
-        for (int i = 0; i < domainData.getNumberOfSubjects(); i++) {
-            String policyName = "policy for subject " + i;
+        for (DomainSubject subject : allSubjects) {
+            String subjectName = subject.getSubjectName();
+            String policyName = "policy for " + subjectName;
 
-            StringBuilder policyBuilder = generateEmptyPolicy(policyName);
+            StringBuilder policyBuilder = generateEmptyPolicy(policyName, true);
+            policyBuilder.append(String.format("(resource == \"%s\")", subjectName))
+                    .append(System.lineSeparator())
+                    .append(TAB_STRING).append(" & ")
+                    .append(String.format("(\"%s\" == subject.name)", subjectName));
 
-            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), "subject" + i));
+            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), subjectName));
         }
 
         return policies;
     }
 
-    private List<DomainPolicy> generateLockedSubjectPolicies() {
-        List<DomainPolicy> policies = new ArrayList<>();
-
-        for (int i = 0; i < domainData.getNumberOfLockedSubjects(); i++) {
-            String policyName = "policy for locked subject " + i;
-
-            StringBuilder policyBuilder = generateEmptyPolicy(policyName);
-            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), "subject" + i + "_locked"));
-        }
-
-        return policies;
-    }
+//    private List<DomainPolicy> generateLockedSubjectPolicies() {
+//        List<DomainPolicy> policies = new ArrayList<>();
+//
+//        for (int i = 0; i < domainData.getNumberOfLockedSubjects(); i++) {
+//            String subjectName = String.format("subject%03d", i);
+//            String policyName = "policy for locked" + subjectName;
+//
+//            StringBuilder policyBuilder = generateEmptyPolicy(policyName, false);
+//            policyBuilder.append(String.format("(\"%s\" == subject.name)", subjectName));
+//            policies.add(new DomainPolicy(policyName, policyBuilder.toString(), subjectName+ "_locked"));
+//        }
+//
+//        return policies;
+//    }
 }

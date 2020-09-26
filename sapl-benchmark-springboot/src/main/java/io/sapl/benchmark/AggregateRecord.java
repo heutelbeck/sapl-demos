@@ -18,7 +18,7 @@ package io.sapl.benchmark;
 import lombok.Value;
 
 @Value
-public class XlsAggregateRecord {
+public class AggregateRecord {
 
     String name;
 
@@ -29,6 +29,12 @@ public class XlsAggregateRecord {
     double avg;
 
     double mdn;
+
+    long seed;
+
+    int policies;
+
+    int variables;
 
 
 

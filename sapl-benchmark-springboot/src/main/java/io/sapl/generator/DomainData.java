@@ -1,14 +1,10 @@
 package io.sapl.generator;
 
-import io.sapl.generator.DomainResource.DomainResources;
 import io.sapl.generator.DomainRole.DomainRoles;
 import io.sapl.generator.DomainRole.ExtendedDomainRole;
 import io.sapl.generator.example.Department;
 import io.sapl.generator.example.ExampleProvider;
 import io.sapl.generator.example.Hospital;
-import io.sapl.generator.example.patientresources.ResourceMedication;
-import io.sapl.generator.example.patientresources.ResourcePersonalDetails;
-import io.sapl.generator.example.patientresources.ResourceRoom;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,10 +14,9 @@ import org.springframework.context.annotation.DependsOn;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,6 +38,8 @@ public class DomainData {
     //#### DOMAIN ####
     @Value("${sapl.number.of.subjects}")
     private int numberOfSubjects;
+    @Value("${sapl.maximum.of.subject.roles}")
+    private int limitOfSubjectRoles;
     @Value("${sapl.number.of.subjects.locked}")
     private int numberOfLockedSubjects;
     @Value("${sapl.maximum.additional.entries}")
@@ -93,6 +90,20 @@ public class DomainData {
     private int numberOfAdditionalResources;
     private int numberOfAdditionalActions;
 
+    //AuthorizationSubscription Generation
+    @Value("${sapl.subscription.generation.factor}")
+    private int subscriptionGenerationFactor;
+    @Value("${sapl.number.of.benchmark.runs}")
+    private int numberOfBenchmarkRuns;
+
+    private int numberOfGeneratedSubscriptions;
+
+    @Value("${sapl.probability.empty.subscription:0.8}")
+    private double probabilityEmptySubscription;
+    @Value("${sapl.probability.empty.subscription.node:0.4}")
+    private double probabilityEmptySubscriptionNode;
+
+
     private Hospital hospital;
     private List<Department> departments = new ArrayList<>();
 
@@ -101,49 +112,40 @@ public class DomainData {
 
     private Random dice;
 
-//    @PostConstruct
-//    private void postConstruct() {
-//        this.numberOfGeneralRoles = Math.max(numberOfGeneralRoles, ExampleProvider.EXAMPLE_MANDATORY_ROLE_LIST.size());
-//        this.numberOfGeneralResources =
-//                Math.max(numberOfGeneralResources, ExampleProvider.EXAMPLE_MANDATORY_RESOURCE_LIST.size());
-//
-//        this.numberOfAdditionalRoles = getAdditionalCount(dice.nextDouble() < probabilityOfAdditionalRoles);
-//        this.numberOfAdditionalResources = getAdditionalCount(dice.nextDouble() < probabilityOfAdditionalResources);
-//        this.numberOfAdditionalActions = getAdditionalCount(dice.nextDouble() < probabilityOfAdditionalActions);
-//    }
+    private List<DomainRole> domainRoles = new LinkedList<>();
+    private List<DomainResource> domainResources = new LinkedList<>();
+    private List<DomainSubject> domainSubjects = new LinkedList<>();
+    private List<String> domainActions = new LinkedList<>();
+    private DomainUtil domainUtil;
+
+
+    public List<DomainRole> getDomainRoles() {
+        return List.copyOf(domainRoles);
+    }
+
+    public List<DomainResource> getDomainResources() {
+        return List.copyOf(domainResources);
+    }
+
+    public List<DomainSubject> getDomainSubjects() {
+        return List.copyOf(domainSubjects);
+    }
+
+    public List<String> getDomainActions() {
+        return List.copyOf(domainActions);
+    }
 
     private int getAdditionalCount(boolean rollCount) {
         return rollCount ? dice.nextInt(limitOfAdditional) + 1 : 0;
     }
 
-    @Bean("settingsFileContent")
-    public String getSettingsFileContent() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("#### CONFIGURATION FILE ####").append(System.lineSeparator())
-                .append("\t").append(String.format("policy.output.directory: %s", policyDirectoryPath))
-                .append(System.lineSeparator())
-                .append("\t").append(String.format("policy.output.directory.clean: %b", cleanPolicyDirectory))
-                .append(System.lineSeparator())
-                .append("\t").append(String.format("general.role.count: %d", numberOfGeneralRoles))
-                .append(System.lineSeparator())
-                .append("\t").append(String.format("general.resource.count: %d", numberOfGeneralResources))
-                .append(System.lineSeparator())
-                .append("\t").append(String.format("general.department.count: %d", numberOfDepartments))
-                .append(System.lineSeparator())
-                .append(String.format("\tdepartment.additional.role.chance: %.2f", probabilityOfAdditionalRoles))
-                .append(System.lineSeparator())
-                .append(String
-                        .format("\tdepartment.additional.resource.chance: %.2f", probabilityOfAdditionalResources))
-                .append(System.lineSeparator())
-                .append("\t").append(String.format("department.additional.role.count: %d", numberOfAdditionalRoles))
-                .append(System.lineSeparator())
-                .append(String.format("\tdepartment.additional.resource.count: %d", numberOfAdditionalResources));
-
-        return sb.toString();
+    public Random initDiceWithSeed(long newSeed) {
+        this.seed = newSeed;
+        return dice();
     }
 
     @Bean
-    public Random dice(){
+    public Random dice() {
         this.dice = new Random(seed);
 
         this.numberOfGeneralRoles = Math.max(numberOfGeneralRoles, ExampleProvider.EXAMPLE_MANDATORY_ROLE_LIST.size());
@@ -154,20 +156,44 @@ public class DomainData {
         this.numberOfAdditionalResources = getAdditionalCount(dice.nextDouble() < probabilityOfAdditionalResources);
         this.numberOfAdditionalActions = getAdditionalCount(dice.nextDouble() < probabilityOfAdditionalActions);
 
+        this.numberOfGeneratedSubscriptions = this.numberOfBenchmarkRuns * this.subscriptionGenerationFactor + 100;
+
         return this.dice;
+    }
+
+    public double roll() {
+        return getDice().nextDouble();
+    }
+
+    public boolean rollIsLowerThanProbability(double probability) {
+        return roll() < probability;
+    }
+
+    private <T> T getRandomElement(List<T> list) {
+        return list.get(getDice().nextInt(list.size()));
     }
 
     @Bean
     @DependsOn("dice")
-    public DomainUtil generatorUtility(Random dice) {
-        return new DomainUtil(policyDirectoryPath, cleanPolicyDirectory, dice);
-    }
+    public DomainUtil generatorUtility() {
+        this.domainUtil = new DomainUtil(cleanPolicyDirectory);
 
+        this.domainRoles = generateRoles();
+        this.domainResources = generateResources();
+        this.domainSubjects = generateSubjects(this.domainRoles);
+        this.domainActions = DomainActions.generateActionListByCount(this.getNumberOfActions());
+
+        LOGGER.debug("generated {} roles", this.domainRoles.size());
+        LOGGER.debug("generated {} resources", this.domainResources.size());
+        LOGGER.debug("generated {} subjects", this.domainSubjects.size());
+        LOGGER.debug("generated {} actions", this.domainActions.size());
+
+        return this.domainUtil;
+    }
 
     @PostConstruct
     public void init() {
         createHospital();
-
         createDepartments();
     }
 
@@ -177,131 +203,55 @@ public class DomainData {
         this.hospitalRoles = hospital.getHospitalRoles();
         this.hospitalResources = hospital.getHospitalResources();
 
-
-//        createHospitalGeneralAccess();
-//        createHospitalResourceSpecificRoleAccess();
-//        createHospitalResourceSpecificExtendedRoleAccess();
-//        printHospitalStatistics();
-
     }
 
-    private void printHospitalStatistics() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("#### HOSPITAL ####").append(System.lineSeparator())
-                .append("\t").append(String.format("ROLES GENERAL TOTAL: %d", hospital.getHospitalRoles().size()))
-                .append(System.lineSeparator())
-                .append("\t")
-                .append(String.format("ROLES GENERAL FULL ACCESS: %d", hospital.getRolesWithGeneralFullAccess().size()))
-                .append(System.lineSeparator())
-                .append("\t")
-                .append(String.format("ROLES GENERAL READ ACCESS: %d", hospital.getRolesWithGeneralReadAccess().size()))
-                .append(System.lineSeparator())
-                .append("\t").append(String
-                .format("ROLES GENERAL SPECIAL ACCESS: %d", hospital.getRolesWithGeneralSpecialAccess().size()))
-                .append(System.lineSeparator())
-                .append("\t").append(String
-                .format("ROLES EXTENDED FULL ACCESS: %d", hospital.getExtendedRolesWithGeneralFullAccess()))
-                .append(System.lineSeparator())
-                .append(String
-                        .format("\tROLES EXTENDED READ ACCESS: %d", hospital.getExtendedRolesWithGeneralReadAccess()));
+    @DependsOn("generatorUtility")
+    private List<DomainRole> generateRoles() {
+        List<DomainRole> roles = new ArrayList<>();
 
-//        return sb.toString();
+        for (int i = 0; i < this.getNumberOfGeneralRoles(); i++) {
+            roles.add(new DomainRole(String.format("role.%03d", DomainUtil.getNextRoleCount()),
+                    rollIsLowerThanProbability(this.getProbabilityOfGeneralFullAccessRole()),
+                    rollIsLowerThanProbability(this.getProbabilityOfGeneralReadAccessRole()),
+                    rollIsLowerThanProbability(this.getProbabilityOfGeneralCustomAccessRole()),
+                    rollIsLowerThanProbability(this.getProbabilityOfExtendedRole())
+            ));
+        }
+        return roles;
     }
 
-    private void createHospitalResourceSpecificExtendedRoleAccess() {
-        Map<DomainResource, Map<ExtendedDomainRole, DomainActions>> map = hospital
-                .getResourceSpecificExtendedRoleAccess();
+    @DependsOn("generatorUtility")
+    private List<DomainResource> generateResources() {
+        List<DomainResource> resources = new ArrayList<>();
 
-        map.put(DomainResources.findByName(hospitalResources, ResourceRoom.NAME), Map.of(
-                //Patients have full access on own personal details
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_PATIENT))
-                        .body(DomainUtil.OWN_DATA_BODY)
-                        .build(), DomainActions.CRUD,
-                //Relatives have read access on personal details
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_VISITOR))
-                        .body(DomainUtil.RELATIVE_BODY)
-                        .build(), DomainActions.READ_ONLY
-        ));
-
+        for (int i = 0; i < this.getNumberOfGeneralResources(); i++) {
+            resources.add(new DomainResource(String.format("resource.%03d", DomainUtil.getNextResourceCount()),
+                    rollIsLowerThanProbability(this.getProbabilityOfUnrestrictedResource()),
+                    rollIsLowerThanProbability(this.getProbabilityOfExtendedRole())
+            ));
+        }
+        return resources;
     }
 
-    private void createHospitalResourceSpecificRoleAccess() {
-        Map<DomainResource, Map<DomainRole, DomainActions>> resourceSpecificRoleAccess = hospital
-                .getResourceSpecificRoleAccess();
+    @DependsOn("generatorUtility")
+    private List<DomainSubject> generateSubjects(List<DomainRole> allRoles) {
+        List<DomainSubject> subjects = new ArrayList<>();
 
-        //ROOM
-        DomainResource roomResource = DomainResources.findByName(hospitalResources, ResourceRoom.NAME);
-        resourceSpecificRoleAccess.put(roomResource, Map.of(
-                //Visitors can read room information
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_VISITOR), DomainActions.READ_ONLY,
-                // Nurse has full access on rooms in addition to general read permission
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.CRUD
-        ));
+        for (int i = 0; i < this.getNumberOfSubjects(); i++) {
+            DomainSubject domainSubject = new DomainSubject(String.format("subject.%03d", i));
 
-        //PERSONAL DETAILS
-        DomainResource personalDetailsResource = DomainResources
-                .findByName(hospitalResources, ResourcePersonalDetails.NAME);
-        resourceSpecificRoleAccess.put(personalDetailsResource, Map.of(
-                // Nurse has full access on personal details in addition to general read permission
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE), DomainActions.CRUD
-        ));
+            //assign subject random roles (up to 3)
+            for (int j = 0; j < this.dice.nextInt(this.getLimitOfSubjectRoles()) + 1; j++) {
+                DomainRole randomRole = getRandomElement(allRoles);
+                domainSubject.getSubjectAuthorities().add(randomRole.getRoleName());
+            }
 
-        //MEDICATION
-        DomainResource medicationResource = DomainResources.findByName(hospitalResources, ResourceMedication.NAME);
-        resourceSpecificRoleAccess.put(medicationResource, Map.of());
+            subjects.add(domainSubject);
+        }
 
+        return subjects;
     }
 
-    private void createHospitalGeneralAccess() {
-
-        hospital.getRolesWithGeneralFullAccess().addAll(Arrays.asList(
-                //system has full access
-                DomainRoles.ROLE_SYSTEM,
-                //director has full access
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_DIRECTOR)
-        ));
-
-
-        //doctors can read all patient data
-        hospital.getRolesWithGeneralReadAccess().addAll(Collections.singletonList(
-                DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_DOCTOR)
-        ));
-
-
-        hospital.getExtendedRolesWithGeneralFullAccess().addAll(Arrays.asList(
-                //treating doctors have full access
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_DOCTOR))
-                        .body(DomainUtil.TREATING_BODY)
-                        .build(),
-                //admins have full access (log obligation)
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.ROLE_ADMIN)
-                        .obligation(DomainUtil.LOG_OBLIGATION)
-                        .build()
-        ));
-
-
-        hospital.getExtendedRolesWithGeneralReadAccess().addAll(Arrays.asList(
-                //treating nurses have read access
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_NURSE))
-                        .body(DomainUtil.TREATING_BODY)
-                        .build(),
-                //patients have read access on own data
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_PATIENT))
-                        .body(DomainUtil.OWN_DATA_BODY)
-                        .build(),
-                //relatives have read access on patient data
-                ExtendedDomainRole.builder()
-                        .role(DomainRoles.findByName(hospitalRoles, ExampleProvider.ROLE_VISITOR))
-                        .body(DomainUtil.RELATIVE_BODY)
-                        .build()
-        ));
-    }
 
     private void createDepartments() {
         //TODO department creation

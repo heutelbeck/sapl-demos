@@ -3,17 +3,16 @@ package io.sapl.generator;
 import io.sapl.generator.DomainPolicy.DomainPolicyBody;
 import io.sapl.generator.DomainPolicy.DomainPolicyObligation;
 import io.sapl.generator.DomainRole.ExtendedDomainRole;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -25,7 +24,6 @@ public class DomainUtil {
     private static final AtomicInteger resourceCounter = new AtomicInteger();
     private static final AtomicInteger appendixCounter = new AtomicInteger();
 
-    private final String policyPath;
     private final boolean cleanDirectory;
 
     public static final DomainPolicyObligation LOG_OBLIGATION = new DomainPolicyObligation("\"logging:log_access\"");
@@ -33,29 +31,34 @@ public class DomainUtil {
     public static final DomainPolicyBody RELATIVE_BODY = new DomainPolicyBody("subject in resource.<patient.relatives>;");
     public static final DomainPolicyBody OWN_DATA_BODY = new DomainPolicyBody("subject.id == resource.patient;");
 
-    private final Random dice;
 
-    public DomainUtil(String policyPath, boolean cleanDirectory, Random dice) {
-        this.policyPath = policyPath;
+    public DomainUtil(boolean cleanDirectory) {
         this.cleanDirectory = cleanDirectory;
-        this.dice = dice;
     }
 
+    public void writeDomainPoliciesToFilesystem(List<DomainPolicy> domainPolicies, String policyPath) {
+        File policyDir = new File(policyPath);
 
-    public void writeDomainPoliciesToFilesystem(List<DomainPolicy> domainPolicies) {
-        if (cleanDirectory) cleanPolicyDirectory();
+        LOGGER.debug("before clean fileCount:{}", policyDir.listFiles().length);
+        if (cleanDirectory) cleanPolicyDirectory(policyPath);
+        LOGGER.debug("after clean fileCount:{}", policyDir.listFiles().length);
 
         LOGGER.info("writing policies to folder: {}", policyPath);
 
         for (DomainPolicy domainPolicy : domainPolicies) {
-            writePolicyToFile(domainPolicy);
+            writePolicyToFile(domainPolicy, policyPath);
         }
+
+        LOGGER.debug("after write policy fileCount:{}", policyDir.listFiles().length);
     }
 
-    @SneakyThrows
-    public void cleanPolicyDirectory() {
-        LOGGER.debug("removing existing policies in output directory");
-        FileUtils.cleanDirectory(new File(policyPath));
+    public void cleanPolicyDirectory(String policyPath) {
+        LOGGER.info("removing existing policies in output directory");
+        try {
+            FileUtils.cleanDirectory(new File(policyPath));
+        } catch (IOException e) {
+            LOGGER.error("error while cleaning the directory", e);
+        }
     }
 
     public void printDomainPoliciesLimited(List<DomainPolicy> domainPolicies) {
@@ -67,7 +70,7 @@ public class DomainUtil {
         }
     }
 
-    public void writePolicyToFile(DomainPolicy policy) {
+    public void writePolicyToFile(DomainPolicy policy, String policyPath) {
         String policyFileName = String
                 .format("%s/%03d_%s.sapl", policyPath, DomainUtil.getNextPolicyCount(), policy.getFileName());
         LOGGER.trace("writing policy file: {}", policyFileName);
@@ -76,17 +79,6 @@ public class DomainUtil {
             writer.println(policy.getPolicyContent());
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             LOGGER.error("writing policy file failed", e);
-        }
-    }
-
-    public void writeConfigurationInfoToFile(String settingsString) {
-        String fileName = policyPath + "/configurationInfo.txt";
-        LOGGER.debug("writing config info file: {}", fileName);
-
-        try (PrintWriter writer = new PrintWriter(fileName, StandardCharsets.UTF_8.name())) {
-            writer.println(settingsString);
-        } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            LOGGER.error("writing config info file failed", e);
         }
     }
 
@@ -149,11 +141,5 @@ public class DomainUtil {
         }
     }
 
-    public boolean rollIsLowerThanProbability(double probability) {
-        return dice.nextDouble() < probability;
-    }
 
-    public Random getDice(){
-        return this.dice;
-    }
 }

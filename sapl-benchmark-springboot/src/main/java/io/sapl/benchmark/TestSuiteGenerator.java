@@ -150,10 +150,15 @@ public class TestSuiteGenerator {
                 .build();
     }
 
-
     TestSuite generateN(String path, int numberOfTests, Random dice) {
-        List<PolicyGeneratorConfiguration> limitedConfigs = generate(path, dice).getCases().stream().limit(numberOfTests)
+        List<PolicyGeneratorConfiguration> limitedConfigs = generate(path, dice).getCases().stream()
+                .limit(numberOfTests)
                 .collect(Collectors.toList());
+
+        if (limitedConfigs.size() < numberOfTests) {
+            int missingTestCount = numberOfTests - limitedConfigs.size();
+            limitedConfigs.addAll(generateN(path, missingTestCount, dice).getCases());
+        }
 
         return TestSuite.builder()
                 .cases(limitedConfigs)

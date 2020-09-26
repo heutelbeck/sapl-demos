@@ -17,11 +17,11 @@ package io.sapl.benchmark;
 
 import com.google.common.base.Strings;
 import com.google.gson.Gson;
-import io.sapl.analyzer.PolicyAnalyzer;
 import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.generator.DomainGenerator;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -29,101 +29,64 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.jxls.template.SimpleExporter;
-import org.knowm.xchart.BitmapEncoder;
-import org.knowm.xchart.BitmapEncoder.BitmapFormat;
-import org.knowm.xchart.CategoryChart;
+import org.apache.commons.lang3.StringUtils;
 import org.knowm.xchart.XYChart;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Random;
 import java.util.stream.Collectors;
 
+import static io.sapl.benchmark.BenchmarkConstants.DEFAULT_HEIGHT;
+import static io.sapl.benchmark.BenchmarkConstants.DEFAULT_WIDTH;
+import static io.sapl.benchmark.BenchmarkConstants.ERROR_READING_TEST_CONFIGURATION;
+import static io.sapl.benchmark.BenchmarkConstants.HELP;
+import static io.sapl.benchmark.BenchmarkConstants.HELP_DOC;
+import static io.sapl.benchmark.BenchmarkConstants.INDEX;
+import static io.sapl.benchmark.BenchmarkConstants.INDEX_DOC;
+import static io.sapl.benchmark.BenchmarkConstants.ITERATIONS;
+import static io.sapl.benchmark.BenchmarkConstants.ITERATIONS_DOC;
+import static io.sapl.benchmark.BenchmarkConstants.PATH;
+import static io.sapl.benchmark.BenchmarkConstants.PATH_DOC;
+import static io.sapl.benchmark.BenchmarkConstants.TEST;
+import static io.sapl.benchmark.BenchmarkConstants.TEST_DOC;
+import static io.sapl.benchmark.BenchmarkConstants.USAGE;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
-import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class Benchmark implements CommandLineRunner {
 
-    private static final int DEFAULT_HEIGHT = 1080;
-
-    private static final int DEFAULT_WIDTH = 1920;
-
-    private static final String ERROR_READING_TEST_CONFIGURATION = "Error reading test configuration";
-
-    private static final String ERROR_WRITING_BITMAP = "Error writing bitmap";
-
-    private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
-
-    private static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn";
-
-    private static final String DEFAULT_PATH = "/Users/marclucasbaur/benchmarks/";
-
-    private static final String HELP_DOC = "print this message";
-
-    private static final String HELP = "help";
-
-    private static final String REUSE = "reuse";
-
-    private static final String REUSE_DOC = "reuse existing policies (true, false)";
-
-    private static final String INDEX = "index";
-
-    private static final String INDEX_DOC = "index type used (SIMPLE, FAST, IMPROVED)";
-
-    private static final String TEST = "test";
-
-    private static final String TEST_DOC = "JSON file containing test definition";
-
-    private static final String USAGE = "java -jar sapl-benchmark-springboot-1.0.0-SNAPSHOT.jar";
-
-    private static final String PATH = "path";
-
-    private static final String PATH_DOC = "path for output files";
-
-    private static final String COMPARISION_ID = "cid";
-
-    private static final String COMPARISION_ID_DOC = "id to group benchmarks using same policies";
-
-    private IndexType indexType = SIMPLE;
-
-    private String path = DEFAULT_PATH;
-
-    private static final int RUNS = 30;
-
-    private boolean reuseExistingPolicies = false;
-
-    private String testFilePath = DEFAULT_PATH + "tests/tests.json";
-
-    private String filePrefix;
-
-    private String comparisionId = UUID.randomUUID().toString();
-
-    private static final Gson GSON = new Gson();
-
     private static final TestRunner TEST_RUNNER = new TestRunner();
 
-//    private final BenchmarkResultRepository repository;
+    public static final String DEFAULT_PATH = System.getProperty("user.home") + "/benchmarks/";
+    private static final double REMOVE_EDGE_DATA_BY_PERCENTAGE = 0.005D;
+    private static final boolean PERFORM_RANDOM_BENCHMARK = false;
 
     private final DomainGenerator domainGenerator;
 
-    private static final boolean performRandomBenchmark = false;
+    private int numberOfBenchmarks = 2;
 
-    private TestSuite testSuite;
+    private IndexType indexType = IMPROVED;
+
+    private String path = DEFAULT_PATH;
+    private String testFilePath;
+    private String filePrefix;
+
+    private final List<Long> seedList = new LinkedList<>();
 
     @Override
     public void run(String... args) throws Exception {
@@ -131,34 +94,23 @@ public class Benchmark implements CommandLineRunner {
 
         parseCommandLineArguments(args);
 
-        this.testSuite = generateTestSuite(path);
-
-        if (!reuseExistingPolicies) {
-            LOGGER.info("generating domain policies");
-            domainGenerator.generateDomainPolicies();
-        }
-
-        // ####### SIMPLE #######
-//        indexType = SIMPLE;
-//        init();
-//        runBenchmark(path);
-
-        // ####### IMPROVED #######
-//        indexType = IMPROVED;
         init();
         runBenchmark(path);
-
 
         System.exit(0);
     }
 
     private void init() {
         filePrefix = String.format("%s_%s_%s/",
-                LocalDateTime.now(), indexType, performRandomBenchmark ? "RANDOM" : "HOSPITAL");
+                LocalDateTime.now(), indexType, PERFORM_RANDOM_BENCHMARK ? "RANDOM" : "SYSTEMATIC");
 
-        LOGGER.info("\nrandomBenchmark={},\n index={},\n seed={},\n reuse={},\n testfile={},\n filePrefix={},\n comparisonId={}",
-                performRandomBenchmark, indexType, domainGenerator.getDomainData().getSeed(), reuseExistingPolicies,
-                testFilePath, filePrefix, comparisionId);
+        LOGGER.info("\n randomBenchmark={},\n numberOfBenchmarks={}," +
+                        "\n index={},\n initialSeed={},\n runs={}," +
+                        "\n testfile={},\n filePrefix={}",
+                PERFORM_RANDOM_BENCHMARK, numberOfBenchmarks,
+                indexType, domainGenerator.getDomainData().getSeed(),
+                domainGenerator.getDomainData().getNumberOfBenchmarkRuns(),
+                testFilePath, filePrefix);
 
         try {
             final Path dir = Paths.get(path, filePrefix);
@@ -167,191 +119,121 @@ public class Benchmark implements CommandLineRunner {
             LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
         }
 
+        // seed list
+        seedList.add(domainGenerator.getDomainData().getSeed()); //initial seed from properties file
+        for (int i = 0; i < numberOfBenchmarks - 1; i++) {
+            seedList.add((long) Math.abs(new Random().nextInt()));
+        }
     }
 
     public void runBenchmark(String path) throws Exception {
         String resultPath = path + filePrefix;
 
-        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        XYChart overviewChart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        ResultWriter resultWriter = new ResultWriter(resultPath, indexType);
+
         BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType,
-                reuseExistingPolicies, RUNS, comparisionId);
+                domainGenerator.getDomainData());
 
         List<PolicyGeneratorConfiguration> configs = generateConfigurations();
-        LOGGER.info("running benchmarks for {} configs", configs.size());
+
         for (PolicyGeneratorConfiguration config : configs) {
-            LOGGER.info("running benchmark {}", config.getName());
-            benchmarkConfiguration(path, chart, benchmarkDataContainer, config);
+
+            List<XlsRecord> results = benchmarkConfiguration(path, benchmarkDataContainer, config);
+
+            sanitizeResults(results);
+
+            double[] times = new double[results.size()];
+            resultWriter.writeDetailsChart(results, times, config.getName());
+            overviewChart.addSeries(config.getName(), times);
+
+            addResultsForConfigToContainer(benchmarkDataContainer, config, results);
         }
 
-
-        LOGGER.info("writing charts and results to {}", resultPath);
-        writeOverviewChart(resultPath, chart);
-
-        writeHistogram(resultPath, benchmarkDataContainer);
-
-        writeExcelFile(resultPath, benchmarkDataContainer.getData());
-
-        buildAggregateData(benchmarkDataContainer);
-        writeExcelFileAggregates(resultPath, benchmarkDataContainer.getAggregateData());
-        persistAggregates(benchmarkDataContainer);
+        resultWriter.writeFinalResults(benchmarkDataContainer, overviewChart);
     }
 
     private List<PolicyGeneratorConfiguration> generateConfigurations() {
-        if (performRandomBenchmark) {
-            return this.testSuite.getCases();
+        if (PERFORM_RANDOM_BENCHMARK) {
+            return generateTestSuite(path).getCases();
         } else {
+            List<PolicyGeneratorConfiguration> configurations = new LinkedList<>();
 
+            for (Long seed : seedList) {
 
-            PolicyGeneratorConfiguration configuration = new PolicyAnalyzer(domainGenerator.getDomainData()
-                    .getPolicyDirectoryPath())
-                    .analyzeSaplDocuments();
+                configurations.add(PolicyGeneratorConfiguration.builder()
+                        .name(String.format("Bench_%5d_%s", seed, indexType))
+                        .path(domainGenerator.getDomainData().getPolicyDirectoryPath())
+                        .build());
+            }
 
-            return Collections.singletonList(configuration);
+            return configurations;
         }
+
     }
 
+    @SneakyThrows
     private TestSuite generateTestSuite(String path) {
-//            File testFile = new File(testFilePath);
-//            LOGGER.info("using testfile: {}", testFile);
-//            List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
-//            String allLinesAsString = StringUtils.join(allLines, "");
-//            suite = GSON.fromJson(allLinesAsString, TestSuite.class);
+        TestSuite suite;
+        if (!Strings.isNullOrEmpty(testFilePath)) {
+            File testFile = new File(testFilePath);
+            LOGGER.info("using testfile: {}", testFile);
 
-//        TestSuite suite = TestSuiteGenerator.generate(path,
-//                domainGenerator.getDomainUtil().getDice());
+            List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
+            String allLinesAsString = StringUtils.join(allLines, "");
 
-        TestSuite suite = TestSuiteGenerator.generateN(path, 1,
-                domainGenerator.getDomainUtil().getDice());
-
+            suite = new Gson().fromJson(allLinesAsString, TestSuite.class);
+        } else {
+            suite = TestSuiteGenerator.generateN(path, numberOfBenchmarks, domainGenerator.getDomainData().getDice());
+        }
 
         Objects.requireNonNull(suite, "test suite is null");
         Objects.requireNonNull(suite.getCases(), "test cases are null");
         LOGGER.info("suite contains {} test cases", suite.getCases().size());
-        assert !suite.getCases().isEmpty() : "at least one test case must be present";
+        if (!suite.getCases().isEmpty()) throw new RuntimeException("at least one test case must be present");
 
         return suite;
     }
 
-    private void persistAggregates(BenchmarkDataContainer dataContainer) {
-//        dataContainer.getAggregateData().stream()
-//                .map(aggregateRecord -> new BenchmarkResult(dataContainer, aggregateRecord))
-//                .forEach(repository::save);
-    }
-
-    private void buildAggregateData(BenchmarkDataContainer benchmarkDataContainer) {
-        for (int i = 0; i < benchmarkDataContainer.getIdentifier().size(); i++) {
-            benchmarkDataContainer.getAggregateData()
-                    .add(new XlsAggregateRecord(benchmarkDataContainer.getIdentifier().get(i),
-                            benchmarkDataContainer.getMinValues().get(i), benchmarkDataContainer.getMaxValues().get(i),
-                            benchmarkDataContainer.getAvgValues().get(i), benchmarkDataContainer.getMdnValues()
-                            .get(i)));
-        }
-    }
-
-    private void benchmarkConfiguration(String path, XYChart chart, BenchmarkDataContainer benchmarkDataContainer,
-                                        PolicyGeneratorConfiguration config) throws Exception {
+    private List<XlsRecord> benchmarkConfiguration(String path, BenchmarkDataContainer benchmarkDataContainer,
+                                                   PolicyGeneratorConfiguration config) throws Exception {
         benchmarkDataContainer.getIdentifier().add(config.getName());
         List<XlsRecord> results = null;
         try {
-            results = performRandomBenchmark
-                    ? TEST_RUNNER.runTest(config, path, reuseExistingPolicies, benchmarkDataContainer)
-                    : TEST_RUNNER.runTestNew(config, config.getPath(), benchmarkDataContainer);
+            results = PERFORM_RANDOM_BENCHMARK
+                    ? TEST_RUNNER.runTest(config, path, benchmarkDataContainer, domainGenerator)
+                    : TEST_RUNNER
+                    .runTestNew(config, config.getPath(), benchmarkDataContainer, domainGenerator);
         } catch (IOException | PolicyEvaluationException e) {
             LOGGER.error("Error running test", e);
             System.exit(1);
         }
-        double[] times = new double[results.size()];
-        int i = 0;
-        for (XlsRecord item : results) {
-            times[i] = item.getTimeDuration();
-            i++;
-        }
 
-        XYChart details = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        details.setTitle("Evaluation Time");
-        details.setXAxisTitle("Run");
-        details.setYAxisTitle("ms");
-        details.addSeries(config.getName(), times);
+        return results;
+    }
 
-        String resultPath = path + filePrefix;
-
-        try {
-            BitmapEncoder.saveBitmap(details, resultPath + config.getName()
-                    .replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
-        } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
-            System.exit(1);
-        }
-
+    private void addResultsForConfigToContainer(BenchmarkDataContainer benchmarkDataContainer,
+                                                PolicyGeneratorConfiguration config, List<XlsRecord> results) {
         benchmarkDataContainer.getMinValues().add(extractMin(results));
         benchmarkDataContainer.getMaxValues().add(extractMax(results));
         benchmarkDataContainer.getAvgValues().add(extractAvg(results));
         benchmarkDataContainer.getMdnValues().add(extractMdn(results));
-
-        chart.addSeries(config.getName(), times);
         benchmarkDataContainer.getData().addAll(results);
+
+        benchmarkDataContainer.getConfigs().add(config);
     }
 
-    private void writeOverviewChart(String path, XYChart chart) {
-        chart.setTitle("Evaluation Time");
-        chart.setXAxisTitle("Run");
-        chart.setYAxisTitle("ms");
-        try {
-            BitmapEncoder.saveBitmap(chart, path + "overview", BitmapFormat.PNG);
-        } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
-            System.exit(1);
+
+    private void sanitizeResults(List<XlsRecord> results) {
+        int numberOfDataToRemove = (int) (results.size() * REMOVE_EDGE_DATA_BY_PERCENTAGE);
+
+        for (int i = 0; i < numberOfDataToRemove; i++) {
+            results.stream().min(Comparator.comparingDouble(XlsRecord::getTimeDuration))
+                    .ifPresent(results::remove);
+
+            results.stream().max(Comparator.comparingDouble(XlsRecord::getTimeDuration))
+                    .ifPresent(results::remove);
         }
-    }
-
-    private void writeHistogram(String path, BenchmarkDataContainer benchmarkDataContainer) {
-
-        CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        histogram.setTitle("Aggregates");
-        histogram.setXAxisTitle("Run");
-        histogram.setYAxisTitle("ms");
-        histogram.addSeries("min", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMinValues());
-        histogram.addSeries("max", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMaxValues());
-        histogram.addSeries("avg", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getAvgValues());
-        histogram.addSeries("mdn", benchmarkDataContainer.getIdentifier(), benchmarkDataContainer.getMdnValues());
-
-        try {
-            BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
-        } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
-            System.exit(1);
-        }
-    }
-
-    private void writeExcelFile(String path, List<XlsRecord> data) {
-        try (OutputStream os = Files.newOutputStream(Paths.get(path, "overview.xls"))) {
-            SimpleExporter exp = new SimpleExporter();
-            exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
-        } catch (IOException e) {
-            LOGGER.error("Error writing XLS", e);
-            System.exit(1);
-        }
-    }
-
-    private void writeExcelFileAggregates(String path, List<XlsAggregateRecord> data) {
-        try (OutputStream os = Files.newOutputStream(Paths.get(path, "histogram.xls"))) {
-            SimpleExporter exp = new SimpleExporter();
-            exp.gridExport(getExportHeaderAggregates(), data, EXPORT_PROPERTIES_AGGREGATES, os);
-        } catch (IOException e) {
-            LOGGER.error("Error writing XLS", e);
-            System.exit(1);
-        }
-    }
-
-
-    private List<String> getExportHeader() {
-        return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
-                "Response String (ms)");
-    }
-
-    private List<String> getExportHeaderAggregates() {
-        return Arrays.asList("Test Case", "Minimum Time (ms)", "Maximum Time (ms)", "Average Time (ms)",
-                "Median Time (ms)");
     }
 
     private double extractMin(List<XlsRecord> data) {
@@ -397,14 +279,13 @@ public class Benchmark implements CommandLineRunner {
 
         options.addOption(PATH, true, PATH_DOC);
         options.addOption(HELP, false, HELP_DOC);
-        options.addOption(REUSE, true, REUSE_DOC);
         options.addOption(INDEX, true, INDEX_DOC);
         options.addOption(TEST, true, TEST_DOC);
-        options.addOption(COMPARISION_ID, true, COMPARISION_ID_DOC);
+        options.addOption(ITERATIONS, true, ITERATIONS_DOC);
 
         CommandLineParser parser = new DefaultParser();
         try {
-            CommandLine cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, args, true);
             if (cmd.hasOption(HELP)) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp(USAGE, options);
@@ -419,21 +300,6 @@ public class Benchmark implements CommandLineRunner {
                 path = pathOption;
             }
 
-            String reuseOption = cmd.getOptionValue(REUSE);
-            if (!Strings.isNullOrEmpty(reuseOption)) {
-                switch (reuseOption.toUpperCase()) {
-                    case "TRUE":
-                        reuseExistingPolicies = true;
-                        break;
-                    case "FALSE":
-                        reuseExistingPolicies = false;
-                        break;
-                    default:
-                        HelpFormatter formatter = new HelpFormatter();
-                        formatter.printHelp(USAGE, options);
-                        throw new IllegalArgumentException("invalid policy reuse option provided");
-                }
-            }
 
             String indexOption = cmd.getOptionValue(INDEX);
 
@@ -464,11 +330,10 @@ public class Benchmark implements CommandLineRunner {
                 testFilePath = testOption;
             }
 
-            String cidOption = cmd.getOptionValue(COMPARISION_ID);
-            if (!Strings.isNullOrEmpty(cidOption)) {
-                comparisionId = cidOption;
+            String iterOption = cmd.getOptionValue(ITERATIONS);
+            if (!Strings.isNullOrEmpty(iterOption)) {
+                this.numberOfBenchmarks = Integer.parseInt(iterOption);
             }
-
 
         } catch (ParseException e) {
             LOGGER.error("encountered an error running the demo: {}", e.getMessage(), e);
