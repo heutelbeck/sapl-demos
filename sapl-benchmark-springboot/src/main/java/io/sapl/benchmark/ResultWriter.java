@@ -80,8 +80,8 @@ public class ResultWriter {
                 // indextype, name, seed, policies, variables, min, max, avg, mdn
                 out.printf("%s,\t %s;\t %s;\t %d;\t %d;\t %.2f;\t %.2f;\t %.2f;\t %.2f;\t %s",
                         indexType, dat.getName(),
-                        dat.getSeed(), dat.getPolicies(), dat.getVariables(), dat.getMin(), dat.getMax(), dat.getAvg(),
-                        dat.getMdn(), System.lineSeparator());
+                        dat.getSeed(), dat.getPolicyCount(), dat.getVariableCount(), dat.getMin(), dat.getMax(),
+                        dat.getAvg(), dat.getMdn(), System.lineSeparator());
             }
         } catch (IOException e) {
             LOGGER.error("Error appending to  CSV", e);
@@ -152,7 +152,9 @@ public class ResultWriter {
                             benchmarkDataContainer.getMdnValues().get(i),  //mdn
                             config.getSeed(),
                             config.getPolicyCount(),
-                            config.getVariablePoolCount()
+                            config.getVariablePoolCount(),
+                            benchmarkDataContainer.getRuns(),
+                            benchmarkDataContainer.getIterations()
                     ));
         }
     }
@@ -164,7 +166,7 @@ public class ResultWriter {
 
     private List<String> getExportHeaderAggregates() {
         return Arrays.asList("Test Case", "Minimum Time (ms)", "Maximum Time (ms)", "Average Time (ms)",
-                "Median Time (ms)");
+                "Median Time (ms)", "Seed", "Policy Count", "Variable Count", "Runs", "Iterations");
     }
 
 

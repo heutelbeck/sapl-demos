@@ -18,10 +18,10 @@ import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
-import io.sapl.prp.filesystem.FilesystemPolicyRetrievalPoint;
 import io.sapl.prp.inmemory.indexed.FastParsedDocumentIndex;
 import io.sapl.prp.inmemory.indexed.improved.ImprovedDocumentIndex;
 import io.sapl.prp.inmemory.simple.SimpleParsedDocumentIndex;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -30,16 +30,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Iterator;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class TestRunner {
 
     private static final double MILLION = 1000000.0D;
+    private static final double REMOVE_EDGE_DATA_BY_PERCENTAGE = 0.005D;
+
+    private static final Map<String, JsonNode> VARIABLES = Collections.emptyMap();
+    private static final AnnotationFunctionContext FUNCTION_CONTEXT = new AnnotationFunctionContext();
+    private static final AnnotationAttributeContext ATTRIBUTE_CONTEXT = new AnnotationAttributeContext();
+
+    private static final DocumentsCombinator DOCUMENTS_COMBINATOR = new DenyUnlessPermitCombinator();
+    private static final SAPLInterpreter SAPL_INTERPRETER = new DefaultSAPLInterpreter();
 
     private ParsedDocumentIndex getDocumentIndex(EmbeddedPolicyDecisionPoint.Builder.IndexType indexType) {
         switch (indexType) {
@@ -52,13 +60,6 @@ public class TestRunner {
             default:
                 return new SimpleParsedDocumentIndex();
         }
-    }
-
-    private FilesystemPolicyRetrievalPoint createPRP(String policyFolder, IndexType indexType) {
-        ParsedDocumentIndex documentIndex = getDocumentIndex(indexType);
-
-        validateIndexImplementation(indexType, documentIndex);
-        return new FilesystemPolicyRetrievalPoint(policyFolder, documentIndex);
     }
 
     private void validateIndexImplementation(IndexType indexType, ParsedDocumentIndex documentIndex) {
@@ -81,18 +82,78 @@ public class TestRunner {
         }
     }
 
+    private void sanitizeResults(List<XlsRecord> results) {
+        int numberOfDataToRemove = (int) (results.size() * REMOVE_EDGE_DATA_BY_PERCENTAGE);
+
+        for (int i = 0; i < numberOfDataToRemove; i++) {
+            results.stream().min(Comparator.comparingDouble(XlsRecord::getTimeDuration))
+                    .ifPresent(results::remove);
+
+            results.stream().max(Comparator.comparingDouble(XlsRecord::getTimeDuration))
+                    .ifPresent(results::remove);
+        }
+    }
+
+    private void addResultsForConfigToContainer(BenchmarkDataContainer benchmarkDataContainer,
+                                                PolicyGeneratorConfiguration config, List<XlsRecord> results) {
+        benchmarkDataContainer.getIdentifier().add(config.getName());
+        benchmarkDataContainer.getMinValues().add(extractMin(results));
+        benchmarkDataContainer.getMaxValues().add(extractMax(results));
+        benchmarkDataContainer.getAvgValues().add(extractAvg(results));
+        benchmarkDataContainer.getMdnValues().add(extractMdn(results));
+        benchmarkDataContainer.getData().addAll(results);
+
+        benchmarkDataContainer.getConfigs().add(config);
+    }
+
+    private double extractMin(List<XlsRecord> data) {
+        double min = Double.MAX_VALUE;
+        for (XlsRecord item : data) {
+            if (item.getTimeDuration() < min) {
+                min = item.getTimeDuration();
+            }
+        }
+        return min;
+    }
+
+    private double extractMax(List<XlsRecord> data) {
+        double max = Double.MIN_VALUE;
+        for (XlsRecord item : data) {
+            if (item.getTimeDuration() > max) {
+                max = item.getTimeDuration();
+            }
+        }
+        return max;
+    }
+
+    private double extractAvg(List<XlsRecord> data) {
+        double sum = 0;
+        for (XlsRecord item : data) {
+            sum += item.getTimeDuration();
+        }
+        return sum / data.size();
+    }
+
+    private double extractMdn(List<XlsRecord> data) {
+        List<Double> list = data.stream().map(XlsRecord::getTimeDuration).sorted().collect(Collectors.toList());
+        int index = list.size() / 2;
+        if (list.size() % 2 == 0) {
+            return (list.get(index) + list.get(index - 1)) / 2;
+        } else {
+            return list.get(index);
+        }
+    }
+
     public List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path,
                                    BenchmarkDataContainer benchmarkDataContainer,
                                    DomainGenerator domainGenerator) throws Exception {
 
+        config.setPath(path);
+//        config.updateName();
         PolicyGenerator generator = new PolicyGenerator(config, domainGenerator.getDomainData());
         String subFolder = generateRandomPolicies(generator, path);
 
-        List<XlsRecord> results = new LinkedList<>();
-
-        runTestNew(config, subFolder, benchmarkDataContainer, domainGenerator);
-
-        return results;
+        return run(config, path + "/" + subFolder, benchmarkDataContainer, domainGenerator.getDomainData(), generator);
     }
 
     public List<XlsRecord> runTestNew(PolicyGeneratorConfiguration config, String policyFolder,
@@ -103,97 +164,67 @@ public class TestRunner {
                 domainGenerator.getDomainData().getPolicyDirectoryPath());
 
         //update config by analyzing the generated policies
-        config = new PolicyAnalyzer(domainGenerator.getDomainData())
+        PolicyGeneratorConfiguration updatedConfig = new PolicyAnalyzer(domainGenerator.getDomainData())
                 .analyzeSaplDocuments(benchmarkDataContainer.getIndexType());
 
-        return run(config, policyFolder, benchmarkDataContainer, domainGenerator.getDomainData());
+        LOGGER.info("{}", updatedConfig);
+        return run(updatedConfig, policyFolder, benchmarkDataContainer, domainGenerator.getDomainData(),
+                new PolicyGenerator(config, domainGenerator.getDomainData()));
     }
 
     private ParsedDocumentIndex initializeIndex(IndexType indexType, String policyFolder) {
-        SAPLInterpreter interpreter = new DefaultSAPLInterpreter();
+
         ParsedDocumentIndex documentIndex = getDocumentIndex(indexType);
+        validateIndexImplementation(indexType, documentIndex);
+
         try {
-            DirectoryStream stream = Files.newDirectoryStream(Paths.get(policyFolder), "*.sapl");
-
+            DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(policyFolder), "*.sapl");
             try {
-                Iterator var2 = stream.iterator();
-
-                while (var2.hasNext()) {
-                    Path filePath = (Path) var2.next();
-                    LOGGER.trace("load: {}", filePath);
-                    SAPL saplDocument = interpreter.parse(Files.newInputStream(filePath));
+                for (Path filePath : stream) {
+                    SAPL saplDocument = SAPL_INTERPRETER.parse(Files.newInputStream(filePath));
                     documentIndex.put(filePath.toString(), saplDocument);
                 }
-            } catch (Throwable var11) {
-                if (stream != null) {
-                    try {
-                        stream.close();
-                    } catch (Throwable var10) {
-                        var11.addSuppressed(var10);
-                    }
+            } catch (Exception var11) {
+                try {
+                    stream.close();
+                } catch (Exception var10) {
+                    var11.addSuppressed(var10);
                 }
-
                 throw var11;
             }
 
-            if (stream != null) {
-                stream.close();
-            }
+            stream.close();
 
-            documentIndex.setLiveMode();
         } catch (PolicyEvaluationException | IOException var12) {
             LOGGER.error("Error while initializing the document index.", var12);
         }
 
-        return documentIndex;
+        documentIndex.setLiveMode();
 
+        return documentIndex;
     }
 
     private List<XlsRecord> run(PolicyGeneratorConfiguration config, String policyFolder,
-                                BenchmarkDataContainer benchmarkDataContainer, DomainData domainData) {
-
-        PolicyGenerator generator = new PolicyGenerator(config, domainData);
+                                BenchmarkDataContainer benchmarkDataContainer, DomainData domainData,
+                                PolicyGenerator generator) {
 
         List<XlsRecord> results = new LinkedList<>();
+//        PolicyGenerator generator = new PolicyGenerator(config, domainData);
 
         LOGGER.info("running benchmark with config={}, runs={}", config.getName(), benchmarkDataContainer.getRuns());
 
         try {
-            Map<String, JsonNode> variables = Collections.emptyMap();
-            AnnotationFunctionContext functionContext = new AnnotationFunctionContext();
-            AnnotationAttributeContext attributeContext = new AnnotationAttributeContext();
-
-            DocumentsCombinator documentsCombinator = new DenyUnlessPermitCombinator();
-            Objects.requireNonNull(documentsCombinator);
-
-
-            LOGGER.info("init index");
+            LOGGER.debug("init index");
             //create PRP
             long begin = System.nanoTime();
-            ParsedDocumentIndex documentIndex = initializeIndex(benchmarkDataContainer
-                    .getIndexType(), policyFolder);
-
-//            FilesystemPolicyRetrievalPoint policyRetrievalPoint =
-//                    createPRP(policyFolder, benchmarkDataContainer.getIndexType());
+            ParsedDocumentIndex documentIndex = initializeIndex(benchmarkDataContainer.getIndexType(), policyFolder);
             double timePreparation = nanoToMs(System.nanoTime() - begin);
 
             //warm up
-            try {
-                for (int i = 0; i < 10; i++) {
-                    documentIndex
-                            .retrievePolicies(generator.createEmptySubscription(), functionContext, variables);
-                }
-            } catch (Exception ignored) {
-                LOGGER.error("error during warm-up", ignored);
-            }
+            warmUp(generator, documentIndex);
 
             //generate AuthorizationSubscription
-            List<AuthorizationSubscription> subscriptions = new LinkedList<>();
-            for (int i = 0; i < benchmarkDataContainer.getRuns(); i++) {
-                AuthorizationSubscription sub = generator.createRandomSubscription();
-                subscriptions.add(sub);
-                LOGGER.trace("generated sub: {}", sub);
-            }
+            List<AuthorizationSubscription> subscriptions = generateSubscriptions(benchmarkDataContainer, generator);
 
             for (int j = 0; j < benchmarkDataContainer.getRuns(); j++) {
 
@@ -201,33 +232,59 @@ public class TestRunner {
 
                 long start = System.nanoTime();
                 PolicyRetrievalResult result =
-                        documentIndex.retrievePolicies(request, functionContext, variables).block();
+                        documentIndex.retrievePolicies(request, FUNCTION_CONTEXT, VARIABLES).block();
                 long end = System.nanoTime();
 
                 double timeRetrieve = nanoToMs(end - start);
 
-                Objects.requireNonNull(result);
+//                Objects.requireNonNull(result);
+                AuthorizationDecision decision = AuthorizationDecision.INDETERMINATE;
+//                AuthorizationDecision decision = DOCUMENTS_COMBINATOR
+//                        .combineMatchingDocuments(result.getMatchingDocuments(), false,
+//                                request, ATTRIBUTE_CONTEXT, FUNCTION_CONTEXT, VARIABLES).blockFirst();
+//                Objects.requireNonNull(decision);
 
-                AuthorizationDecision decision = documentsCombinator
-                        .combineMatchingDocuments(result.getMatchingDocuments(), false,
-                                request, attributeContext, functionContext, variables).blockFirst();
-
-                Objects.requireNonNull(decision);
-
-                results.add(new XlsRecord(j, config.getName(), timePreparation, timeRetrieve, request.toString(),
+                results.add(new XlsRecord(j, config
+                        .getName(), timePreparation, timeRetrieve, "AuthorizationSubscription",
                         buildResponseStringForResult(result, decision)));
 
                 LOGGER.debug("Total : {}ms", timeRetrieve);
             }
 
-            LOGGER.info("destroy index");
-            documentIndex.destroyIndex();
+//            LOGGER.debug("destroy index");
+//            documentIndex.destroyIndex();
 
         } catch (Exception e) {
             LOGGER.error("Error running test", e);
         }
 
+        sanitizeResults(results);
+        addResultsForConfigToContainer(benchmarkDataContainer, config, results);
+
         return results;
+    }
+
+    private void warmUp(PolicyGenerator generator, ParsedDocumentIndex documentIndex) {
+        try {
+            for (int i = 0; i < 10; i++) {
+                documentIndex
+                        .retrievePolicies(generator.createEmptySubscription(), FUNCTION_CONTEXT, VARIABLES);
+            }
+        } catch (Exception ignored) {
+            LOGGER.error("error during warm-up", ignored);
+        }
+    }
+
+    private List<AuthorizationSubscription> generateSubscriptions(BenchmarkDataContainer benchmarkDataContainer, PolicyGenerator generator) {
+        List<AuthorizationSubscription> subscriptions = new LinkedList<>();
+        for (int i = 0; i < benchmarkDataContainer.getRuns(); i++) {
+            AuthorizationSubscription sub = generator.createRandomSubscription();
+//            AuthorizationSubscription sub = generator.createEmptySubscription();
+//            AuthorizationSubscription sub = generator.createAuthorizationSubscriptionObject();
+            subscriptions.add(sub);
+            LOGGER.trace("generated sub: {}", sub);
+        }
+        return subscriptions;
     }
 
     private String buildResponseStringForResult(PolicyRetrievalResult policyRetrievalResult,
@@ -238,13 +295,14 @@ public class TestRunner {
     }
 
 
+    @SneakyThrows
     private String generateRandomPolicies(PolicyGenerator generator, String path) throws IOException {
 
         String subfolder = generator.getConfig().getName().replaceAll("[^a-zA-Z0-9]", "");
-        generator.generatePolicies(subfolder);
-
         final Path dir = Paths.get(path, subfolder);
         Files.createDirectories(dir);
+        generator.generatePolicies(subfolder);
+
         return subfolder;
     }
 

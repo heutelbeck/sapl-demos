@@ -32,9 +32,13 @@ public class AggregateRecord {
 
     long seed;
 
-    int policies;
+    int policyCount;
 
-    int variables;
+    int variableCount;
+
+    int runs;
+
+    int iterations;
 
 
 

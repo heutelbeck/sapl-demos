@@ -14,7 +14,7 @@ public class TestSuiteGenerator {
         List<PolicyGeneratorConfiguration> configs = new LinkedList<>();
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("100p, 5v, 200vp")
-                .seed(dice.nextLong())
+                .seed(29724)
                 .policyCount(100)
                 .logicalVariableCount(5)
                 .variablePoolCount(200)
@@ -27,7 +27,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("100p, 10v, 200vp")
-                .seed(dice.nextLong())
+                .seed(81893)
                 .policyCount(100)
                 .logicalVariableCount(10)
                 .variablePoolCount(200)
@@ -40,7 +40,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("200p, 5v, 400vp")
-                .seed(dice.nextLong())
+                .seed(1271)
                 .policyCount(200)
                 .logicalVariableCount(5)
                 .variablePoolCount(400)
@@ -53,7 +53,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("200p, 10v, 400vp")
-                .seed(dice.nextLong())
+                .seed(60565)
                 .policyCount(200)
                 .logicalVariableCount(10)
                 .variablePoolCount(400)
@@ -66,7 +66,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("500p, 5v, 1000vp")
-                .seed(dice.nextLong())
+                .seed(2517)
                 .policyCount(500)
                 .logicalVariableCount(5)
                 .variablePoolCount(1000)
@@ -79,7 +79,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("500p, 10v, 1000vp")
-                .seed(dice.nextLong())
+                .seed(52359)
                 .policyCount(500)
                 .logicalVariableCount(10)
                 .variablePoolCount(1000)
@@ -92,7 +92,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("1000p, 5v, 1000vp")
-                .seed(dice.nextLong())
+                .seed(36299)
                 .policyCount(1000)
                 .logicalVariableCount(5)
                 .variablePoolCount(2000)
@@ -105,7 +105,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("1000p, 10v, 1000vp")
-                .seed(dice.nextLong())
+                .seed(85821)
                 .policyCount(1000)
                 .logicalVariableCount(10)
                 .variablePoolCount(2000)
@@ -118,7 +118,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("MH Conj. Max TC")
-                .seed(dice.nextLong())
+                .seed(63317)
                 .policyCount(1000)
                 .logicalVariableCount(10)
                 .variablePoolCount(2000)
@@ -131,7 +131,7 @@ public class TestSuiteGenerator {
         );
         configs.add(PolicyGeneratorConfiguration.builder()
                 .name("ML Conj. Max TC")
-                .seed(dice.nextLong())
+                .seed(11142)
                 .policyCount(1000)
                 .logicalVariableCount(10)
                 .variablePoolCount(2000)

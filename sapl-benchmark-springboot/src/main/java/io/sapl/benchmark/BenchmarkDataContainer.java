@@ -17,6 +17,7 @@ public class BenchmarkDataContainer {
 
     final IndexType indexType;
     final int runs;
+    final int iterations;
 
     List<XlsRecord> data = new LinkedList<>();
     List<Double> minValues = new LinkedList<>();
@@ -28,13 +29,14 @@ public class BenchmarkDataContainer {
 
     List<AggregateRecord> aggregateData = new LinkedList<>();
 
-    public BenchmarkDataContainer(IndexType indexType, DomainData domainData) {
+    public BenchmarkDataContainer(IndexType indexType, DomainData domainData, int runs, int iterations) {
         this.benchmarkId = UUID.randomUUID().toString();
         this.benchmarkTimestamp = System.currentTimeMillis();
         this.runtimeInfo = String.format("%s_%s", System.getProperty("java.vendor"),
                 System.getProperty("java.version"));
         this.indexType = indexType;
-        this.runs = domainData.getNumberOfBenchmarkRuns();
+        this.runs = runs;
+        this.iterations = iterations;
 
     }
 }

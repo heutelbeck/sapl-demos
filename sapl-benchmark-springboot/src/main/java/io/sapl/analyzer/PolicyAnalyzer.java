@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -51,9 +52,39 @@ public class PolicyAnalyzer {
         this.policyPath = domainData.getPolicyDirectoryPath();
     }
 
-
     public PolicyGeneratorConfiguration analyzeSaplDocuments(IndexType indexType) {
         LOGGER.info("analyzing policies in directory {}", policyPath);
+        parseDocuments();
+
+        splitDocumentAndTargets();
+
+        LongSummaryStatistics statistics = publishedTargets.values().stream()
+                .map(this::countVariableForSingleTarget).mapToLong(Long::longValue)
+                .summaryStatistics();
+
+        return PolicyGeneratorConfiguration.builder()
+                .name("Bench_" + domainData.getSeed() + "_" + indexType)
+                .policyCount(publishedDocuments.size())
+                .variablePoolCount((int) statistics.getSum())
+                .logicalVariableCount((int) statistics.getAverage())
+                .seed(domainData.getSeed())
+                .path(policyPath)
+                .build();
+
+    }
+
+    private void splitDocumentAndTargets() {
+        for (Entry<String, SAPL> entry : parsedDocuments.entrySet()) {
+            if (entry.getValue() != null) {
+                retainDocument(entry.getKey(), entry.getValue());
+                retainTarget(entry.getKey(), entry.getValue());
+            } else {
+                discard(entry.getKey());
+            }
+        }
+    }
+
+    private void parseDocuments() {
         try {
             try (DirectoryStream<Path> stream = Files
                     .newDirectoryStream(Paths.get(policyPath), POLICY_FILE_GLOB_PATTERN)) {
@@ -66,31 +97,16 @@ public class PolicyAnalyzer {
         } catch (IOException | PolicyEvaluationException e) {
             LOGGER.error("Error while initializing the document index.", e);
         }
+    }
 
-        for (Entry<String, SAPL> entry : parsedDocuments.entrySet()) {
-            if (entry.getValue() != null) {
-                retainDocument(entry.getKey(), entry.getValue());
-                retainTarget(entry.getKey(), entry.getValue());
-            } else {
-                discard(entry.getKey());
-            }
-        }
-
-        return PolicyGeneratorConfiguration.builder()
-                .name("Bench_" + domainData.getSeed() + "_" + indexType)
-                .policyCount(publishedDocuments.size())
-                .variablePoolCount((int) countVariables())
-                .seed(domainData.getSeed())
-                .path(policyPath)
-                .build();
-
+    private long countVariableForSingleTarget(DisjunctiveFormula formula) {
+        return formula.getClauses().stream()
+                .flatMap(clause -> clause.getLiterals().stream())
+                .map(Literal::getBool).count();
     }
 
     private long countVariables() {
-        return publishedTargets.values().stream()
-                .flatMap(formula -> formula.getClauses().stream())
-                .flatMap(clause -> clause.getLiterals().stream())
-                .map(Literal::getBool).count();
+        return publishedTargets.values().stream().map(this::countVariableForSingleTarget).count();
     }
 
     private void retainDocument(String documentKey, SAPL sapl) {

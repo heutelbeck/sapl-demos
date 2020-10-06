@@ -40,16 +40,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import static io.sapl.benchmark.BenchmarkConstants.DEFAULT_HEIGHT;
 import static io.sapl.benchmark.BenchmarkConstants.DEFAULT_WIDTH;
 import static io.sapl.benchmark.BenchmarkConstants.ERROR_READING_TEST_CONFIGURATION;
+import static io.sapl.benchmark.BenchmarkConstants.FULLY_RANDOM;
+import static io.sapl.benchmark.BenchmarkConstants.FULLY_RANDOM_DOC;
 import static io.sapl.benchmark.BenchmarkConstants.HELP;
 import static io.sapl.benchmark.BenchmarkConstants.HELP_DOC;
 import static io.sapl.benchmark.BenchmarkConstants.INDEX;
@@ -70,23 +69,31 @@ import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType
 @RequiredArgsConstructor
 public class Benchmark implements CommandLineRunner {
 
-    private static final TestRunner TEST_RUNNER = new TestRunner();
-
     public static final String DEFAULT_PATH = System.getProperty("user.home") + "/benchmarks/";
-    private static final double REMOVE_EDGE_DATA_BY_PERCENTAGE = 0.005D;
-    private static final boolean PERFORM_RANDOM_BENCHMARK = false;
 
+    private final TestRunner TEST_RUNNER = new TestRunner();
+    private final List<Long> seedList = new LinkedList<>();
     private final DomainGenerator domainGenerator;
 
-    private int numberOfBenchmarks = 2;
-
-    private IndexType indexType = IMPROVED;
-
-    private String path = DEFAULT_PATH;
-    private String testFilePath;
     private String filePrefix;
 
-    private final List<Long> seedList = new LinkedList<>();
+    /* COMMAND LINE ARGUMENTS */ //TODO: merge with application.properties
+
+    // Switch between benchmark types
+    public boolean performFullyRandomBenchmark = false;
+
+    // Benchmark directory: Results will be written to this directory. Can be overwritten by providing a command line argument.
+    private String path = DEFAULT_PATH;
+
+    // If no index type is provided as an command line argument, use this to set the index for the benchmark
+    private IndexType indexType = IMPROVED;
+
+    // If not provided as command line argument, use this to set the number of benchmark iterations
+    private int numberOfBenchmarkIterations = 1;
+
+    // If not provided as command line argument, use this to set the benchmark configuration file for the fully random benchmark
+    private String benchmarkConfigurationFile = System.getProperty("user.home") +
+            "/IdeaProjects/sapl-demos/sapl-benchmark-springboot/src/main/resources/tests.json";
 
     @Override
     public void run(String... args) throws Exception {
@@ -102,15 +109,15 @@ public class Benchmark implements CommandLineRunner {
 
     private void init() {
         filePrefix = String.format("%s_%s_%s/",
-                LocalDateTime.now(), indexType, PERFORM_RANDOM_BENCHMARK ? "RANDOM" : "SYSTEMATIC");
+                LocalDateTime.now(), indexType, performFullyRandomBenchmark ? "RANDOM" : "SYSTEMATIC");
 
         LOGGER.info("\n randomBenchmark={},\n numberOfBenchmarks={}," +
                         "\n index={},\n initialSeed={},\n runs={}," +
                         "\n testfile={},\n filePrefix={}",
-                PERFORM_RANDOM_BENCHMARK, numberOfBenchmarks,
+                performFullyRandomBenchmark, numberOfBenchmarkIterations,
                 indexType, domainGenerator.getDomainData().getSeed(),
                 domainGenerator.getDomainData().getNumberOfBenchmarkRuns(),
-                testFilePath, filePrefix);
+                benchmarkConfigurationFile, filePrefix);
 
         try {
             final Path dir = Paths.get(path, filePrefix);
@@ -121,8 +128,8 @@ public class Benchmark implements CommandLineRunner {
 
         // seed list
         seedList.add(domainGenerator.getDomainData().getSeed()); //initial seed from properties file
-        for (int i = 0; i < numberOfBenchmarks - 1; i++) {
-            seedList.add((long) Math.abs(new Random().nextInt()));
+        for (int i = 0; i < numberOfBenchmarkIterations - 1; i++) {
+            seedList.add((long) domainGenerator.getDomainData().getDice().nextInt());
         }
     }
 
@@ -133,7 +140,8 @@ public class Benchmark implements CommandLineRunner {
         ResultWriter resultWriter = new ResultWriter(resultPath, indexType);
 
         BenchmarkDataContainer benchmarkDataContainer = new BenchmarkDataContainer(indexType,
-                domainGenerator.getDomainData());
+                domainGenerator.getDomainData(), domainGenerator.getDomainData().getNumberOfBenchmarkRuns(),
+                numberOfBenchmarkIterations);
 
         List<PolicyGeneratorConfiguration> configs = generateConfigurations();
 
@@ -141,20 +149,17 @@ public class Benchmark implements CommandLineRunner {
 
             List<XlsRecord> results = benchmarkConfiguration(path, benchmarkDataContainer, config);
 
-            sanitizeResults(results);
-
             double[] times = new double[results.size()];
             resultWriter.writeDetailsChart(results, times, config.getName());
             overviewChart.addSeries(config.getName(), times);
 
-            addResultsForConfigToContainer(benchmarkDataContainer, config, results);
         }
 
         resultWriter.writeFinalResults(benchmarkDataContainer, overviewChart);
     }
 
     private List<PolicyGeneratorConfiguration> generateConfigurations() {
-        if (PERFORM_RANDOM_BENCHMARK) {
+        if (performFullyRandomBenchmark) {
             return generateTestSuite(path).getCases();
         } else {
             List<PolicyGeneratorConfiguration> configurations = new LinkedList<>();
@@ -162,8 +167,9 @@ public class Benchmark implements CommandLineRunner {
             for (Long seed : seedList) {
 
                 configurations.add(PolicyGeneratorConfiguration.builder()
-                        .name(String.format("Bench_%5d_%s", seed, indexType))
+                        .name(String.format("Bench_%d_%s", seed, indexType))
                         .path(domainGenerator.getDomainData().getPolicyDirectoryPath())
+                        .seed(seed)
                         .build());
             }
 
@@ -175,8 +181,8 @@ public class Benchmark implements CommandLineRunner {
     @SneakyThrows
     private TestSuite generateTestSuite(String path) {
         TestSuite suite;
-        if (!Strings.isNullOrEmpty(testFilePath)) {
-            File testFile = new File(testFilePath);
+        if (!Strings.isNullOrEmpty(benchmarkConfigurationFile)) {
+            File testFile = new File(benchmarkConfigurationFile);
             LOGGER.info("using testfile: {}", testFile);
 
             List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
@@ -184,26 +190,26 @@ public class Benchmark implements CommandLineRunner {
 
             suite = new Gson().fromJson(allLinesAsString, TestSuite.class);
         } else {
-            suite = TestSuiteGenerator.generateN(path, numberOfBenchmarks, domainGenerator.getDomainData().getDice());
+            suite = TestSuiteGenerator
+                    .generateN(path, numberOfBenchmarkIterations, domainGenerator.getDomainData().getDice());
         }
 
         Objects.requireNonNull(suite, "test suite is null");
         Objects.requireNonNull(suite.getCases(), "test cases are null");
         LOGGER.info("suite contains {} test cases", suite.getCases().size());
-        if (!suite.getCases().isEmpty()) throw new RuntimeException("at least one test case must be present");
+        if (suite.getCases().isEmpty()) throw new RuntimeException("at least one test case must be present");
 
         return suite;
     }
 
     private List<XlsRecord> benchmarkConfiguration(String path, BenchmarkDataContainer benchmarkDataContainer,
                                                    PolicyGeneratorConfiguration config) throws Exception {
-        benchmarkDataContainer.getIdentifier().add(config.getName());
+
         List<XlsRecord> results = null;
         try {
-            results = PERFORM_RANDOM_BENCHMARK
+            results = performFullyRandomBenchmark
                     ? TEST_RUNNER.runTest(config, path, benchmarkDataContainer, domainGenerator)
-                    : TEST_RUNNER
-                    .runTestNew(config, config.getPath(), benchmarkDataContainer, domainGenerator);
+                    : TEST_RUNNER.runTestNew(config, config.getPath(), benchmarkDataContainer, domainGenerator);
         } catch (IOException | PolicyEvaluationException e) {
             LOGGER.error("Error running test", e);
             System.exit(1);
@@ -212,67 +218,6 @@ public class Benchmark implements CommandLineRunner {
         return results;
     }
 
-    private void addResultsForConfigToContainer(BenchmarkDataContainer benchmarkDataContainer,
-                                                PolicyGeneratorConfiguration config, List<XlsRecord> results) {
-        benchmarkDataContainer.getMinValues().add(extractMin(results));
-        benchmarkDataContainer.getMaxValues().add(extractMax(results));
-        benchmarkDataContainer.getAvgValues().add(extractAvg(results));
-        benchmarkDataContainer.getMdnValues().add(extractMdn(results));
-        benchmarkDataContainer.getData().addAll(results);
-
-        benchmarkDataContainer.getConfigs().add(config);
-    }
-
-
-    private void sanitizeResults(List<XlsRecord> results) {
-        int numberOfDataToRemove = (int) (results.size() * REMOVE_EDGE_DATA_BY_PERCENTAGE);
-
-        for (int i = 0; i < numberOfDataToRemove; i++) {
-            results.stream().min(Comparator.comparingDouble(XlsRecord::getTimeDuration))
-                    .ifPresent(results::remove);
-
-            results.stream().max(Comparator.comparingDouble(XlsRecord::getTimeDuration))
-                    .ifPresent(results::remove);
-        }
-    }
-
-    private double extractMin(List<XlsRecord> data) {
-        double min = Double.MAX_VALUE;
-        for (XlsRecord item : data) {
-            if (item.getTimeDuration() < min) {
-                min = item.getTimeDuration();
-            }
-        }
-        return min;
-    }
-
-    private double extractMax(List<XlsRecord> data) {
-        double max = Double.MIN_VALUE;
-        for (XlsRecord item : data) {
-            if (item.getTimeDuration() > max) {
-                max = item.getTimeDuration();
-            }
-        }
-        return max;
-    }
-
-    private double extractAvg(List<XlsRecord> data) {
-        double sum = 0;
-        for (XlsRecord item : data) {
-            sum += item.getTimeDuration();
-        }
-        return sum / data.size();
-    }
-
-    private double extractMdn(List<XlsRecord> data) {
-        List<Double> list = data.stream().map(XlsRecord::getTimeDuration).sorted().collect(Collectors.toList());
-        int index = list.size() / 2;
-        if (list.size() % 2 == 0) {
-            return (list.get(index) + list.get(index - 1)) / 2;
-        } else {
-            return list.get(index);
-        }
-    }
 
     private void parseCommandLineArguments(String... args) {
         Options options = new Options();
@@ -282,6 +227,7 @@ public class Benchmark implements CommandLineRunner {
         options.addOption(INDEX, true, INDEX_DOC);
         options.addOption(TEST, true, TEST_DOC);
         options.addOption(ITERATIONS, true, ITERATIONS_DOC);
+        options.addOption(FULLY_RANDOM, true, FULLY_RANDOM_DOC);
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -327,13 +273,19 @@ public class Benchmark implements CommandLineRunner {
                 if (!Files.exists(Paths.get(testOption))) {
                     throw new IllegalArgumentException("test file provided does not exists");
                 }
-                testFilePath = testOption;
+                benchmarkConfigurationFile = testOption;
             }
 
             String iterOption = cmd.getOptionValue(ITERATIONS);
             if (!Strings.isNullOrEmpty(iterOption)) {
-                this.numberOfBenchmarks = Integer.parseInt(iterOption);
+                this.numberOfBenchmarkIterations = Integer.parseInt(iterOption);
             }
+
+            String randomOption = cmd.getOptionValue(FULLY_RANDOM);
+            if (!Strings.isNullOrEmpty(randomOption)) {
+                this.performFullyRandomBenchmark = Boolean.parseBoolean(randomOption);
+            }
+
 
         } catch (ParseException e) {
             LOGGER.error("encountered an error running the demo: {}", e.getMessage(), e);

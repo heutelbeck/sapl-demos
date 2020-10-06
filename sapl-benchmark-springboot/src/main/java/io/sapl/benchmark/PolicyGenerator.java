@@ -31,6 +31,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Data
@@ -192,6 +194,23 @@ public class PolicyGenerator {
 
     private AuthorizationSubscription createSubscription(JsonNode subject, JsonNode action, JsonNode resource) {
         return new AuthorizationSubscription(subject, action, resource, EMPTY_NODE);
+    }
+
+    public Collection<String> getVariables() {
+        HashSet<String> variables = new HashSet<>();
+        for (int i = 0; i < config.getVariablePoolCount(); i++) {
+            variables.add("x" + i);
+        }
+        return variables;
+    }
+
+    public AuthorizationSubscription createAuthorizationSubscriptionObject() {
+        ObjectNode resource = JsonNodeFactory.instance.objectNode();
+        for (String var : getVariables()) {
+            resource = resource.put(var, roll() < config.getFalseProbability() ? false : true);
+        }
+        return new AuthorizationSubscription(NullNode.getInstance(), NullNode.getInstance(), resource,
+                NullNode.getInstance());
     }
 
 }

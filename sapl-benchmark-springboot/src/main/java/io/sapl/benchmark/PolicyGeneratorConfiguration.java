@@ -44,5 +44,10 @@ public class PolicyGeneratorConfiguration {
 
     private String path = "";
 
+    public void updateName() {
+        this.name = String
+                .format("\"%dp, %dv, %dvp\"", this.policyCount, this.logicalVariableCount, this.variablePoolCount);
+    }
+
 
 }

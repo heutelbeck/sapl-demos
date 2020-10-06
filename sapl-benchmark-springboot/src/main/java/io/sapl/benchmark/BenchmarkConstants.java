@@ -12,7 +12,7 @@ public class BenchmarkConstants {
 
     public static final String EXPORT_PROPERTIES = "number, name, timePreparation, timeDuration, request, response";
 
-    public static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn";
+    public static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn, seed, policyCount, variableCount, runs, iterations";
 
     public static final String HELP_DOC = "print this message";
 
@@ -35,5 +35,9 @@ public class BenchmarkConstants {
     public static final String ITERATIONS = "iter";
 
     public static final String ITERATIONS_DOC = "the number how often the benchmark will be generated and executed";
+
+    public static final String FULLY_RANDOM = "random";
+
+    public static final String FULLY_RANDOM_DOC = "true: fully random benchmark, false: structured random benchmark";
 
 }

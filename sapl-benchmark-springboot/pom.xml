@@ -27,6 +27,7 @@
     </properties>
 
     <dependencies>
+        <!-- GRAAL VM -->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
