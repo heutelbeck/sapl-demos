@@ -278,9 +278,10 @@ public class TestRunner {
     private List<AuthorizationSubscription> generateSubscriptions(BenchmarkDataContainer benchmarkDataContainer, PolicyGenerator generator) {
         List<AuthorizationSubscription> subscriptions = new LinkedList<>();
         for (int i = 0; i < benchmarkDataContainer.getRuns(); i++) {
-            AuthorizationSubscription sub = generator.createRandomSubscription();
+            AuthorizationSubscription sub = Benchmark.performFullyRandomBenchmark ?
+                    generator.createFullyRandomSubscription() : generator.createStructuredRandomSubscription();
 //            AuthorizationSubscription sub = generator.createEmptySubscription();
-//            AuthorizationSubscription sub = generator.createAuthorizationSubscriptionObject();
+
             subscriptions.add(sub);
             LOGGER.trace("generated sub: {}", sub);
         }

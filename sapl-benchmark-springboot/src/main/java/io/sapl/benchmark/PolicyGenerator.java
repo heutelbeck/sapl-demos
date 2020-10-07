@@ -131,7 +131,7 @@ public class PolicyGenerator {
 
     }
 
-    public AuthorizationSubscription createRandomSubscription() {
+    public AuthorizationSubscription createStructuredRandomSubscription() {
         double roll = roll();
         if (roll >= emptySubProbability) {
             LOGGER.trace("dice rolled {} - higher than {} -> EMPTY SUB", roll, emptySubProbability);
@@ -204,7 +204,7 @@ public class PolicyGenerator {
         return variables;
     }
 
-    public AuthorizationSubscription createAuthorizationSubscriptionObject() {
+    public AuthorizationSubscription createFullyRandomSubscription() {
         ObjectNode resource = JsonNodeFactory.instance.objectNode();
         for (String var : getVariables()) {
             resource = resource.put(var, roll() < config.getFalseProbability() ? false : true);

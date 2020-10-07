@@ -80,7 +80,7 @@ public class Benchmark implements CommandLineRunner {
     /* COMMAND LINE ARGUMENTS */ //TODO: merge with application.properties
 
     // Switch between benchmark types
-    public boolean performFullyRandomBenchmark = false;
+    public static boolean performFullyRandomBenchmark = false;
 
     // Benchmark directory: Results will be written to this directory. Can be overwritten by providing a command line argument.
     private String path = DEFAULT_PATH;
@@ -109,7 +109,7 @@ public class Benchmark implements CommandLineRunner {
 
     private void init() {
         filePrefix = String.format("%s_%s_%s/",
-                LocalDateTime.now(), indexType, performFullyRandomBenchmark ? "RANDOM" : "SYSTEMATIC");
+                LocalDateTime.now(), indexType, performFullyRandomBenchmark ? "RANDOM" : "STRUCTURED");
 
         LOGGER.info("\n randomBenchmark={},\n numberOfBenchmarks={}," +
                         "\n index={},\n initialSeed={},\n runs={}," +
@@ -227,7 +227,7 @@ public class Benchmark implements CommandLineRunner {
         options.addOption(INDEX, true, INDEX_DOC);
         options.addOption(TEST, true, TEST_DOC);
         options.addOption(ITERATIONS, true, ITERATIONS_DOC);
-        options.addOption(FULLY_RANDOM, true, FULLY_RANDOM_DOC);
+        options.addOption(FULLY_RANDOM, false, FULLY_RANDOM_DOC);
 
         CommandLineParser parser = new DefaultParser();
         try {
@@ -281,9 +281,9 @@ public class Benchmark implements CommandLineRunner {
                 this.numberOfBenchmarkIterations = Integer.parseInt(iterOption);
             }
 
-            String randomOption = cmd.getOptionValue(FULLY_RANDOM);
-            if (!Strings.isNullOrEmpty(randomOption)) {
-                this.performFullyRandomBenchmark = Boolean.parseBoolean(randomOption);
+            if (cmd.hasOption(FULLY_RANDOM)) {
+                LOGGER.info("passed random argument");
+                Benchmark.performFullyRandomBenchmark = true;
             }
 
 
