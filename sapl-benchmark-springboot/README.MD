@@ -1,8 +1,10 @@
-# SAPl BENCHMARK
+# SAPL BENCHMARK
+It is recommended to run the benchmark with at least 8 GB of heap space.
+
+## Command Line Arguments
 
 ## Structured Random Benchmark
 
-### Command Line Arguments
 
 ### Benchmark Configurations
 Several predefined benchmark configurations are available as property files:
@@ -14,6 +16,6 @@ They can be activated by setting the respective profile using the parameter `-Ds
 
 
 #### Provide external configuration
-It is possible to provide a custom property file using the parameter `--spring.config.location=/whereever/appplication.properties`.
+It is possible to provide a custom property file using the parameter `-Dspring.config.location=/whereever/appplication.properties`.
 
 ## Fully Random Benchmark

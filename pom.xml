@@ -50,7 +50,6 @@
 		<module>sapl-demo-remote</module>
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-web-editor</module>
-        <module>sapl-test-spring</module>
     </modules>
 
 </project>

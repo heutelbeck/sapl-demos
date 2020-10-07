@@ -8,7 +8,7 @@ java --version
 #for i in {1..10}
 #do
 	SEED=$RANDOM
-	RUNS=100
+	RUNS=1
 	ITER=1
 
 	echo "IMPROVED - $SEED"

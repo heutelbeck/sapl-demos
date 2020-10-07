@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Data
@@ -33,7 +32,7 @@ public class DomainActions {
         List<String> actionList = new ArrayList<>();
 
         for (int i = 0; i < domainData.getDice().nextInt(domainData.getNumberOfActions()) + 1; i++) {
-            actionList.add(String.format("action.%03d", new Random().nextInt(1000) + 1));
+            actionList.add(String.format("action.%03d", domainData.getDice().nextInt(1000) + 1));
         }
 
         return new DomainActions(actionList, true).getActionList();
