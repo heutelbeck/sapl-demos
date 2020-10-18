@@ -11,7 +11,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "100p, 10v, 200vp",
@@ -23,7 +23,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "200p, 5v, 400vp",
@@ -35,7 +35,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "200p, 10v, 400vp",
@@ -47,7 +47,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "500p, 5v, 1000vp",
@@ -59,7 +59,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "500p, 10v, 1000vp",
@@ -71,7 +71,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "1000p, 5v, 1000vp",
@@ -83,7 +83,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "1000p, 10v, 1000vp",
@@ -95,7 +95,7 @@
 		    "conjunctionProbability": 0.9,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "MH Conj. Max TC",
@@ -107,7 +107,7 @@
 		    "conjunctionProbability": 0.7,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "ML Conj. Max TC",
@@ -119,7 +119,7 @@
 		    "conjunctionProbability": 0.3,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    }
 	]
 }

@@ -20,7 +20,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -33,7 +33,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -46,7 +46,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -59,7 +59,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -72,7 +72,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -85,7 +85,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -98,7 +98,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -111,7 +111,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.9)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -124,7 +124,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.7)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
         configs.add(PolicyGeneratorConfiguration.builder()
@@ -137,7 +137,7 @@ public class TestSuiteGenerator {
                 .conjunctionProbability(0.3)
                 .negationProbability(0.3)
                 .falseProbability(0.5)
-                .path("/Users/marclucasbaur/sapl/")
+                .path(System.getProperty("user.home") + "/sapl/")
                 .build()
         );
 

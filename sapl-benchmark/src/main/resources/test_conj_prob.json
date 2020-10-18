@@ -11,7 +11,7 @@
 			"conjunctionProbability": 0.9,
 			"negationProbability": 0.3,
 			"falseProbability": 0.5,
-			"path": "/Users/marclucasbaur/sapl/"
+			"path": "~/sapl/"
 		},
 	    {
 		    "name": "Conj. 0.7",
@@ -23,7 +23,7 @@
 		    "conjunctionProbability": 0.7,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "Conj. 0.3",
@@ -35,7 +35,7 @@
 		    "conjunctionProbability": 0.3,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 		{
 			"name": "Conj. 0.1",
@@ -47,7 +47,7 @@
 			"conjunctionProbability": 0.1,
 			"negationProbability": 0.3,
 			"falseProbability": 0.5,
-			"path": "/Users/marclucasbaur/sapl/"
+			"path": "~/sapl/"
 		}
 	]
-}
+}~

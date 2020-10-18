@@ -1,8 +1,5 @@
 #!/bin/bash
 
-rm -rf /Users/marclucasbaur/demo-policies
-mkdir /Users/marclucasbaur/demo-policies
-
 java --version
 
 	SEED=3242

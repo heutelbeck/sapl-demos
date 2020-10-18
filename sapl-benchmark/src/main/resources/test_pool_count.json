@@ -11,7 +11,7 @@
 			"conjunctionProbability": 0.7,
 			"negationProbability": 0.3,
 			"falseProbability": 0.5,
-			"path": "/Users/marclucasbaur/sapl/"
+			"path": "~/sapl/"
 		},
 	    {
 		    "name": "Pool 100",
@@ -23,7 +23,7 @@
 		    "conjunctionProbability": 0.7,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 	    {
 		    "name": "Pool 1000",
@@ -35,7 +35,7 @@
 		    "conjunctionProbability": 0.7,
 		    "negationProbability": 0.3,
 		    "falseProbability": 0.5,
-		    "path": "/Users/marclucasbaur/sapl/"
+		    "path": "~/sapl/"
 	    },
 		{
 			"name": "Pool 2000",
@@ -47,7 +47,7 @@
 			"conjunctionProbability": 0.7,
 			"negationProbability": 0.3,
 			"falseProbability": 0.5,
-			"path": "/Users/marclucasbaur/sapl/"
+			"path": "~/sapl/"
 		}
 	]
 }

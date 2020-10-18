@@ -73,7 +73,7 @@ public class Benchmark {
 
     private static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn";
 
-    private static final String DEFAULT_PATH = "/Users/marclucasbaur/sapl/";
+    private static final String DEFAULT_PATH = System.getProperty("user.home") + "/sapl/";
 
     private static final String HELP_DOC = "print this message";
 
