@@ -21,14 +21,14 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+		<java.version>11</java.version>
 		<version.sapl.policy.engine>2.0.0-SNAPSHOT</version.sapl.policy.engine>
-		<version.junit>4.12</version.junit>
-		<version.springboot>2.1.5.RELEASE</version.springboot>
+		<version.junit>4.13.1</version.junit>
+		<version.springboot>2.3.4.RELEASE</version.springboot>
 		<version.maven-source-plugin>3.0.1</version.maven-source-plugin>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.lombok>1.18.6</version.lombok>
+		<version.lombok>1.18.16</version.lombok>
 	</properties>
 
 	<dependencyManagement>
@@ -139,29 +139,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>sonar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.sonarsource.scanner.maven</groupId>
-						<artifactId>sonar-maven-plugin</artifactId>
-						<version>3.3.0.603</version>
-						<executions>
-							<execution>
-								<id>sonar</id>
-								<goals>
-									<goal>sonar</goal>
-								</goals>
-								<phase>deploy</phase>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
