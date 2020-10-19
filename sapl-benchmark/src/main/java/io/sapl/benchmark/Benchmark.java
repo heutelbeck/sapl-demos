@@ -15,21 +15,18 @@
  ******************************************************************************/
 package io.sapl.benchmark;
 
-import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import io.sapl.api.functions.FunctionException;
+import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.PDPConfigurationException;
+import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -42,293 +39,422 @@ import org.knowm.xchart.BitmapEncoder.BitmapFormat;
 import org.knowm.xchart.CategoryChart;
 import org.knowm.xchart.XYChart;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
-import com.google.common.io.Resources;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.pdp.AuthorizationDecision;
-import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PDPConfigurationException;
-import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import lombok.extern.slf4j.Slf4j;
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
+import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
 @Slf4j
 public class Benchmark {
 
-	private static final int DEFAULT_HEIGHT = 1080;
+    private static final int DEFAULT_HEIGHT = 1080;
 
-	private static final int DEFAULT_WIDTH = 1920;
+    private static final int DEFAULT_WIDTH = 1920;
 
-	private static final String ERROR_READING_TEST_CONFIGURATION = "Error reading test configuration";
+    private static final String ERROR_READING_TEST_CONFIGURATION = "Error reading test configuration";
 
-	private static final String ERROR_WRITING_BITMAP = "Error writing bitmap";
+    private static final String ERROR_WRITING_BITMAP = "Error writing bitmap";
 
-	private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
+    private static final String EXPORT_PROPERTIES = "number, name, preparation, duration, request, response";
 
-	private static final String DEFAULT_PATH = "C:/sapl";
+    private static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn";
 
-	private static final String HELP_DOC = "print this message";
+    private static final String DEFAULT_PATH = System.getProperty("user.home") + "/sapl/";
 
-	private static final String HELP = "help";
+    private static final String HELP_DOC = "print this message";
 
-	private static final String USAGE = "java -jar sapl-benchmark-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
+    private static final String HELP = "help";
 
-	private static final String PATH = "path";
+    private static final String REUSE = "reuse";
 
-	private static final String PATH_DOC = "path for output files";
+    private static final String REUSE_DOC = "reuse existing policies (true, false)";
 
-	private static final int ITERATIONS = 10;
+    private static final String INDEX = "index";
 
-	private static final int RUNS = 30;
+    private static final String INDEX_DOC = "index type used (SIMPLE, FAST, IMPROVED)";
 
-	private static final double MILLION = 1000000.0D;
+    private static final String TEST = "test";
 
-	private static double nanoToMs(long nanoseconds) {
-		return nanoseconds / MILLION;
-	}
+    private static final String TEST_DOC = "JSON file containing test definition";
 
-	private static List<String> getExportHeader() {
-		return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
-				"Response String (ms)");
-	}
+    private static final String USAGE = "java -jar sapl-benchmark-1.0.0-SNAPSHOT-jar-with-dependencies.jar";
 
-	private static double extractMin(List<XlsRecord> data) {
-		double min = Double.MAX_VALUE;
-		for (XlsRecord item : data) {
-			if (item.getDuration() < min) {
-				min = item.getDuration();
-			}
-		}
-		return min;
-	}
+    private static final String PATH = "path";
 
-	private static double extractMax(List<XlsRecord> data) {
-		double max = Double.MIN_VALUE;
-		for (XlsRecord item : data) {
-			if (item.getDuration() > max) {
-				max = item.getDuration();
-			}
-		}
-		return max;
-	}
+    private static final String PATH_DOC = "path for output files";
 
-	private static double extractAvg(List<XlsRecord> data) {
-		double sum = 0;
-		for (XlsRecord item : data) {
-			sum += item.getDuration();
-		}
-		return sum / data.size();
-	}
+    private static final int ITERATIONS = 10;
 
-	private static double extractMdn(List<XlsRecord> data) {
-		List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
-		int index = list.size() / 2;
-		if (list.size() % 2 == 0) {
-			return (list.get(index) + list.get(index - 1)) / 2;
-		}
-		else {
-			return list.get(index);
-		}
-	}
+    private static final int RUNS = 30;
 
-	public static void main(String[] args) throws URISyntaxException {
+    private static final double MILLION = 1000000.0D;
 
-		Options options = new Options();
+    private static IndexType indexType = FAST;
 
-		options.addOption(PATH, true, PATH_DOC);
-		options.addOption(HELP, false, HELP_DOC);
+    private static boolean reuseExistingPolicies = true;
 
-		CommandLineParser parser = new DefaultParser();
-		try {
-			CommandLine cmd = parser.parse(options, args);
-			if (cmd.hasOption(HELP)) {
-				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp(USAGE, options);
-			}
-			else {
-				String path = cmd.getOptionValue(PATH);
-				if (Strings.isNullOrEmpty(path)) {
-					path = DEFAULT_PATH;
-				}
-				runBenchmark(path);
-			}
-		}
-		catch (ParseException e) {
-			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
-			System.exit(1);
-		}
-	}
+    private static String testFilePath = DEFAULT_PATH + "tests/tests.json";
 
-	public static void runBenchmark(String path) throws URISyntaxException {
-		ObjectMapper mapper = new ObjectMapper();
-		TestSuite suite = null;
-		try {
-			suite = mapper.readValue(Resources.getResource("tests.json"), TestSuite.class);
-		}
-		catch (IOException e) {
-			LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
-			System.exit(1);
-		}
+    private static String filePrefix;
 
-		List<XlsRecord> data = new ArrayList<>();
+    private static final Gson GSON = new Gson();
 
-		XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    public static void main(String[] args) throws URISyntaxException {
 
-		List<Double> minValues = new LinkedList<>();
-		List<Double> maxValues = new LinkedList<>();
-		List<Double> avgValues = new LinkedList<>();
-		List<Double> mdnValues = new LinkedList<>();
+        Options options = new Options();
 
-		List<PolicyGeneratorConfiguration> configs = suite.getCases();
-		List<String> identifier = new LinkedList<>();
-		for (PolicyGeneratorConfiguration config : configs) {
-			benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues, mdnValues, identifier, config);
-		}
+        options.addOption(PATH, true, PATH_DOC);
+        options.addOption(HELP, false, HELP_DOC);
+        options.addOption(REUSE, true, REUSE_DOC);
+        options.addOption(INDEX, true, INDEX_DOC);
+        options.addOption(TEST, true, TEST_DOC);
 
-		writeOverviewChart(path, chart);
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption(HELP)) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp(USAGE, options);
+            } else {
+                String path = cmd.getOptionValue(PATH);
+                if (Strings.isNullOrEmpty(path)) {
+                    path = DEFAULT_PATH;
+                }
 
-		writeHistogram(path, minValues, maxValues, avgValues, mdnValues, identifier);
+                String reuseOption = cmd.getOptionValue(REUSE);
+                if (!Strings.isNullOrEmpty(reuseOption)) {
+                    switch (reuseOption.toUpperCase()) {
+                        case "TRUE":
+                            reuseExistingPolicies = true;
+                            break;
+                        case "FALSE":
+                            reuseExistingPolicies = false;
+                            break;
+                        default:
+                            HelpFormatter formatter = new HelpFormatter();
+                            formatter.printHelp(USAGE, options);
+                            throw new IllegalArgumentException("invalid policy reuse option provided");
+                    }
+                }
 
-		writeExcelFile(path, data);
-	}
+                String indexOption = cmd.getOptionValue(INDEX);
 
-	private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
-			List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
-			PolicyGeneratorConfiguration config) throws URISyntaxException {
-		identifier.add(config.getName());
-		List<XlsRecord> results = null;
-		try {
-			results = runTest(config, path);
-		}
-		catch (IOException | PolicyEvaluationException e) {
-			LOGGER.error("Error running test", e);
-			System.exit(1);
-		}
-		double[] times = new double[results.size()];
-		int i = 0;
-		for (XlsRecord item : results) {
-			times[i] = item.getDuration();
-			i++;
-		}
+                if (!Strings.isNullOrEmpty(indexOption)) {
+                    LOGGER.info("using index {}", indexOption);
+                    switch (indexOption.toUpperCase()) {
+                        case "FAST":
+                            indexType = FAST;
+                            break;
+                        case "IMPROVED":
+                            indexType = IMPROVED;
+                            break;
+                        case "SIMPLE":
+                            indexType = SIMPLE;
+                            break;
+                        default:
+                            HelpFormatter formatter = new HelpFormatter();
+                            formatter.printHelp(USAGE, options);
+                            throw new IllegalArgumentException("invalid index option provided");
+                    }
+                }
 
-		XYChart details = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		details.setTitle("Evaluation Time");
-		details.setXAxisTitle("Run");
-		details.setYAxisTitle("ms");
-		details.addSeries(config.getName(), times);
+                String testOption = cmd.getOptionValue(TEST);
+                if (!Strings.isNullOrEmpty(testOption)) {
+                    if (!Files.exists(Paths.get(testOption))) {
+                        throw new IllegalArgumentException("test file provided does not exists");
+                    }
+                    testFilePath = testOption;
+                }
 
-		try {
-			BitmapEncoder.saveBitmap(details, path + config.getName().replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
-		}
-		catch (IOException e) {
-			LOGGER.error(ERROR_WRITING_BITMAP, e);
-			System.exit(1);
-		}
+                filePrefix = String.format("%s_%s/", LocalDateTime.now(), indexType);
+                LOGGER.info("index={}, reuse={}, testfile={}, filePrefix={}", indexType, reuseExistingPolicies,
+                        testFilePath, filePrefix);
 
-		minValues.add(extractMin(results));
-		maxValues.add(extractMax(results));
-		avgValues.add(extractAvg(results));
-		mdnValues.add(extractMdn(results));
+                runBenchmark(path);
+            }
+        } catch (ParseException e) {
+            LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
+            System.exit(1);
+        }
 
-		chart.addSeries(config.getName(), times);
-		data.addAll(results);
-	}
+        System.exit(0);
+    }
 
-	private static void writeOverviewChart(String path, XYChart chart) {
-		chart.setTitle("Evaluation Time");
-		chart.setXAxisTitle("Run");
-		chart.setYAxisTitle("ms");
-		try {
-			BitmapEncoder.saveBitmap(chart, path + "overview", BitmapFormat.PNG);
-		}
-		catch (IOException e) {
-			LOGGER.error(ERROR_WRITING_BITMAP, e);
-			System.exit(1);
-		}
-	}
+    public static void runBenchmark(String path) throws URISyntaxException {
+        TestSuite suite = null;
 
-	private static void writeHistogram(String path, List<Double> minValues, List<Double> maxValues,
-			List<Double> avgValues, List<Double> mdnValues, List<String> identifier) {
-		CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-		histogram.setTitle("Aggregates");
-		histogram.setXAxisTitle("Run");
-		histogram.setYAxisTitle("ms");
-		histogram.addSeries("min", identifier, minValues);
-		histogram.addSeries("max", identifier, maxValues);
-		histogram.addSeries("avg", identifier, avgValues);
-		histogram.addSeries("mdn", identifier, mdnValues);
+        String resultPath = path + filePrefix;
+        try {
+//            File testFile = new File(testFilePath);
+//            LOGGER.info("using testfile: {}", testFile);
+//            List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
+//            String allLinesAsString = StringUtils.join(allLines, "");
+//            suite = GSON.fromJson(allLinesAsString, TestSuite.class);
+            suite = TestSuiteGenerator.generate();
 
-		try {
-			BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
-		}
-		catch (IOException e) {
-			LOGGER.error(ERROR_WRITING_BITMAP, e);
-			System.exit(1);
-		}
-	}
+            Objects.requireNonNull(suite, "test suite is null");
+            Objects.requireNonNull(suite.getCases(), "test cases are null");
+            LOGGER.info("suite contains {} test cases", suite.getCases().size());
+            assert !suite.getCases().isEmpty() : "at least one test case must be present";
 
-	private static void writeExcelFile(String path, List<XlsRecord> data) {
-		try (OutputStream os = Files.newOutputStream(Paths.get(path, "overview.xls"))) {
-			SimpleExporter exp = new SimpleExporter();
-			exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
-		}
-		catch (IOException e) {
-			LOGGER.error("Error writing XLS", e);
-			System.exit(1);
-		}
-	}
+            final Path dir = Paths.get(path, filePrefix);
+            Files.createDirectories(dir);
 
-	private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
-			throws IOException, URISyntaxException, PolicyEvaluationException {
+        } catch (IOException e) {
+            LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
+            System.exit(1);
+        }
 
-		PolicyGenerator generator = new PolicyGenerator(config);
+        List<XlsRecord> data = new ArrayList<>();
 
-		String subfolder = config.getName().replaceAll("[^a-zA-Z0-9]", "");
-		generator.generatePolicies(subfolder);
+        XYChart chart = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
-		final Path dir = Paths.get(path, subfolder);
-		Files.createDirectories(dir);
-		Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"),
-				StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+        List<Double> minValues = new LinkedList<>();
+        List<Double> maxValues = new LinkedList<>();
+        List<Double> avgValues = new LinkedList<>();
+        List<Double> mdnValues = new LinkedList<>();
 
-		List<XlsRecord> results = new LinkedList<>();
+        List<PolicyGeneratorConfiguration> configs = suite.getCases();
+        List<String> identifier = new LinkedList<>();
+        for (PolicyGeneratorConfiguration config : configs) {
+            benchmarkConfiguration(path, data, chart, minValues, maxValues, avgValues, mdnValues, identifier, config);
+        }
 
-		try {
-			for (int i = 0; i < ITERATIONS; i++) {
-				long begin = System.nanoTime();
-				PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
-						.withFilesystemPolicyRetrievalPoint(path + subfolder, SIMPLE)
-						.withFilesystemPDPConfigurationProvider(path + subfolder).build();
-				double prep = nanoToMs(System.nanoTime() - begin);
+        writeOverviewChart(resultPath, chart);
 
-				for (int j = 0; j < RUNS; j++) {
-					AuthorizationSubscription request = generator.createAuthorizationSubscriptionObject();
+        writeHistogram(resultPath, minValues, maxValues, avgValues, mdnValues, identifier);
 
-					long start = System.nanoTime();
-					AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();
-					long end = System.nanoTime();
+        writeExcelFile(resultPath, data);
 
-					double diff = nanoToMs(end - start);
+        List<XlsAggregateRecord> aggregateData = buildAggregateData(minValues, maxValues, avgValues, mdnValues,
+                identifier);
+        writeExcelFileAggregates(resultPath, aggregateData);
+    }
 
-					if (authzDecision == null) {
-						throw new IOException("PDP returned null authzDecision");
-					}
-					results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
-							authzDecision.toString()));
+    private static List<XlsAggregateRecord> buildAggregateData(List<Double> minValues, List<Double> maxValues,
+                                                               List<Double> avgValues, List<Double> mdnValues,
+                                                               List<String> identifier) {
+        List<XlsAggregateRecord> records = new LinkedList<>();
 
-					LOGGER.info("Total : {}ms", diff);
-				}
-			}
-		}
-		catch (IOException | AttributeException | FunctionException | PDPConfigurationException e) {
-			LOGGER.error("Error running test", e);
-		}
+        for (int i = 0; i < identifier.size(); i++) {
+            records.add(new XlsAggregateRecord(identifier.get(i), minValues.get(i), maxValues.get(i), avgValues
+                    .get(i), mdnValues.get(i)));
+        }
 
-		return results;
-	}
+        return records;
+    }
+
+    private static void benchmarkConfiguration(String path, List<XlsRecord> data, XYChart chart, List<Double> minValues,
+                                               List<Double> maxValues, List<Double> avgValues, List<Double> mdnValues, List<String> identifier,
+                                               PolicyGeneratorConfiguration config) throws URISyntaxException {
+        identifier.add(config.getName());
+        List<XlsRecord> results = null;
+        try {
+            results = runTest(config, path);
+        } catch (IOException | PolicyEvaluationException e) {
+            LOGGER.error("Error running test", e);
+            System.exit(1);
+        }
+        double[] times = new double[results.size()];
+        int i = 0;
+        for (XlsRecord item : results) {
+            times[i] = item.getDuration();
+            i++;
+        }
+
+        XYChart details = new XYChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        details.setTitle("Evaluation Time");
+        details.setXAxisTitle("Run");
+        details.setYAxisTitle("ms");
+        details.addSeries(config.getName(), times);
+
+        String resultPath = path + filePrefix;
+
+        try {
+            BitmapEncoder.saveBitmap(details, resultPath + config.getName()
+                    .replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
+        } catch (IOException e) {
+            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            System.exit(1);
+        }
+
+        minValues.add(extractMin(results));
+        maxValues.add(extractMax(results));
+        avgValues.add(extractAvg(results));
+        mdnValues.add(extractMdn(results));
+
+        chart.addSeries(config.getName(), times);
+        data.addAll(results);
+    }
+
+    private static void writeOverviewChart(String path, XYChart chart) {
+        chart.setTitle("Evaluation Time");
+        chart.setXAxisTitle("Run");
+        chart.setYAxisTitle("ms");
+        try {
+            BitmapEncoder.saveBitmap(chart, path + "overview", BitmapFormat.PNG);
+        } catch (IOException e) {
+            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            System.exit(1);
+        }
+    }
+
+    private static void writeHistogram(String path, List<Double> minValues, List<Double> maxValues,
+                                       List<Double> avgValues, List<Double> mdnValues, List<String> identifier) {
+
+        CategoryChart histogram = new CategoryChart(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        histogram.setTitle("Aggregates");
+        histogram.setXAxisTitle("Run");
+        histogram.setYAxisTitle("ms");
+        histogram.addSeries("min", identifier, minValues);
+        histogram.addSeries("max", identifier, maxValues);
+        histogram.addSeries("avg", identifier, avgValues);
+        histogram.addSeries("mdn", identifier, mdnValues);
+
+        try {
+            BitmapEncoder.saveBitmap(histogram, path + "histogram", BitmapFormat.PNG);
+        } catch (IOException e) {
+            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            System.exit(1);
+        }
+    }
+
+    private static void writeExcelFile(String path, List<XlsRecord> data) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(path, "overview.xls"))) {
+            SimpleExporter exp = new SimpleExporter();
+            exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
+        } catch (IOException e) {
+            LOGGER.error("Error writing XLS", e);
+            System.exit(1);
+        }
+    }
+
+    private static void writeExcelFileAggregates(String path, List<XlsAggregateRecord> data) {
+        try (OutputStream os = Files.newOutputStream(Paths.get(path, "histogram.xls"))) {
+            SimpleExporter exp = new SimpleExporter();
+            exp.gridExport(getExportHeaderAggregates(), data, EXPORT_PROPERTIES_AGGREGATES, os);
+        } catch (IOException e) {
+            LOGGER.error("Error writing XLS", e);
+            System.exit(1);
+        }
+    }
+
+    private static List<XlsRecord> runTest(PolicyGeneratorConfiguration config, String path)
+            throws IOException, URISyntaxException, PolicyEvaluationException {
+
+
+        PolicyGenerator generator = new PolicyGenerator(config);
+
+        String subfolder = config.getName().replaceAll("[^a-zA-Z0-9]", "");
+        if (!reuseExistingPolicies) {
+            generator.generatePolicies(subfolder);
+
+            final Path dir = Paths.get(path, subfolder);
+            Files.createDirectories(dir);
+            Files.copy(Paths.get(path, "pdp.json"), Paths.get(path, subfolder, "pdp.json"),
+                    StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        List<XlsRecord> results = new LinkedList<>();
+
+        try {
+            for (int i = 0; i < ITERATIONS; i++) {
+                long begin = System.nanoTime();
+                PolicyDecisionPoint pdp = EmbeddedPolicyDecisionPoint.builder()
+                        .withFilesystemPolicyRetrievalPoint(path + subfolder, indexType)
+                        .withFilesystemPDPConfigurationProvider(path + subfolder).build();
+                double prep = nanoToMs(System.nanoTime() - begin);
+
+                for (int j = 0; j < RUNS; j++) {
+                    AuthorizationSubscription request = generator.createAuthorizationSubscriptionObject();
+
+                    long start = System.nanoTime();
+                    AuthorizationDecision authzDecision = pdp.decide(request).blockFirst();
+                    long end = System.nanoTime();
+
+                    double diff = nanoToMs(end - start);
+
+                    if (authzDecision == null) {
+                        throw new IOException("PDP returned null authzDecision");
+                    }
+                    results.add(new XlsRecord(j + (i * RUNS), config.getName(), prep, diff, request.toString(),
+                            authzDecision.toString()));
+
+                    LOGGER.debug("Total : {}ms", diff);
+                }
+            }
+        } catch (IOException | AttributeException | FunctionException | PDPConfigurationException e) {
+            LOGGER.error("Error running test", e);
+        }
+
+        return results;
+    }
+
+    private static double nanoToMs(long nanoseconds) {
+        return nanoseconds / MILLION;
+    }
+
+    private static List<String> getExportHeader() {
+        return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
+                "Response String (ms)");
+    }
+
+    private static List<String> getExportHeaderAggregates() {
+        return Arrays.asList("Test Case", "Minimum Time (ms)", "Maximum Time (ms)", "Average Time (ms)",
+                "Median Time (ms)");
+    }
+
+    private static double extractMin(List<XlsRecord> data) {
+        double min = Double.MAX_VALUE;
+        for (XlsRecord item : data) {
+            if (item.getDuration() < min) {
+                min = item.getDuration();
+            }
+        }
+        return min;
+    }
+
+    private static double extractMax(List<XlsRecord> data) {
+        double max = Double.MIN_VALUE;
+        for (XlsRecord item : data) {
+            if (item.getDuration() > max) {
+                max = item.getDuration();
+            }
+        }
+        return max;
+    }
+
+    private static double extractAvg(List<XlsRecord> data) {
+        double sum = 0;
+        for (XlsRecord item : data) {
+            sum += item.getDuration();
+        }
+        return sum / data.size();
+    }
+
+    private static double extractMdn(List<XlsRecord> data) {
+        List<Double> list = data.stream().map(XlsRecord::getDuration).sorted().collect(Collectors.toList());
+        int index = list.size() / 2;
+        if (list.size() % 2 == 0) {
+            return (list.get(index) + list.get(index - 1)) / 2;
+        } else {
+            return list.get(index);
+        }
+    }
+
 
 }

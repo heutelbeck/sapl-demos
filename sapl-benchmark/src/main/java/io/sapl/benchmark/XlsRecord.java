@@ -20,16 +20,16 @@ import lombok.Value;
 @Value
 public class XlsRecord {
 
-	private int number;
+    int number;
 
-	private String name;
+    String name;
 
-	private double preparation;
+    double preparation;
 
-	private double duration;
+    double duration;
 
-	private String request;
+    String request;
 
-	private String response;
+    String response;
 
 }

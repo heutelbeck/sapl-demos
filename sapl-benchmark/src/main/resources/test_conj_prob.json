@@ -1,0 +1,53 @@
+{
+	"cases":
+	[
+		{
+			"name": "Conj. 0.9",
+			"seed": 20937,
+			"policyCount": 1000,
+			"logicalVariableCount": 10,
+			"variablePoolCount": 2000,
+			"bracketProbability": 0.2,
+			"conjunctionProbability": 0.9,
+			"negationProbability": 0.3,
+			"falseProbability": 0.5,
+			"path": "~/sapl/"
+		},
+	    {
+		    "name": "Conj. 0.7",
+		    "seed": 63317,
+		    "policyCount": 1000,
+		    "logicalVariableCount": 10,
+		    "variablePoolCount": 2000,
+		    "bracketProbability": 0.2,
+		    "conjunctionProbability": 0.7,
+		    "negationProbability": 0.3,
+		    "falseProbability": 0.5,
+		    "path": "~/sapl/"
+	    },
+	    {
+		    "name": "Conj. 0.3",
+		    "seed": 11142,
+		    "policyCount": 1000,
+		    "logicalVariableCount": 10,
+		    "variablePoolCount": 2000,
+		    "bracketProbability": 0.2,
+		    "conjunctionProbability": 0.3,
+		    "negationProbability": 0.3,
+		    "falseProbability": 0.5,
+		    "path": "~/sapl/"
+	    },
+		{
+			"name": "Conj. 0.1",
+			"seed": 92375,
+			"policyCount": 1000,
+			"logicalVariableCount": 10,
+			"variablePoolCount": 2000,
+			"bracketProbability": 0.2,
+			"conjunctionProbability": 0.1,
+			"negationProbability": 0.3,
+			"falseProbability": 0.5,
+			"path": "~/sapl/"
+		}
+	]
+}~
