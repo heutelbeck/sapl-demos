@@ -105,9 +105,9 @@ public class PolicyAnalyzer {
                 .map(Literal::getBool).count();
     }
 
-    private long countVariables() {
-        return publishedTargets.values().stream().map(this::countVariableForSingleTarget).count();
-    }
+//    private long countVariables() {
+//        return publishedTargets.values().stream().map(this::countVariableForSingleTarget).count();
+//    }
 
     private void retainDocument(String documentKey, SAPL sapl) {
         publishedDocuments.put(documentKey, sapl);

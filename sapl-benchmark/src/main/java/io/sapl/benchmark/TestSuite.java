@@ -23,6 +23,7 @@ import java.util.List;
 @Builder
 public class TestSuite {
 
+	@Builder.Default
     private List<PolicyGeneratorConfiguration> cases = new ArrayList<>();
 
     public TestSuite() {

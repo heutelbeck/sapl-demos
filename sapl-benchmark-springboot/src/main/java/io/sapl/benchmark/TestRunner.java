@@ -1,28 +1,5 @@
 package io.sapl.benchmark;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.sapl.analyzer.PolicyAnalyzer;
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.interpreter.SAPLInterpreter;
-import io.sapl.api.pdp.AuthorizationDecision;
-import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.prp.ParsedDocumentIndex;
-import io.sapl.api.prp.PolicyRetrievalResult;
-import io.sapl.generator.DomainData;
-import io.sapl.generator.DomainGenerator;
-import io.sapl.grammar.sapl.SAPL;
-import io.sapl.interpreter.DefaultSAPLInterpreter;
-import io.sapl.interpreter.combinators.DenyUnlessPermitCombinator;
-import io.sapl.interpreter.combinators.DocumentsCombinator;
-import io.sapl.interpreter.functions.AnnotationFunctionContext;
-import io.sapl.interpreter.pip.AnnotationAttributeContext;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
-import io.sapl.prp.inmemory.indexed.improved.ImprovedDocumentIndex;
-import io.sapl.prp.inmemory.simple.SimpleParsedDocumentIndex;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -35,6 +12,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.sapl.analyzer.PolicyAnalyzer;
+import io.sapl.api.interpreter.PolicyEvaluationException;
+import io.sapl.api.interpreter.SAPLInterpreter;
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.prp.ParsedDocumentIndex;
+import io.sapl.api.prp.PolicyRetrievalResult;
+import io.sapl.generator.DomainData;
+import io.sapl.generator.DomainGenerator;
+import io.sapl.grammar.sapl.SAPL;
+import io.sapl.interpreter.DefaultSAPLInterpreter;
+import io.sapl.interpreter.functions.AnnotationFunctionContext;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
+import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType;
+import io.sapl.prp.inmemory.indexed.improved.ImprovedDocumentIndex;
+import io.sapl.prp.inmemory.simple.SimpleParsedDocumentIndex;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 public class TestRunner {
 
@@ -45,10 +43,6 @@ public class TestRunner {
 	private static final Map<String, JsonNode> VARIABLES = Collections.emptyMap();
 
 	private static final AnnotationFunctionContext FUNCTION_CONTEXT = new AnnotationFunctionContext();
-
-	private static final AnnotationAttributeContext ATTRIBUTE_CONTEXT = new AnnotationAttributeContext();
-
-	private static final DocumentsCombinator DOCUMENTS_COMBINATOR = new DenyUnlessPermitCombinator();
 
 	private static final SAPLInterpreter SAPL_INTERPRETER = new DefaultSAPLInterpreter();
 
@@ -133,8 +127,7 @@ public class TestRunner {
 		int index = list.size() / 2;
 		if (list.size() % 2 == 0) {
 			return (list.get(index) + list.get(index - 1)) / 2;
-		}
-		else {
+		} else {
 			return list.get(index);
 		}
 	}
@@ -178,12 +171,10 @@ public class TestRunner {
 					SAPL saplDocument = SAPL_INTERPRETER.parse(Files.newInputStream(filePath));
 					documentIndex.put(filePath.toString(), saplDocument);
 				}
-			}
-			catch (Exception var11) {
+			} catch (Exception var11) {
 				try {
 					stream.close();
-				}
-				catch (Exception var10) {
+				} catch (Exception var10) {
 					var11.addSuppressed(var10);
 				}
 				throw var11;
@@ -191,8 +182,7 @@ public class TestRunner {
 
 			stream.close();
 
-		}
-		catch (PolicyEvaluationException | IOException var12) {
+		} catch (PolicyEvaluationException | IOException var12) {
 			LOGGER.error("Error while initializing the document index.", var12);
 		}
 
@@ -249,8 +239,7 @@ public class TestRunner {
 			// LOGGER.debug("destroy index");
 			// documentIndex.destroyIndex();
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOGGER.error("Error running test", e);
 		}
 
@@ -265,8 +254,7 @@ public class TestRunner {
 			for (int i = 0; i < 10; i++) {
 				documentIndex.retrievePolicies(generator.createEmptySubscription(), FUNCTION_CONTEXT, VARIABLES);
 			}
-		}
-		catch (Exception ignored) {
+		} catch (Exception ignored) {
 			LOGGER.error("error during warm-up", ignored);
 		}
 	}
@@ -276,7 +264,8 @@ public class TestRunner {
 		List<AuthorizationSubscription> subscriptions = new LinkedList<>();
 		for (int i = 0; i < benchmarkDataContainer.getRuns(); i++) {
 			AuthorizationSubscription sub = Benchmark.performFullyRandomBenchmark
-					? generator.createFullyRandomSubscription() : generator.createStructuredRandomSubscription();
+					? generator.createFullyRandomSubscription()
+					: generator.createStructuredRandomSubscription();
 			// AuthorizationSubscription sub = generator.createEmptySubscription();
 
 			subscriptions.add(sub);
