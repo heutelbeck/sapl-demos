@@ -54,7 +54,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
@@ -103,7 +102,7 @@ public class Benchmark {
 
     private static final double MILLION = 1000000.0D;
 
-    private static IndexType indexType = FAST;
+    private static IndexType indexType = IMPROVED;
 
     private static boolean reuseExistingPolicies = true;
 
@@ -156,9 +155,6 @@ public class Benchmark {
                 if (!Strings.isNullOrEmpty(indexOption)) {
                     LOGGER.info("using index {}", indexOption);
                     switch (indexOption.toUpperCase()) {
-                        case "FAST":
-                            indexType = FAST;
-                            break;
                         case "IMPROVED":
                             indexType = IMPROVED;
                             break;

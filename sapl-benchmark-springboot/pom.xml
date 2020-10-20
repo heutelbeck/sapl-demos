@@ -13,7 +13,7 @@
     <artifactId>sapl-benchmark-springboot</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>sapl-benchmark-springboot</name>
+    <name>SAPL Benchmark Spring Boot</name>
     <description>SAPL Benchmark Spring Boot</description>
 
 

@@ -17,7 +17,7 @@
 
     <packaging>jar</packaging>
 
-    <name>SAPL Benchmark</name>
+    <name>SAPL Benchmark (Deprecated)</name>
 
     <organization>
         <name>Dominic Heutelbeck</name>

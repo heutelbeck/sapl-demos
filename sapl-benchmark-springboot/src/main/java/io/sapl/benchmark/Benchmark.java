@@ -60,7 +60,6 @@ import static io.sapl.benchmark.BenchmarkConstants.PATH_DOC;
 import static io.sapl.benchmark.BenchmarkConstants.TEST;
 import static io.sapl.benchmark.BenchmarkConstants.TEST_DOC;
 import static io.sapl.benchmark.BenchmarkConstants.USAGE;
-import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.FAST;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.IMPROVED;
 import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType.SIMPLE;
 
@@ -252,9 +251,6 @@ public class Benchmark implements CommandLineRunner {
             if (!Strings.isNullOrEmpty(indexOption)) {
                 LOGGER.debug("using index {}", indexOption);
                 switch (indexOption.toUpperCase()) {
-                    case "FAST":
-                        indexType = FAST;
-                        break;
                     case "IMPROVED":
                         indexType = IMPROVED;
                         break;
