@@ -9,7 +9,7 @@ The current implementation can be found in the Maven module [sapl-benchmark-spri
 
 `Benchmark.java` requires a working directory for the benchmark. By default this value is set to:
 
-`private static final String DEFAULT_PATH = System.getProperty("user.home") + "/sapl/";`
+`private static final String DEFAULT_PATH = "/tmp/sapl/benchmarks/"`
 
 Make sure this directory is existing on your file system, including the sub-directory `tests` containing the test configurations.
 

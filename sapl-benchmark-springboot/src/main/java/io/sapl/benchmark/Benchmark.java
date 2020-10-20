@@ -68,7 +68,7 @@ import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType
 @RequiredArgsConstructor
 public class Benchmark implements CommandLineRunner {
 
-    public static final String DEFAULT_PATH = System.getProperty("user.home") + "/benchmarks/";
+    public static final String DEFAULT_PATH = "/tmp/sapl/benchmarks";
 
     private final TestRunner TEST_RUNNER = new TestRunner();
     private final List<Long> seedList = new LinkedList<>();
@@ -91,8 +91,7 @@ public class Benchmark implements CommandLineRunner {
     private int numberOfBenchmarkIterations = 1;
 
     // If not provided as command line argument, use this to set the benchmark configuration file for the fully random benchmark
-    private String benchmarkConfigurationFile = System.getProperty("user.home") +
-            "/IdeaProjects/sapl-demos/sapl-benchmark-springboot/src/main/resources/tests.json";
+    private String benchmarkConfigurationFile = DEFAULT_PATH + "tests/tests.json";
 
     @Override
     public void run(String... args) throws Exception {

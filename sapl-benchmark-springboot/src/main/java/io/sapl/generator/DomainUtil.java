@@ -37,13 +37,15 @@ public class DomainUtil {
     }
 
     public void writeDomainPoliciesToFilesystem(List<DomainPolicy> domainPolicies, String policyPath) {
+        LOGGER.info("writing policies to folder: {}", policyPath);
+
         File policyDir = new File(policyPath);
 
         LOGGER.debug("before clean fileCount:{}", policyDir.listFiles().length);
         if (cleanDirectory) cleanPolicyDirectory(policyPath);
         LOGGER.debug("after clean fileCount:{}", policyDir.listFiles().length);
 
-        LOGGER.info("writing policies to folder: {}", policyPath);
+
 
         for (DomainPolicy domainPolicy : domainPolicies) {
             writePolicyToFile(domainPolicy, policyPath);
