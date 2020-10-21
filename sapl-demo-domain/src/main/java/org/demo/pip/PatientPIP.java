@@ -1,23 +1,25 @@
 package org.demo.pip;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.AttributeException;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Number;
-import io.sapl.grammar.sapl.impl.Val;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
 import org.demo.domain.Relation;
 import org.demo.domain.RelationRepository;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.sapl.api.interpreter.Val;
+import io.sapl.api.pip.Attribute;
+import io.sapl.api.pip.AttributeException;
+import io.sapl.api.pip.PolicyInformationPoint;
+import io.sapl.api.validation.Number;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
 @Service
 @RequiredArgsConstructor
@@ -38,9 +40,9 @@ public class PatientPIP {
 		return Flux.just(Val.of(jsonNode));
 	}
 
-	//TODO familiars
+	// TODO familiars
 
-	//TODO treating
+	// TODO treating
 
 	@Attribute(name = "patientRecord")
 	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, JsonNode> variables) {

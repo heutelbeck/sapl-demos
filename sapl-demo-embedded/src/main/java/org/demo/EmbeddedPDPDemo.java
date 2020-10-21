@@ -91,12 +91,10 @@ public class EmbeddedPDPDemo {
 			if (cmd.hasOption(HELP)) {
 				HelpFormatter formatter = new HelpFormatter();
 				formatter.printHelp(USAGE, options);
-			}
-			else {
+			} else {
 				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
 			}
-		}
-		catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
+		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
 				| PolicyEvaluationException | PDPConfigurationException e) {
 			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
 			System.exit(1);
@@ -118,7 +116,8 @@ public class EmbeddedPDPDemo {
 
 		// to compare single authorization subscriptions with multi-subscriptions, only
 		// run one of the following
-		// methods at once to avoid later methods benefit from earlier methods (e.g. class
+		// methods at once to avoid later methods benefit from earlier methods (e.g.
+		// class
 		// loading)
 		runPerformanceDemoSingle(pdp);
 		// runPerformanceDemoMulti(pdp);
