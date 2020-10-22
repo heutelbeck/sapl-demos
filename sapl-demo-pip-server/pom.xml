@@ -14,7 +14,7 @@
 	<artifactId>sapl-demo-pip-server</artifactId>
 	<packaging>jar</packaging>
 
-	<name>sapl-demo-pip-server</name>
+	<name>SAPL Demo PIP Server</name>
 	<description>Sapl demo PIP server with reactive and non reactive PIP endpoints</description>
 
 	<properties>

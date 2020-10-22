@@ -35,7 +35,7 @@ public class ResultWriter {
     private final IndexType indexType;
 
     public void writeFinalResults(BenchmarkDataContainer benchmarkDataContainer, XYChart overviewChart) {
-        LOGGER.info("writing charts and results to {}", resultPath);
+        log.info("writing charts and results to {}", resultPath);
 
         writeOverviewChart(overviewChart);
         writeOverviewExcel(benchmarkDataContainer.getData());
@@ -64,7 +64,7 @@ public class ResultWriter {
             BitmapEncoder.saveBitmap(details, resultPath + configName
                     .replaceAll("[^a-zA-Z0-9]", ""), BitmapFormat.PNG);
         } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            log.error(ERROR_WRITING_BITMAP, e);
             System.exit(1);
         }
     }
@@ -84,7 +84,7 @@ public class ResultWriter {
                         dat.getAvg(), dat.getMdn(), System.lineSeparator());
             }
         } catch (IOException e) {
-            LOGGER.error("Error appending to  CSV", e);
+            log.error("Error appending to  CSV", e);
             System.exit(1);
         }
     }
@@ -96,7 +96,7 @@ public class ResultWriter {
         try {
             BitmapEncoder.saveBitmap(chart, resultPath + "overview-" + indexType, BitmapFormat.PNG);
         } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            log.error(ERROR_WRITING_BITMAP, e);
             System.exit(1);
         }
     }
@@ -115,7 +115,7 @@ public class ResultWriter {
         try {
             BitmapEncoder.saveBitmap(histogram, resultPath + "histogram-" + indexType, BitmapFormat.PNG);
         } catch (IOException e) {
-            LOGGER.error(ERROR_WRITING_BITMAP, e);
+            log.error(ERROR_WRITING_BITMAP, e);
             System.exit(1);
         }
     }
@@ -125,7 +125,7 @@ public class ResultWriter {
             SimpleExporter exp = new SimpleExporter();
             exp.gridExport(getExportHeader(), data, EXPORT_PROPERTIES, os);
         } catch (IOException e) {
-            LOGGER.error("Error writing XLS", e);
+            log.error("Error writing XLS", e);
             System.exit(1);
         }
     }
@@ -135,7 +135,7 @@ public class ResultWriter {
             SimpleExporter exp = new SimpleExporter();
             exp.gridExport(getExportHeaderAggregates(), data, EXPORT_PROPERTIES_AGGREGATES, os);
         } catch (IOException e) {
-            LOGGER.error("Error writing XLS", e);
+            log.error("Error writing XLS", e);
             System.exit(1);
         }
     }

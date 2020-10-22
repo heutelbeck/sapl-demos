@@ -19,8 +19,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-spring-boot-starter</artifactId>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-security</artifactId>
+			<version>${version.sapl.policy.engine}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-pdp-embedded</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>

@@ -95,7 +95,7 @@ public class Benchmark implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.info("command line runner started");
+        log.info("command line runner started");
 
         parseCommandLineArguments(args);
 
@@ -109,7 +109,7 @@ public class Benchmark implements CommandLineRunner {
         filePrefix = String.format("%s_%s_%s/",
                 LocalDateTime.now(), indexType, performFullyRandomBenchmark ? "RANDOM" : "STRUCTURED");
 
-        LOGGER.info("\n randomBenchmark={},\n numberOfBenchmarks={}," +
+        log.info("\n randomBenchmark={},\n numberOfBenchmarks={}," +
                         "\n index={},\n initialSeed={},\n runs={}," +
                         "\n testfile={},\n filePrefix={}",
                 performFullyRandomBenchmark, numberOfBenchmarkIterations,
@@ -121,7 +121,7 @@ public class Benchmark implements CommandLineRunner {
             final Path dir = Paths.get(path, filePrefix);
             Files.createDirectories(dir);
         } catch (IOException e) {
-            LOGGER.error(ERROR_READING_TEST_CONFIGURATION, e);
+            log.error(ERROR_READING_TEST_CONFIGURATION, e);
         }
 
         // seed list
@@ -181,7 +181,7 @@ public class Benchmark implements CommandLineRunner {
         TestSuite suite;
         if (!Strings.isNullOrEmpty(benchmarkConfigurationFile)) {
             File testFile = new File(benchmarkConfigurationFile);
-            LOGGER.info("using testfile: {}", testFile);
+            log.info("using testfile: {}", testFile);
 
             List<String> allLines = Files.readAllLines(Paths.get(testFile.toURI()));
             String allLinesAsString = StringUtils.join(allLines, "");
@@ -194,7 +194,7 @@ public class Benchmark implements CommandLineRunner {
 
         Objects.requireNonNull(suite, "test suite is null");
         Objects.requireNonNull(suite.getCases(), "test cases are null");
-        LOGGER.info("suite contains {} test cases", suite.getCases().size());
+        log.info("suite contains {} test cases", suite.getCases().size());
         if (suite.getCases().isEmpty()) throw new RuntimeException("at least one test case must be present");
 
         return suite;
@@ -209,7 +209,7 @@ public class Benchmark implements CommandLineRunner {
                     ? TEST_RUNNER.runTest(config, path, benchmarkDataContainer, domainGenerator)
                     : TEST_RUNNER.runTestNew(config, config.getPath(), benchmarkDataContainer, domainGenerator);
         } catch (IOException | PolicyEvaluationException e) {
-            LOGGER.error("Error running test", e);
+            log.error("Error running test", e);
             System.exit(1);
         }
 
@@ -248,7 +248,7 @@ public class Benchmark implements CommandLineRunner {
             String indexOption = cmd.getOptionValue(INDEX);
 
             if (!Strings.isNullOrEmpty(indexOption)) {
-                LOGGER.debug("using index {}", indexOption);
+                log.debug("using index {}", indexOption);
                 switch (indexOption.toUpperCase()) {
                     case "IMPROVED":
                         indexType = IMPROVED;
@@ -277,13 +277,13 @@ public class Benchmark implements CommandLineRunner {
             }
 
             if (cmd.hasOption(FULLY_RANDOM)) {
-                LOGGER.info("passed random argument");
+                log.info("passed random argument");
                 Benchmark.performFullyRandomBenchmark = true;
             }
 
 
         } catch (ParseException e) {
-            LOGGER.error("encountered an error running the demo: {}", e.getMessage(), e);
+            log.error("encountered an error running the demo: {}", e.getMessage(), e);
             System.exit(1);
         }
 

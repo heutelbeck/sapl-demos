@@ -82,7 +82,7 @@ public class CertificateAddressProvider {
 			return ultimakerCert.getContractAddress();
 		}
 		catch (Exception e) {
-			LOGGER.info("Could not deploy Ultimaker Certificate. Requests to this contract will not work.");
+			log.info("Could not deploy Ultimaker Certificate. Requests to this contract will not work.");
 		}
 		return "";
 	}
@@ -94,7 +94,7 @@ public class CertificateAddressProvider {
 			return graftenCert.getContractAddress();
 		}
 		catch (Exception e) {
-			LOGGER.info("Could not deploy Graften Certificate. Requests to this contract will not work.");
+			log.info("Could not deploy Graften Certificate. Requests to this contract will not work.");
 		}
 		return "";
 	}
@@ -106,7 +106,7 @@ public class CertificateAddressProvider {
 			return zmorphCert.getContractAddress();
 		}
 		catch (Exception e) {
-			LOGGER.info("Could not deploy Zmorph Certificate. Requests to this contract will not work.");
+			log.info("Could not deploy Zmorph Certificate. Requests to this contract will not work.");
 		}
 		return "";
 	}
@@ -118,7 +118,7 @@ public class CertificateAddressProvider {
 			return variables;
 		}
 		catch (IOException | NullPointerException e) {
-			LOGGER.info("No PDP configuration file found. Deploying contracts...");
+			log.info("No PDP configuration file found. Deploying contracts...");
 		}
 		return null;
 	}

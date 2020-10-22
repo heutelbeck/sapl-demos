@@ -53,7 +53,7 @@ public class PolicyAnalyzer {
     }
 
     public PolicyGeneratorConfiguration analyzeSaplDocuments(IndexType indexType) {
-        LOGGER.info("analyzing policies in directory {}", policyPath);
+        log.info("analyzing policies in directory {}", policyPath);
         parseDocuments();
 
         splitDocumentAndTargets();
@@ -89,13 +89,13 @@ public class PolicyAnalyzer {
             try (DirectoryStream<Path> stream = Files
                     .newDirectoryStream(Paths.get(policyPath), POLICY_FILE_GLOB_PATTERN)) {
                 for (Path filePath : stream) {
-                    LOGGER.trace("load: {}", filePath);
+                    log.trace("load: {}", filePath);
                     final SAPL saplDocument = interpreter.parse(Files.newInputStream(filePath));
                     parsedDocuments.put(filePath.toString(), saplDocument);
                 }
             }
         } catch (IOException | PolicyEvaluationException e) {
-            LOGGER.error("Error while initializing the document index.", e);
+            log.error("Error while initializing the document index.", e);
         }
     }
 

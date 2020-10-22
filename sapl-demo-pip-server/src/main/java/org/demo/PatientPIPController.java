@@ -63,7 +63,7 @@ public class PatientPIPController {
 			final ArrayNode relatives = objectNode.putArray("relatives");
 			relatives.addAll((ArrayNode) jsonNode);
 			return (JsonNode) objectNode;
-		}).doOnNext(jsonNode -> LOGGER.trace("PatientPIPController.getRelations() returns {}", jsonNode));
+		}).doOnNext(jsonNode -> log.trace("PatientPIPController.getRelations() returns {}", jsonNode));
 	}
 
 	/**
@@ -77,7 +77,7 @@ public class PatientPIPController {
 	@GetMapping(value = "{id}", produces = MediaType.APPLICATION_STREAM_JSON_VALUE)
 	public Flux<JsonNode> getPatientRecord(@PathVariable String id) {
 		return patientPIP.getPatientRecord(Val.of(id), null)
-				.doOnNext(jsonNode -> LOGGER.trace("PatientPIPController.getPatientRecord() returns {}", jsonNode))
+				.doOnNext(jsonNode -> log.trace("PatientPIPController.getPatientRecord() returns {}", jsonNode))
 				.map(Val::get);
 	}
 

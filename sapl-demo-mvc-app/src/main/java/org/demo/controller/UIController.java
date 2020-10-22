@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.spring.PolicyEnforcementPoint;
 import io.sapl.spring.method.pre.PreEnforce;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,7 +110,7 @@ public class UIController {
 	@PreEnforce
 	@PutMapping("/patients/{id}")
 	public String updatePatient(@ModelAttribute("patient") Patient patient, @PathVariable Long id) {
-		LOGGER.info("Got patient: {}", patient);
+		log.info("Got patient: {}", patient);
 		if (patient.getName() != null) {
 			patientenRepo.updateNameById(patient.getName(), id);
 		}

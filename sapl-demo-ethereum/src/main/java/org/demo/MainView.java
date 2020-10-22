@@ -191,14 +191,14 @@ public class MainView extends VerticalLayout {
 		VaadinPEP<Button> printerPep = new VaadinPEP<Button>(printerButton, printerSub(printerSelect.getValue()), pdp,
 				UI.getCurrent());
 		printerPep.onPermit((component, decision) -> {
-			LOGGER.info("New printer access decision: {}", decision.getDecision());
+			log.info("New printer access decision: {}", decision.getDecision());
 			component.setEnabled(true);
 			printerStatus.setText("You are certified for the current printer.");
 			printerStatus.getStyle().set("color", "green");
 
 		});
 		printerPep.onDeny((component, decision) -> {
-			LOGGER.info("New printer access decision: {}", decision.getDecision());
+			log.info("New printer access decision: {}", decision.getDecision());
 			component.setEnabled(false);
 			printerStatus.setText("You are not certified for the current printer.");
 			printerStatus.getStyle().set("color", "red");
@@ -210,12 +210,12 @@ public class MainView extends VerticalLayout {
 		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<Select<String>>(templateSelect, crowdSub(), pdp,
 				UI.getCurrent());
 		crowdPep.onPermit((component, decision) -> {
-			LOGGER.info("New crowd access decision: {}", decision.getDecision());
+			log.info("New crowd access decision: {}", decision.getDecision());
 			disabledItems.remove(BALL);
 			component.setItemEnabledProvider(this::itemEnabledCheck);
 		});
 		crowdPep.onDeny((component, decision) -> {
-			LOGGER.info("New crowd access decision: {}", decision.getDecision());
+			log.info("New crowd access decision: {}", decision.getDecision());
 		});
 		return crowdPep;
 	}
@@ -224,12 +224,12 @@ public class MainView extends VerticalLayout {
 		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<Select<String>>(templateSelect, paidSub(), pdp,
 				UI.getCurrent());
 		paymentPep.onPermit((component, decision) -> {
-			LOGGER.info("New paid access decision: {}", decision.getDecision());
+			log.info("New paid access decision: {}", decision.getDecision());
 			disabledItems.remove(CUBES);
 			component.setItemEnabledProvider(this::itemEnabledCheck);
 		});
 		paymentPep.onDeny((component, decision) -> {
-			LOGGER.info("New paid access decision: {}", decision.getDecision());
+			log.info("New paid access decision: {}", decision.getDecision());
 		});
 		return paymentPep;
 	}

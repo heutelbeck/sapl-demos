@@ -31,7 +31,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 
 @SpringUI
 @Theme(ValoTheme.THEME_NAME)

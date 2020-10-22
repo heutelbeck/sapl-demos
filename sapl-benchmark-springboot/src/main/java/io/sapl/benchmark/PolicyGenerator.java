@@ -115,7 +115,7 @@ public class PolicyGenerator {
 			if (files != null) {
 				for (File file : files) {
 					if (file.getName().endsWith("sapl") && !file.delete()) {
-						LOGGER.error("failed to delete: {}", file.getAbsolutePath());
+						log.error("failed to delete: {}", file.getAbsolutePath());
 					}
 				}
 			}
@@ -132,10 +132,10 @@ public class PolicyGenerator {
 	public AuthorizationSubscription createStructuredRandomSubscription() {
 		double roll = roll();
 		if (roll >= emptySubProbability) {
-			LOGGER.trace("dice rolled {} - higher than {} -> EMPTY SUB", roll, emptySubProbability);
+			log.trace("dice rolled {} - higher than {} -> EMPTY SUB", roll, emptySubProbability);
 			return createEmptySubscription();
 		}
-		LOGGER.trace("dice rolled {} - lower than {}", roll, emptySubProbability);
+		log.trace("dice rolled {} - lower than {}", roll, emptySubProbability);
 		return createSubscription(getRandomSub(), getRandomAction(), getRandomResource());
 	}
 
@@ -158,30 +158,30 @@ public class PolicyGenerator {
 	private JsonNode getRandomResource() {
 		double roll = roll();
 		if (roll >= emptySubNodeProbability) {
-			LOGGER.trace("dice rolled {} - higher than {} -> EMPTY RESOURCE", roll, emptySubNodeProbability);
+			log.trace("dice rolled {} - higher than {} -> EMPTY RESOURCE", roll, emptySubNodeProbability);
 			return EMPTY_NODE;
 		}
-		LOGGER.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
+		log.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
 		return JsonNodeFactory.instance.textNode(getRandomElement(domainData.getDomainResources()).getResourceName());
 	}
 
 	private JsonNode getRandomAction() {
 		double roll = roll();
 		if (roll >= emptySubNodeProbability) {
-			LOGGER.trace("dice rolled {} - higher than {} -> EMPTY ACTION", roll, emptySubNodeProbability);
+			log.trace("dice rolled {} - higher than {} -> EMPTY ACTION", roll, emptySubNodeProbability);
 			return EMPTY_NODE;
 		}
-		LOGGER.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
+		log.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
 		return JsonNodeFactory.instance.textNode(getRandomElement(domainData.getDomainActions()));
 	}
 
 	private JsonNode getRandomSub() {
 		double roll = roll();
 		if (roll >= emptySubNodeProbability) {
-			LOGGER.trace("dice rolled {} - higher than {} -> EMPTY SUBJECT", roll, emptySubNodeProbability);
+			log.trace("dice rolled {} - higher than {} -> EMPTY SUBJECT", roll, emptySubNodeProbability);
 			return EMPTY_NODE;
 		}
-		LOGGER.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
+		log.trace("dice rolled {} - lower than {}", roll, emptySubNodeProbability);
 		DomainSubject domainSubject = getRandomElement(domainData.getDomainSubjects());
 		return buildSubjectNode(domainSubject);
 	}

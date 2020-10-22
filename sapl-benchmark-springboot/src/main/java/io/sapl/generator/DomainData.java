@@ -142,10 +142,10 @@ public class DomainData {
         this.domainSubjects = generateSubjects(this.domainRoles);
         this.domainActions = DomainActions.generateActionListByCount(this.getNumberOfActions());
 
-        LOGGER.debug("generated {} roles", this.domainRoles.size());
-        LOGGER.debug("generated {} resources", this.domainResources.size());
-        LOGGER.debug("generated {} subjects", this.domainSubjects.size());
-        LOGGER.debug("generated {} actions", this.domainActions.size());
+        log.debug("generated {} roles", this.domainRoles.size());
+        log.debug("generated {} resources", this.domainResources.size());
+        log.debug("generated {} subjects", this.domainSubjects.size());
+        log.debug("generated {} actions", this.domainActions.size());
 
         return this.domainUtil;
     }

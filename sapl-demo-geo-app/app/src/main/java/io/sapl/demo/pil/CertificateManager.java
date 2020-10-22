@@ -24,7 +24,7 @@ import lombok.Getter;
 class CertificateManager {
     private static final String CLIENT_CERT_PW = "saplgeo";
     private static final String CERT_ERR = "Unable to load certificates into Key-/Truststore. {}";
-    private static final Logger LOGGER = Logger.getLogger(CertificateManager.class.getName());
+    private static final Logger LOGGER = log.getLogger(CertificateManager.class.getName());
 
     private KeyManager[] keyManager;
     private TrustManager[] trustManager;
@@ -34,7 +34,7 @@ class CertificateManager {
             initKeyManagers(key);
             initTrustManagers(trust);
         } catch (IOException | CertificateException | NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
-            LOGGER.log(Level.FINE, CERT_ERR, e.getMessage());
+            log.log(Level.FINE, CERT_ERR, e.getMessage());
         }
     }
 

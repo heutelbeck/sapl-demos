@@ -13,7 +13,7 @@ import com.vaadin.spring.annotation.SpringView;
 
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
 /**

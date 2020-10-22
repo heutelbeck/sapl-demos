@@ -37,7 +37,7 @@ public class PilController {
 				return pil.getData();
 			}
 			catch (IOException e) {
-				LOGGER.error(e.getMessage());
+				log.error(e.getMessage());
 				return UNABLE_TO_GENERATE_PIL;
 			}
 		}

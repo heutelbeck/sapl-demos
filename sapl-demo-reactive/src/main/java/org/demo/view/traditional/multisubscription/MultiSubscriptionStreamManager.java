@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 
@@ -51,7 +51,7 @@ public class MultiSubscriptionStreamManager {
 	public void setupNewMultiSubscription(String multiSubscriptionId,
 			MultiAuthorizationSubscription multiSubscription) {
 		if (!hasSubscriptionFor(multiSubscriptionId)) {
-			LOGGER.debug("setup multi-subscription for multiSubscriptionId {}", multiSubscriptionId);
+			log.debug("setup multi-subscription for multiSubscriptionId {}", multiSubscriptionId);
 			final MultiAuthorizationDecision multiAuthzDecision = pep.filterEnforceAll(multiSubscription).blockFirst();
 			if (multiAuthzDecision != null) {
 				multiAuthzDecision.forEach(ir -> decisionsByAuthorizationSubscriptionId
@@ -93,7 +93,7 @@ public class MultiSubscriptionStreamManager {
 	 * the PEP.
 	 */
 	public void dispose() {
-		LOGGER.debug("disposing {} subscriptions", subscriptions.size());
+		log.debug("disposing {} subscriptions", subscriptions.size());
 		subscriptions.forEach(Disposable::dispose);
 		multiSubscriptionIdsWithSubscription.clear();
 		decisionsByAuthorizationSubscriptionId.clear();

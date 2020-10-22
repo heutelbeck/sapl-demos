@@ -14,7 +14,7 @@ public class LoggingConstraintHandler implements ConstraintHandler {
 	@Override
 	public boolean handle(JsonNode constraint) {
 		if (canHandle(constraint) && constraint.has("message")) {
-			LOGGER.info(constraint.findValue("message").asText());
+			log.info(constraint.findValue("message").asText());
 			return true;
 		}
 		return false;

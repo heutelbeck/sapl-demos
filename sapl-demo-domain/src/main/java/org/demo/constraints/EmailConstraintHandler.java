@@ -29,7 +29,7 @@ public class EmailConstraintHandler implements ConstraintHandler {
 	}
 
 	private static void sendEmail(String recipient, String subject, String message) {
-		LOGGER.info("An E-Mail has been sent to {} with the subject '{}' and the message '{}'.", recipient, subject,
+		log.info("An E-Mail has been sent to {} with the subject '{}' and the message '{}'.", recipient, subject,
 				message);
 	}
 

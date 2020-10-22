@@ -11,21 +11,23 @@
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 
-	<artifactId>spring-mvc-app</artifactId>
+	<artifactId>sapl-demo-mvc-app</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Spring MVC Application Demo</name>
+	<name>SAPL Demo Spring MVC Application</name>
 	<description>A complete Spring Boot MVC application, demonstrating SAPL in aspect oriented programming, manual enforcement, using external data sources for policy decisions, content filtering and how to handle constraints, i.e. obligations and advices.</description>
 
 	<dependencies>
-		<!-- The SAPL spring boot starter will automatically configure the policy 
-			enforcement engine -->
 		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-spring-boot-starter</artifactId>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-security</artifactId>
 			<version>${version.sapl.policy.engine}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-pdp-embedded</artifactId>
+			<version>${version.sapl.policy.engine}</version>
+		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-demo-domain</artifactId>

@@ -11,7 +11,7 @@ import org.demo.security.SecurityUtils;
 import org.springframework.security.core.Authentication;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 
@@ -70,7 +70,7 @@ public class SingleSubscriptionStreamManager {
 	public boolean isAccessPermitted(Object action, Object resource, Object environment) {
 		final String key = createKeyFor(action, resource, environment);
 		if (keysWithSubscription.add(key)) {
-			LOGGER.debug("setup subscription for action {}, resource {} and environment {}", action, resource,
+			log.debug("setup subscription for action {}, resource {} and environment {}", action, resource,
 					environment);
 			final Authentication subject = SecurityUtils.getAuthentication();
 			final Decision initialDecision = pep.enforce(subject, action, resource, environment).blockFirst();
@@ -95,7 +95,7 @@ public class SingleSubscriptionStreamManager {
 	 * the PEP.
 	 */
 	public void dispose() {
-		LOGGER.debug("disposing {} subscriptions", subscriptions.size());
+		log.debug("disposing {} subscriptions", subscriptions.size());
 		subscriptions.forEach(Disposable::dispose);
 		keysWithSubscription.clear();
 		decisionsByKey.clear();

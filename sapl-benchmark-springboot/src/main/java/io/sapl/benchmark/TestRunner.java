@@ -146,7 +146,7 @@ public class TestRunner {
 	public List<XlsRecord> runTestNew(PolicyGeneratorConfiguration config, String policyFolder,
 			BenchmarkDataContainer benchmarkDataContainer, DomainGenerator domainGenerator) {
 
-		LOGGER.info("generating domain policies with seed {}", config.getSeed());
+		log.info("generating domain policies with seed {}", config.getSeed());
 		domainGenerator.generateDomainPoliciesWithSeed(config.getSeed(),
 				domainGenerator.getDomainData().getPolicyDirectoryPath());
 
@@ -154,7 +154,7 @@ public class TestRunner {
 		PolicyGeneratorConfiguration updatedConfig = new PolicyAnalyzer(domainGenerator.getDomainData())
 				.analyzeSaplDocuments(benchmarkDataContainer.getIndexType());
 
-		LOGGER.info("{}", updatedConfig);
+		log.info("{}", updatedConfig);
 		return run(updatedConfig, policyFolder, benchmarkDataContainer, domainGenerator.getDomainData(),
 				new PolicyGenerator(config, domainGenerator.getDomainData()));
 	}
@@ -183,7 +183,7 @@ public class TestRunner {
 			stream.close();
 
 		} catch (PolicyEvaluationException | IOException var12) {
-			LOGGER.error("Error while initializing the document index.", var12);
+			log.error("Error while initializing the document index.", var12);
 		}
 
 		documentIndex.setLiveMode();
@@ -197,10 +197,10 @@ public class TestRunner {
 		List<XlsRecord> results = new LinkedList<>();
 		// PolicyGenerator generator = new PolicyGenerator(config, domainData);
 
-		LOGGER.info("running benchmark with config={}, runs={}", config.getName(), benchmarkDataContainer.getRuns());
+		log.info("running benchmark with config={}, runs={}", config.getName(), benchmarkDataContainer.getRuns());
 
 		try {
-			LOGGER.debug("init index");
+			log.debug("init index");
 			// create PRP
 			long begin = System.nanoTime();
 			ParsedDocumentIndex documentIndex = initializeIndex(benchmarkDataContainer.getIndexType(), policyFolder);
@@ -233,14 +233,14 @@ public class TestRunner {
 				results.add(new XlsRecord(j, config.getName(), timePreparation, timeRetrieve,
 						"AuthorizationSubscription", buildResponseStringForResult(result, decision)));
 
-				LOGGER.debug("Total : {}ms", timeRetrieve);
+				log.debug("Total : {}ms", timeRetrieve);
 			}
 
-			// LOGGER.debug("destroy index");
+			// log.debug("destroy index");
 			// documentIndex.destroyIndex();
 
 		} catch (Exception e) {
-			LOGGER.error("Error running test", e);
+			log.error("Error running test", e);
 		}
 
 		sanitizeResults(results);
@@ -255,7 +255,7 @@ public class TestRunner {
 				documentIndex.retrievePolicies(generator.createEmptySubscription(), FUNCTION_CONTEXT, VARIABLES);
 			}
 		} catch (Exception ignored) {
-			LOGGER.error("error during warm-up", ignored);
+			log.error("error during warm-up", ignored);
 		}
 	}
 
@@ -269,7 +269,7 @@ public class TestRunner {
 			// AuthorizationSubscription sub = generator.createEmptySubscription();
 
 			subscriptions.add(sub);
-			LOGGER.trace("generated sub: {}", sub);
+			log.trace("generated sub: {}", sub);
 		}
 		return subscriptions;
 	}

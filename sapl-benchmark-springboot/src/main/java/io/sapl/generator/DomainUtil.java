@@ -37,13 +37,13 @@ public class DomainUtil {
     }
 
     public void writeDomainPoliciesToFilesystem(List<DomainPolicy> domainPolicies, String policyPath) {
-        LOGGER.info("writing policies to folder: {}", policyPath);
+        log.info("writing policies to folder: {}", policyPath);
 
         File policyDir = new File(policyPath);
 
-        LOGGER.debug("before clean fileCount:{}", policyDir.listFiles().length);
+        log.debug("before clean fileCount:{}", policyDir.listFiles().length);
         if (cleanDirectory) cleanPolicyDirectory(policyPath);
-        LOGGER.debug("after clean fileCount:{}", policyDir.listFiles().length);
+        log.debug("after clean fileCount:{}", policyDir.listFiles().length);
 
 
 
@@ -51,22 +51,22 @@ public class DomainUtil {
             writePolicyToFile(domainPolicy, policyPath);
         }
 
-        LOGGER.debug("after write policy fileCount:{}", policyDir.listFiles().length);
+        log.debug("after write policy fileCount:{}", policyDir.listFiles().length);
     }
 
     public void cleanPolicyDirectory(String policyPath) {
-        LOGGER.info("removing existing policies in output directory");
+        log.info("removing existing policies in output directory");
         try {
             FileUtils.cleanDirectory(new File(policyPath));
         } catch (IOException e) {
-            LOGGER.error("error while cleaning the directory", e);
+            log.error("error while cleaning the directory", e);
         }
     }
 
     public void printDomainPoliciesLimited(List<DomainPolicy> domainPolicies) {
-        LOGGER.trace("#################### POLICIES ####################");
+        log.trace("#################### POLICIES ####################");
         for (DomainPolicy domainPolicy : domainPolicies) {
-            LOGGER.trace("{}--------------------------------------------------{}{}{}--------------------------------------------------",
+            log.trace("{}--------------------------------------------------{}{}{}--------------------------------------------------",
                     System.lineSeparator(), System.lineSeparator(), domainPolicy.getPolicyContent(), System
                             .lineSeparator());
         }
@@ -75,12 +75,12 @@ public class DomainUtil {
     public void writePolicyToFile(DomainPolicy policy, String policyPath) {
         String policyFileName = String
                 .format("%s/%03d_%s.sapl", policyPath, DomainUtil.getNextPolicyCount(), policy.getFileName());
-        LOGGER.trace("writing policy file: {}", policyFileName);
+        log.trace("writing policy file: {}", policyFileName);
 
         try (PrintWriter writer = new PrintWriter(policyFileName, StandardCharsets.UTF_8.name())) {
             writer.println(policy.getPolicyContent());
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
-            LOGGER.error("writing policy file failed", e);
+            log.error("writing policy file failed", e);
         }
     }
 

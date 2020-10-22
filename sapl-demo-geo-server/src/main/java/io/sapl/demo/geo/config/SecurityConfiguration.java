@@ -12,7 +12,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 
 import io.sapl.demo.geo.AuthManager;
 import io.sapl.demo.geo.domain.CrewRepo;
-import io.sapl.spring.PolicyEnforcementFilterPEP;
+import io.sapl.spring.pep.PolicyEnforcementFilterPEP;
 
 @Configuration
 @EnableWebSecurity

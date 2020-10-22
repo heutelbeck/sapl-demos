@@ -32,7 +32,7 @@ public class DomainGenerator {
     public void generateDomainPolicies(String policyPath) {
         List<DomainPolicy> domainPolicies = generatePolicies();
 
-        LOGGER.info("policies TOTAL: {}", domainPolicies.size());
+        log.info("policies TOTAL: {}", domainPolicies.size());
 
         domainUtil.printDomainPoliciesLimited(domainPolicies);
         domainUtil.writeDomainPoliciesToFilesystem(domainPolicies, policyPath);
@@ -219,38 +219,38 @@ public class DomainGenerator {
     public List<DomainPolicy> generatePolicies() {
 
         List<DomainRole> allRoles = List.copyOf(domainData.getDomainRoles());
-        LOGGER.debug("allRolesCount:{}", allRoles.size());
+        log.debug("allRolesCount:{}", allRoles.size());
         List<DomainResource> allResources = List.copyOf(domainData.getDomainResources());
-        LOGGER.debug("allResources:{}", allResources.size());
+        log.debug("allResources:{}", allResources.size());
         List<DomainSubject> allSubjects = List.copyOf(domainData.getDomainSubjects());
-        LOGGER.debug("allSubjects:{}", allSubjects.size());
+        log.debug("allSubjects:{}", allSubjects.size());
 
         List<DomainResource> unrestrictedResources = allResources.stream().filter(DomainResource::isUnrestricted)
                 .collect(Collectors.toList());
         List<DomainResource> restrictedResources = new ArrayList<>(allResources);
         restrictedResources.removeAll(unrestrictedResources);
-        LOGGER.debug("generated {} resources (unrestricted={})", allResources.size(), unrestrictedResources.size());
+        log.debug("generated {} resources (unrestricted={})", allResources.size(), unrestrictedResources.size());
 
         int newPolicyCount = 0;
         List<DomainPolicy> allPolicies = new ArrayList<>(generateSubjectSpecificPolicies(allSubjects));
         newPolicyCount = allPolicies.size();
-        LOGGER.debug("generated {} subject specific policies", newPolicyCount);
+        log.debug("generated {} subject specific policies", newPolicyCount);
 
 //        allPolicies.addAll(generateLockedSubjectPolicies());
 //        newPolicyCount = allPolicies.size() - newPolicyCount;
-//        LOGGER.debug("generated {} policies for locked subjects", newPolicyCount);
+//        log.debug("generated {} policies for locked subjects", newPolicyCount);
 
         allPolicies.addAll(generatePoliciesForGeneralAccessRoles(allRoles));
         newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated {} policies for general access roles", newPolicyCount);
+        log.debug("generated {} policies for general access roles", newPolicyCount);
 
         allPolicies.addAll(generatePoliciesForUnrestrictedResources(unrestrictedResources));
         newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated {} policies for unrestricted resources", newPolicyCount);
+        log.debug("generated {} policies for unrestricted resources", newPolicyCount);
 
         allPolicies.addAll(generatePoliciesForRestrictedResources(restrictedResources, allRoles));
         newPolicyCount = allPolicies.size() - newPolicyCount;
-        LOGGER.debug("generated {} policies for restricted resources", newPolicyCount);
+        log.debug("generated {} policies for restricted resources", newPolicyCount);
 
 
         return allPolicies;

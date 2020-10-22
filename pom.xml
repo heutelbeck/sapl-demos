@@ -34,13 +34,12 @@
 	</licenses>
 
 	<modules>
-		<module>docs</module>
-		<module>sapl-benchmark</module>
+		<module>sapl-demos-docs</module>
 		<module>sapl-benchmark-springboot</module>
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-domain</module>
-		<module>spring-mvc-app</module>
+		<module>sapl-demo-mvc-app</module>
 		<module>sapl-demo-filterchain</module>
 		<module>sapl-demo-geo-app</module>
 		<module>sapl-demo-geo-server</module>

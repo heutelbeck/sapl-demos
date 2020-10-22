@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 
-import io.sapl.spring.PolicyEnforcementFilterPEP;
+import io.sapl.spring.pep.PolicyEnforcementFilterPEP;
 
 @Configuration
 @EnableWebSecurity

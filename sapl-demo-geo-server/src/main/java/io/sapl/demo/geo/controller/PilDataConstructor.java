@@ -130,7 +130,7 @@ public class PilDataConstructor {
 			return MAPPER.writeValueAsString(data);
 		}
 		catch (JsonProcessingException e) {
-			LOGGER.error(e.toString());
+			log.error(e.toString());
 			return PIL_BUILD_ERR;
 		}
 	}

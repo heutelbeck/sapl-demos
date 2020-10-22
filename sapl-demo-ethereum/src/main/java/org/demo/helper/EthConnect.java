@@ -43,7 +43,7 @@ public class EthConnect {
 
 		}
 		catch (Exception e) {
-			LOGGER.info("Donation failed", e);
+			log.info("Donation failed", e);
 		}
 
 	}
@@ -60,7 +60,7 @@ public class EthConnect {
 			user.setTransactionHash(receipt.getTransactionHash());
 		}
 		catch (Exception e) {
-			LOGGER.info("Payment failed", e);
+			log.info("Payment failed", e);
 		}
 
 	}

@@ -26,7 +26,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.Decision;
-import io.sapl.spring.PolicyEnforcementPoint;
+import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -292,7 +292,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 				timeScheduleDataHolder[0] = mapper.treeToValue(resource.get(), TimeScheduleData.class);
 			}
 			catch (JsonProcessingException e) {
-				LOGGER.error("Error while unmarshalling TimeScheduleData: {}", e.getMessage());
+				log.error("Error while unmarshalling TimeScheduleData: {}", e.getMessage());
 			}
 		}
 		getUI().access(() -> {
