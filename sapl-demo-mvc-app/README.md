@@ -105,12 +105,22 @@ If the response to the request is `DENY`, the execution of the annotated method 
 ## How to use the @PdpAuthorize annotation in your own application
 
 ### Step 1:
-Add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) project as dependency to the pom.xml of your project:
+Add the sapl-spring-security integration as a dependency to the pom.xml of your project:
 
 ```java
 <dependency>
         <groupId>io.sapl</groupId>
-        <artifactId>sapl-spring-boot-starter</artifactId>
+        <artifactId>sapl-spring-security</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
+
+Add a PDP, either embedded or remote, e.g.:
+
+```java
+<dependency>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-spring-pdp-embedded</artifactId>
         <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
