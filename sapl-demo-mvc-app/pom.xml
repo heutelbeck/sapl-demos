@@ -21,12 +21,12 @@
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
-			<version>${version.sapl.policy.engine}</version>
+			<version>${sapl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
-			<version>${version.sapl.policy.engine}</version>
+			<version>${sapl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>

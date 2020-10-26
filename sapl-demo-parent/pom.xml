@@ -22,10 +22,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
-		<version.sapl.policy.engine>2.0.0-SNAPSHOT</version.sapl.policy.engine>
-		<version.junit>4.13.1</version.junit>
-		<version.springboot>2.3.4.RELEASE</version.springboot>
-		<version.maven-source-plugin>3.0.1</version.maven-source-plugin>
+		<sapl.version>2.0.0-SNAPSHOT</sapl.version>
+		<junit.version>4.13.1</junit.version>
+		<springboot.version>2.3.4.RELEASE</springboot.version>
+		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<version.lombok>1.18.16</version.lombok>
@@ -37,7 +37,7 @@
 			<dependency>
 				<groupId>junit</groupId>
 				<artifactId>junit</artifactId>
-				<version>${version.junit}</version>
+				<version>${junit.version}</version>
 				<scope>test</scope>
 			</dependency>
 
@@ -45,7 +45,7 @@
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-dependencies</artifactId>
-				<version>${version.springboot}</version>
+				<version>${springboot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -128,13 +128,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.22.1</version>
-					<configuration>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
-					<version>${version.springboot}</version>
+					<version>${springboot.version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
