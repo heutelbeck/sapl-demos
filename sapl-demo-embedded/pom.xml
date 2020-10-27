@@ -17,67 +17,71 @@
 
 	<packaging>jar</packaging>
 
-	<name>SAPL Demo Embedded PDP</name>
-
-	<organization>
-		<name>Dominic Heutelbeck</name>
-	</organization>
-
-	<inceptionYear>2019</inceptionYear>
-
-	<licenses>
-		<license>
-			<name>Apache 2.0</name>
-		</license>
-	</licenses>
+	<name>SAPL Demo Remote PDP</name>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
 		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- The Version of the SAPL Dependencies -->
 		<sapl.version>2.0.0-SNAPSHOT</sapl.version>
 	</properties>
 
-	<dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
+			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
+				additional dependencies. This is a utility dependency, making it easier to 
+				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
+				section of the POM all SAPL dependencies can be used without explicitly declaring 
+				a version. This ensures that when multiple SAPL dependencies are used, the 
+				versions of them are consistent. -->
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
+	<dependencies>
+		<!-- The embedded Streaming Attribute Engine PDP -->
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp-embedded</artifactId>
-			<version>${sapl.version}</version>
 		</dependency>
 
+		<!-- A logging library for printing messages to the console -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.7.30</version>
 		</dependency>
 
+		<!-- A library for parsing command-line parameters -->
 		<dependency>
 			<groupId>commons-cli</groupId>
 			<artifactId>commons-cli</artifactId>
 			<version>1.4</version>
 		</dependency>
-
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${maven.compiler.source}</source>
-					<target>${maven.compiler.target}</target>
-				</configuration>
-			</plugin>
+			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which 
+				contains the code from this module and in addition, all dependencies are 
+				packed into the JAR as well. This results in a self-contained executable 
+				Java application directly runnable via 'java -jar'. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.demo.EmbeddedPDPDemo</mainClass>
+							<mainClass>org.demo.RemotePDPDemo</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
@@ -96,25 +100,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<repositories>
-		<repository>
-			<id>openconjurer-public</id>
-			<name>OpenConjurer Nexus Maven Release Repository</name>
-			<url>https://nexus.openconjurer.org/repository/releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>openconjurer-public-snapshots</id>
-			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
-			<url>https://nexus.openconjurer.org/repository/snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 </project>
