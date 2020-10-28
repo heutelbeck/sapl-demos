@@ -15,32 +15,21 @@
  ******************************************************************************/
 package org.demo;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.util.concurrent.Callable;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
-import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
 /**
  * This demo shows how to manually construct a PDP without infrastructure
@@ -48,69 +37,37 @@ import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
  * the PDP. The demo runs a few performance tests and illustrates different ways
  * of invoking the PDP.
  */
-public class EmbeddedPDPDemo {
+@Command(description = "This demo shows how to manually construct a PDP without infrastructure support. "
+		+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
+		+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP.")
+public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
-	private static final String USAGE = "java -jar sapl-demo-embedded-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
-
-	private static final String HELP_DOC = "This demo shows how to manually construct a PDP without infrastructure support.\r\n"
-			+ "A Custom Policy Information Point and Function Library are bound to the PDP.\r\n"
-			+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP.";
-
-	private static final String HELP = "help";
-
-	private static final String POLICYPATH = "policypath";
-
-	private static final String POLICYPATH_DOC = "ANT style pattern providing the path to the polices. "
-			+ "The default path is 'classpath:policies'. The pattern will be extended by '/*.sapl' by the PDP/PRP. "
-			+ "So all files with the '.sapl' suffix will be loaded.";
+	@Option(names = { "-p",
+			"-path" }, description = "Path to the folder in the filesystem where the demo will look for the configuration file 'pdp.json' and the '*.sapl' policy documents. Deafults to '~/sapl/policies'")
+	private String path = "~/sapl/policies";
 
 	private static final String SUBJECT = "willi";
-
 	private static final String ACTION_READ = "read";
-
 	private static final String ACTION_WRITE = "write";
-
 	private static final String RESOURCE = "something";
-
-	private static final AuthorizationSubscription READ_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+	private static final AuthorizationSubscription READ_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_READ, RESOURCE);
-
-	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 20_000;
-
 	private static final double BILLION = 1_000_000_000.0D;
-
 	private static final double MILLION = 1_000_000.0D;
-
 	private static final DecimalFormat decFormat = new DecimalFormat("#.####");
 
-	public static void main(String[] args) {
-		Options options = new Options();
-		options.addOption(POLICYPATH, true, POLICYPATH_DOC);
-		options.addOption(HELP, false, HELP_DOC);
-
-		CommandLineParser parser = new DefaultParser();
-		try {
-			CommandLine cmd = parser.parse(options, args);
-			if (cmd.hasOption(HELP)) {
-				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp(USAGE, options);
-			} else {
-				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
-			}
-		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
-				| PolicyEvaluationException | PDPConfigurationException e) {
-			LOGGER.error("encountered an error running the demo: {}", e.getMessage(), e);
-			System.exit(1);
-		}
+	public static void main(String... args) {
+		System.exit(new CommandLine(new EmbeddedPDPDemo()).execute(args));
 	}
 
-	private static void runDemo(String path) throws IOException, AttributeException, FunctionException,
-			URISyntaxException, PolicyEvaluationException, PDPConfigurationException {
+	@Override
+	public Integer call() throws Exception {
 		// A PDP is constructed using the builder pattern
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
 		// by default the policies are loaded from bundled resources.
@@ -136,6 +93,7 @@ public class EmbeddedPDPDemo {
 
 		LOGGER.info("End of demo.");
 		pdp.dispose();
+		return 0;
 	}
 
 	/**
@@ -253,14 +211,6 @@ public class EmbeddedPDPDemo {
 		LOGGER.info("Runs  : {}", runs);
 		LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
 		LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / RUNS)));
-	}
-
-	private static AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
-			Object resource) {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new Jdk8Module());
-		return new AuthorizationSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
-				mapper.valueToTree(resource), null);
 	}
 
 }

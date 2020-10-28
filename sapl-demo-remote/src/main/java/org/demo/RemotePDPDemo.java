@@ -15,132 +15,70 @@
  ******************************************************************************/
 package org.demo;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import java.util.concurrent.Callable;
+
+import javax.net.ssl.SSLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-
+import io.netty.handler.ssl.SslContextBuilder;
+import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public class RemotePDPDemo {
+@Command
+public class RemotePDPDemo implements Callable<Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
 
-	private static final String USAGE = "java -jar sapl-demo-remote-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
-	private static final String DEFAULT_PORT = "8443";
-	private static final String DEFAULT_HOST = "localhost";
-	private static final String DEFAULT_KEY = "YJidgyT2mfdkbmL";
-	private static final String DEFAULT_SECRET = "Fa4zvYQdiwHZVXh";
-	private static final String HELP_DOC = "print this message";
-	private static final String HOST_DOC = "hostname of the policy decision point";
-	private static final String PORT_DOC = "port of the policy decision point";
-	private static final String KEY_DOC = "client key for the demo application, to be obtained from the PDP administrator";
-	private static final String SECRET_DOC = "client secret for the demo application, to be obtained from the PDP administrator";
-	private static final String HELP = "help";
-	private static final String HOST = "host";
-	private static final String PORT = "port";
-	private static final String KEY = "key";
-	private static final String SECRET = "secret";
+	@Option(names = { "-h",
+			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
+	private String host = "https://localhost:8443";
 
-	private static final int RUNS = 10;
-	private static final double BILLION = 1_000_000_000.0D;
-	private static final double MILLION = 1_000_000.0D;
+	// The default option set here are the default credentials of the pdp-server-lt
 
-	public static void main(String[] args) throws InterruptedException {
+	@Option(names = { "-k",
+			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
+	private String clientKey = "YJidgyT2mfdkbmL";
+	@Option(names = { "-s",
+			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
+	private String clientSecret = "Fa4zvYQdiwHZVXh";
 
-		Options options = new Options();
-
-		options.addOption(HOST, true, HOST_DOC);
-		options.addOption(PORT, true, PORT_DOC);
-		options.addOption(KEY, true, KEY_DOC);
-		options.addOption(SECRET, true, SECRET_DOC);
-		options.addOption(HELP, false, HELP_DOC);
-
-		CommandLineParser parser = new DefaultParser();
-		CommandLine cmd = null;
-		try {
-			cmd = parser.parse(options, args);
-		}
-		catch (ParseException e) {
-			LOG.info("encountered an error running the demo: {}", e.getMessage(), e);
-			System.exit(1);
-		}
-
-		if (cmd.hasOption(HELP)) {
-			HelpFormatter formatter = new HelpFormatter();
-			formatter.printHelp(USAGE, options);
-		}
-		else {
-			String host = cmd.getOptionValue(HOST);
-			if (host == null) {
-				host = DEFAULT_HOST;
-			}
-			String portOption = cmd.getOptionValue(PORT);
-			if (portOption == null) {
-				portOption = DEFAULT_PORT;
-			}
-			int port = Integer.parseInt(portOption);
-			String key = cmd.getOptionValue(KEY);
-			if (key == null) {
-				key = DEFAULT_KEY;
-			}
-			String secret = cmd.getOptionValue(SECRET);
-			if (secret == null) {
-				secret = DEFAULT_SECRET;
-			}
-			runDemo(host, port, key, secret);
-		}
+	public static void main(String... args) {
+		System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
 	}
 
-	private static void runDemo(String host, int port, String key, String secret) throws InterruptedException {
-		RemotePolicyDecisionPoint pdp = new RemotePolicyDecisionPoint(host, port, key, secret);
+	public Integer call() throws SSLException {
+		LOG.warn("INSECURE SSL SETTINGS! This demo uses an insecure SslContext for "
+				+ "testing purposes only. It will accept all certificates. "
+				+ "This is only for testing local servers with self-signed certificates easily. "
+				+ "NERVER USE SUCH A CONFIURATION IN PRODUCTION!");
+		var sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
+		var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret, sslContext);
 
-		final AuthorizationSubscription authzSubscription = buildAuthorizationSubscription("willi", "test-read",
-				"something");
-		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
-			// @formatter:off
-			pdp.decide(authzSubscription).take(1)
-					.subscribe(
-					        authzDecision -> LOG.info("authzDecision: {}", authzDecision),
-                            error -> LOG.error("error", error),
-                            () -> LOG.info("complete")
-                    );
-			// @formatter:on
-		}
-		long end = System.nanoTime();
+		/*
+		 * To have the client use the default SSL verification use this constructor
+		 * instead, or provide your own TrustManager/SslContext accordingly.
+		 * 
+		 * var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret);
+		 */
 
-		LOG.info("Start : {}", start);
-		LOG.info("End   : {}", end);
-		LOG.info("Runs  : {}", RUNS);
-		LOG.info("Total : {}s", nanoToS((double) end - start));
-		LOG.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
-
-		Thread.sleep(1000);
-	}
-
-	private static AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
-			Object resource) {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new Jdk8Module());
-		return new AuthorizationSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
-				mapper.valueToTree(resource), null);
-	}
-
-	private static double nanoToMs(double nanoseconds) {
-		return nanoseconds / MILLION;
-	}
-
-	private static double nanoToS(double nanoseconds) {
-		return nanoseconds / BILLION;
+		var authzSubscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
+		LOG.info("Subscription: {}", authzSubscription);
+		/*
+		 * This just consumes the first decision in a blocking fashion to quickly
+		 * terminate the demo application. If not using blockFirst() or take(1), the
+		 * Flux will continue to listen to the PDP server and receive updated
+		 * authorization decisions when applicable. For alternative patterns of
+		 * invocation, consult the sapl-demo-pdp-embedded
+		 */
+		var decision = pdp.decide(authzSubscription).blockFirst();
+		LOG.info("Decision: {}", decision);
+		return 0;
 	}
 
 }
