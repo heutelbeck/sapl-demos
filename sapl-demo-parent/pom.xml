@@ -33,6 +33,20 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
+			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
+				additional dependencies. This is a utility dependency, making it easier to 
+				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
+				section of the POM all SAPL dependencies can be used without explicitly declaring 
+				a version. This ensures that when multiple SAPL dependencies are used, the 
+				versions of them are consistent. -->
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 			<!-- Testing Scope Dependencies -->
 			<dependency>
 				<groupId>junit</groupId>

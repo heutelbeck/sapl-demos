@@ -4,7 +4,6 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
@@ -16,11 +15,7 @@
 	<name>SAPL Demo Ethereum</name>
 
 	<properties>
-		<maven.compiler.source>11</maven.compiler.source>
-		<maven.compiler.target>11</maven.compiler.target>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<vaadin.version>14.1.28</vaadin.version>
 		<drivers.dir>${project.basedir}/drivers</drivers.dir>
 		<drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
@@ -137,23 +132,19 @@
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
-			<version>${sapl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
-			<version>${sapl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-ethereum</artifactId>
-			<version>${sapl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -212,7 +203,7 @@
 				<version>1.9.1</version>
 				<executions>
 					<execution>
-						<?m2e execute onConfiguration,onIncremental?>				
+						<?m2e execute onConfiguration,onIncremental?>
 						<id>add-contracts</id>
 						<phase>initialize</phase>
 						<goals>
