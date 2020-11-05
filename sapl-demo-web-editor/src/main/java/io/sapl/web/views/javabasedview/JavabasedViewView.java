@@ -12,6 +12,8 @@ import com.vaadin.flow.router.Route;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.DocumentChangedListener;
 import io.sapl.vaadin.Issue;
+import io.sapl.vaadin.JsonEditor;
+import io.sapl.vaadin.JsonEditorConfiguration;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
@@ -24,41 +26,63 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
-	private SaplEditor editor;
+	private SaplEditor saplEditor;
+	private JsonEditor jsonEditor;
 
 	public JavabasedViewView() {
 		setId("javabased-view-view");
 
-		SaplEditorConfiguration config = new SaplEditorConfiguration();
-		config.setHasLineNumbers(true);
-		config.setTextUpdateDelay(500);
+		SaplEditorConfiguration saplConfig = new SaplEditorConfiguration();
+		saplConfig.setHasLineNumbers(true);
+		saplConfig.setTextUpdateDelay(500);
 
-		editor = new SaplEditor(config);
-		editor.addDocumentChangedListener(this);
-		editor.addValidationFinishedListener(this::onValidationFinished);
-		add(editor);
+		saplEditor = new SaplEditor(saplConfig);
+		saplEditor.addDocumentChangedListener(this);
+		saplEditor.addValidationFinishedListener(this::onValidationFinished);
+		add(saplEditor);
 
-		Button getDocumentButton = new Button();
-		getDocumentButton.setText("Get Document");
-		getDocumentButton.addClickListener(e -> {
-			String document = editor.getDocument();
-			System.out.println("Get Document: " + document);
+		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
+		jsonEditor.addDocumentChangedListener(this);
+		add(jsonEditor);
+
+		Button getSaplDocumentButton = new Button();
+		getSaplDocumentButton.setText("Get Document (SAPL)");
+		getSaplDocumentButton.addClickListener(e -> {
+			String document = saplEditor.getDocument();
+			System.out.println("Get Document (SAPL): " + document);
 		});
-		add(getDocumentButton);
+		add(getSaplDocumentButton);
 
-		Button setDocumentButton = new Button();
-		setDocumentButton.setText("Set Document");
-		setDocumentButton.addClickListener(e -> {
+		Button setSaplDocumentButton = new Button();
+		setSaplDocumentButton.setText("Set Document (SAPL)");
+		setSaplDocumentButton.addClickListener(e -> {
 			String document = getRandomString();
-			System.out.println("Set Document: " + document);
-			editor.setDocument(document);
+			System.out.println("Set Document (SAPL): " + document);
+			saplEditor.setDocument(document);
 		});
-		add(setDocumentButton);
+		add(setSaplDocumentButton);
+		
+		Button getJsonDocumentButton = new Button();
+		getJsonDocumentButton.setText("Get Document (JSON)");
+		getJsonDocumentButton.addClickListener(e -> {
+			String document = jsonEditor.getDocument();
+			System.out.println("Get Document (JSON): " + document);
+		});
+		add(getJsonDocumentButton);
+
+		Button setJsonDocumentButton = new Button();
+		setJsonDocumentButton.setText("Set Document (JSON)");
+		setJsonDocumentButton.addClickListener(e -> {
+			String document = getRandomString();
+			System.out.println("Set Document (JSON): " + document);
+			jsonEditor.setDocument(document);
+		});
+		add(setJsonDocumentButton);
 
 		addDocumentChangedListenerButton = new Button();
-		addDocumentChangedListenerButton.setText("Add Change Listener");
+		addDocumentChangedListenerButton.setText("Add Change Listener (SAPL)");
 		addDocumentChangedListenerButton.addClickListener(e -> {
-			editor.addDocumentChangedListener(this);
+			saplEditor.addDocumentChangedListener(this);
 			addDocumentChangedListenerButton.setEnabled(false);
 			removeDocumentChangedListenerButton.setEnabled(true);
 		});
@@ -66,15 +90,15 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 		add(addDocumentChangedListenerButton);
 
 		removeDocumentChangedListenerButton = new Button();
-		removeDocumentChangedListenerButton.setText("Remove Change Listener");
+		removeDocumentChangedListenerButton.setText("Remove Change Listener (SAPL)");
 		removeDocumentChangedListenerButton.addClickListener(e -> {
-			editor.removeDocumentChangedListener(this);
+			saplEditor.removeDocumentChangedListener(this);
 			addDocumentChangedListenerButton.setEnabled(true);
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
 		add(removeDocumentChangedListenerButton);
 
-		editor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
+		saplEditor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
