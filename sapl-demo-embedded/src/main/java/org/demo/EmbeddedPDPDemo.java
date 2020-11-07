@@ -15,154 +15,149 @@
  ******************************************************************************/
 package org.demo;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.util.concurrent.Callable;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-
-import io.sapl.api.functions.FunctionException;
-import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PDPConfigurationException;
 import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.api.pdp.multisubscription.IdentifiableAuthorizationDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
-import io.sapl.api.pip.AttributeException;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
-import reactor.core.publisher.Flux;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public class EmbeddedPDPDemo {
+/**
+ * This demo shows how to manually construct a PDP without infrastructure
+ * support. A Custom Policy Information Point and Function Library are bound to
+ * the PDP. The demo runs a few performance tests and illustrates different ways
+ * of invoking the PDP.
+ */
+@Command(description = "This demo shows how to manually construct a PDP without infrastructure support. "
+		+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
+		+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP.")
+public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
-	private static final String USAGE = "java -jar sapl-demo-embedded-2.0.0-SNAPSHOT-jar-with-dependencies.jar";
-
-	private static final String HELP_DOC = "print this message";
-
-	private static final String HELP = "help";
-
-	private static final String POLICYPATH = "policypath";
-
-	private static final String POLICYPATH_DOC = "ANT style pattern providing the path to the polices. "
-			+ "The default path is 'classpath:policies'. The pattern will be extended by '/*.sapl' by the PDP/PRP. "
-			+ "So all files with the '.sapl' suffix will be loaded.";
+	@Option(names = { "-p",
+			"-path" }, description = "Path to the folder in the filesystem where the demo will look for the configuration file 'pdp.json' and the '*.sapl' policy documents. Deafults to '~/sapl/policies'")
+	private String path = "~/sapl/policies";
 
 	private static final String SUBJECT = "willi";
-
 	private static final String ACTION_READ = "read";
-
 	private static final String ACTION_WRITE = "write";
-
 	private static final String RESOURCE = "something";
-
-	private static final AuthorizationSubscription READ_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+	private static final AuthorizationSubscription READ_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_READ, RESOURCE);
-
-	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = buildAuthorizationSubscription(SUBJECT,
+	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_WRITE, RESOURCE);
 
-	private static final int RUNS = 25_000;
-
+	private static final int RUNS = 20_000;
 	private static final double BILLION = 1_000_000_000.0D;
-
 	private static final double MILLION = 1_000_000.0D;
+	private static final DecimalFormat decFormat = new DecimalFormat("#.####");
 
-	public static void main(String[] args) {
-		Options options = new Options();
-		options.addOption(POLICYPATH, true, POLICYPATH_DOC);
-		options.addOption(HELP, false, HELP_DOC);
-
-		CommandLineParser parser = new DefaultParser();
-		try {
-			CommandLine cmd = parser.parse(options, args);
-			if (cmd.hasOption(HELP)) {
-				HelpFormatter formatter = new HelpFormatter();
-				formatter.printHelp(USAGE, options);
-			} else {
-				EmbeddedPDPDemo.runDemo(cmd.getOptionValue(POLICYPATH));
-			}
-		} catch (ParseException | IOException | AttributeException | FunctionException | URISyntaxException
-				| PolicyEvaluationException | PDPConfigurationException e) {
-			LOGGER.info("encountered an error running the demo: {}", e.getMessage(), e);
-			System.exit(1);
-		}
-
+	public static void main(String... args) {
+		System.exit(new CommandLine(new EmbeddedPDPDemo()).execute(args));
 	}
 
-	private static void runDemo(String path) throws IOException, AttributeException, FunctionException,
-			URISyntaxException, PolicyEvaluationException, PDPConfigurationException {
+	@Override
+	public Integer call() throws Exception {
+		// A PDP is constructed using the builder pattern
 		Builder builder = EmbeddedPolicyDecisionPoint.builder();
+		// by default the policies are loaded from bundled resources.
 		if (path != null) {
+			// if a path is defined load polices and configuration from the filesystem
 			builder = builder.withFilesystemPolicyRetrievalPoint(path, Builder.IndexType.SIMPLE);
 		}
+		// register the custom PIP and function library
 		builder.withPolicyInformationPoint(new EchoPIP()).withFunctionLibrary(new SimpleFunctionLibrary());
 		final EmbeddedPolicyDecisionPoint pdp = builder.build();
 
 		blockingUsageDemo(pdp);
+
 		reactiveUsageDemo(pdp);
 
-		// to compare single authorization subscriptions with multi-subscriptions, only
-		// run one of the following
-		// methods at once to avoid later methods benefit from earlier methods (e.g.
-		// class
-		// loading)
-		runPerformanceDemoSingle(pdp);
-		// runPerformanceDemoMulti(pdp);
-		// runPerformanceDemoMultiAll(pdp);
+		runPerformanceDemoSingleBlocking(pdp);
+
+		runPerformanceDemoSingleSequentialReactive(pdp);
+
+		runPerformanceDemoMulti(pdp);
+
+		runPerformanceDemoMultiAll(pdp);
+
+		LOGGER.info("End of demo.");
+		pdp.dispose();
+		return 0;
 	}
 
+	/**
+	 * If traditional blocking behavior is required, use .blockFirst() this is not
+	 * applicable in multi-threaded environments, e.g. web application. The reactor
+	 * runtime will likely complain, that this behavior is not permitted.
+	 */
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
-		LOGGER.info("Blocking...");
+		LOGGER.info("Single blocking decision by using .blockFirst()...");
 		final AuthorizationDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		LOGGER.info("Decision for action 'read': {}", readDecision != null ? readDecision.getDecision() : "null");
 		final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
 		LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
 	}
 
+	/**
+	 * If only one result is required, the appropriate way to consume exactly one
+	 * decision event is to use .take(1) and subscribe accordingly. In this demo
+	 * these will be processed sequentially, as this application is not declaring
+	 * schedulers.
+	 */
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
-		LOGGER.info("Reactive...");
-		final Flux<AuthorizationDecision> readDecision = pdp.decide(READ_SUBSCRIPTION);
-		readDecision.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
-		final Flux<AuthorizationDecision> writeDecision = pdp.decide(WRITE_SUBSCRIPTION);
-		writeDecision.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
+		LOGGER.info("Single reactive decision by using .take(1) and .subscribe()...");
+		pdp.decide(READ_SUBSCRIPTION).take(1)
+				.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
+		pdp.decide(WRITE_SUBSCRIPTION).take(1)
+				.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
 	}
 
 	private static void handleAuthorizationDecision(String action, AuthorizationDecision authzDecision) {
 		LOGGER.info("Decision for action '{}': {}", action, authzDecision.getDecision());
 	}
 
-	private static void runPerformanceDemoSingle(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance Single...");
+	private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
+		LOGGER.info("Performance using sequential .blockFirst()");
 
-		final AuthorizationDecision authzDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
-		LOGGER.info("{}", authzDecision);
-
-		int[] count = { 0 };
+		LOGGER.info("Warming up...");
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decide(READ_SUBSCRIPTION).blockFirst();
+		}
+		LOGGER.info("Measuring...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe(decision -> count[0]++);
-			// pdp.decide(READ_SUBSCRIPTION).blockFirst();
-			// count[0]++;
+			pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		}
 		long end = System.nanoTime();
-		LOGGER.info("Single");
-		LOGGER.info("Runs  : {}", RUNS);
-		LOGGER.info("Count  : {}", count[0]);
-		LOGGER.info("Total : {}s", nanoToS((double) end - start));
-		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+		logResults("Single Blocking Results:", RUNS, start, end);
+	}
+
+	private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
+		LOGGER.info("Performance using sequential .take(1)");
+
+		LOGGER.info("Warming up...");
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
+		}
+		LOGGER.info("Measuring...");
+
+		long start = System.nanoTime();
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
+		}
+		long end = System.nanoTime();
+		logResults("Single Reactive Results:", RUNS, start, end);
 	}
 
 	protected static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
@@ -170,22 +165,19 @@ public class EmbeddedPDPDemo {
 
 		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
 		multiSubscription.addAuthorizationSubscription("sub", SUBJECT, ACTION_READ, RESOURCE);
-		final IdentifiableAuthorizationDecision identifiableAuthzDecision = pdp.decide(multiSubscription).blockFirst();
-		LOGGER.info("{}", identifiableAuthzDecision.getAuthorizationDecision());
 
-		int[] count = { 0 };
+		LOGGER.info("Warming up...");
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decide(multiSubscription).take(1).subscribe();
+		}
+		LOGGER.info("Measuring...");
+
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			// pdp.decide(multiSubscription).take(1).subscribe(decision -> count[0]++);
-			pdp.decide(multiSubscription).blockFirst();
-			count[0]++;
+			pdp.decide(multiSubscription).take(1).subscribe();
 		}
 		long end = System.nanoTime();
-		LOGGER.info("Multi");
-		LOGGER.info("Runs  : {}", RUNS);
-		LOGGER.info("Count  : {}", count[0]);
-		LOGGER.info("Total : {}s", nanoToS((double) end - start));
-		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+		logResults("MultiAuthorizationSubscription decide Results:", RUNS, start, end);
 	}
 
 	protected static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
@@ -193,22 +185,17 @@ public class EmbeddedPDPDemo {
 
 		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
 		multiSubscription.addAuthorizationSubscription("read", SUBJECT, ACTION_READ, RESOURCE);
-		final MultiAuthorizationDecision multiDecision = pdp.decideAll(multiSubscription).blockFirst();
-		LOGGER.info("{}", multiDecision.getAuthorizationDecisionForSubscriptionWithId("read"));
-
-		int[] count = { 0 };
+		LOGGER.info("Warming up...");
+		for (int i = 0; i < RUNS; i++) {
+			pdp.decideAll(multiSubscription).take(1).subscribe();
+		}
+		LOGGER.info("Measuring...");
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
-			pdp.decideAll(multiSubscription).take(1).subscribe(decision -> count[0]++);
-			// pdp.decideAll(multiSubscription).blockFirst();
-			// count[0]++;
+			pdp.decideAll(multiSubscription).take(1).subscribe();
 		}
 		long end = System.nanoTime();
-		LOGGER.info("Multi All");
-		LOGGER.info("Runs  : {}", RUNS);
-		LOGGER.info("Count  : {}", count[0]);
-		LOGGER.info("Total : {}s", nanoToS((double) end - start));
-		LOGGER.info("Avg.  : {}ms", nanoToMs(((double) end - start) / RUNS));
+		logResults("MultiAuthorizationSubscription decideAll Results:", RUNS, start, end);
 	}
 
 	private static double nanoToMs(double nanoseconds) {
@@ -219,12 +206,11 @@ public class EmbeddedPDPDemo {
 		return nanoseconds / BILLION;
 	}
 
-	private static AuthorizationSubscription buildAuthorizationSubscription(Object subject, Object action,
-			Object resource) {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.registerModule(new Jdk8Module());
-		return new AuthorizationSubscription(mapper.valueToTree(subject), mapper.valueToTree(action),
-				mapper.valueToTree(resource), null);
+	private static void logResults(String title, int runs, long start, long end) {
+		LOGGER.info(title);
+		LOGGER.info("Runs  : {}", runs);
+		LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
+		LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / RUNS)));
 	}
 
 }

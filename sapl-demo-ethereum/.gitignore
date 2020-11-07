@@ -21,3 +21,5 @@ webpack.generated.js
 /solidity/linux_convert.sh
 package.json
 package-lock.json
+webpack.config.js
+webpack.generated.js

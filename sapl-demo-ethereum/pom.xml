@@ -3,28 +3,23 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>sapl-demo-ethereum</artifactId>
-	<name>SAPL Demo Ethereum</name>
-	<version>2.0-SNAPSHOT</version>
-
-
-	<properties>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<vaadin.version>14.1.5</vaadin.version>
-		<drivers.dir>${project.basedir}/drivers</drivers.dir>
-		<drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
-	</properties>
 
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
 		<version>2.0.0-SNAPSHOT</version>
-		<relativePath>../sapl-demo-parent/pom.xml</relativePath> <!-- lookup parent from repository -->
+		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
+
+	<artifactId>sapl-demo-ethereum</artifactId>
+	<name>SAPL Demo Ethereum</name>
+
+	<properties>
+		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
+		<vaadin.version>14.1.28</vaadin.version>
+		<drivers.dir>${project.basedir}/drivers</drivers.dir>
+		<drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
+	</properties>
 
 	<repositories>
 		<!-- The order of definitions matters. Explicitly defining central here 
@@ -137,23 +132,19 @@
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
-			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
-			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-ethereum</artifactId>
-			<version>${version.sapl.policy.engine}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>
@@ -196,6 +187,7 @@
 				</configuration>
 				<executions>
 					<execution>
+						<?m2e ignore?>
 						<id>generate-contracts</id>
 						<phase>generate-sources</phase>
 						<goals>
@@ -211,6 +203,7 @@
 				<version>1.9.1</version>
 				<executions>
 					<execution>
+						<?m2e execute onConfiguration,onIncremental?>
 						<id>add-contracts</id>
 						<phase>initialize</phase>
 						<goals>
@@ -225,62 +218,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.web3j
-										</groupId>
-										<artifactId>
-											web3j-maven-plugin
-										</artifactId>
-										<versionRange>
-											[4.5.11,)
-										</versionRange>
-										<goals>
-											<goal>generate-sources</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.9.1,)
-										</versionRange>
-										<goals>
-											<goal>add-source</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnIncremental>true</runOnIncremental>
-											<runOnConfiguration>true</runOnConfiguration>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
 	<profiles>
@@ -323,85 +260,5 @@
 				</plugins>
 			</build>
 		</profile>
-
-		<profile>
-			<id>integration-tests</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>start-spring-boot</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>start</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>stop-spring-boot</id>
-								<phase>post-integration-test</phase>
-								<goals>
-									<goal>stop</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<!-- Runs the integration tests (*IT) after the server is started -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<trimStackTrace>false</trimStackTrace>
-							<enableAssertions>true</enableAssertions>
-							<systemPropertyVariables>
-								<!-- Pass location of downloaded webdrivers to the tests -->
-								<webdriver.chrome.driver>${webdriver.chrome.driver}</webdriver.chrome.driver>
-							</systemPropertyVariables>
-						</configuration>
-					</plugin>
-
-					<plugin>
-						<groupId>com.lazerycode.selenium</groupId>
-						<artifactId>driver-binary-downloader-maven-plugin</artifactId>
-						<version>1.0.17</version>
-						<configuration>
-							<onlyGetDriversForHostOperatingSystem>true
-							</onlyGetDriversForHostOperatingSystem>
-							<rootStandaloneServerDirectory>
-								${project.basedir}/drivers/driver
-							</rootStandaloneServerDirectory>
-							<downloadedZipFileDirectory>
-								${project.basedir}/drivers/driver_zips
-							</downloadedZipFileDirectory>
-							<customRepositoryMap>
-								${project.basedir}/drivers.xml
-							</customRepositoryMap>
-						</configuration>
-						<executions>
-							<execution>
-								<!-- use phase "none" to skip download step -->
-								<phase>${drivers.downloader.phase}</phase>
-								<goals>
-									<goal>selenium</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-				</plugins>
-			</build>
-		</profile>
-
 	</profiles>
 </project>

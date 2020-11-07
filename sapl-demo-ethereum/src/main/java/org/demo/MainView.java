@@ -27,7 +27,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.PWA;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
@@ -39,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Push
 @Slf4j
 @Route
-@PWA(name = "Sapl Ethereum Printer Application", shortName = "Sapl Ethereum App", description = "This is an application showing the use of Sapl with Ethereum.", enableInstallPrompt = true)
 @CssImport("./styles/shared-styles.css")
 @StyleSheet("frontend://styles/styles.css")
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
