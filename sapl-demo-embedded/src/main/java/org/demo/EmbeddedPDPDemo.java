@@ -16,6 +16,7 @@
 package org.demo;
 
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -26,7 +27,7 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
 import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint;
-import io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder;
+import io.sapl.pdp.embedded.PolicyDecisionPointFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -68,16 +69,16 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		// A PDP is constructed using the builder pattern
-		Builder builder = EmbeddedPolicyDecisionPoint.builder();
-		// by default the policies are loaded from bundled resources.
-		if (path != null) {
-			// if a path is defined load polices and configuration from the filesystem
-			builder = builder.withFilesystemPolicyRetrievalPoint(path, Builder.IndexType.SIMPLE);
-		}
+		// A PDP is constructed using the factory pattern
 		// register the custom PIP and function library
-		builder.withPolicyInformationPoint(new EchoPIP()).withFunctionLibrary(new SimpleFunctionLibrary());
-		final EmbeddedPolicyDecisionPoint pdp = builder.build();
+		EmbeddedPolicyDecisionPoint pdp;
+		if (path != null) {
+			pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List.of(new EchoPIP()),
+					List.of(new SimpleFunctionLibrary()));
+		}
+		// by default the policies are loaded from bundled resources.
+		pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List.of(new EchoPIP()),
+				List.of(new SimpleFunctionLibrary()));
 
 		blockingUsageDemo(pdp);
 
