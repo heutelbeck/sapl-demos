@@ -76,17 +76,9 @@
 
 	<repositories>
 		<repository>
-			<id>openconjurer-public</id>
-			<name>OpenConjurer Nexus Maven Release Repository</name>
-			<url>https://nexus.openconjurer.org/repository/releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>openconjurer-public-snapshots</id>
-			<name>OpenConjurer Nexus Maven Snapshot Repository</name>
-			<url>https://nexus.openconjurer.org/repository/snapshots/</url>
+			<id>sapl</id>
+         	<name>SAPL Maven Repository</name>
+         	<url>https://maven.pkg.github.com/heutelbeck/packages</url>		
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
