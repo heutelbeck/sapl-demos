@@ -26,7 +26,7 @@ jobs:
     - name: Configure servers
       uses: s4u/maven-settings-action@v2.3.0
       with:
-        servers: '[{"id": "ftk", "username": "${env.GHUB_USERNAME}", "password": "${env.GHUB_ACCESS_TOKEN}"},{"id": "sapl", "username": "${env.GHUB_USERNAME}", "password": "${env.GHUB_ACCESS_TOKEN}"},{"id": "ghcr.io", "username": "${env.GHUB_USERNAME}", "password": "${env.GHUB_ACCESS_TOKEN}"}]'
+        servers: '[{"id": "sapl", "username": "${env.GHUB_USERNAME}", "password": "${env.GHUB_ACCESS_TOKEN}"}]'
         
     - name: Set up Node.js
       uses: actions/setup-node@v2

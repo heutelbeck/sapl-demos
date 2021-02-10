@@ -75,10 +75,12 @@
 	</dependencyManagement>
 
 	<repositories>
+		<!-- The SAPL dependencies are hosted in this repository. A matching server 
+			entry has to be set in the settings.xml using a GitHub personal access token -->
 		<repository>
 			<id>sapl</id>
-         	<name>SAPL Maven Repository</name>
-         	<url>https://maven.pkg.github.com/heutelbeck/packages</url>		
+			<name>SAPL Maven Repository</name>
+			<url>https://maven.pkg.github.com/heutelbeck/packages</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>
