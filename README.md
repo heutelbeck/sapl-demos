@@ -1,7 +1,7 @@
 [![Build Status](https://github.com/heutelbeck/sapl-demos/workflows/build/badge.svg)](https://github.com/heutelbeck/sapl-demos/actions)
 
 Please generate a personal access token for your GitHub account and add this to your ~/.m2/settings.xml:
-
+```
    </servers>
       <server>
          <id>sapl</id>
@@ -10,6 +10,7 @@ Please generate a personal access token for your GitHub account and add this to 
          <password>ACCESS TOKEN</password>
       </server>
    </servers>
+```
 
 # sapl-demos
 
