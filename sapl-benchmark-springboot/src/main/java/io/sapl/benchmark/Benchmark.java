@@ -68,7 +68,8 @@ import static io.sapl.pdp.embedded.EmbeddedPolicyDecisionPoint.Builder.IndexType
 @RequiredArgsConstructor
 public class Benchmark implements CommandLineRunner {
 
-    public static final String DEFAULT_PATH = "/tmp/sapl/benchmarks";
+
+    public static final String DEFAULT_PATH = "/tmp/sapl/benchmarks/";
 
     private final TestRunner TEST_RUNNER = new TestRunner();
     private final List<Long> seedList = new LinkedList<>();
