@@ -33,13 +33,13 @@ jobs:
       with:
         node-version: '12'
     
-#    - name: Cache Maven dependencies
-#      uses: actions/cache@v2      
-#      with:
-#        path: ~/.m2/repository
-#        key: ${{ runner.os }}-maven-v1-${{ hashFiles('**/pom.xml') }}
-#        restore-keys: |
-#          ${{ runner.os }}-maven-v1-
+    - name: Cache Maven dependencies
+      uses: actions/cache@v2      
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
           
     - name: Build with Maven (JUnit, JaCoCo, Sonar) 
       run: mvn -B org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.host.url=https://sonar.ftk.de -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
