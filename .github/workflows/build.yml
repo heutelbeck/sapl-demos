@@ -3,6 +3,8 @@ name: build
 on:
   push:
     branches: [master]
+  repository_dispatch:
+    branches: [master]
 
 jobs:
   build:
