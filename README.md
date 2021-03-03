@@ -2,7 +2,7 @@
 
 Please generate a personal access token for your GitHub account and add this to your ~/.m2/settings.xml:
 ```
-   </servers>
+   <servers>
       <server>
          <id>sapl</id>
          <username>USERNAME</username>
