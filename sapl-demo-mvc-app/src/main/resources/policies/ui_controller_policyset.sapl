@@ -53,7 +53,7 @@ where
 /*
  * Doctors may access the POST controller for registering a new patient bound to the relative resource URI given
  */
-policy "doctors may register new patients"
+policy "doctors may register new patients POST"
 permit action.http.method == "POST" & resource.http.requestedURI == "/patients"
 where
 	("ROLE_DOCTOR" in subject..authority);
