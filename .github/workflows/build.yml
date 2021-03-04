@@ -3,6 +3,8 @@ name: build
 on:
   push:
     branches: [master]
+  repository_dispatch:
+    branches: [master]
 
 jobs:
   build:
@@ -45,4 +47,6 @@ jobs:
       run: mvn -B org.jacoco:jacoco-maven-plugin:prepare-agent install org.jacoco:jacoco-maven-plugin:report sonar:sonar -Dsonar.host.url=https://sonar.ftk.de -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
              
     - name: Clean up local repository before caching
+      if: ${{ always() }}
       run: rm -rf /.m2/repository/io/sapl
+      
