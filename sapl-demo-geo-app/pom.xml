@@ -51,15 +51,11 @@
 	</build>
 
 	<repositories>
-		<!-- The SAPL dependencies are hosted in this repository. A matching server 
-			entry has to be set in the settings.xml using a GitHub personal access token -->
 		<repository>
-			<id>sapl</id>
-			<name>SAPL Maven Repository</name>
-			<url>https://maven.pkg.github.com/heutelbeck/packages</url>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
 	</repositories>
