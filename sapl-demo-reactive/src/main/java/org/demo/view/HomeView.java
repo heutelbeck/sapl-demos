@@ -13,7 +13,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.MultiAuthorizationSubscription;
 
 @SpringView(name = "") // Root view
 public class HomeView extends VerticalLayout implements View {

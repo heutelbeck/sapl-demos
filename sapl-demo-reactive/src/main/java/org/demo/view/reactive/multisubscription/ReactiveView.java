@@ -11,8 +11,8 @@ import org.springframework.security.core.Authentication;
 import com.vaadin.spring.annotation.SpringComponent;
 import com.vaadin.spring.annotation.SpringView;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.MultiAuthorizationDecision;
+import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.spring.pep.PolicyEnforcementPoint;
 import reactor.core.publisher.Flux;
 
