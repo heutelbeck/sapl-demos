@@ -17,15 +17,18 @@ import io.sapl.vaadin.JsonEditorConfiguration;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.ValidationFinishedListener;
 import io.sapl.web.MainView;
 
 @Route(value = "", layout = MainView.class)
 @PageTitle("Java-based View")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-public class JavabasedViewView extends Div implements DocumentChangedListener {
+public class JavabasedViewView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
+	private Button addValidationChangedListenerButton;
+	private Button removeValidationChangedListenerButton;
 	private SaplEditor saplEditor;
 	private JsonEditor jsonEditor;
 
@@ -38,47 +41,9 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 
 		saplEditor = new SaplEditor(saplConfig);
 		saplEditor.addDocumentChangedListener(this);
-		saplEditor.addValidationFinishedListener(this::onValidationFinished);
+		saplEditor.addValidationFinishedListener(this);
 		add(saplEditor);
-
-		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
-		jsonEditor.addDocumentChangedListener(this);
-		add(jsonEditor);
-
-		Button getSaplDocumentButton = new Button();
-		getSaplDocumentButton.setText("Get Document (SAPL)");
-		getSaplDocumentButton.addClickListener(e -> {
-			String document = saplEditor.getDocument();
-			System.out.println("Get Document (SAPL): " + document);
-		});
-		add(getSaplDocumentButton);
-
-		Button setSaplDocumentButton = new Button();
-		setSaplDocumentButton.setText("Set Document (SAPL)");
-		setSaplDocumentButton.addClickListener(e -> {
-			String document = getRandomString();
-			System.out.println("Set Document (SAPL): " + document);
-			saplEditor.setDocument(document);
-		});
-		add(setSaplDocumentButton);
 		
-		Button getJsonDocumentButton = new Button();
-		getJsonDocumentButton.setText("Get Document (JSON)");
-		getJsonDocumentButton.addClickListener(e -> {
-			String document = jsonEditor.getDocument();
-			System.out.println("Get Document (JSON): " + document);
-		});
-		add(getJsonDocumentButton);
-
-		Button setJsonDocumentButton = new Button();
-		setJsonDocumentButton.setText("Set Document (JSON)");
-		setJsonDocumentButton.addClickListener(e -> {
-			String document = getRandomString();
-			System.out.println("Set Document (JSON): " + document);
-			jsonEditor.setDocument(document);
-		});
-		add(setJsonDocumentButton);
-
 		addDocumentChangedListenerButton = new Button();
 		addDocumentChangedListenerButton.setText("Add Change Listener (SAPL)");
 		addDocumentChangedListenerButton.addClickListener(e -> {
@@ -97,15 +62,56 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
 		add(removeDocumentChangedListenerButton);
+		
+		addValidationChangedListenerButton = new Button();
+		addValidationChangedListenerButton.setText("Add Validation Listener (SAPL)");
+		addValidationChangedListenerButton.addClickListener(e -> {
+			saplEditor.addValidationFinishedListener(this);
+			addValidationChangedListenerButton.setEnabled(false);
+			removeValidationChangedListenerButton.setEnabled(true);
+		});
+		addValidationChangedListenerButton.setEnabled(false);
+		add(addValidationChangedListenerButton);
+
+		removeValidationChangedListenerButton = new Button();
+		removeValidationChangedListenerButton.setText("Remove Validation Listener (SAPL)");
+		removeValidationChangedListenerButton.addClickListener(e -> {
+			saplEditor.removeValidationFinishedListener(this);
+			addValidationChangedListenerButton.setEnabled(true);
+			removeValidationChangedListenerButton.setEnabled(false);
+		});
+		add(removeValidationChangedListenerButton);
+
+		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
+		jsonEditor.addDocumentChangedListener(this);
+		add(jsonEditor);
+		
+		Button getJsonDocumentButton = new Button();
+		getJsonDocumentButton.setText("Get Document (JSON)");
+		getJsonDocumentButton.addClickListener(e -> {
+			String document = jsonEditor.getDocument();
+			System.out.println("Get Document (JSON): " + document);
+		});
+		add(getJsonDocumentButton);
+
+		Button setJsonDocumentButton = new Button();
+		setJsonDocumentButton.setText("Set Document (JSON)");
+		setJsonDocumentButton.addClickListener(e -> {
+			String document = getJsonString();
+			System.out.println("Set Document (JSON): " + document);
+			jsonEditor.setDocument(document);
+		});
+		add(setJsonDocumentButton);
 
 		saplEditor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
+		jsonEditor.setDocument(getJsonString());
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
 		System.out.println("value changed: " + event.getNewValue());
 	}
 
-	private void onValidationFinished(ValidationFinishedEvent event) {
+	public void onValidationFinished(ValidationFinishedEvent event) {
 		System.out.println("validation finished");
 		Issue[] issues = event.getIssues();
 		System.out.println("issue count: " + issues.length);
@@ -114,10 +120,27 @@ public class JavabasedViewView extends Div implements DocumentChangedListener {
 		}
 	}
 
-	private String getRandomString() {
-		byte[] array = new byte[20];
-		Random random = new Random();
-		random.nextBytes(array);
-		return new String(array, Charset.forName("UTF-8"));
+	private String getJsonString() {
+		return "[\r\n"
+				+ " {\r\n"
+				+ "  _id: \"post 1\",\r\n"
+				+ "  \"author\": \"Bob\",\r\n"
+				+ "  \"content\": \"...\",\r\n"
+				+ "  \"page_views\": 5\r\n"
+				+ " },\r\n"
+				+ " {\r\n"
+				+ "  \"_id\": \"post 2\",\r\n"
+				+ "  \"author\": \"Bob\",\r\n"
+				+ "  \"content\": \"...\",\r\n"
+				+ "  \"page_views\": 9\r\n"
+				+ " },\r\n"
+				+ " {\r\n"
+				+ "  \"_id\": \"post 3\",\r\n"
+				+ "  \"author\": \"Bob\",\r\n"
+				+ "  \"content\": \"...\",\r\n"
+				+ "  \"page_views\": 8\r\n"
+				+ " }\r\n"
+				+ "]\r\n"
+				+ "";
 	}
 }
