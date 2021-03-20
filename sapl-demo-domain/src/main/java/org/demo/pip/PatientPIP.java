@@ -97,7 +97,7 @@ public class PatientPIP {
 			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
 			return Flux.just(Val.of(jsonNode));
 		} catch (IllegalArgumentException | PolicyEvaluationException e) {
-			return Flux.just(Val.ofNull());
+			return Flux.just(Val.NULL);
 		}
 	}
 
