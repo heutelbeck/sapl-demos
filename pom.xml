@@ -42,6 +42,7 @@
 		<module>sapl-demo-filterchain</module>
 		<module>sapl-demo-geo-app</module>
 		<module>sapl-demo-geo-server</module>
+		<module>sapl-demo-rest-server</module>
 		<module>sapl-demo-reactive</module>
 		<module>sapl-demo-remote</module>
 		<module>sapl-demo-ethereum</module>

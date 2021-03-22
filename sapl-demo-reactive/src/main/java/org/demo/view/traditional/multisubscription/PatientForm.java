@@ -5,7 +5,7 @@ import org.demo.service.UIController;
 import org.demo.view.traditional.AbstractPatientForm;
 import org.springframework.security.core.Authentication;
 
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.MultiAuthorizationSubscription;
 
 /**
  * Concrete patient form implementation demonstrating the usage of SAPL

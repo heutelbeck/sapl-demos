@@ -13,9 +13,9 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.AttributeException;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.api.validation.Number;
 import lombok.RequiredArgsConstructor;
@@ -92,11 +92,12 @@ public class PatientPIP {
 	@Attribute(name = "patientRecord")
 	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, JsonNode> variables) {
 		try {
-			final Patient patient = patientRepo.findById(patientId.get().asLong()).orElseThrow(AttributeException::new);
+			final Patient patient = patientRepo.findById(patientId.get().asLong())
+					.orElseThrow(PolicyEvaluationException::new);
 			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
 			return Flux.just(Val.of(jsonNode));
-		} catch (IllegalArgumentException | AttributeException e) {
-			return Flux.just(Val.ofNull());
+		} catch (IllegalArgumentException | PolicyEvaluationException e) {
+			return Flux.just(Val.NULL);
 		}
 	}
 

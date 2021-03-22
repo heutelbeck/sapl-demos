@@ -52,7 +52,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 		System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
 	}
 
-	public Integer call() throws SSLException {
+	public Integer call() throws SSLException, InterruptedException {
 		LOG.warn("INSECURE SSL SETTINGS! This demo uses an insecure SslContext for "
 				+ "testing purposes only. It will accept all certificates. "
 				+ "This is only for testing local servers with self-signed certificates easily. "
@@ -76,8 +76,8 @@ public class RemotePDPDemo implements Callable<Integer> {
 		 * authorization decisions when applicable. For alternative patterns of
 		 * invocation, consult the sapl-demo-pdp-embedded
 		 */
-		var decision = pdp.decide(authzSubscription).blockFirst();
-		LOG.info("Decision: {}", decision);
+		pdp.decide(authzSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).subscribe();
+		Thread.sleep(60*1000);
 		return 0;
 	}
 

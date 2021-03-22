@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationDecision;
-import io.sapl.api.pdp.multisubscription.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.MultiAuthorizationDecision;
+import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
