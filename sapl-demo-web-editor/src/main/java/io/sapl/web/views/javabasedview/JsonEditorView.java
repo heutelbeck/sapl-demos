@@ -18,6 +18,8 @@ import io.sapl.web.MainView;
 public class JsonEditorView extends Div implements DocumentChangedListener {
 
 	private JsonEditor jsonEditor;
+	private Button addDocumentChangedListenerButton;
+	private Button removeDocumentChangedListenerButton;
 	
 	public JsonEditorView() {
 		setId("json-editor-view");
@@ -26,19 +28,37 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 		jsonEditor.addDocumentChangedListener(this);
 		add(jsonEditor);
 		
-		Button getJsonDocumentButton = new Button();
-		getJsonDocumentButton.setText("Get Document (JSON)");
-		getJsonDocumentButton.addClickListener(e -> {
-			String document = jsonEditor.getDocument();
-			System.out.println("Get Document (JSON): " + document);
+		addDocumentChangedListenerButton = new Button();
+		addDocumentChangedListenerButton.setText("Add Change Listener");
+		addDocumentChangedListenerButton.addClickListener(e -> {
+			jsonEditor.addDocumentChangedListener(this);
+			addDocumentChangedListenerButton.setEnabled(false);
+			removeDocumentChangedListenerButton.setEnabled(true);
 		});
-		add(getJsonDocumentButton);
+		addDocumentChangedListenerButton.setEnabled(false);
+		add(addDocumentChangedListenerButton);
+
+		removeDocumentChangedListenerButton = new Button();
+		removeDocumentChangedListenerButton.setText("Remove Change Listener");
+		removeDocumentChangedListenerButton.addClickListener(e -> {
+			jsonEditor.removeDocumentChangedListener(this);
+			addDocumentChangedListenerButton.setEnabled(true);
+			removeDocumentChangedListenerButton.setEnabled(false);
+		});
+		add(removeDocumentChangedListenerButton);
+		
+		Button showJsonDocumentButton = new Button();
+		showJsonDocumentButton.setText("Show Document in Console");
+		showJsonDocumentButton.addClickListener(e -> {
+			String document = jsonEditor.getDocument();
+			System.out.println("Current JSON value: " + document);
+		});
+		add(showJsonDocumentButton);
 
 		Button setJsonDocumentButton = new Button();
-		setJsonDocumentButton.setText("Set Document (JSON)");
+		setJsonDocumentButton.setText("Set Document to Default");
 		setJsonDocumentButton.addClickListener(e -> {
 			String document = getDefaultJsonString();
-			System.out.println("Set Document (JSON): " + document);
 			jsonEditor.setDocument(document);
 		});
 		add(setJsonDocumentButton);
