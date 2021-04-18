@@ -16,9 +16,9 @@ import io.sapl.vaadin.ValidationFinishedListener;
 import io.sapl.web.MainView;
 
 @Route(value = "", layout = MainView.class)
-@PageTitle("Java-based View")
+@PageTitle("Sapl Editor Demo")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-public class JavabasedViewView extends Div implements DocumentChangedListener, ValidationFinishedListener {
+public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
@@ -26,8 +26,8 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 	private Button removeValidationChangedListenerButton;
 	private SaplEditor saplEditor;
 
-	public JavabasedViewView() {
-		setId("javabased-view-view");
+	public SaplEditorView() {
+		setId("sapl-editor-view");
 
 		SaplEditorConfiguration saplConfig = new SaplEditorConfiguration();
 		saplConfig.setHasLineNumbers(true);
@@ -39,7 +39,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		add(saplEditor);
 		
 		addDocumentChangedListenerButton = new Button();
-		addDocumentChangedListenerButton.setText("Add Change Listener (SAPL)");
+		addDocumentChangedListenerButton.setText("Add Change Listener");
 		addDocumentChangedListenerButton.addClickListener(e -> {
 			saplEditor.addDocumentChangedListener(this);
 			addDocumentChangedListenerButton.setEnabled(false);
@@ -49,7 +49,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		add(addDocumentChangedListenerButton);
 
 		removeDocumentChangedListenerButton = new Button();
-		removeDocumentChangedListenerButton.setText("Remove Change Listener (SAPL)");
+		removeDocumentChangedListenerButton.setText("Remove Change Listener");
 		removeDocumentChangedListenerButton.addClickListener(e -> {
 			saplEditor.removeDocumentChangedListener(this);
 			addDocumentChangedListenerButton.setEnabled(true);
@@ -58,7 +58,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		add(removeDocumentChangedListenerButton);
 		
 		addValidationChangedListenerButton = new Button();
-		addValidationChangedListenerButton.setText("Add Validation Listener (SAPL)");
+		addValidationChangedListenerButton.setText("Add Validation Listener");
 		addValidationChangedListenerButton.addClickListener(e -> {
 			saplEditor.addValidationFinishedListener(this);
 			addValidationChangedListenerButton.setEnabled(false);
@@ -68,13 +68,28 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		add(addValidationChangedListenerButton);
 
 		removeValidationChangedListenerButton = new Button();
-		removeValidationChangedListenerButton.setText("Remove Validation Listener (SAPL)");
+		removeValidationChangedListenerButton.setText("Remove Validation Listener");
 		removeValidationChangedListenerButton.addClickListener(e -> {
 			saplEditor.removeValidationFinishedListener(this);
 			addValidationChangedListenerButton.setEnabled(true);
 			removeValidationChangedListenerButton.setEnabled(false);
 		});
 		add(removeValidationChangedListenerButton);
+		
+		Button setDocumentToDefaultButton = new Button();
+		setDocumentToDefaultButton.setText("Set Document to Default");
+		setDocumentToDefaultButton.addClickListener(e -> {
+			saplEditor.setDocument(getDefaultSaplString());
+		});
+		add(setDocumentToDefaultButton);
+		
+		Button showSaplDocumentButton = new Button();
+		showSaplDocumentButton.setText("Show Document in Console");
+		showSaplDocumentButton.addClickListener(e -> {
+			String document = saplEditor.getDocument();
+			System.out.println("Current SAPL value: " + document);
+		});
+		add(showSaplDocumentButton);
 
 		saplEditor.setDocument(getDefaultSaplString());
 	}

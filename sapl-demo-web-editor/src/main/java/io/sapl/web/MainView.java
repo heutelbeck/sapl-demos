@@ -16,7 +16,7 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
-import io.sapl.web.views.javabasedview.JavabasedViewView;
+import io.sapl.web.views.javabasedview.SaplEditorView;
 import io.sapl.web.views.javabasedview.JsonEditorView;
 
 /**
@@ -43,7 +43,7 @@ public class MainView extends AppLayout {
 
     private static Tab[] getAvailableTabs() {
         final List<Tab> tabs = new ArrayList<>();
-        tabs.add(createTab("Java-based View", JavabasedViewView.class));
+        tabs.add(createTab("SAPL Editor Demo", SaplEditorView.class));
         tabs.add(createTab("JSON Editor Demo", JsonEditorView.class));
         return tabs.toArray(new Tab[tabs.size()]);
     }
