@@ -1,8 +1,5 @@
 package io.sapl.web.views.javabasedview;
 
-import java.nio.charset.Charset;
-import java.util.Random;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -12,8 +9,6 @@ import com.vaadin.flow.router.Route;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.DocumentChangedListener;
 import io.sapl.vaadin.Issue;
-import io.sapl.vaadin.JsonEditor;
-import io.sapl.vaadin.JsonEditorConfiguration;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
@@ -30,7 +25,6 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 	private Button addValidationChangedListenerButton;
 	private Button removeValidationChangedListenerButton;
 	private SaplEditor saplEditor;
-	private JsonEditor jsonEditor;
 
 	public JavabasedViewView() {
 		setId("javabased-view-view");
@@ -82,29 +76,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		});
 		add(removeValidationChangedListenerButton);
 
-		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
-		jsonEditor.addDocumentChangedListener(this);
-		add(jsonEditor);
-		
-		Button getJsonDocumentButton = new Button();
-		getJsonDocumentButton.setText("Get Document (JSON)");
-		getJsonDocumentButton.addClickListener(e -> {
-			String document = jsonEditor.getDocument();
-			System.out.println("Get Document (JSON): " + document);
-		});
-		add(getJsonDocumentButton);
-
-		Button setJsonDocumentButton = new Button();
-		setJsonDocumentButton.setText("Set Document (JSON)");
-		setJsonDocumentButton.addClickListener(e -> {
-			String document = getJsonString();
-			System.out.println("Set Document (JSON): " + document);
-			jsonEditor.setDocument(document);
-		});
-		add(setJsonDocumentButton);
-
-		saplEditor.setDocument("policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit");
-		jsonEditor.setDocument(getJsonString());
+		saplEditor.setDocument(getDefaultSaplString());
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
@@ -120,27 +92,7 @@ public class JavabasedViewView extends Div implements DocumentChangedListener, V
 		}
 	}
 
-	private String getJsonString() {
-		return "[\r\n"
-				+ " {\r\n"
-				+ "  _id: \"post 1\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 5\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 2\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 9\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 3\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 8\r\n"
-				+ " }\r\n"
-				+ "]\r\n"
-				+ "";
+	private String getDefaultSaplString() {
+		return "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit"; 
 	}
 }
