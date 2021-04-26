@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SEED=$RANDOM
-RUNS=300
+RUNS=100
 ITER=1
 
 

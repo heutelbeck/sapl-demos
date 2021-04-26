@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -75,16 +74,6 @@ public class TestRunner {
 				throw new RuntimeException(
 						String.format("wrong index impl. expected %s but got %s", indexType, documentIndex.getClass()));
 			break;
-		}
-	}
-
-	private void sanitizeResults(List<XlsRecord> results) {
-		int numberOfDataToRemove = (int) (results.size() * REMOVE_EDGE_DATA_BY_PERCENTAGE);
-
-		for (int i = 0; i < numberOfDataToRemove; i++) {
-			results.stream().min(Comparator.comparingDouble(XlsRecord::getTimeDuration)).ifPresent(results::remove);
-
-			results.stream().max(Comparator.comparingDouble(XlsRecord::getTimeDuration)).ifPresent(results::remove);
 		}
 	}
 
@@ -254,7 +243,6 @@ public class TestRunner {
 			LOGGER.error("Error running test", e);
 		}
 
-		sanitizeResults(results);
 		addResultsForConfigToContainer(benchmarkDataContainer, config, results);
 
 		return results;
