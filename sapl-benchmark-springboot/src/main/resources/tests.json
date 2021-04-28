@@ -1,6 +1,30 @@
 {
 	"cases":
 	[
+		{
+			"name": "50p, 5v, 200vp",
+			"seed": 564653,
+			"policyCount": 50,
+			"logicalVariableCount": 5,
+			"variablePoolCount": 200,
+			"bracketProbability": 0.2,
+			"conjunctionProbability": 0.9,
+			"negationProbability": 0.3,
+			"falseProbability": 0.5,
+			"path": "~/sapl/"
+		},
+		{
+			"name": "50p, 10v, 200vp",
+			"seed": 436934,
+			"policyCount": 50,
+			"logicalVariableCount": 10,
+			"variablePoolCount": 200,
+			"bracketProbability": 0.2,
+			"conjunctionProbability": 0.9,
+			"negationProbability": 0.3,
+			"falseProbability": 0.5,
+			"path": "~/sapl/"
+		},
 	    {
 		    "name": "100p, 5v, 200vp",
 		    "seed": 29724,
