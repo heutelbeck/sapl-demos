@@ -10,7 +10,7 @@ public class BenchmarkConstants {
 
     public static final String ERROR_WRITING_BITMAP = "Error writing bitmap";
 
-    public static final String EXPORT_PROPERTIES = "number, name, timePreparation, timeDuration, request, response";
+    public static final String EXPORT_PROPERTIES = "number, name, timePreparation, timeDuration, request, numberOfMatchingPolicies, matchingPolicyNames";
 
     public static final String EXPORT_PROPERTIES_AGGREGATES = "name, min, max, avg, mdn, seed, policyCount, variableCount, runs, iterations";
 

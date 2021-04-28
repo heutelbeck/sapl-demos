@@ -160,13 +160,13 @@ public class ResultWriter {
     }
 
     private List<String> getExportHeader() {
-        return Arrays.asList("Iteration", "Test Case", "Preparation Time (ms)", "Execution Time (ms)", "Request String",
-                "Response String (ms)");
+        return Arrays.asList("Iteration", "Test Case", "Preparation Time (ns)", "Execution Time (ns)", "Request String",
+                "Number of Matching Policies", "Matching Policy Names");
     }
 
     private List<String> getExportHeaderAggregates() {
-        return Arrays.asList("Test Case", "Minimum Time (ms)", "Maximum Time (ms)", "Average Time (ms)",
-                "Median Time (ms)", "Seed", "Policy Count", "Variable Count", "Runs", "Iterations");
+        return Arrays.asList("Test Case", "Minimum Time (ns)", "Maximum Time (ns)", "Average Time (ns)",
+                "Median Time (ns)", "Seed", "Policy Count", "Variable Count", "Runs", "Iterations");
     }
 
 

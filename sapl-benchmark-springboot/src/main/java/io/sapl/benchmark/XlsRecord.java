@@ -30,6 +30,8 @@ public class XlsRecord {
 
     String request;
 
-    String response;
+    String numberOfMatchingPolicies;
+
+    String matchingPolicyNames;
 
 }

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @RequiredArgsConstructor
@@ -23,19 +22,19 @@ public class DomainActions {
     public static final DomainActions NONE = new DomainActions(Collections.emptyList(), false);
 
 
-    public List<String> generateActionsForResource(String resource) {
-        return getActionList().stream().map(action -> action + resource).collect(Collectors.toList());
-    }
-
-
     public static List<String> generateCustomActionList(DomainData domainData) {
         List<String> actionList = new ArrayList<>();
 
         for (int i = 0; i < domainData.getDice().nextInt(domainData.getNumberOfActions()) + 1; i++) {
-            actionList.add(String.format("action.%03d", domainData.getDice().nextInt(1000) + 1));
+            //            actionList.add(String.format("action.%03d", domainData.getDice().nextInt(1000) + 1));
+            actionList.add(getRandomActionFromList(domainData));
         }
 
         return new DomainActions(actionList, true).getActionList();
+    }
+
+    private static String getRandomActionFromList(DomainData domainData) {
+        return domainData.getDomainActions().get(domainData.getDice().nextInt(domainData.getDomainActions().size()));
     }
 
     public static List<String> generateActionListByCount(int actionCount) {

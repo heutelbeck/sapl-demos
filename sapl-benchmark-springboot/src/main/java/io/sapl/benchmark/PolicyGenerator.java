@@ -147,7 +147,7 @@ public class PolicyGenerator {
         for (String subjectAuthority : domainSubject.getSubjectAuthorities()) {
             authorityNode.add(subjectAuthority);
         }
-        subject.set("authorities", authorityNode);
+        subject.set("positions", authorityNode);
         subject.put("name", domainSubject.getSubjectName());
 
         return subject;
