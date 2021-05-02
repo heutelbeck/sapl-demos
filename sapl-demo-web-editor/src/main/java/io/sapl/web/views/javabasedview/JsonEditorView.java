@@ -3,6 +3,8 @@ package io.sapl.web.views.javabasedview;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -62,6 +64,12 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 			jsonEditor.setDocument(document);
 		});
 		add(setJsonDocumentButton);
+		
+		Button toggleReadOnlyButton = new Button("Toggle ReadOnly");
+		toggleReadOnlyButton.addClickListener(e -> {
+			jsonEditor.setReadOnly(!jsonEditor.isReadOnly());
+		});
+		add(toggleReadOnlyButton);
 		
 		jsonEditor.setDocument(getDefaultJsonString());
 	}

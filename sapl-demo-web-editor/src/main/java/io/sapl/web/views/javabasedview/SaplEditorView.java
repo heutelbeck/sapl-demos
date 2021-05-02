@@ -90,6 +90,13 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 			System.out.println("Current SAPL value: " + document);
 		});
 		add(showSaplDocumentButton);
+		
+		Button toggleReadOnlyButton = new Button();
+		toggleReadOnlyButton.setText("Toggle ReadOnly");
+		toggleReadOnlyButton.addClickListener(e -> {
+			saplEditor.setReadOnly(!saplEditor.isReadOnly());
+		});
+		add(toggleReadOnlyButton);
 
 		saplEditor.setDocument(getDefaultSaplString());
 	}
