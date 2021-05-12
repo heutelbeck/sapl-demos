@@ -40,7 +40,7 @@ public class EmailConstraintHandler implements ConstraintHandler {
 	 * an obligation that cannot be handled. In this case no other advices or
 	 * obligations have to be followed.
 	 * 
-	 * It is a good practice to validate the overall contraint object given, as an
+	 * It is a good practice to validate the overall constraint object given, as an
 	 * invalid constraint cannot be handled and declining a constrAint at this stage
 	 * leads to a clean behavior in case of obligations. This dummy implementation
 	 * does not check for a valid email address, which should be done.
