@@ -30,6 +30,14 @@
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sapl-demo-domain</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- transitive jackson dependency brings in an old guava version it 
+						overrides the xtext dependencies and causes problems in current JDK16+ environments -->
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>

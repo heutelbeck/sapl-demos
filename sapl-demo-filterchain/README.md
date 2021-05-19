@@ -6,10 +6,9 @@ This demo shows how to filter incoming Requests with a `Policy Enforcement Filte
 
 First add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) to your application as described in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
-When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , a bean of type `policyEnforcementFilter` will be automatically provided. In this example we provide the bean to our `SecurityConfig`. Please note that you have to use the `@Lazy` annotation to avoid circular dependency problems:
+When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , a bean of type `policyEnforcementFilter` will be automatically provided. In this example we provide the bean to our `SecurityConfig`.
 
 ```java
-	@Lazy
 	@Autowired
 	private PolicyEnforcementFilter policyEnforcementFilter;
 ```

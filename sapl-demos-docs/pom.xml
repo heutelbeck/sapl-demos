@@ -21,7 +21,7 @@
 		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.asciidoctor>1.5.6</version.asciidoctor>
+		<version.asciidoctor>2.1.0</version.asciidoctor>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
