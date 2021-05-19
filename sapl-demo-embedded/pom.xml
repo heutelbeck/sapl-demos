@@ -81,7 +81,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>org.demo.RemotePDPDemo</mainClass>
+							<mainClass>org.demo.EmbeddedPDPDemo</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>
