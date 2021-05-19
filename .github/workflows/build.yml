@@ -43,6 +43,9 @@ jobs:
     - name: Run tests
       run: mvn -B test
 
+    - name: Clean up local repository before caching
+      run: rm -rf /.m2/repository/io/sapl
+
   analyze:
     needs: [tests]
     name: Code analysis and coverage
