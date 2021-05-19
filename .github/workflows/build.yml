@@ -44,7 +44,7 @@ jobs:
       run: mvn -B test
 
     - name: Clean up local repository before caching
-      run: rm -rf /.m2/repository/io/sapl
+      run: rm -r -f /.m2/repository/io/sapl
 
   analyze:
     needs: [tests]
