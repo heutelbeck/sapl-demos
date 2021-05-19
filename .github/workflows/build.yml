@@ -86,10 +86,5 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.7:report sonar:sonar -Dsonar.host.url=https://sonar.ftk.de -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
       
-    - name: Clean up local repository before caching (Linux/Mac)
-      if: ${{ matrix.os != 'windows-latest'}}
+    - name: Clean up local repository before caching
       run: rm -rf ~/.m2/repository/io/sapl
-
-    - name: Clean up local repository before caching (Win)
-      if: ${{ matrix.os == 'windows-latest'}}
-      run: rm -Recurse -Force ~/.m2/repository/io/sapl
