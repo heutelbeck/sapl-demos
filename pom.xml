@@ -48,6 +48,7 @@
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-web-editor</module>
 		<module>sapl-demo-playground</module>
+		<module>sapl-demo-testing</module>
     </modules>
 
 </project>
