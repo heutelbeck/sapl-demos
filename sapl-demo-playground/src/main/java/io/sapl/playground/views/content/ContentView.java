@@ -389,10 +389,10 @@ public class ContentView extends Div {
 			case ATTRIBUTE:
 				if(mock.getAlways() != null) {
 					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), new Val[]{mock.getAlways()}));
+					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
 				} else {
 					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), mock.getSequence().toArray(new Val[0])));
+					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), mock.getSequence()));
 				}
 				break;
 			case FUNCTION:
@@ -475,9 +475,9 @@ public class ContentView extends Div {
     	
     	for(AttributeMockReturnValues mock : this.attrReturnValues) {
     		if(countValues.containsKey(mock.getFullname())) {
-    			countValues.put(mock.getFullname(), countValues.get(mock.getFullname() + mock.getMockReturnValues().length));
+    			countValues.put(mock.getFullname(), countValues.get(mock.getFullname() + mock.getMockReturnValues().size()));
     		} else {
-    			countValues.put(mock.getFullname(), mock.getMockReturnValues().length);
+    			countValues.put(mock.getFullname(), mock.getMockReturnValues().size());
     		}
     	}
     	
