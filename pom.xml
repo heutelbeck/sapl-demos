@@ -47,6 +47,7 @@
 		<module>sapl-demo-remote</module>
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-web-editor</module>
+		<module>sapl-demo-playground</module>
     </modules>
 
 </project>

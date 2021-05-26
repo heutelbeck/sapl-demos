@@ -1,0 +1,68 @@
+#content-view {
+	height: calc(100vh - var(--lumo-size-xl));
+}
+
+#content-view div {
+	width: 100%;
+}
+
+#dividePageHorizontal {
+	height: 100%;
+	width: 100%
+}
+#leftSide {
+	/*padding: 1em;*/
+	border-right: solid var(--lumo-contrast-60pct);
+	max-width: 45vw;
+	height: calc(100% - 1em);
+	padding: 0.5rem;
+}
+
+#leftSideContent {
+	/*margin: var(--lumo-space-m);*/
+}
+
+#saplEditorDiv {
+	height: 100%;
+	max-width: 45vw;
+}
+
+#mockInputHelpTextDiv {
+	height: calc(40vh - var(--lumo-size-l));
+	overflow: auto;
+}
+
+#mockInputHelpTextDiv p {
+	margin: 4px 0px 6px 0px;	
+}
+
+#rightSideVertical {
+	height: 100%;
+	padding: 0 !important;
+}
+
+#rightSideInputDiv {
+	height: calc(50% - var(--lumo-space-m));
+	border-bottom: solid var(--lumo-contrast-60pct);
+}
+
+
+#rightSideInputDiv div {
+	height: calc(100% - var(--lumo-size-l) - 2em);
+	max-width: 45vw;
+}
+
+
+#rightSideOutputDiv {
+	height: calc(50% - var(--lumo-space-m));
+}
+
+#jsonOutputDiv {
+	height: calc(100% - 2em);;
+	max-width: 45vw;
+}
+
+
+.errorText {
+	color: red;
+}

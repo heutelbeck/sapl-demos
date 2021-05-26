@@ -1,0 +1,34 @@
+#header {
+  height: var(--lumo-size-xl);
+  background-color: #20232a;
+}
+#header h1 {
+  font-size: var(--lumo-font-size-l);
+  margin-left: auto;
+  margin-right: auto;
+  color: white;
+}
+#header img#logo {
+  height: var(--lumo-size-l);
+  margin: 0 var(--lumo-space-s);
+}
+#header .alignRight {
+  border-radius: 50%;
+  height: var(--lumo-size-s);
+  margin-right: var(--lumo-space-m);
+  margin-left: auto;
+}
+vaadin-app-layout[dir='rtl'] vaadin-horizontal-layout #header .alignRight {
+  margin-left: var(--lumo-space-m);
+  margin-right: auto;
+}
+
+#header .alignRight a {
+	--lumo-button-size: var(--lumo-size-m);
+    min-width: calc(var(--lumo-button-size) * 2);
+    height: var(--lumo-button-size);
+    padding: 0 calc(var(--lumo-button-size) / 3 + var(--lumo-border-radius) / 2);
+    margin: var(--lumo-space-xs) 0;
+
+  	border-color: #f8f9fa;
+}
