@@ -54,7 +54,6 @@ import io.sapl.vaadin.ValidationFinishedEvent;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
 
-@SuppressWarnings("serial")
 @Route(value = "", layout = MainView.class)
 @PageTitle("SAPL Playground")
 @RouteAlias(value = "", layout = MainView.class)
