@@ -16,8 +16,8 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
-import io.sapl.web.views.javabasedview.SaplEditorView;
 import io.sapl.web.views.javabasedview.JsonEditorView;
+import io.sapl.web.views.javabasedview.SaplEditorView;
 
 /**
  * The main view is a top-level placeholder for other views.

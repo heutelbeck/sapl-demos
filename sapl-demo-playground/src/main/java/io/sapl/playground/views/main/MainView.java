@@ -18,7 +18,6 @@ import io.sapl.playground.models.ExamplesEnum;
 /**
  * The main view is a top-level placeholder for other views.
  */
-@SuppressWarnings("serial")
 @CssImport(value = "./styles/views/main/main-view.css", themeFor = "vaadin-app-layout")
 @CssImport("./styles/views/main/main-view.css")
 //@PWA(name = "SAPL Playground", shortName = "SAPL", enableInstallPrompt = false)
