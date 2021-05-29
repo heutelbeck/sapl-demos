@@ -56,7 +56,9 @@
 			</plugins>
 		</pluginManagement>
 	
-		<!-- If this is used, you have to configure this sapl-test via a system property "io.sapl.test.outputDir" too. See maven-surefire-plugin for example configuration.-->
+		<!-- If the <directory> is changed via the following property, 
+			you have to configure the sapl-test module via a system property "io.sapl.test.outputDir" too. 
+			See below maven-surefire-plugin for example configuration.-->
     	<!--<directory>temp/</directory> -->
 		<plugins>
 			<plugin>
@@ -82,12 +84,6 @@
 					<policyConditionHitRatio>50</policyConditionHitRatio>
 				</configuration>
 			</plugin>
-			<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-			</plugin>
-			-->
 		</plugins>
 	</build>
 </project>
