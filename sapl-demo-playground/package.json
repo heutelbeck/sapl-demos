@@ -48,7 +48,7 @@
       "@vaadin/vaadin-material-styles": "1.3.2",
       "@vaadin/vaadin-rich-text-editor": "1.3.0",
       "open": "^7.2.1",
-      "jquery": "3.4.1",
+      "jquery": "3.5.0",
       "codemirror": "5.52.2",
       "@vaadin/vaadin-avatar": "1.0.4",
       "lit-html": "1.4.1"
@@ -119,7 +119,7 @@
     "@vaadin/vaadin-lumo-styles": "1.6.0",
     "@vaadin/vaadin-material-styles": "1.3.2",
     "@vaadin/vaadin-rich-text-editor": "1.3.0",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "codemirror": "5.52.2",
     "open": "^7.2.1",
     "lit-html": "1.4.1",
