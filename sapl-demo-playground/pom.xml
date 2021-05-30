@@ -15,11 +15,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <vaadin.version>14.6.1</vaadin.version>
-
     </properties>
-
     <repositories>
         <!-- The order of definitions matters. Explicitly defining central here to make sure it has the highest priority. -->
 
@@ -177,9 +174,18 @@
                 <!-- Clean build and startup time for Vaadin apps sometimes may exceed
                      the default Spring Boot's 30sec timeout.  -->
                 <configuration>
-                    <wait>500</wait>
-                    <maxAttempts>240</maxAttempts>
-                </configuration>
+					<wait>500</wait>
+					<maxAttempts>240</maxAttempts>
+					<mainClass>io.sapl.playground.Application</mainClass>
+					<layout>ZIP</layout>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
             </plugin>
 
             <!--
@@ -193,12 +199,25 @@
                 <version>${vaadin.version}</version>
                 <executions>
                     <execution>
+						<?m2e ignore?>
                         <goals>
                             <goal>prepare-frontend</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<!-- write version to manifest to show up in banner when running JAR -->
+						<manifestEntries>
+							<Implementation-Version>${project.version}</Implementation-Version>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 
@@ -288,6 +307,33 @@
                 </plugins>
             </build>
         </profile>
-
+        <profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<repository>${docker-registry-url}/${project.artifactId}</repository>
+							<tag>${project.version}</tag>
+							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                            <buildArgs>
+								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
     </profiles>
 </project>
