@@ -18,7 +18,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.UnorderedList;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -79,6 +82,8 @@ public class ContentView extends Div {
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
+	private final String propertyNameClassName = "property-name";
+	private final String propertyDescriptionClassName = "property-description";
 	
     public ContentView() {
     	
@@ -181,10 +186,49 @@ public class ContentView extends Div {
         page3MockHelpText.setVisible(false);
         page3MockHelpText.setId("mockInputHelpTextDiv");
         page3MockHelpText.add(new Paragraph("Expecting an array of JSON objects, each object consisting of the following properties:"));
-        page3MockHelpText.add(new Paragraph("\"type\" (Required): Allowed values are \"ATTRIBUTE\" or \"FUNCTION\""));
-        page3MockHelpText.add(new Paragraph("\"importName\" (Required): The name the function or attribute is referenced in your policy (for example \"time.dayOfWeekFrom\")."));
-        page3MockHelpText.add(new Paragraph("\"always\" (Optional): A JSON value to be returned by this attribute or to be returned by a function every time the function is called."));
-        page3MockHelpText.add(new Paragraph("\"sequence\" (Optional): An array of JSON values to be returned by the attribute or function."));
+        
+        UnorderedList properties = new UnorderedList();
+        ListItem item1 = new ListItem();
+        Span item11 = new Span("\"type\"");
+        item11.setClassName(propertyNameClassName);
+        item1.add(item11);
+        Span item12 = new Span(" - (Required): Allowed values are \"ATTRIBUTE\" or \"FUNCTION\"");
+        item12.setClassName(propertyDescriptionClassName);
+        item1.add(item12);
+        properties.add(item1);
+        
+
+        ListItem item2 = new ListItem();
+        Span item21 = new Span("\"importName\"");
+        item21.setClassName(propertyNameClassName);
+        item2.add(item21);
+        Span item22 = new Span(" - (Required): The name the function or attribute referenced in your policy (for example \"time.dayOfWeekFrom\").");
+        item22.setClassName(propertyDescriptionClassName);
+        item2.add(item22);
+        properties.add(item2);
+        
+
+        ListItem item3 = new ListItem();
+        Span item31 = new Span("\"always\"");
+        item31.setClassName(propertyNameClassName);
+        item3.add(item31);
+        Span item32 = new Span(" - (Optional): A JSON value to be returned by this attribute or to be returned by a function every time the function is called.");
+        item32.setClassName(propertyDescriptionClassName);
+        item3.add(item32);
+        properties.add(item3);
+        
+
+        ListItem item4 = new ListItem();
+        Span item41 = new Span("\"sequence\"");
+        item41.setClassName(propertyNameClassName);
+        item4.add(item41);
+        Span item42 = new Span(" - (Optional): An array of JSON values to be returned by the attribute or function.");
+        item42.setClassName(propertyDescriptionClassName);
+        item4.add(item42);
+        properties.add(item4);
+        
+        page3MockHelpText.add(properties);
+        
         page3MockHelpText.add(new Paragraph("One of \"always\" or \"sequence\" is required"));
 
 		//Icon helpLogo = new Icon(VaadinIcon.INFO_CIRCLE);
