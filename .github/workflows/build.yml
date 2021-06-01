@@ -132,10 +132,10 @@ jobs:
     - name: Build Modules
       run: mvn -B install -DskipTests -pl sapl-demo-playground -P production
 
-    - name: Build SAPL Server LT image
+    - name: Build SAPL Demo Playground Image
       run: mvn -B dockerfile:build -pl sapl-demo-playground -P docker,production -DskipTests
 
-    - name: Push image
+    - name: Push Image
       run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,poduction -DskipTests
 
     - name: Clean up local repository before caching 

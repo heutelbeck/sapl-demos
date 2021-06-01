@@ -205,6 +205,10 @@
                         </goals>
                     </execution>
                 </executions>
+                <!-- https://github.com/heutelbeck/sapl-server/issues/3 -->
+                <configuration>
+                    <optimizeBundle>false</optimizeBundle>
+                </configuration>
             </plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
