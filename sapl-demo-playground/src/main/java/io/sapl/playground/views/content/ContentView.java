@@ -407,7 +407,7 @@ public class ContentView extends Div {
     
     
 	private EvaluationContext getEvalContextForMockJson(String json) {
-		var attributeCtx = new MockingAttributeContext(new AnnotationAttributeContext());
+		var attributeCtx = new MockingAttributeContext(new AnnotationAttributeContext(), null);
 		var functionCtx = new MockingFunctionContext(new AnnotationFunctionContext());
 		var variables = new HashMap<String, JsonNode>(1);
 		this.attrReturnValues = new LinkedList<>();
