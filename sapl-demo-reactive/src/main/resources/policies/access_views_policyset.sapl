@@ -1,4 +1,4 @@
-set "AccessViews"
+set "Access to UI Views"
 deny-unless-permit
 for action == "access" & resource =~ ".*View$"
 

@@ -1,6 +1,6 @@
 import filter.*
 
-set "UIController"
+set "UI Controller"
 first-applicable
 
 

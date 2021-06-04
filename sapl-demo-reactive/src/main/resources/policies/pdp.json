@@ -1,4 +1,8 @@
 {
 	"algorithm": "DENY_UNLESS_PERMIT",
-	"variables": {}
+	"variables": {
+		"CONFIG": {
+			"interval": 1 
+		}
+	}
 }
