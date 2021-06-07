@@ -26,7 +26,7 @@ public class BasicExample extends Example {
 		
 		
 		this.authSub = "{\n"
-    			+ " \"subject\": \"WILLI\",\n"
+    			+ " \"subject\"     : \"WILLI\",\n"
     			+ " \"action\"      : \"read\",\n"
     			+ " \"resource\"    : \"something\"\n"
     			+ "}";

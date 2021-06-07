@@ -49,7 +49,7 @@
 
 #rightSideInputDiv div {
 	height: calc(100% - var(--lumo-size-l) - 2em);
-	/*max-width: 45vw;*/
+	max-width: 50vw;
 }
 
 
