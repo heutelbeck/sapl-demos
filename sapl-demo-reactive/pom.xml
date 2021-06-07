@@ -40,6 +40,12 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
 		</dependency>
+<!-- 
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-pdp-remote</artifactId>
+		</dependency>
+ -->
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>

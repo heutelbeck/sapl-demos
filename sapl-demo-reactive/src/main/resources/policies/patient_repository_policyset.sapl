@@ -1,7 +1,7 @@
 // Import the filter library, so that 'blacken' can be used directly instead of using the absolute name 'filter.blacken'.
 import filter.*
 
-set "PatientRepository"
+set "Data Access layer polices for the PatientRepository"
 
 /*
  * The 'first-applicable' combination algorithm is used here in oder to avoid 'transformation uncertainty',

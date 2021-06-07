@@ -145,7 +145,7 @@ public abstract class AbstractReactiveView extends VerticalLayout implements Vie
 	public void enter(ViewChangeListener.ViewChangeEvent event) {
 		// @formatter:off
 		subscription1 = getCombinedFluxForNonFilteredResources().subscribe(
-				this::updateUIForNonFilteredResources,
+				this::updateUIForNonFilteredResources,		
 				error -> Notification.show(error.getMessage(), Notification.Type.ERROR_MESSAGE)
 		);
 
