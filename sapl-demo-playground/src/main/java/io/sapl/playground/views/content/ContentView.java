@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.html.Div;
@@ -34,15 +35,26 @@ import com.vaadin.flow.router.RouteAlias;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.functions.FilterFunctionLibrary;
+import io.sapl.functions.StandardFunctionLibrary;
+import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
 import io.sapl.interpreter.EvaluationContext;
+import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.SAPLInterpreter;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
+import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
+import io.sapl.interpreter.pip.AttributeContext;
+import io.sapl.pip.ClockPolicyInformationPoint;
 import io.sapl.playground.models.BasicExample;
 import io.sapl.playground.models.Example;
+import io.sapl.playground.models.ExamplesEnum;
 import io.sapl.playground.models.MockingModel;
+import io.sapl.playground.models.SpringDataExample;
+import io.sapl.playground.models.SpringSecurityExample;
+import io.sapl.playground.views.events.ExampleSelectedViewBus;
 import io.sapl.playground.views.main.MainView;
 import io.sapl.test.mocking.MockingAttributeContext;
 import io.sapl.test.mocking.MockingFunctionContext;
@@ -79,16 +91,26 @@ public class ContentView extends Div {
 	private List<AttributeMockReturnValues> attrReturnValues;
 	private final ObjectMapper objectMapper;
 	private ArrayNode aggregatedResult;
+	private AttributeContext defaultAttrContext;
+	private FunctionContext defaultFuntionContext;
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	private final String propertyNameClassName = "property-name";
 	private final String propertyDescriptionClassName = "property-description";
 	
-    public ContentView() {
+    public ContentView(ExampleSelectedViewBus exampleSelectedViewBus) throws InitializationException {
+        
+        exampleSelectedViewBus.setContentView(this);
     	
     	this.saplInterpreter = new DefaultSAPLInterpreter();
     	this.objectMapper = new ObjectMapper();
+    	this.defaultAttrContext = new AnnotationAttributeContext();
+    	this.defaultAttrContext.loadPolicyInformationPoint(new ClockPolicyInformationPoint());
+    	this.defaultFuntionContext = new AnnotationFunctionContext();
+    	this.defaultFuntionContext.loadLibrary(new FilterFunctionLibrary());
+    	this.defaultFuntionContext.loadLibrary(new StandardFunctionLibrary());
+    	this.defaultFuntionContext.loadLibrary(new TemporalFunctionLibrary());
     	
         setId("content-view");
         
@@ -101,10 +123,15 @@ public class ContentView extends Div {
         horizontalLayout.add(createRightSide());
 		
         add(horizontalLayout);
-        
-        initalizeExample();
     }
     
+    /**
+     * After all components are attached -> initialize & evaluate default example
+     */
+    @Override
+    protected void onAttach(AttachEvent attachEvent) {
+        initalizeExample();
+    }
 
 	private Component createLeftSide() {
         Div leftSide = new Div();
@@ -276,11 +303,11 @@ public class ContentView extends Div {
 	}
 	
 	private void onValidationFinished(ValidationFinishedEvent event) {
-		System.out.println("validation finished");
+		log.debug("validation finished");
 		Issue[] issues = event.getIssues();
-		System.out.println("issue count: " + issues.length);
+		log.debug("issue count: " + issues.length);
 		for (Issue issue : issues) {
-			System.out.println(issue.getDescription());
+			log.debug(issue.getDescription());
 		}
 	}
 	
@@ -294,6 +321,30 @@ public class ContentView extends Div {
 		 evaluatePolicy();
 	 }
 	 
+	public void setExample(ExamplesEnum example) {
+		Example newExample = null;
+		switch(example) {
+			case Basic:
+				newExample = new BasicExample();
+				break;
+			case SpringData:
+				newExample = new SpringDataExample();
+				break;
+			case SpringSecurity:
+				newExample = new SpringSecurityExample();
+				break;
+			default:
+				newExample = new BasicExample();
+				break;
+		}
+
+		this.saplEditor.setDocument(newExample.getPolicy());
+		this.authSubEditor.setDocument(newExample.getAuthSub());
+		this.mockDefinitionEditor.setDocument(newExample.getMockDefinition());
+		 
+		evaluatePolicy();
+		
+	}
 
 	    
     private void onMockingJsonEditorInputChanged(DocumentChangedEvent event) {
@@ -367,12 +418,14 @@ public class ContentView extends Div {
 		Step<AuthorizationDecision> steps = StepVerifier.create(sapl.evaluate(ctxForAuthSub));
 		
 		//emit TestPublishers in given order
+		
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
 			String fullname = mock.getFullname();
 			for (Val val : mock.getMockReturnValues()) {
 				steps = steps.then(() -> ((MockingAttributeContext)ctx.getAttributeCtx()).mockEmit(fullname, val));
 			}
 		}
+		
 		
 		//consume decisions
 		for(int i = 0; i < countNumberOfExpectedDecisions(); i++) {
@@ -381,7 +434,7 @@ public class ContentView extends Div {
 		
 		//execute policy evaluation and catch AssertionErros
 		try {
-			steps.thenCancel().verify(Duration.ofSeconds(1));
+			steps.thenCancel().verify(Duration.ofSeconds(10));
 	    	log.debug("Evaluation finished");
 		} catch (AssertionError err) {
 	    	log.debug("Evaluation error", err);
@@ -407,8 +460,8 @@ public class ContentView extends Div {
     
     
 	private EvaluationContext getEvalContextForMockJson(String json) {
-		var attributeCtx = new MockingAttributeContext(new AnnotationAttributeContext(), null);
-		var functionCtx = new MockingFunctionContext(new AnnotationFunctionContext());
+		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext, null);
+		var functionCtx = new MockingFunctionContext(this.defaultFuntionContext);
 		var variables = new HashMap<String, JsonNode>(1);
 		this.attrReturnValues = new LinkedList<>();
 		
@@ -433,9 +486,11 @@ public class ContentView extends Div {
 				if(mock.getAlways() != null) {
 					attributeCtx.markAttributeMock(mock.getImportName());
 					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
+					//attributeCtx.loadAttributeMock(mock.getImportName(), mock.getInterval(), new Val[]{mock.getAlways()});
 				} else {
 					attributeCtx.markAttributeMock(mock.getImportName());
 					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), mock.getSequence()));
+					//attributeCtx.loadAttributeMock(mock.getImportName(), mock.getInterval(), mock.getSequence().toArray(new Val[0]));
 				}
 				break;
 			case FUNCTION:
@@ -478,16 +533,20 @@ public class ContentView extends Div {
     
     private Consumer<AuthorizationDecision> consumeAuthDecision() {
     	return authDecision -> {
-    		this.aggregatedResult.add(convertAuthDecisionToPrintableJsonNode(authDecision));
     		
-    		try {
-    			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.aggregatedResult));
-    		} catch (JsonProcessingException e) {
-    			System.out.println(e);
-    			this.evaluationError.setVisible(true);
-    			this.evaluationError.setText("Error printing Evaluation Result!");
-    		}
-    		return;
+    		getUI().ifPresent(ui -> ui.access(() -> {
+    			this.aggregatedResult.add(convertAuthDecisionToPrintableJsonNode(authDecision));
+        		
+        		try {
+        			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.aggregatedResult));
+        		} catch (JsonProcessingException e) {
+        			log.error("Error deserializing AuthorizationDecisions: " + e);
+        			this.evaluationError.setVisible(true);
+        			this.evaluationError.setText("Error printing Evaluation Result!");
+        		}
+        		return;
+    		}));
+    		
     	};
     }
     

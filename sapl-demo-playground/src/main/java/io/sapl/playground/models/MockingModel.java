@@ -1,5 +1,6 @@
 package io.sapl.playground.models;
 
+import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,11 +16,26 @@ public class MockingModel {
 
 	MockingTargetEnum type;
 	
+	/**
+	 * Name how the attribute or function is referenced to in the policy
+	 */
 	String importName;
 	
+	/**
+	 * {@link Val} to be returned by the attribute once or by the function every time it is called. One of always or sequence required. 
+	 */
 	Val always;
 	
+	/**
+	 * List of {@link Val}'s to be returned by an attribute or by a function (one per function call). One of always or sequence required. 
+	 */
 	List<Val> sequence;
+	
+	/**
+	 * time interval between the {@link Val}'s of the sequence to be returned by an attribute. {@link #type} has to be {@link MockingTargetEnum#ATTRIBUTE} and {@link #sequence} has to be set.
+	 * Currently not configurable from the frontend.
+	 */
+	Duration interval = Duration.ofSeconds(2);
 	
 	
     public static List<MockingModel> parseMockingJsonInputToModel(JsonNode mockInput, Paragraph mockDefinitionJsonInputError) {

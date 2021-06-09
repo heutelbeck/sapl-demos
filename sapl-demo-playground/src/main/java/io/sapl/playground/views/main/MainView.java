@@ -14,6 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 
 import io.sapl.playground.models.ExamplesEnum;
+import io.sapl.playground.views.events.ExampleSelectedViewBus;
 
 /**
  * The main view is a top-level placeholder for other views.
@@ -24,8 +25,11 @@ import io.sapl.playground.models.ExamplesEnum;
 @JsModule("./styles/shared-styles.js")
 public class MainView extends AppLayout {
 
-    public MainView() {
-        HorizontalLayout header = createHeader();
+	private ExampleSelectedViewBus exampleSelectedViewBus;
+	
+    public MainView(ExampleSelectedViewBus exampleSelectedViewBus) {
+        this.exampleSelectedViewBus = exampleSelectedViewBus;
+    	HorizontalLayout header = createHeader();
         addToNavbar(header);
     }
  
@@ -57,7 +61,16 @@ public class MainView extends AppLayout {
         select.setPlaceholder("Examples");
         select.setItems(Arrays.asList(ExamplesEnum.values()).stream().map(e -> e.getDisplayValue()));
         select.setId("dropdownButton");
+        select.addValueChangeListener(
+                event -> {
+                          var optional = Arrays.asList(ExamplesEnum.values()).stream().filter(e -> e.getDisplayValue().equals(event.getValue())).findFirst();
+                          if(optional.isEmpty()) {
+                        	  throw new RuntimeException("Error processing Example enums");
+                          }
+                          this.exampleSelectedViewBus.getContentView().setExample(optional.get());
+            	});
         buttons.add(select);
+        
         
         header.add(buttons);
         
