@@ -14,7 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 
 import io.sapl.playground.models.ExamplesEnum;
-import io.sapl.playground.views.events.ExampleSelectedViewBus;
+import io.sapl.playground.views.ExampleSelectedViewBus;
 
 /**
  * The main view is a top-level placeholder for other views.

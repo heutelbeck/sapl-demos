@@ -54,7 +54,7 @@ import io.sapl.playground.models.ExamplesEnum;
 import io.sapl.playground.models.MockingModel;
 import io.sapl.playground.models.SpringDataExample;
 import io.sapl.playground.models.SpringSecurityExample;
-import io.sapl.playground.views.events.ExampleSelectedViewBus;
+import io.sapl.playground.views.ExampleSelectedViewBus;
 import io.sapl.playground.views.main.MainView;
 import io.sapl.test.mocking.MockingAttributeContext;
 import io.sapl.test.mocking.MockingFunctionContext;
