@@ -1,6 +1,7 @@
 package io.sapl.playground.views.main;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -13,7 +14,10 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 
-import io.sapl.playground.models.ExamplesEnum;
+import io.sapl.playground.models.BasicExample;
+import io.sapl.playground.models.Example;
+import io.sapl.playground.models.SpringDataExample;
+import io.sapl.playground.models.SpringSecurityExample;
 import io.sapl.playground.views.ExampleSelectedViewBus;
 
 /**
@@ -26,9 +30,11 @@ import io.sapl.playground.views.ExampleSelectedViewBus;
 public class MainView extends AppLayout {
 
 	private ExampleSelectedViewBus exampleSelectedViewBus;
+	private Map<String, Example> examples;
 	
     public MainView(ExampleSelectedViewBus exampleSelectedViewBus) {
         this.exampleSelectedViewBus = exampleSelectedViewBus;
+        initializeExamples();
     	HorizontalLayout header = createHeader();
         addToNavbar(header);
     }
@@ -59,21 +65,30 @@ public class MainView extends AppLayout {
         
         Select<String> select = new Select<>();
         select.setPlaceholder("Examples");
-        select.setItems(Arrays.asList(ExamplesEnum.values()).stream().map(e -> e.getDisplayValue()));
+        select.setItems(this.examples.keySet());
         select.setId("dropdownButton");
         select.addValueChangeListener(
-                event -> {
-                          var optional = Arrays.asList(ExamplesEnum.values()).stream().filter(e -> e.getDisplayValue().equals(event.getValue())).findFirst();
-                          if(optional.isEmpty()) {
-                        	  throw new RuntimeException("Error processing Example enums");
-                          }
-                          this.exampleSelectedViewBus.getContentView().setExample(optional.get());
-            	});
+                event -> this.exampleSelectedViewBus.getContentView().setExample(this.examples.get(event.getValue())));
         buttons.add(select);
         
         
         header.add(buttons);
         
         return header;
+    }
+    
+    private void initializeExamples() {
+        this.examples = new HashMap<>();
+        
+    	Example example;
+    	
+    	example = new BasicExample();
+    	this.examples.put(example.getDisplayName(), example);
+    	
+    	example = new SpringSecurityExample();
+    	this.examples.put(example.getDisplayName(), example);
+    	
+    	example = new SpringDataExample();
+    	this.examples.put(example.getDisplayName(), example);
     }
 }

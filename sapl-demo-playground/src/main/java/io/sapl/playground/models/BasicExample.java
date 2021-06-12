@@ -30,5 +30,7 @@ public class BasicExample extends Example {
     			+ " \"action\"      : \"read\",\n"
     			+ " \"resource\"    : \"something\"\n"
     			+ "}";
+		
+		this.displayName = "Basic";
 	}
 }

@@ -21,5 +21,7 @@ public class SpringSecurityExample extends Example {
 				+ "\"resource\":\"ui:view:patients:createPatientButton\", \r\n"
 				+ "\"subject\":{\"authorities\":[{\"authority\":\"ROLE_DOCTOR\"}],\"details\":{\"remoteAddress\":\"0:0:0:0:0:0:0:1\",\"sessionId\":\"102486A0FD0D716DDF4A8D4DD38940D0\"},\"authenticated\":true,\"principal\":{\"password\":null,\"username\":\"Alina\",\"authorities\":[{\"authority\":\"ROLE_DOCTOR\"}],\"accountNonExpired\":true,\"accountNonLocked\":true,\"credentialsNonExpired\":true,\"enabled\":true},\"credentials\":null,\"name\":\"Alina\"}\r\n"
 				+ "}";
+		
+		this.displayName = "Spring Security";
 	}
 }

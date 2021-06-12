@@ -75,5 +75,7 @@ public class SpringDataExample extends Example {
 				+ "      },\r\n"
 				+ "      \"credentials\":null,\"name\":\"Dominic\"}\r\n"
 				+ "}";
+		
+		this.displayName = "Spring Data";
 	}
 }

@@ -50,10 +50,7 @@ import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pip.ClockPolicyInformationPoint;
 import io.sapl.playground.models.BasicExample;
 import io.sapl.playground.models.Example;
-import io.sapl.playground.models.ExamplesEnum;
 import io.sapl.playground.models.MockingModel;
-import io.sapl.playground.models.SpringDataExample;
-import io.sapl.playground.models.SpringSecurityExample;
 import io.sapl.playground.views.ExampleSelectedViewBus;
 import io.sapl.playground.views.main.MainView;
 import io.sapl.test.mocking.MockingAttributeContext;
@@ -99,6 +96,8 @@ public class ContentView extends Div {
 	private final String propertyNameClassName = "property-name";
 	private final String propertyDescriptionClassName = "property-description";
 	
+	private int ignoreUIChanges = 0;
+	
     public ContentView(ExampleSelectedViewBus exampleSelectedViewBus) throws InitializationException {
         
         exampleSelectedViewBus.setContentView(this);
@@ -130,7 +129,7 @@ public class ContentView extends Div {
      */
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        initalizeExample();
+        setExample(new BasicExample());
     }
 
 	private Component createLeftSide() {
@@ -310,37 +309,12 @@ public class ContentView extends Div {
 			log.debug(issue.getDescription());
 		}
 	}
-	
-	private void initalizeExample() {
-		 Example initExample = new BasicExample();
-		 
-		 this.saplEditor.setDocument(initExample.getPolicy());
-		 this.authSubEditor.setDocument(initExample.getAuthSub());
-		 this.mockDefinitionEditor.setDocument(initExample.getMockDefinition());
-		 
-		 evaluatePolicy();
-	 }
-	 
-	public void setExample(ExamplesEnum example) {
-		Example newExample = null;
-		switch(example) {
-			case Basic:
-				newExample = new BasicExample();
-				break;
-			case SpringData:
-				newExample = new SpringDataExample();
-				break;
-			case SpringSecurity:
-				newExample = new SpringSecurityExample();
-				break;
-			default:
-				newExample = new BasicExample();
-				break;
-		}
 
-		this.saplEditor.setDocument(newExample.getPolicy());
-		this.authSubEditor.setDocument(newExample.getAuthSub());
-		this.mockDefinitionEditor.setDocument(newExample.getMockDefinition());
+	public void setExample(Example example) {
+		this.ignoreUIChanges = 3;
+		this.saplEditor.setDocument(example.getPolicy());
+		this.authSubEditor.setDocument(example.getAuthSub());
+		this.mockDefinitionEditor.setDocument(example.getMockDefinition());
 		 
 		evaluatePolicy();
 		
@@ -348,6 +322,11 @@ public class ContentView extends Div {
 
 	    
     private void onMockingJsonEditorInputChanged(DocumentChangedEvent event) {
+    	if(this.ignoreUIChanges != 0) {
+    		this.ignoreUIChanges--;
+    		return;
+    	}
+    	
     	log.debug("Mock Json Editor changed");
     	this.mockDefinitionJsonInputError.setVisible(false);
 		evaluatePolicy();
@@ -355,6 +334,11 @@ public class ContentView extends Div {
 
     
     private void onAuthSubJsonInputChanged(DocumentChangedEvent event) {
+    	if(this.ignoreUIChanges != 0) {
+    		this.ignoreUIChanges--;
+    		return;
+    	}
+    	
     	log.debug("AuthSub Editor changed");
     	this.authSubJsonInputError.setVisible(false);		
 		evaluatePolicy();
@@ -363,6 +347,11 @@ public class ContentView extends Div {
     
     
     private void onSaplPolicyChanged(DocumentChangedEvent event) {
+    	if(this.ignoreUIChanges != 0) {
+    		this.ignoreUIChanges--;
+    		return;
+    	}
+    	
     	log.debug("Policy Editor changed");
 		this.evaluationError.setVisible(false);
 	

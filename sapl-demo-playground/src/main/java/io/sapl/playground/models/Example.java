@@ -8,6 +8,8 @@ public abstract class Example {
 	
 	protected String authSub;
 	
+	protected String displayName;
+	
 	public String getMockDefinition() {
 		return this.mockDefinition;
 	}
@@ -18,5 +20,9 @@ public abstract class Example {
 	
 	public String getAuthSub() {
 		return this.authSub;
+	}
+	
+	public String getDisplayName() {
+		return this.displayName;
 	}
 }
