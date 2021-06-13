@@ -215,7 +215,7 @@ public class ContentView extends Div {
         
         UnorderedList properties = new UnorderedList();
         ListItem item1 = new ListItem();
-        Span item11 = new Span("\"type\"");
+        Span item11 = new Span("\"" + MockingModel.KeyValue_Type + "\"");
         item11.setClassName(propertyNameClassName);
         item1.add(item11);
         Span item12 = new Span(" - (Required): Allowed values are \"ATTRIBUTE\" or \"FUNCTION\"");
@@ -225,7 +225,7 @@ public class ContentView extends Div {
         
 
         ListItem item2 = new ListItem();
-        Span item21 = new Span("\"importName\"");
+        Span item21 = new Span("\"" + MockingModel.KeyValue_ImportName + "\"");
         item21.setClassName(propertyNameClassName);
         item2.add(item21);
         Span item22 = new Span(" - (Required): The name the function or attribute referenced in your policy (for example \"time.dayOfWeekFrom\").");
@@ -235,7 +235,7 @@ public class ContentView extends Div {
         
 
         ListItem item3 = new ListItem();
-        Span item31 = new Span("\"always\"");
+        Span item31 = new Span("\"" + MockingModel.KeyValue_AlwaysReturnValue + "\"");
         item31.setClassName(propertyNameClassName);
         item3.add(item31);
         Span item32 = new Span(" - (Optional): A JSON value to be returned by this attribute or to be returned by a function every time the function is called.");
@@ -245,7 +245,7 @@ public class ContentView extends Div {
         
 
         ListItem item4 = new ListItem();
-        Span item41 = new Span("\"sequence\"");
+        Span item41 = new Span("\"" + MockingModel.KeyValue_ReturnSequenceValues + "\"");
         item41.setClassName(propertyNameClassName);
         item4.add(item41);
         Span item42 = new Span(" - (Optional): An array of JSON values to be returned by the attribute or function.");
