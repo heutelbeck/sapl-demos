@@ -16,7 +16,7 @@
         class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %-5level %msg%n%throwable
+                %d{ISO8601} %-5level %msg%n%throwable
             </Pattern>
         </layout>
     </appender>
@@ -26,7 +26,7 @@
         <appender-ref ref="Console" />
     </root>
 
-    <logger name="io.sapl" level="trace" additivity="false">
+    <logger name="io.sapl" level="warn" additivity="false">
         <appender-ref ref="SaplConsole" />
     </logger>
 
