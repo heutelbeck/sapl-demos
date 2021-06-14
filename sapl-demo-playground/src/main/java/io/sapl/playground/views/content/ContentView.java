@@ -77,10 +77,14 @@ public class ContentView extends Div {
 	
 	private JsonEditor mockDefinitionEditor;
 	private Paragraph mockDefinitionJsonInputError;
-	//private MockingModel currentMockDefinition;
 	
 	private JsonEditor authSubEditor;
 	private Paragraph authSubJsonInputError;
+	
+
+	private List<MockingModel> currentMockingModel;
+	private AuthorizationSubscription currentAuthSub;
+	private SAPL currentPolicy;
 	
 	private JsonEditor jsonOutput;
 	private Paragraph evaluationError;
@@ -144,7 +148,7 @@ public class ContentView extends Div {
 		saplConfig.setHasLineNumbers(true);
 		saplConfig.setTextUpdateDelay(500);
 		this.saplEditor = new SaplEditor(saplConfig);
-		this.saplEditor.addDocumentChangedListener(event -> this.onSaplPolicyChanged(event));
+		this.saplEditor.addDocumentChangedListener(this::onSaplPolicyChanged);
 		this.saplEditor.addValidationFinishedListener(this::onValidationFinished);
 		saplEditorDiv.add(this.saplEditor);
 		
@@ -314,14 +318,21 @@ public class ContentView extends Div {
 		}
 	}
 
-	public void setExample(Example example) {
-				
+	public void setExample(Example example) {				
 		this.ignoreUIChanges = 3;
-		this.saplEditor.setDocument(example.getPolicy());
-		this.authSubEditor.setDocument(example.getAuthSub());
-		this.mockDefinitionEditor.setDocument(example.getMockDefinition());
 
-
+		this.saplEditor.getUI().ifPresent(ui -> ui.access(() -> this.saplEditor.setDocument(example.getPolicy())));
+		
+		this.authSubEditor.getUI().ifPresent(ui -> ui.access(() -> this.authSubEditor.setDocument(example.getAuthSub())));
+		
+		this.mockDefinitionEditor.getUI().ifPresent(ui -> ui.access(() -> this.mockDefinitionEditor.setDocument(example.getMockDefinition())));
+		
+		
+		
+		this.currentAuthSub = getAuthSubForJsonString(example.getAuthSub());
+		this.currentPolicy = getSAPLDocument(example.getPolicy());
+		this.currentMockingModel = parseMockingModels(example.getMockDefinition());
+		
 		evaluatePolicy();		
 	}
 
@@ -334,6 +345,9 @@ public class ContentView extends Div {
     	
     	log.debug("Mock Json Editor changed");
     	this.mockDefinitionJsonInputError.setVisible(false);
+
+		this.currentMockingModel = parseMockingModels(event.getNewValue());
+		
 		evaluatePolicy();
     }
 
@@ -345,7 +359,10 @@ public class ContentView extends Div {
     	}
     	
     	log.debug("AuthSub Editor changed");
-    	this.authSubJsonInputError.setVisible(false);		
+    	this.authSubJsonInputError.setVisible(false);
+    	
+		this.currentAuthSub = getAuthSubForJsonString(event.getNewValue());
+		
 		evaluatePolicy();
     }
    
@@ -360,39 +377,33 @@ public class ContentView extends Div {
     	log.debug("Policy Editor changed");
 		this.evaluationError.setVisible(false);
 	
-		var saplString = this.saplEditor.getDocument();
+		var saplString = event.getNewValue();
 		if(saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
 			updateErrorParagraph(this.evaluationError, "Policy isn't valid!");
 			return;
 		}
+		
+
+		this.currentPolicy = getSAPLDocument(saplString);
 		
 		evaluatePolicy();
     }
     
     private void evaluatePolicy() {
     	log.debug("Evaluating Policy");
+    	if(this.currentAuthSub == null || this.currentMockingModel == null || this.currentPolicy == null) {
+    		return;
+    	}
     	
     	this.evaluationError.setVisible(false);
     	
     	//initialize output
     	this.aggregatedResult = this.objectMapper.createArrayNode();
 	
-    	
-    	//prepare policy evaluation
-    	var ctx = getEvalContextForMockJson(this.mockDefinitionEditor.getDocument());
-    	if(ctx == null)
-    		return;
-    	var authSub = getAuthSubForJsonString(this.authSubEditor.getDocument());
-    	if(authSub == null)
-    		return;
-    	var sapl = getSAPLDocument(this.saplEditor.getDocument());
-    	if(sapl == null)
-    		return;
-    	
-    	
+    	   	
     	//check if authSub matches Policy
-    	var ctxForAuthSub = ctx.forAuthorizationSubscription(authSub);
-    	var matchesResult = sapl.matches(ctxForAuthSub).block();
+    	var ctxForAuthSub = getEvalContextForMockJson(this.currentMockingModel).forAuthorizationSubscription(this.currentAuthSub);
+    	var matchesResult = this.currentPolicy.matches(ctxForAuthSub).block();
     	if(!matchesResult.isBoolean()) {
 			updateErrorParagraph(this.evaluationError, matchesResult.toString());
 			return;    		
@@ -404,14 +415,14 @@ public class ContentView extends Div {
     	
     	
     	//setup StepVerifier
-		Step<AuthorizationDecision> steps = StepVerifier.create(sapl.evaluate(ctxForAuthSub));
+		Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthSub));
 		
 		//emit TestPublishers in given order
 		
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
 			String fullname = mock.getFullname();
 			for (Val val : mock.getMockReturnValues()) {
-				steps = steps.then(() -> ((MockingAttributeContext)ctx.getAttributeCtx()).mockEmit(fullname, val));
+				steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthSub.getAttributeCtx()).mockEmit(fullname, val));
 			}
 		}
 		
@@ -447,13 +458,7 @@ public class ContentView extends Div {
     }
     
     
-	private EvaluationContext getEvalContextForMockJson(String json) {
-		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext, null);
-		var functionCtx = new MockingFunctionContext(this.defaultFuntionContext);
-		var variables = new HashMap<String, JsonNode>(1);
-		this.attrReturnValues = new LinkedList<>();
-		
-		
+    private List<MockingModel> parseMockingModels(String json) {
 		JsonNode mockInput;
 		try {
 			mockInput = this.objectMapper.readTree(json);
@@ -468,9 +473,15 @@ public class ContentView extends Div {
 			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage());
 		}
 		
-		if(mocks == null) {
-			return null;
-		}
+		return mocks;
+    }
+    
+	private EvaluationContext getEvalContextForMockJson(List<MockingModel> mocks) {
+		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext, null);
+		var functionCtx = new MockingFunctionContext(this.defaultFuntionContext);
+		var variables = new HashMap<String, JsonNode>(1);
+		this.attrReturnValues = new LinkedList<>();
+		
 		
 		for(var mock : mocks) {
 			switch (mock.getType()) {
@@ -481,7 +492,7 @@ public class ContentView extends Div {
 					//attributeCtx.loadAttributeMock(mock.getImportName(), mock.getInterval(), new Val[]{mock.getAlways()});
 				} else {
 					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), mock.getSequence()));
+					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<Val>(mock.getSequence())));
 					//attributeCtx.loadAttributeMock(mock.getImportName(), mock.getInterval(), mock.getSequence().toArray(new Val[0]));
 				}
 				break;
@@ -585,7 +596,8 @@ public class ContentView extends Div {
     }
     
     private void updateErrorParagraph(Paragraph paragraph, String text) {
-		getUI().ifPresent(ui -> ui.access(() -> {
+
+    	getUI().ifPresent(ui -> ui.access(() -> {
 			
 			paragraph.setVisible(true);
 			paragraph.setText(text);

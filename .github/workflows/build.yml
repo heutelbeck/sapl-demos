@@ -136,7 +136,7 @@ jobs:
       run: mvn -B dockerfile:build -pl sapl-demo-playground -P docker,production -DskipTests
 
     - name: Push Image
-      run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,poduction -DskipTests
+      run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,production -DskipTests
 
     - name: Clean up local repository before caching 
       run: rm -rf ~/.m2/repository/io/sapl
