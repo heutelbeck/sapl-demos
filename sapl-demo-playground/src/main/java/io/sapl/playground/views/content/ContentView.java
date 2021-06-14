@@ -50,6 +50,7 @@ import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pip.ClockPolicyInformationPoint;
 import io.sapl.playground.models.BasicExample;
 import io.sapl.playground.models.Example;
+import io.sapl.playground.models.MockDefinitionParsingException;
 import io.sapl.playground.models.MockingModel;
 import io.sapl.playground.views.ExampleSelectedViewBus;
 import io.sapl.playground.views.main.MainView;
@@ -76,6 +77,7 @@ public class ContentView extends Div {
 	
 	private JsonEditor mockDefinitionEditor;
 	private Paragraph mockDefinitionJsonInputError;
+	//private MockingModel currentMockDefinition;
 	
 	private JsonEditor authSubEditor;
 	private Paragraph authSubJsonInputError;
@@ -176,6 +178,8 @@ public class ContentView extends Div {
         authSubEditorConfig.setTextUpdateDelay(500);
 		this.authSubEditor = new JsonEditor(authSubEditorConfig);
 		this.authSubEditor.addDocumentChangedListener(event -> this.onAuthSubJsonInputChanged(event));
+		//this.authSubEditor.getElement().addEventListener("value-changed", event ->  this.onAuthSubJsonInputChanged(event.getEventData().getString("element.value"))).debounce(500).addEventData("element.value");
+		
 		page1JsonEditorDiv.add(this.authSubEditor);
 		//div.add(jsonEditorDiv);
 		
@@ -311,13 +315,14 @@ public class ContentView extends Div {
 	}
 
 	public void setExample(Example example) {
+				
 		this.ignoreUIChanges = 3;
 		this.saplEditor.setDocument(example.getPolicy());
 		this.authSubEditor.setDocument(example.getAuthSub());
 		this.mockDefinitionEditor.setDocument(example.getMockDefinition());
-		 
-		evaluatePolicy();
-		
+
+
+		evaluatePolicy();		
 	}
 
 	    
@@ -357,8 +362,7 @@ public class ContentView extends Div {
 	
 		var saplString = this.saplEditor.getDocument();
 		if(saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
-			this.evaluationError.setVisible(true);
-			this.evaluationError.setText("Policy isn't valid!");
+			updateErrorParagraph(this.evaluationError, "Policy isn't valid!");
 			return;
 		}
 		
@@ -390,15 +394,11 @@ public class ContentView extends Div {
     	var ctxForAuthSub = ctx.forAuthorizationSubscription(authSub);
     	var matchesResult = sapl.matches(ctxForAuthSub).block();
     	if(!matchesResult.isBoolean()) {
-    		this.evaluationError.setVisible(true);
-			this.evaluationError.setText(matchesResult.toString());
-			this.jsonOutput.setDocument("");
+			updateErrorParagraph(this.evaluationError, matchesResult.toString());
 			return;    		
     	}
     	if(!matchesResult.getBoolean()) {
-    		this.evaluationError.setVisible(true);
-			this.evaluationError.setText("The policy does not match the AuthorizationSubscription!");
-			this.jsonOutput.setDocument("");
+			updateErrorParagraph(this.evaluationError, "The policy does not match the AuthorizationSubscription!");
 			return;
     	}
     	
@@ -416,6 +416,7 @@ public class ContentView extends Div {
 		}
 		
 		
+		
 		//consume decisions
 		for(int i = 0; i < countNumberOfExpectedDecisions(); i++) {
 			steps = steps.consumeNextWith(consumeAuthDecision());
@@ -427,20 +428,18 @@ public class ContentView extends Div {
 	    	log.debug("Evaluation finished");
 		} catch (AssertionError err) {
 	    	log.debug("Evaluation error", err);
-			this.evaluationError.setVisible(true);
 			String errorMessage = "";
 			for(Throwable t : err.getSuppressed()) {
 				errorMessage = errorMessage + t.getMessage() + "; ";
 			}
-			this.evaluationError.setText(errorMessage);
+			updateErrorParagraph(this.evaluationError, errorMessage);
 		}
     }
     
     
     private SAPL getSAPLDocument(String saplString) {
 		if(saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
-			this.evaluationError.setVisible(true);
-			this.evaluationError.setText("Policy isn't valid!");
+			updateErrorParagraph(this.evaluationError, "Policy isn't valid!");
 			return null;
 		} else {
 			return this.saplInterpreter.parse(saplString);
@@ -459,12 +458,16 @@ public class ContentView extends Div {
 		try {
 			mockInput = this.objectMapper.readTree(json);
 		} catch (JsonProcessingException e) {
-			this.mockDefinitionJsonInputError.setText("Cannot parse JSON!");
-			this.mockDefinitionJsonInputError.setVisible(true);
+			updateErrorParagraph(this.mockDefinitionJsonInputError, "Cannot parse JSON!");
 			return null;
 		}
+		List<MockingModel> mocks = null;
+		try {
+			mocks = MockingModel.parseMockingJsonInputToModel(mockInput);			
+		} catch(MockDefinitionParsingException e) {
+			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage());
+		}
 		
-		List<MockingModel> mocks = MockingModel.parseMockingJsonInputToModel(mockInput, this.mockDefinitionJsonInputError);
 		if(mocks == null) {
 			return null;
 		}
@@ -506,8 +509,7 @@ public class ContentView extends Div {
 		try {
 			jsonInput = objectMapper.readTree(jsonInputString);
 		} catch (JsonProcessingException e) {
-			this.authSubJsonInputError.setText("Input JSON is not valid");
-			this.authSubJsonInputError.setVisible(true);
+			updateErrorParagraph(this.authSubJsonInputError, "Input JSON is not valid");
 			return null;
 		}
 		
@@ -530,8 +532,7 @@ public class ContentView extends Div {
         			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.aggregatedResult));
         		} catch (JsonProcessingException e) {
         			log.error("Error deserializing AuthorizationDecisions: " + e);
-        			this.evaluationError.setVisible(true);
-        			this.evaluationError.setText("Error printing Evaluation Result!");
+        			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!");
         		}
         		return;
     		}));
@@ -581,5 +582,16 @@ public class ContentView extends Div {
     	
     	return biggestNumberOfValuesEmittedByOneMock;
     	
+    }
+    
+    private void updateErrorParagraph(Paragraph paragraph, String text) {
+		getUI().ifPresent(ui -> ui.access(() -> {
+			
+			paragraph.setVisible(true);
+			paragraph.setText(text);
+			this.jsonOutput.setDocument("");
+			 
+    		return;
+		}));
     }
 }

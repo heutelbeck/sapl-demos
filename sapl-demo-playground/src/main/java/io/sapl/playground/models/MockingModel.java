@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.vaadin.flow.component.html.Paragraph;
 
 import io.sapl.api.interpreter.Val;
 import lombok.Data;
@@ -44,13 +43,11 @@ public class MockingModel {
 	
 	
 	
-    public static List<MockingModel> parseMockingJsonInputToModel(JsonNode mockInput, Paragraph mockDefinitionJsonInputError) {
+    public static List<MockingModel> parseMockingJsonInputToModel(JsonNode mockInput) throws MockDefinitionParsingException {
     	List<MockingModel> models = new LinkedList<>();
     	
     	if(!mockInput.isArray()) {
-			mockDefinitionJsonInputError.setText("Expecting an array at top level");
-			mockDefinitionJsonInputError.setVisible(true);
-			return null;
+			throw new MockDefinitionParsingException("Expecting an array at top level");
 		}
 		
 		
@@ -68,17 +65,13 @@ public class MockingModel {
 								typeString.equals(MockingTargetEnum.FUNCTION.name())
 						)
 					) {
-					mockDefinitionJsonInputError.setText("Expecting for field \"" + KeyValue_Type + "\" a value of \"ATTRIBUTE\" or \"FUNCTION\"");
-					mockDefinitionJsonInputError.setVisible(true);
-					return null;
+					throw new MockDefinitionParsingException("Expecting for field \"" + KeyValue_Type + "\" a value of \"ATTRIBUTE\" or \"FUNCTION\"");
 				} else {
 					mockModel.setType(MockingTargetEnum.valueOf(typeString));
 				}
 				
 			} else {
-				mockDefinitionJsonInputError.setText("Expecting the field \"" + KeyValue_Type + "\" in every element");
-				mockDefinitionJsonInputError.setVisible(true);
-				return null;
+				throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_Type + "\" in every element");
 			}
 			
 			
@@ -90,26 +83,20 @@ public class MockingModel {
 				String importNameString = mockElement.get(KeyValue_ImportName).asText();
 				
 				if(importNameString.isEmpty() || !importNameString.contains(".")) {
-					mockDefinitionJsonInputError.setText("Expecting a string value with a dot like \"function.name\" for field \"" + KeyValue_ImportName + "\"!");
-					mockDefinitionJsonInputError.setVisible(true);
-					return null;
+					throw new MockDefinitionParsingException("Expecting a string value with a dot like \"function.name\" for field \"" + KeyValue_ImportName + "\"!");
 				} else {
 					mockModel.setImportName(importNameString);
 				}
 				
 			} else {
-				mockDefinitionJsonInputError.setText("Expecting the field \"" + KeyValue_ImportName + "\" in every element");
-				mockDefinitionJsonInputError.setVisible(true);
-				return null;
+				throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_ImportName + "\" in every element");
 			}
 			
 			
 			//check only one of "mockValue" or "mockValues" is set
 			if(mockElement.has(KeyValue_AlwaysReturnValue) && mockElement.has(KeyValue_ReturnSequenceValues)) {
-				mockDefinitionJsonInputError.setText("You cannot specify an always-returned \"" + KeyValue_AlwaysReturnValue + "\" "
+				throw new MockDefinitionParsingException("You cannot specify an always-returned \"" + KeyValue_AlwaysReturnValue + "\" "
 						+ "AND an array of \"" + KeyValue_ReturnSequenceValues + "\" for importName \"" + mockModel.getImportName() + "\". Specify only one!");
-				mockDefinitionJsonInputError.setVisible(true);
-				return null;
 			}
 			
 			//parse optional "mockValue" field
@@ -122,10 +109,8 @@ public class MockingModel {
 			if(mockElement.has(KeyValue_ReturnSequenceValues)) {
 				var values = mockElement.get(KeyValue_ReturnSequenceValues);
 				if(!values.isArray()) {
-					mockDefinitionJsonInputError.setText("Expecting an array for field \"" + KeyValue_ReturnSequenceValues + "\""
+					throw new MockDefinitionParsingException("Expecting an array for field \"" + KeyValue_ReturnSequenceValues + "\""
 							+ " for importName \"" + mockModel.getImportName() + "\"!");
-					mockDefinitionJsonInputError.setVisible(true);
-					return null;
 					
 				}
 				var valuesArray = (ArrayNode) values;
