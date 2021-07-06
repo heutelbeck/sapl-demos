@@ -102,8 +102,6 @@ public class ContentView extends Div {
 	private final String propertyNameClassName = "property-name";
 	private final String propertyDescriptionClassName = "property-description";
 	
-	private int ignoreUIChanges = 0;
-	
     public ContentView(ExampleSelectedViewBus exampleSelectedViewBus) throws InitializationException {
         
         exampleSelectedViewBus.setContentView(this);
@@ -280,7 +278,14 @@ public class ContentView extends Div {
 
 		tabs.addSelectedChangeListener(event -> {
 		    tabsToPages.values().forEach(page -> page.setVisible(false));
-		    Component selectedPage = tabsToPages.get(tabs.getSelectedTab());
+			Component selectedTab = tabs.getSelectedTab();
+		    Component selectedPage = tabsToPages.get(selectedTab);
+			if(selectedTab.equals(tab2MockInput)) {
+				//mockDefinitionEditor.Refresh();
+			}
+			if(selectedTab.equals(tab1AuthSubInput)) {
+				//authSubEditor.Refresh();
+			}
 		    selectedPage.setVisible(true);
 		});
 		
@@ -318,9 +323,7 @@ public class ContentView extends Div {
 		}
 	}
 
-	public void setExample(Example example) {				
-		this.ignoreUIChanges = 3;
-
+	public void setExample(Example example) {
 		this.saplEditor.getUI().ifPresent(ui -> ui.access(() -> this.saplEditor.setDocument(example.getPolicy())));
 		
 		this.authSubEditor.getUI().ifPresent(ui -> ui.access(() -> this.authSubEditor.setDocument(example.getAuthSub())));
@@ -338,10 +341,6 @@ public class ContentView extends Div {
 
 	    
     private void onMockingJsonEditorInputChanged(DocumentChangedEvent event) {
-    	if(this.ignoreUIChanges != 0) {
-    		this.ignoreUIChanges--;
-    		return;
-    	}
     	
     	log.debug("Mock Json Editor changed");
     	this.mockDefinitionJsonInputError.setVisible(false);
@@ -353,10 +352,6 @@ public class ContentView extends Div {
 
     
     private void onAuthSubJsonInputChanged(DocumentChangedEvent event) {
-    	if(this.ignoreUIChanges != 0) {
-    		this.ignoreUIChanges--;
-    		return;
-    	}
     	
     	log.debug("AuthSub Editor changed");
     	this.authSubJsonInputError.setVisible(false);
@@ -369,10 +364,6 @@ public class ContentView extends Div {
     
     
     private void onSaplPolicyChanged(DocumentChangedEvent event) {
-    	if(this.ignoreUIChanges != 0) {
-    		this.ignoreUIChanges--;
-    		return;
-    	}
     	
     	log.debug("Policy Editor changed");
 		this.evaluationError.setVisible(false);
