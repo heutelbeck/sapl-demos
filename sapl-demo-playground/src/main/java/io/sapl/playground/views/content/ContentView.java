@@ -281,10 +281,10 @@ public class ContentView extends Div {
 			Component selectedTab = tabs.getSelectedTab();
 		    Component selectedPage = tabsToPages.get(selectedTab);
 			if(selectedTab.equals(tab2MockInput)) {
-				//mockDefinitionEditor.Refresh();
+				mockDefinitionEditor.Refresh();
 			}
 			if(selectedTab.equals(tab1AuthSubInput)) {
-				//authSubEditor.Refresh();
+				authSubEditor.Refresh();
 			}
 		    selectedPage.setVisible(true);
 		});
