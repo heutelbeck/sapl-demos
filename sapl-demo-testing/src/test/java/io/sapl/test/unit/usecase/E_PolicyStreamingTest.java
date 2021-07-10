@@ -1,7 +1,7 @@
 package io.sapl.test.unit.usecase;
 
 
-import static io.sapl.hamcrest.Matchers.anyAuthDecision;
+import static io.sapl.hamcrest.Matchers.anyDecision;
 import static io.sapl.test.Imports.times;
 
 import java.time.Duration;
@@ -63,17 +63,17 @@ public class E_PolicyStreamingTest {
 			.withVirtualTime()
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyAuthDecision())
+			.expectNext(anyDecision())
 			.verify();
 	}
 	
