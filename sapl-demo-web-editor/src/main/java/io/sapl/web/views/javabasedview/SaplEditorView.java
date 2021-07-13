@@ -18,7 +18,10 @@ import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Sapl Editor Demo")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
+@SuppressWarnings("serial")
 public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
+
+	private final String DefaultSaplString = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
 
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
@@ -37,7 +40,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		saplEditor.addDocumentChangedListener(this);
 		saplEditor.addValidationFinishedListener(this);
 		add(saplEditor);
-		
+
 		addDocumentChangedListenerButton = new Button();
 		addDocumentChangedListenerButton.setText("Add Change Listener");
 		addDocumentChangedListenerButton.addClickListener(e -> {
@@ -56,7 +59,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
 		add(removeDocumentChangedListenerButton);
-		
+
 		addValidationChangedListenerButton = new Button();
 		addValidationChangedListenerButton.setText("Add Validation Listener");
 		addValidationChangedListenerButton.addClickListener(e -> {
@@ -75,14 +78,14 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 			removeValidationChangedListenerButton.setEnabled(false);
 		});
 		add(removeValidationChangedListenerButton);
-		
+
 		Button setDocumentToDefaultButton = new Button();
 		setDocumentToDefaultButton.setText("Set Document to Default");
 		setDocumentToDefaultButton.addClickListener(e -> {
-			saplEditor.setDocument(getDefaultSaplString());
+			saplEditor.setDocument(DefaultSaplString);
 		});
 		add(setDocumentToDefaultButton);
-		
+
 		Button showSaplDocumentButton = new Button();
 		showSaplDocumentButton.setText("Show Document in Console");
 		showSaplDocumentButton.addClickListener(e -> {
@@ -90,7 +93,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 			System.out.println("Current SAPL value: " + document);
 		});
 		add(showSaplDocumentButton);
-		
+
 		Button toggleReadOnlyButton = new Button();
 		toggleReadOnlyButton.setText("Toggle ReadOnly");
 		toggleReadOnlyButton.addClickListener(e -> {
@@ -98,7 +101,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		});
 		add(toggleReadOnlyButton);
 
-		saplEditor.setDocument(getDefaultSaplString());
+		saplEditor.setDocument(DefaultSaplString);
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
@@ -112,9 +115,5 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		for (Issue issue : issues) {
 			System.out.println(issue.getDescription());
 		}
-	}
-
-	private String getDefaultSaplString() {
-		return "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit"; 
 	}
 }

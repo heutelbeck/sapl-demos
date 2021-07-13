@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.tabs.Tab;
@@ -25,6 +24,7 @@ import io.sapl.web.views.javabasedview.SaplEditorView;
 @JsModule("./styles/shared-styles.js")
 //@PWA(name = "SAPL Demo Web Editor", shortName = "SAPL Demo Web Editor")
 @Theme(value = Lumo.class, variant = Lumo.DARK)
+@SuppressWarnings("serial")
 public class MainView extends AppLayout {
 
     private final Tabs menu;
@@ -50,7 +50,9 @@ public class MainView extends AppLayout {
 
     private static Tab createTab(String title,
             Class<? extends Component> viewClass) {
-        return createTab(populateLink(new RouterLink(null, viewClass), title));
+    	RouterLink routerLink = new RouterLink(null, viewClass);
+    	routerLink.add(title);
+    	return createTab(routerLink);
     }
 
     private static Tab createTab(Component content) {
@@ -59,12 +61,7 @@ public class MainView extends AppLayout {
         tab.add(content);
         return tab;
     }
-
-    private static <T extends HasComponents> T populateLink(T a, String title) {
-        a.add(title);
-        return a;
-    }
-
+    
     @Override
     protected void afterNavigation() {
         super.afterNavigation();

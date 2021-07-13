@@ -15,8 +15,32 @@ import io.sapl.web.MainView;
 @Route(value = "jsoneditor", layout = MainView.class)
 @PageTitle("JSON Editor Demo")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
+@SuppressWarnings("serial")
 public class JsonEditorView extends Div implements DocumentChangedListener {
 
+	private final String DefaultJsonString = 
+			"[\r\n"
+			+ " {\r\n"
+			+ "  _id: \"post 1\",\r\n"
+			+ "  \"author\": \"Bob\",\r\n"
+			+ "  \"content\": \"...\",\r\n"
+			+ "  \"page_views\": 5\r\n"
+			+ " },\r\n"
+			+ " {\r\n"
+			+ "  \"_id\": \"post 2\",\r\n"
+			+ "  \"author\": \"Bob\",\r\n"
+			+ "  \"content\": \"...\",\r\n"
+			+ "  \"page_views\": 9\r\n"
+			+ " },\r\n"
+			+ " {\r\n"
+			+ "  \"_id\": \"post 3\",\r\n"
+			+ "  \"author\": \"Bob\",\r\n"
+			+ "  \"content\": \"...\",\r\n"
+			+ "  \"page_views\": 8\r\n"
+			+ " }\r\n"
+			+ "]\r\n"
+			+ "";
+	
 	private JsonEditor jsonEditor;
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
@@ -58,7 +82,7 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 		Button setJsonDocumentButton = new Button();
 		setJsonDocumentButton.setText("Set Document to Default");
 		setJsonDocumentButton.addClickListener(e -> {
-			String document = getDefaultJsonString();
+			String document = DefaultJsonString;
 			jsonEditor.setDocument(document);
 		});
 		add(setJsonDocumentButton);
@@ -69,31 +93,7 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 		});
 		add(toggleReadOnlyButton);
 		
-		jsonEditor.setDocument(getDefaultJsonString());
-	}
-	
-	private String getDefaultJsonString() {
-		return "[\r\n"
-				+ " {\r\n"
-				+ "  _id: \"post 1\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 5\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 2\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 9\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 3\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 8\r\n"
-				+ " }\r\n"
-				+ "]\r\n"
-				+ "";
+		jsonEditor.setDocument(DefaultJsonString);
 	}
 
 	@Override
