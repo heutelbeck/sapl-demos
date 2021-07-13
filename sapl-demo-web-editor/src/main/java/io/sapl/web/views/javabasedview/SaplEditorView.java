@@ -21,8 +21,6 @@ import io.sapl.web.MainView;
 @SuppressWarnings("serial")
 public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
-	private final String DefaultSaplString = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
-
 	private Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
 	private Button addValidationChangedListenerButton;
@@ -30,6 +28,8 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 	private SaplEditor saplEditor;
 
 	public SaplEditorView() {
+		final String DefaultSaplString = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
+
 		setId("sapl-editor-view");
 
 		SaplEditorConfiguration saplConfig = new SaplEditorConfiguration();
