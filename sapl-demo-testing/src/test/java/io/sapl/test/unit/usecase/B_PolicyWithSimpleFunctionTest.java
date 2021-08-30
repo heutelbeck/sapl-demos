@@ -40,7 +40,7 @@ public class B_PolicyWithSimpleFunctionTest {
 	void test_policyWithSimpleMockedFunction() {
 		
 		fixture.constructTestCaseWithMocks()
-			.givenFunction("time.dayOfWeekFrom", Val.of("SATURDAY"))
+			.givenFunction("time.dayOfWeek", Val.of("SATURDAY"))
 			.when(AuthorizationSubscription.of("willi", "read", "something"))
 			.expectPermit()
 			.verify();
@@ -51,7 +51,7 @@ public class B_PolicyWithSimpleFunctionTest {
 	void test_policyWithSimpleMockedFunction_VerifyTimesCalled() {
 		
 		fixture.constructTestCaseWithMocks()
-			.givenFunction("time.dayOfWeekFrom", Val.of("SATURDAY"), times(1))
+			.givenFunction("time.dayOfWeek", Val.of("SATURDAY"), times(1))
 			.when(AuthorizationSubscription.of("willi", "read", "something"))
 			.expectPermit()
 			.verify();
