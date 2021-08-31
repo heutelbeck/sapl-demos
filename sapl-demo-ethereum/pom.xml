@@ -16,7 +16,7 @@
 
 	<properties>
 		<maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
-		<vaadin.version>14.6.5</vaadin.version>
+		<vaadin.version>14.6.8</vaadin.version>
 		<drivers.dir>${project.basedir}/drivers</drivers.dir>
 		<drivers.downloader.phase>pre-integration-test</drivers.downloader.phase>
 	</properties>
