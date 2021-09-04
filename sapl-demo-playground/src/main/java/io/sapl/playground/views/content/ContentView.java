@@ -7,31 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.UnorderedList;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -64,6 +39,33 @@ import io.sapl.vaadin.JsonEditorConfiguration;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.ListItem;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
+
+import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
 
@@ -261,7 +263,7 @@ public class ContentView extends Div {
         
         page3MockHelpText.add(properties);
         
-        page3MockHelpText.add(new Paragraph("One of \"always\" or \"sequence\" is required"));
+        page3MockHelpText.add(new Paragraph("Exactly one of \"always\" or \"sequence\" is required"));
 
 		//Icon helpLogo = new Icon(VaadinIcon.INFO_CIRCLE);
 		//div.add(helpLogo);
@@ -390,8 +392,7 @@ public class ContentView extends Div {
     	
     	//initialize output
     	this.aggregatedResult = this.objectMapper.createArrayNode();
-	
-    	   	
+    	
     	//check if authSub matches Policy
     	var ctxForAuthSub = getEvalContextForMockJson(this.currentMockingModel).forAuthorizationSubscription(this.currentAuthSub);
     	var matchesResult = this.currentPolicy.matches(ctxForAuthSub).block();
@@ -400,16 +401,17 @@ public class ContentView extends Div {
 			return;    		
     	}
     	if(!matchesResult.getBoolean()) {
-			updateErrorParagraph(this.evaluationError, "The policy does not match the AuthorizationSubscription!");
-			return;
+    		StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
+    			.consumeNextWith(consumeAuthDecision())
+    			.thenCancel().verify(Duration.ofSeconds(10));
+    		return;
     	}
     	
     	
     	//setup StepVerifier
-		Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthSub));
+    	Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthSub));
 		
 		//emit TestPublishers in given order
-		
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
 			String fullname = mock.getFullname();
 			for (Val val : mock.getMockReturnValues()) {
