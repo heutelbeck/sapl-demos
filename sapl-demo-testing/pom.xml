@@ -33,14 +33,19 @@
 	<build>
 		<!-- If the <directory> is changed via the following property, 
 			you have to configure the sapl-test module via a system property "io.sapl.test.outputDir" too. 
-			See below maven-surefire-plugin for example configuration.-->
-    	<!--<directory>temp/</directory> -->
+			See below maven-surefire-plugin for example configuration. And configure the outputDir parameter in the configuration of the sapl-maven-plugin -->
+    	<!-- <directory>test/</directory> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<!-- <configuration> <systemPropertyVariables> <io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir> 
-					</systemPropertyVariables> </configuration> -->
+				<!--
+				<configuration>
+					<systemPropertyVariables>
+						<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir> 
+					</systemPropertyVariables>
+				</configuration>
+				-->
 			</plugin>
 			<plugin>
 				<groupId>${project.groupId}</groupId>
@@ -49,7 +54,7 @@
 				<configuration>
 					<!--<coverageEnabled>false</coverageEnabled> -->
 					<!--<policyPath>policies</policyPath> -->
-					<!--<outputDir>something/special/</outputDir> -->
+					<!--<outputDir>${project.build.directory}</outputDir>-->
 					<!--<policySetHitRatio>100</policySetHitRatio> -->
 					<policyHitRatio>100</policyHitRatio>
 					<policyConditionHitRatio>50</policyConditionHitRatio>
