@@ -40,7 +40,7 @@ public class SpringDataExample extends Example {
 				+ "					}";
 		
 		
-		this.authSub = "{\r\n"
+		this.authzSub = "{\r\n"
 				+ "  	\"action\": {\r\n"
 				+ "      \"http\":{\r\n"
 				+ "        \"characterEncoding\":\"UTF-8\",\"protocol\":\"HTTP/1.1\",\"scheme\":\"http\",\"serverName\":\"localhost\",\"serverPort\":8080,\"remoteAddress\":\"0:0:0:0:0:0:0:1\",\"remoteHost\":\"0:0:0:0:0:0:0:1\",\"remotePort\":55317,\"isSecure\":false,\"localName\":\"0:0:0:0:0:0:0:1\",\"localAddress\":\"0:0:0:0:0:0:0:1\",\"localPort\":8080,\r\n"

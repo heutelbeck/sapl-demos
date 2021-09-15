@@ -25,7 +25,7 @@ public class BasicExample extends Example {
 				+ "    time.dayOfWeekFrom(\"UTC\".<clock.now>) =~ \"MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY\";";
 		
 		
-		this.authSub = "{\n"
+		this.authzSub = "{\n"
     			+ " \"subject\"     : \"WILLI\",\n"
     			+ " \"action\"      : \"read\",\n"
     			+ " \"resource\"    : \"something\"\n"
