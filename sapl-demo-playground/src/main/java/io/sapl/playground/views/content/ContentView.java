@@ -7,31 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.UnorderedList;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
-
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -64,6 +39,33 @@ import io.sapl.vaadin.JsonEditorConfiguration;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.dependency.CssImport;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.ListItem;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteAlias;
+
+import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
 
@@ -78,12 +80,12 @@ public class ContentView extends Div {
 	private JsonEditor mockDefinitionEditor;
 	private Paragraph mockDefinitionJsonInputError;
 	
-	private JsonEditor authSubEditor;
-	private Paragraph authSubJsonInputError;
+	private JsonEditor authzSubEditor;
+	private Paragraph authzSubJsonInputError;
 	
 
 	private List<MockingModel> currentMockingModel;
-	private AuthorizationSubscription currentAuthSub;
+	private AuthorizationSubscription currentAuthzSub;
 	private SAPL currentPolicy;
 	
 	private JsonEditor jsonOutput;
@@ -96,6 +98,10 @@ public class ContentView extends Div {
 	private ArrayNode aggregatedResult;
 	private AttributeContext defaultAttrContext;
 	private FunctionContext defaultFuntionContext;
+
+	private boolean ignoreNextPolicyEditorChangedEvent = false;
+	private boolean ignoreNextAuthzSubJsonEditorChangedEvent = false;
+	private boolean ignoreNextMockJsonEditorChangedEvent = false;
 	
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 	
@@ -173,22 +179,22 @@ public class ContentView extends Div {
 		
         //Tab 1
         
-        Tab tab1AuthSubInput = new Tab("AuthorizationSubscription");
+        Tab tab1AuthzSubInput = new Tab("AuthorizationSubscription");
         Div page1JsonEditorDiv = new Div();
         page1JsonEditorDiv.setId("jsonEditorDiv");
-        JsonEditorConfiguration authSubEditorConfig = new JsonEditorConfiguration();
-        authSubEditorConfig.setTextUpdateDelay(500);
-		this.authSubEditor = new JsonEditor(authSubEditorConfig);
-		this.authSubEditor.addDocumentChangedListener(event -> this.onAuthSubJsonInputChanged(event));
-		//this.authSubEditor.getElement().addEventListener("value-changed", event ->  this.onAuthSubJsonInputChanged(event.getEventData().getString("element.value"))).debounce(500).addEventData("element.value");
+        JsonEditorConfiguration authzSubEditorConfig = new JsonEditorConfiguration();
+        authzSubEditorConfig.setTextUpdateDelay(500);
+		this.authzSubEditor = new JsonEditor(authzSubEditorConfig);
+		this.authzSubEditor.addDocumentChangedListener(event -> this.onAuthzSubJsonInputChanged(event));
+		//this.authzSubEditor.getElement().addEventListener("value-changed", event ->  this.onAuthzSubJsonInputChanged(event.getEventData().getString("element.value"))).debounce(500).addEventData("element.value");
 		
-		page1JsonEditorDiv.add(this.authSubEditor);
+		page1JsonEditorDiv.add(this.authzSubEditor);
 		//div.add(jsonEditorDiv);
 		
-		this.authSubJsonInputError = new Paragraph("Input JSON is not valid");
-		this.authSubJsonInputError.setVisible(false);
-		this.authSubJsonInputError.setClassName("errorText");
-		page1JsonEditorDiv.add(this.authSubJsonInputError);
+		this.authzSubJsonInputError = new Paragraph("Input JSON is not valid");
+		this.authzSubJsonInputError.setVisible(false);
+		this.authzSubJsonInputError.setClassName("errorText");
+		page1JsonEditorDiv.add(this.authzSubJsonInputError);
 		
 		
 		
@@ -209,7 +215,7 @@ public class ContentView extends Div {
 		this.mockDefinitionJsonInputError.setClassName("errorText");
 		page2MockInput.add(this.mockDefinitionJsonInputError);
 
-				
+		
 		
 		//Tab 3
         
@@ -261,7 +267,7 @@ public class ContentView extends Div {
         
         page3MockHelpText.add(properties);
         
-        page3MockHelpText.add(new Paragraph("One of \"always\" or \"sequence\" is required"));
+        page3MockHelpText.add(new Paragraph("Exactly one of \"always\" or \"sequence\" is required"));
 
 		//Icon helpLogo = new Icon(VaadinIcon.INFO_CIRCLE);
 		//div.add(helpLogo);
@@ -271,10 +277,10 @@ public class ContentView extends Div {
 		//Tab visible logic
 		
 		Map<Tab, Component> tabsToPages = new HashMap<>();
-		tabsToPages.put(tab1AuthSubInput, page1JsonEditorDiv);
+		tabsToPages.put(tab1AuthzSubInput, page1JsonEditorDiv);
 		tabsToPages.put(tab2MockInput, page2MockInput);
 		tabsToPages.put(tab3MockHelpText, page3MockHelpText);
-		Tabs tabs = new Tabs(tab1AuthSubInput, tab2MockInput, tab3MockHelpText);
+		Tabs tabs = new Tabs(tab1AuthzSubInput, tab2MockInput, tab3MockHelpText);
 
 		tabs.addSelectedChangeListener(event -> {
 		    tabsToPages.values().forEach(page -> page.setVisible(false));
@@ -283,8 +289,8 @@ public class ContentView extends Div {
 			if(selectedTab.equals(tab2MockInput)) {
 				mockDefinitionEditor.refresh();
 			}
-			if(selectedTab.equals(tab1AuthSubInput)) {
-				authSubEditor.refresh();
+			if(selectedTab.equals(tab1AuthzSubInput)) {
+				authzSubEditor.refresh();
 			}
 		    selectedPage.setVisible(true);
 		});
@@ -322,27 +328,48 @@ public class ContentView extends Div {
 			log.debug(issue.getDescription());
 		}
 	}
-
+	
 	public void setExample(Example example) {
-		this.saplEditor.getUI().ifPresent(ui -> ui.access(() -> this.saplEditor.setDocument(example.getPolicy())));
 		
-		this.authSubEditor.getUI().ifPresent(ui -> ui.access(() -> this.authSubEditor.setDocument(example.getAuthSub())));
-		
-		this.mockDefinitionEditor.getUI().ifPresent(ui -> ui.access(() -> this.mockDefinitionEditor.setDocument(example.getMockDefinition())));
-		
-		
-		
-		this.currentAuthSub = getAuthSubForJsonString(example.getAuthSub());
+		this.getUI().ifPresent(ui -> ui.access(() -> {
+			
+			//updating the editor components triggers the document changed event and following evaluation of the policy
+			// to prevent these multiple concurrent evaluations, ignore the documentChanged events
+			
+			if(this.saplEditor.isVisible()) {
+				this.ignoreNextPolicyEditorChangedEvent = true;				
+			}			
+			if(this.authzSubEditor.isVisible()) {
+				this.ignoreNextAuthzSubJsonEditorChangedEvent = true;
+			}
+			if(this.mockDefinitionEditor.isVisible()) {
+				this.ignoreNextMockJsonEditorChangedEvent = true;
+			}
+			
+			this.saplEditor.setDocument(example.getPolicy());
+			this.authzSubEditor.setDocument(example.getAuthzSub());
+			this.mockDefinitionEditor.setDocument(example.getMockDefinition());
+		}));
+				
+		// update the internal values
+		this.currentAuthzSub = getAuthzSubForJsonString(example.getAuthzSub());
 		this.currentPolicy = getSAPLDocument(example.getPolicy());
 		this.currentMockingModel = parseMockingModels(example.getMockDefinition());
 		
+		// and manually execute a evaluation once
 		evaluatePolicy();		
 	}
 
 	    
     private void onMockingJsonEditorInputChanged(DocumentChangedEvent event) {
-    	
     	log.debug("Mock Json Editor changed");
+    	
+    	if(this.ignoreNextMockJsonEditorChangedEvent) {
+    		log.debug("Ignore this Mock Json Editor Document Changed Event");
+    		this.ignoreNextMockJsonEditorChangedEvent = false;
+    		return;
+    	}
+    	
     	this.mockDefinitionJsonInputError.setVisible(false);
 
 		this.currentMockingModel = parseMockingModels(event.getNewValue());
@@ -351,12 +378,18 @@ public class ContentView extends Div {
     }
 
     
-    private void onAuthSubJsonInputChanged(DocumentChangedEvent event) {
+    private void onAuthzSubJsonInputChanged(DocumentChangedEvent event) {
+    	log.debug("AuthzSub Editor changed");
     	
-    	log.debug("AuthSub Editor changed");
-    	this.authSubJsonInputError.setVisible(false);
+    	if(this.ignoreNextAuthzSubJsonEditorChangedEvent) {
+    		log.debug("Ignore this AuthzSub Editor Editor Document Changed Event");
+    		this.ignoreNextAuthzSubJsonEditorChangedEvent = false;
+    		return;
+    	}
     	
-		this.currentAuthSub = getAuthSubForJsonString(event.getNewValue());
+    	this.authzSubJsonInputError.setVisible(false);
+    	
+		this.currentAuthzSub = getAuthzSubForJsonString(event.getNewValue());
 		
 		evaluatePolicy();
     }
@@ -364,17 +397,22 @@ public class ContentView extends Div {
     
     
     private void onSaplPolicyChanged(DocumentChangedEvent event) {
-    	
     	log.debug("Policy Editor changed");
+    	
+    	if(this.ignoreNextPolicyEditorChangedEvent) {
+    		log.debug("Ignore this Policy Editor Document Changed Event");
+    		this.ignoreNextPolicyEditorChangedEvent = false;
+    		return;
+    	}
+    	
 		this.evaluationError.setVisible(false);
 	
 		var saplString = event.getNewValue();
 		if(saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
-			updateErrorParagraph(this.evaluationError, "Policy isn't valid!");
+			updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
 			return;
 		}
 		
-
 		this.currentPolicy = getSAPLDocument(saplString);
 		
 		evaluatePolicy();
@@ -382,7 +420,7 @@ public class ContentView extends Div {
     
     private void evaluatePolicy() {
     	log.debug("Evaluating Policy");
-    	if(this.currentAuthSub == null || this.currentMockingModel == null || this.currentPolicy == null) {
+    	if(this.currentAuthzSub == null || this.currentMockingModel == null || this.currentPolicy == null) {
     		return;
     	}
     	
@@ -390,30 +428,30 @@ public class ContentView extends Div {
     	
     	//initialize output
     	this.aggregatedResult = this.objectMapper.createArrayNode();
-	
-    	   	
-    	//check if authSub matches Policy
-    	var ctxForAuthSub = getEvalContextForMockJson(this.currentMockingModel).forAuthorizationSubscription(this.currentAuthSub);
-    	var matchesResult = this.currentPolicy.matches(ctxForAuthSub).block();
+    	
+    	//check if authzSub matches Policy
+    	var ctxForAuthzSub = getEvalContextForMockJson(this.currentMockingModel).forAuthorizationSubscription(this.currentAuthzSub);
+    	var matchesResult = this.currentPolicy.matches(ctxForAuthzSub).block();
     	if(!matchesResult.isBoolean()) {
-			updateErrorParagraph(this.evaluationError, matchesResult.toString());
+			updateErrorParagraph(this.evaluationError, matchesResult.toString(), true);
 			return;    		
     	}
     	if(!matchesResult.getBoolean()) {
-			updateErrorParagraph(this.evaluationError, "The policy does not match the AuthorizationSubscription!");
-			return;
+    		StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
+    			.consumeNextWith(consumeAuthDecision())
+    			.thenCancel().verify(Duration.ofSeconds(10));
+    		return;
     	}
     	
     	
     	//setup StepVerifier
-		Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthSub));
+    	Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthzSub));
 		
 		//emit TestPublishers in given order
-		
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
 			String fullname = mock.getFullname();
 			for (Val val : mock.getMockReturnValues()) {
-				steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthSub.getAttributeCtx()).mockEmit(fullname, val));
+				steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthzSub.getAttributeCtx()).mockEmit(fullname, val));
 			}
 		}
 		
@@ -430,18 +468,14 @@ public class ContentView extends Div {
 	    	log.debug("Evaluation finished");
 		} catch (AssertionError err) {
 	    	log.debug("Evaluation error", err);
-			String errorMessage = "";
-			for(Throwable t : err.getSuppressed()) {
-				errorMessage = errorMessage + t.getMessage() + "; ";
-			}
-			updateErrorParagraph(this.evaluationError, errorMessage);
+			updateErrorParagraph(this.evaluationError, err.getMessage(), false);
 		}
     }
     
     
     private SAPL getSAPLDocument(String saplString) {
 		if(saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
-			updateErrorParagraph(this.evaluationError, "Policy isn't valid!");
+			updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
 			return null;
 		} else {
 			return this.saplInterpreter.parse(saplString);
@@ -454,14 +488,14 @@ public class ContentView extends Div {
 		try {
 			mockInput = this.objectMapper.readTree(json);
 		} catch (JsonProcessingException e) {
-			updateErrorParagraph(this.mockDefinitionJsonInputError, "Cannot parse JSON!");
+			updateErrorParagraph(this.mockDefinitionJsonInputError, "Cannot parse JSON!", true);
 			return null;
 		}
 		List<MockingModel> mocks = null;
 		try {
 			mocks = MockingModel.parseMockingJsonInputToModel(mockInput);			
 		} catch(MockDefinitionParsingException e) {
-			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage());
+			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage(), true);
 		}
 		
 		return mocks;
@@ -503,7 +537,7 @@ public class ContentView extends Div {
 	}
 	
 	 
-    private AuthorizationSubscription getAuthSubForJsonString(String jsonInputString) {
+    private AuthorizationSubscription getAuthzSubForJsonString(String jsonInputString) {
     	JsonNode jsonInput = null;
 		if(jsonInputString == null) {
 			return null;
@@ -511,7 +545,7 @@ public class ContentView extends Div {
 		try {
 			jsonInput = objectMapper.readTree(jsonInputString);
 		} catch (JsonProcessingException e) {
-			updateErrorParagraph(this.authSubJsonInputError, "Input JSON is not valid");
+			updateErrorParagraph(this.authzSubJsonInputError, "Input JSON is not valid", true);
 			return null;
 		}
 		
@@ -534,7 +568,7 @@ public class ContentView extends Div {
         			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.aggregatedResult));
         		} catch (JsonProcessingException e) {
         			log.error("Error deserializing AuthorizationDecisions: " + e);
-        			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!");
+        			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!", false);
         		}
         		return;
     		}));
@@ -586,13 +620,16 @@ public class ContentView extends Div {
     	
     }
     
-    private void updateErrorParagraph(Paragraph paragraph, String text) {
+    private void updateErrorParagraph(Paragraph paragraph, String text, boolean clearOutput) {
 
     	getUI().ifPresent(ui -> ui.access(() -> {
-			
+			log.trace("updateErrorParagraph()");
 			paragraph.setVisible(true);
 			paragraph.setText(text);
-			this.jsonOutput.setDocument("");
+			
+			if(clearOutput) {
+				this.jsonOutput.setDocument("");				
+			}
 			 
     		return;
 		}));

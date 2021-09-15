@@ -6,7 +6,7 @@ public abstract class Example {
 
 	protected String policy;
 	
-	protected String authSub;
+	protected String authzSub;
 	
 	protected String displayName;
 	
@@ -18,8 +18,8 @@ public abstract class Example {
 		return this.policy;
 	}
 	
-	public String getAuthSub() {
-		return this.authSub;
+	public String getAuthzSub() {
+		return this.authzSub;
 	}
 	
 	public String getDisplayName() {
