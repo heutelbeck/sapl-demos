@@ -95,7 +95,6 @@ public class ContentView extends Div {
 	private final SAPLInterpreter saplInterpreter;
 	private List<AttributeMockReturnValues> attrReturnValues;
 	private final ObjectMapper objectMapper;
-	private ArrayNode aggregatedResult;
 	private AttributeContext defaultAttrContext;
 	private FunctionContext defaultFuntionContext;
 
@@ -427,7 +426,8 @@ public class ContentView extends Div {
     	this.evaluationError.setVisible(false);
     	
     	//initialize output
-    	this.aggregatedResult = this.objectMapper.createArrayNode();
+
+    	ArrayNode aggregatedResult = this.objectMapper.createArrayNode();
     	
     	//check if authzSub matches Policy
     	var ctxForAuthzSub = getEvalContextForMockJson(this.currentMockingModel).forAuthorizationSubscription(this.currentAuthzSub);
@@ -438,7 +438,7 @@ public class ContentView extends Div {
     	}
     	if(!matchesResult.getBoolean()) {
     		StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
-    			.consumeNextWith(consumeAuthDecision())
+    			.consumeNextWith(consumeAuthDecision(aggregatedResult))
     			.thenCancel().verify(Duration.ofSeconds(10));
     		return;
     	}
@@ -459,7 +459,7 @@ public class ContentView extends Div {
 		
 		//consume decisions
 		for(int i = 0; i < countNumberOfExpectedDecisions(); i++) {
-			steps = steps.consumeNextWith(consumeAuthDecision());
+			steps = steps.consumeNextWith(consumeAuthDecision(aggregatedResult));
 		}		
 		
 		//execute policy evaluation and catch AssertionErros
@@ -470,6 +470,14 @@ public class ContentView extends Div {
 	    	log.debug("Evaluation error", err);
 			updateErrorParagraph(this.evaluationError, err.getMessage(), false);
 		}
+		
+		try {
+			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedResult));
+		} catch (JsonProcessingException e) {
+			log.error("Error deserializing AuthorizationDecisions: " + e);
+			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!", false);
+		}
+		
     }
     
     
@@ -558,22 +566,8 @@ public class ContentView extends Div {
     }
     
     
-    private Consumer<AuthorizationDecision> consumeAuthDecision() {
-    	return authDecision -> {
-    		
-    		getUI().ifPresent(ui -> ui.access(() -> {
-    			this.aggregatedResult.add(convertAuthDecisionToPrintableJsonNode(authDecision));
-        		
-        		try {
-        			this.jsonOutput.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this.aggregatedResult));
-        		} catch (JsonProcessingException e) {
-        			log.error("Error deserializing AuthorizationDecisions: " + e);
-        			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!", false);
-        		}
-        		return;
-    		}));
-    		
-    	};
+    private Consumer<AuthorizationDecision> consumeAuthDecision(ArrayNode aggregatedResult) {
+    	return authDecision -> aggregatedResult.add(convertAuthDecisionToPrintableJsonNode(authDecision));
     }
     
     
