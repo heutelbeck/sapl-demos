@@ -122,6 +122,10 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
  
         <dependency>
             <groupId>com.vaadin</groupId>
@@ -330,7 +334,7 @@
 						</executions>
 						<configuration>
 							<repository>${docker-registry-url}/${project.artifactId}</repository>
-							<tag>${project.version}-4</tag>
+							<tag>${project.version}-5</tag>
 							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <buildArgs>
 								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>

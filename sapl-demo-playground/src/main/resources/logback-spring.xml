@@ -26,7 +26,7 @@
         <appender-ref ref="Console" />
     </root>
 
-    <logger name="io.sapl" level="warn" additivity="false">
+    <logger name="io.sapl" level="trace" additivity="false">
         <appender-ref ref="SaplConsole" />
     </logger>
 
