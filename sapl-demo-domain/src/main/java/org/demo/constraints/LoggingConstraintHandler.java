@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.api.pep.ConstraintHandler;
+import io.sapl.spring.constraints.AbstractConstraintHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,7 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
-public class LoggingConstraintHandler implements ConstraintHandler {
+public class LoggingConstraintHandler extends AbstractConstraintHandler {
+
+	public LoggingConstraintHandler() {
+		super(1); // Priority 1
+	}
 
 	/**
 	 * Upon receiving a decision from the PDP containing a constraint, i.e. an
@@ -45,12 +49,9 @@ public class LoggingConstraintHandler implements ConstraintHandler {
 	 * leads to a clean behavior in case of obligations.
 	 */
 	@Override
-	public boolean handle(JsonNode constraint) {
-		if (canHandle(constraint) && constraint.has("message")) {
-			log.info(constraint.findValue("message").asText());
-			return true;
-		}
-		return false;
+	public boolean isResponsible(JsonNode constraint) {
+		return constraint != null && constraint.has("type")
+				&& "logAccess".equals(constraint.findValue("type").asText());
 	}
 
 	/**
@@ -58,9 +59,12 @@ public class LoggingConstraintHandler implements ConstraintHandler {
 	 * implied behavior of the application.
 	 */
 	@Override
-	public boolean canHandle(JsonNode constraint) {
-		return constraint != null && constraint.has("type")
-				&& "logAccess".equals(constraint.findValue("type").asText());
+	public boolean preBlockingMethodInvocationOrOnAccessDenied(JsonNode constraint) {
+		if (isResponsible(constraint) && constraint.has("message")) {
+			log.info(constraint.findValue("message").asText());
+			return true;
+		}
+		return false;
 	}
 
 }

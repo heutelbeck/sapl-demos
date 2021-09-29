@@ -1,13 +1,15 @@
 package org.demo.domain;
 
-import io.sapl.spring.method.post.PostEnforce;
-import io.sapl.spring.method.pre.PreEnforce;
+import java.util.List;
+import java.util.Optional;
+
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Optional;
+import io.sapl.spring.method.annotations.PostEnforce;
+import io.sapl.spring.method.annotations.PreEnforce;
 
 public interface PatientRepository {
 

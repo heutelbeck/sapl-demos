@@ -6,14 +6,15 @@ This demo shows how to filter incoming Requests with a `Policy Enforcement Filte
 
 First add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) to your application as described in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
 
-When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , a bean of type `policyEnforcementFilter` will be automatically provided. In this example we provide the bean to our `SecurityConfig`.
+When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , a bean of type `policyEnforcementFilter` will be automatically provided, if the following parameter is set in the `application.properties`:
 
 ```java
-	@Autowired
-	private PolicyEnforcementFilter policyEnforcementFilter;
+pdp.policyEnforcementFilter=true
 ```
 
-Then you can configure your `HttpSecurity` to use the `PEF`. Here you can see an example of such a configuration:
+Spring security will automatically pick up the bean and insert it in its filter chain. 
+
+Attention: If you manually configure your `HttpSecurity` to use the `PEF` the following way, you will end up with the filter to be present twice in the filter chain.
 
 ```java
 	@Override
@@ -26,11 +27,6 @@ Then you can configure your `HttpSecurity` to use the `PEF`. Here you can see an
 	}
 ```
 
-Furthermore, you need to add the following line to your `application.properties`:
-
-```java
-pdp.policyEnforcementFilter=true
-```
 
 Now you can filter incoming Requests using Sapl Policies. In the Policy Enforcement Filter the following pattern is used:
 
@@ -56,6 +52,3 @@ where
   "DOCTOR" in subject..authority;
   resource =~ "/patient/*";
 ```
-
-Tip: If you add the line `logging.level.io.sapl=DEBUG` to your `application.properties` you will get useful messages that shows you the parameters that are actually provided to the `SAPLAuthorizer`, which can help you write your policies.
-

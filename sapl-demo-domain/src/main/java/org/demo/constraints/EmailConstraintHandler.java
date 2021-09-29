@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.api.pep.ConstraintHandler;
+import io.sapl.spring.constraints.AbstractConstraintHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,7 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Component
-public class EmailConstraintHandler implements ConstraintHandler {
+public class EmailConstraintHandler extends AbstractConstraintHandler {
+
+	public EmailConstraintHandler() {
+		super(0); // Priority 0
+	}
 
 	/**
 	 * Upon receiving a decision from the PDP containing a constraint, i.e. an
@@ -46,7 +50,7 @@ public class EmailConstraintHandler implements ConstraintHandler {
 	 * does not check for a valid email address, which should be done.
 	 */
 	@Override
-	public boolean canHandle(JsonNode constraint) {
+	public boolean isResponsible(JsonNode constraint) {
 		return constraint != null && constraint.has("type") && "sendEmail".equals(constraint.findValue("type").asText())
 				&& constraint.has("recipient") && constraint.has("subject") && constraint.has("message");
 	}
@@ -56,8 +60,8 @@ public class EmailConstraintHandler implements ConstraintHandler {
 	 * implied behavior of the application.
 	 */
 	@Override
-	public boolean handle(JsonNode constraint) {
-		if (canHandle(constraint)) {
+	public boolean preBlockingMethodInvocationOrOnAccessDenied(JsonNode constraint) {
+		if (isResponsible(constraint)) {
 			sendEmail(constraint.findValue("recipient").asText(), constraint.findValue("subject").asText(),
 					constraint.findValue("message").asText());
 			return true;
@@ -78,5 +82,6 @@ public class EmailConstraintHandler implements ConstraintHandler {
 		log.info("An E-Mail has been sent to {} with the subject '{}' and the message '{}'.", recipient, subject,
 				message);
 	}
+
 
 }

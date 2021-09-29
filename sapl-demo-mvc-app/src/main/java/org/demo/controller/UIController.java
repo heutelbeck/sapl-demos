@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.Decision;
-import io.sapl.spring.method.pre.PreEnforce;
+import io.sapl.spring.method.annotations.PreEnforce;
 import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

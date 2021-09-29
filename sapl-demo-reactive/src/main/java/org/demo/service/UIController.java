@@ -10,7 +10,7 @@ import org.demo.domain.PatientRepository;
 import org.demo.model.PatientListItem;
 import org.springframework.stereotype.Component;
 
-import io.sapl.spring.method.pre.PreEnforce;
+import io.sapl.spring.method.annotations.PreEnforce;
 import lombok.RequiredArgsConstructor;
 
 /**

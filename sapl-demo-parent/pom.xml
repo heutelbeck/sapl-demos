@@ -24,7 +24,7 @@
 		<java.version>11</java.version>
 		<sapl.version>2.0.0-SNAPSHOT</sapl.version>
 		<junit.version>4.13.1</junit.version>
-		<springboot.version>2.5.2</springboot.version>
+		<springboot.version>2.5.5</springboot.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
