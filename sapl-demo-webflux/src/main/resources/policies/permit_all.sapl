@@ -1,0 +1,14 @@
+policy "Permit All"
+permit 
+obligation
+	{
+		"type"		: "sendEmail",
+		"recipient"	: "Adam Admin <admin@example.com>",
+		"subject"	: "Data was accessed.",
+		"message"	: ("Administrator " + subject.name + " has accessed: " + action.http.requestedURI)
+	}
+advice
+	{
+		"type" 		: "logAccess",
+		"message"	: ("User " + subject.name + " has accessed: " + action.http.requestedURI)
+	}
