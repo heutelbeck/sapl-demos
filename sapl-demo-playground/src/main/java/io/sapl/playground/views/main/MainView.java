@@ -68,7 +68,7 @@ public class MainView extends AppLayout {
         select.setItems(this.examples.keySet());
         select.setId("dropdownButton");
         select.addValueChangeListener(
-                event -> this.exampleSelectedViewBus.getContentView().setExample(this.examples.get(event.getValue())));
+                event -> this.exampleSelectedViewBus.getContentView().setExample(this.examples.get(event.getValue()), true));
         buttons.add(select);
         
         
