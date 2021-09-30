@@ -1,3 +1,17 @@
+set "demo set"
+first-applicable
+
+
+policy "Change Resource Example"
+permit action.http.contextPath == "/changedstring"
+obligation
+	{
+		"type" 		: "logAccess",
+		"message"	: ("User " + subject.name + " has accessed: " + action.http.requestedURI)
+	}
+transform "***" + resource + "***"
+
+
 policy "Permit All"
 permit 
 obligation

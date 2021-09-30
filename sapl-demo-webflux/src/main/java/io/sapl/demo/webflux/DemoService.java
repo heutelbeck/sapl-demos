@@ -4,6 +4,7 @@ import java.time.Duration;
 
 import org.springframework.stereotype.Service;
 
+import io.sapl.spring.method.annotations.PostEnforce;
 import io.sapl.spring.method.annotations.PreEnforce;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -60,6 +61,12 @@ public class DemoService {
 	@PreEnforce
 	public Mono<String> getMonoString() {
 		return Mono.just("data returnded by Mono");
+	}
+
+//	@PreEnforce
+	@PostEnforce(resource = "returnObject")
+	public Mono<String> getMonoStringWithPreAndPost() {
+		return Mono.just("I will be decorated with * on the left and right, because the policy said so");
 	}
 
 	/**

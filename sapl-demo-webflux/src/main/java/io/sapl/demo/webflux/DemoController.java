@@ -43,8 +43,13 @@ public class DemoController {
 				.map(value -> ServerSentEvent.<JsonNode>builder().data(JSON.numberNode(value)).build());
 	}
 
-	@GetMapping(value = "/string", produces = MediaType.APPLICATION_NDJSON_VALUE)
+	@GetMapping(value = "/string", produces = MediaType.TEXT_PLAIN_VALUE)
 	public Mono<String> string() {
 		return service.getMonoString();
+	}
+
+	@GetMapping(value = "/changedstring", produces = MediaType.TEXT_PLAIN_VALUE)
+	public Mono<String> changedstring() {
+		return service.getMonoStringWithPreAndPost();
 	}
 }
