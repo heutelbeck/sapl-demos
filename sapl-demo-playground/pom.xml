@@ -334,7 +334,7 @@
 						</executions>
 						<configuration>
 							<repository>${docker-registry-url}/${project.artifactId}</repository>
-							<tag>${project.version}-6</tag>
+							<tag>${project.version}-7</tag>
 							<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
                             <buildArgs>
 								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>

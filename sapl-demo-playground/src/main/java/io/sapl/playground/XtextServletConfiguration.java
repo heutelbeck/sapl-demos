@@ -15,13 +15,13 @@
  */
 package io.sapl.playground;
 
+import io.sapl.grammar.web.SAPLServlet;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import io.sapl.grammar.web.SAPLServlet;
 
 @Configuration
 public class XtextServletConfiguration {
@@ -41,12 +41,4 @@ public class XtextServletConfiguration {
 		registration.setEnabled(false);
 		return registration;
 	}
-//  TODO: check add back in. security ???
-//	@Bean
-//	public static FilterRegistrationBean<HiddenHttpMethodFilter> registration2(HiddenHttpMethodFilter filter) {
-//		FilterRegistrationBean<HiddenHttpMethodFilter> registration = new FilterRegistrationBean<>(filter);
-//		registration.setEnabled(false);
-//		return registration;
-//	}
-
 }

@@ -3,6 +3,12 @@ package io.sapl.playground.views.main;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.sapl.playground.examples.BasicExample;
+import io.sapl.playground.examples.Example;
+import io.sapl.playground.examples.SpringDataExample;
+import io.sapl.playground.examples.SpringSecurityExample;
+import io.sapl.playground.views.ExampleSelectedViewBus;
+
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -13,19 +19,14 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
-
-import io.sapl.playground.models.BasicExample;
-import io.sapl.playground.models.Example;
-import io.sapl.playground.models.SpringDataExample;
-import io.sapl.playground.models.SpringSecurityExample;
-import io.sapl.playground.views.ExampleSelectedViewBus;
+import com.vaadin.flow.server.PWA;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 @CssImport(value = "./styles/views/main/main-view.css", themeFor = "vaadin-app-layout")
 @CssImport("./styles/views/main/main-view.css")
-//@PWA(name = "SAPL Playground", shortName = "SAPL", enableInstallPrompt = false)
+@PWA(name = "SAPL Playground", shortName = "SAPL", enableInstallPrompt = false, iconPath = "images/favicon.png")
 @JsModule("./styles/shared-styles.js")
 public class MainView extends AppLayout {
 
@@ -47,16 +48,17 @@ public class MainView extends AppLayout {
         header.setAlignItems(FlexComponent.Alignment.CENTER);
         header.setId("header");
         
-        Image logo = new Image("images/logo-header.png", "SAPL Logo");
-        logo.setId("logo");
-        header.add(logo);
+        headerSetLogo(header);
         
-        header.add(new H1("SAPL Playground"));
+        headerAddTitel(header);
         
-        //VerticalLayout vertical = new VerticalLayout();
-        //vertical.setAlignItems(Alignment.END);
+        headerAddButtons(header);
         
-        Div buttons = new Div();
+        return header;
+    }
+
+	private void headerAddButtons(HorizontalLayout header) {
+		Div buttons = new Div();
         buttons.setClassName("alignRight");
         
         Anchor linkToDocs = new Anchor("https://sapl.io/docs/sapl-reference.html", "Docs");
@@ -73,9 +75,17 @@ public class MainView extends AppLayout {
         
         
         header.add(buttons);
-        
-        return header;
-    }
+	}
+
+	private void headerAddTitel(HorizontalLayout header) {
+		header.add(new H1("SAPL Playground"));
+	}
+
+	private void headerSetLogo(HorizontalLayout header) {
+		Image logo = new Image("images/logo-header.png", "SAPL Logo");
+        logo.setId("logo");
+        header.add(logo);
+	}
     
     private void initializeExamples() {
         this.examples = new HashMap<>();

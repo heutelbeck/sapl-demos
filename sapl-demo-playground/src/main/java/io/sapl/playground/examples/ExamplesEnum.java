@@ -1,4 +1,4 @@
-package io.sapl.playground.models;
+package io.sapl.playground.examples;
 
 public enum ExamplesEnum {
 	Basic("Basic"),

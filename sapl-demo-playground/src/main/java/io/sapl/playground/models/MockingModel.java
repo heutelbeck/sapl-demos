@@ -1,13 +1,13 @@
 package io.sapl.playground.models;
 
-import java.time.Duration;
 import java.util.LinkedList;
 import java.util.List;
+
+import io.sapl.api.interpreter.Val;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.sapl.api.interpreter.Val;
 import lombok.Data;
 
 @Data
@@ -34,95 +34,123 @@ public class MockingModel {
 	List<Val> sequence;
 	public static final String KeyValue_ReturnSequenceValues = "sequence";
 	
-	/**
-	 * time interval between the {@link Val}'s of the sequence to be returned by an attribute. {@link #type} has to be {@link MockingTargetEnum#ATTRIBUTE} and {@link #sequence} has to be set.
-	 * Currently not configurable from the frontend.
-	 */
-	Duration interval = Duration.ofSeconds(2);
-	
-	
-	
 	
     public static List<MockingModel> parseMockingJsonInputToModel(JsonNode mockInput) throws MockDefinitionParsingException {
     	List<MockingModel> models = new LinkedList<>();
     	
-    	if(!mockInput.isArray()) {
-			throw new MockDefinitionParsingException("Expecting an array at top level");
-		}
-		
+    	checkArray(mockInput);
 		
 		for (JsonNode mockElement : mockInput) {
 			MockingModel mockModel = new MockingModel();
 			
-			//parse required "type" field
-			if(mockElement.has(KeyValue_Type)) {
-				
-				String typeString = mockElement.get(KeyValue_Type).asText();
-				
-				if(typeString.isEmpty() || 
-						!(
-								typeString.equals(MockingTargetEnum.ATTRIBUTE.name()) || 
-								typeString.equals(MockingTargetEnum.FUNCTION.name())
-						)
-					) {
-					throw new MockDefinitionParsingException("Expecting for field \"" + KeyValue_Type + "\" a value of \"ATTRIBUTE\" or \"FUNCTION\"");
-				} else {
-					mockModel.setType(MockingTargetEnum.valueOf(typeString));
-				}
-				
-			} else {
-				throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_Type + "\" in every element");
-			}
+			parseTypeField(mockElement, mockModel);
 			
+			extractImportNameField(mockElement, mockModel);
 			
+			checkOnlyOneOfOptionalFieldsIsSet(mockElement, mockModel);
 			
+			parseMockValueField(mockElement, mockModel);
 			
-			//parse required "importName" field
-			if(mockElement.has(KeyValue_ImportName)) {
-				
-				String importNameString = mockElement.get(KeyValue_ImportName).asText();
-				
-				if(importNameString.isEmpty() || !importNameString.contains(".")) {
-					throw new MockDefinitionParsingException("Expecting a string value with a dot like \"function.name\" for field \"" + KeyValue_ImportName + "\"!");
-				} else {
-					mockModel.setImportName(importNameString);
-				}
-				
-			} else {
-				throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_ImportName + "\" in every element");
-			}
-			
-			
-			//check only one of "mockValue" or "mockValues" is set
-			if(mockElement.has(KeyValue_AlwaysReturnValue) && mockElement.has(KeyValue_ReturnSequenceValues)) {
-				throw new MockDefinitionParsingException("You cannot specify an always-returned \"" + KeyValue_AlwaysReturnValue + "\" "
-						+ "AND an array of \"" + KeyValue_ReturnSequenceValues + "\" for importName \"" + mockModel.getImportName() + "\". Specify only one!");
-			}
-			
-			//parse optional "mockValue" field
-			if(mockElement.has(KeyValue_AlwaysReturnValue)) {
-				mockModel.setAlways(Val.of(mockElement.get(KeyValue_AlwaysReturnValue)));
-			}
-			
-			
-			//parse optional "mockValue" field
-			if(mockElement.has(KeyValue_ReturnSequenceValues)) {
-				var values = mockElement.get(KeyValue_ReturnSequenceValues);
-				if(!values.isArray()) {
-					throw new MockDefinitionParsingException("Expecting an array for field \"" + KeyValue_ReturnSequenceValues + "\""
-							+ " for importName \"" + mockModel.getImportName() + "\"!");
-					
-				}
-				var valuesArray = (ArrayNode) values;
-				List<Val> vals = new LinkedList<>();
-				for (var specifiedValue : valuesArray) {
-					vals.add(Val.of(specifiedValue));
-				}
-				mockModel.setSequence(vals);
-			}
+			parseMockValuesField(mockElement, mockModel);
 			
 			models.add(mockModel);
 		}
+		
 		return models;
     }
+
+
+
+
+	private static void parseMockValuesField(JsonNode mockElement, MockingModel mockModel)
+			throws MockDefinitionParsingException {
+		if(mockElement.has(KeyValue_ReturnSequenceValues)) {
+			var values = mockElement.get(KeyValue_ReturnSequenceValues);
+			if(!values.isArray()) {
+				throw new MockDefinitionParsingException("Expecting an array for field \"" + KeyValue_ReturnSequenceValues + "\""
+						+ " for importName \"" + mockModel.getImportName() + "\"!");
+				
+			}
+			var valuesArray = (ArrayNode) values;
+			List<Val> vals = new LinkedList<>();
+			for (var specifiedValue : valuesArray) {
+				vals.add(Val.of(specifiedValue));
+			}
+			mockModel.setSequence(vals);
+		}
+	}
+
+
+
+
+	private static void parseMockValueField(JsonNode mockElement, MockingModel mockModel) {
+		if(mockElement.has(KeyValue_AlwaysReturnValue)) {
+			mockModel.setAlways(Val.of(mockElement.get(KeyValue_AlwaysReturnValue)));
+		}
+	}
+
+
+
+
+	private static void checkOnlyOneOfOptionalFieldsIsSet(JsonNode mockElement, MockingModel mockModel)
+			throws MockDefinitionParsingException {
+		if(mockElement.has(KeyValue_AlwaysReturnValue) && mockElement.has(KeyValue_ReturnSequenceValues)) {
+			throw new MockDefinitionParsingException("You cannot specify an always-returned \"" + KeyValue_AlwaysReturnValue + "\" "
+					+ "AND an array of \"" + KeyValue_ReturnSequenceValues + "\" for importName \"" + mockModel.getImportName() + "\". Specify only one!");
+		}
+	}
+
+
+
+
+	private static void extractImportNameField(JsonNode mockElement, MockingModel mockModel)
+			throws MockDefinitionParsingException {
+		if(mockElement.has(KeyValue_ImportName)) {
+			
+			String importNameString = mockElement.get(KeyValue_ImportName).asText();
+			
+			if(importNameString.isEmpty() || !importNameString.contains(".")) {
+				throw new MockDefinitionParsingException("Expecting a string value with a dot like \"function.name\" for field \"" + KeyValue_ImportName + "\"!");
+			} else {
+				mockModel.setImportName(importNameString);
+			}
+			
+		} else {
+			throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_ImportName + "\" in every element");
+		}
+	}
+
+
+
+
+	private static void parseTypeField(JsonNode mockElement, MockingModel mockModel)
+			throws MockDefinitionParsingException {
+		if(mockElement.has(KeyValue_Type)) {
+			
+			String typeString = mockElement.get(KeyValue_Type).asText();
+			
+			if(typeString.isEmpty() || 
+					!(
+							typeString.equals(MockingTargetEnum.ATTRIBUTE.name()) || 
+							typeString.equals(MockingTargetEnum.FUNCTION.name())
+					)
+				) {
+				throw new MockDefinitionParsingException("Expecting for field \"" + KeyValue_Type + "\" a value of \"ATTRIBUTE\" or \"FUNCTION\"");
+			} else {
+				mockModel.setType(MockingTargetEnum.valueOf(typeString));
+			}
+			
+		} else {
+			throw new MockDefinitionParsingException("Expecting the field \"" + KeyValue_Type + "\" in every element");
+		}
+	}
+
+
+
+
+	private static void checkArray(JsonNode mockInput) throws MockDefinitionParsingException {
+		if(!mockInput.isArray()) {
+			throw new MockDefinitionParsingException("Expecting an array at top level");
+		}
+	}
 }
