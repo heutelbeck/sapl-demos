@@ -22,6 +22,14 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
 		</dependency>
+		<!-- For testing the application against a SAPL Server replace the sapl-spring-pdp-embedded 
+			with sapl-spring-pdp-remote. The application.yml does contain all settings 
+			to connect to a sapl-server-lt which as been started locally from source 
+			using mvn spring-boot:run. However, remember that the application will require 
+			the matching PDP configuration an policy deployed on the server. I.e., copy 
+			the contents of the src/main/resources/policies folder to the policies folder 
+			of the server. By default, the sapl-server-lt uses ~/sapl/policies or the 
+			equivalent under windows. -->
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
@@ -33,7 +41,7 @@
 			<exclusions>
 				<exclusion>
 					<!-- transitive jackson dependency brings in an old guava version it 
-						overrides the xtext dependencies and causes problems in current JDK16+ environments -->
+						overrides the xtext dependencies and causes problems in JDK16+ environments -->
 					<groupId>com.google.guava</groupId>
 					<artifactId>guava</artifactId>
 				</exclusion>
