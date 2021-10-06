@@ -58,7 +58,7 @@ where
   resource.<demo.reachable(500,300)>;
 ```
 
-This policy will ping the host every 500ms and return false if it is not reachable within 300ms. The decision will only change if the reachability status changes. If you now run the sapl-demo-remote code with you phones IP address in the subscriptions resource field, you can see the decision changing when you turn on and off the WiFi connection of your phone. Of course this will only work, if your test machine and your phone are in the same local network.
+This policy will ping the host every 500ms and return false if it is not reachable within 300ms. The decision will only change if the reachability status changes. If you now run the sapl-demo-remote code with you phones IP address in the subscriptions resource field, you can see the decision changing when you turn on and off the WiFi connection of your phone. Of course this will only work, if your test machine and your phone are in the same local network. There may also be some differences with phone settings and local routing that may prevent this from working. However, this is only a teaching example and should get across the point of how the custom PIP and policies may interact.
 
 In case you do not want to deploy the extensions with a Server, but with an embedded PDP, you have to declare an dependency in your projects POM to include the module containing your PIP classes. You could alternatively just put the source of the extensions directly in your applications module.
 To instantiate the extensions there are two possibilities. 
