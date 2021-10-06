@@ -43,6 +43,7 @@
 		<module>sapl-demo-reactive</module>
 		<module>sapl-demo-webflux</module>
 		<module>sapl-demo-remote</module>
+		<module>sapl-demo-extension</module>
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-web-editor</module>
 		<module>sapl-demo-playground</module>

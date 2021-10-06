@@ -1,0 +1,121 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>tst</groupId>
+	<artifactId>sapl-demo-extension</artifactId>
+	<version>2.0.0-SNAPSHOT</version>
+
+
+	<properties>
+		<!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
+		<java.version>11</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- The Version of the SAPL Dependencies -->
+		<sapl.version>2.0.0-SNAPSHOT</sapl.version>
+	</properties>
+
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
+			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
+				additional dependencies. This is a utility dependency, making it easier to 
+				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
+				section of the POM all SAPL dependencies can be used without explicitly declaring 
+				a version. This ensures that when multiple SAPL dependencies are used, the 
+				versions of them are consistent. -->
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<!-- The sapl-extionsion-api module provides the basic APIs which can 
+				be implemented by custom Policy Information Point or Function libraries. -->
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-extensions-api</artifactId>
+			<!-- Please not, that extensions are always deployed alongside a full 
+				PDP implementation. I.e., an embedded PDP. Thus, this dependency and its 
+				transitive dependencies are always present in the classpath of the target 
+				environment. Declaring the 'provided' scope is not necessary, if you are 
+				deploying your custom extensions directly as a dependency in the build of 
+				an application or a custom version of a PDP Server. However, if you want 
+				to deploy the extensions as a side-loaded JAR for a PDP server, it is necessary 
+				to deliver extension in the form of a fat JAR. I.e., a JAR including all 
+				transitive dependencies which are NOT ALREADY BUNDLED WITH THE PDP Server. 
+				Declaring a dependency scope to be 'provided' ensures, that this dependency 
+				and its transitive dependencies will not be bundled in the fat JAR. -->
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<!-- If you want to use the extensions in a Spring application and do 
+				want to supply configuration of the extensions Beans using annotations like 
+				@Component, these annotations must be available via this dependency. For 
+				building a slide-loading JAR, declare the scope to be 'provided' so that 
+				these do not end up in the fat JAR. Also, side-loading into an existing SAPL 
+				server means that you should actually use Spring annotations to configure 
+				your PDP. -->
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>5.3.10</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Add further dependencies required to implement your PIP or functions -->
+	</dependencies>
+
+
+	<repositories>
+		<!-- Adding this repository allows you to use -SNAPSHOT versions of the 
+			SAPL policy engine. If you only want to use a release version, this repository 
+			can be omitted. -->
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots
+			</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
+
+	<build>
+		<plugins>
+			<!-- The maven-assembly-plugin is responsible to create the side-loadable 
+				fat JAR of your extensions. Once the build process concluded, you will find 
+				two artifacts in your target folder: a) sapl-demo-extension-2.0.0-SNAPSHOT.jar 
+				b) sapl-demo-extension-0.0.1-SNAPSHOT-jar-with-dependencies.jar a) is the 
+				normal JAR only containing the classfiles and resources of your extension 
+				module. b) is the far JAR, which can be used to side-load the extension as 
+				a plugin to an existing PDP server. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.3.0</version>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
