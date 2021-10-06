@@ -60,4 +60,17 @@ where
 
 This policy will ping the host every 500ms and return false if it is not reachable within 300ms. The decision will only change if the reachability status changes. If you now run the sapl-demo-remote code with you phones IP address in the subscriptions resource field, you can see the decision changing when you turn on and off the WiFi connection of your phone. Of course this will only work, if your test machine and your phone are in the same local network.
 
+In case you do not want to deploy the extensions with a Server, but with an embedded PDP, you have to declare an dependency in your projects POM to include the module containing your PIP classes. You could alternatively just put the source of the extensions directly in your applications module.
+To instantiate the extensions there are two possibilities. 
 
+a) Spring application: Make sure to have the PIPs and function library classes as Beans in your application context. The PDP will pick them up automatically. Of course the classes/configuration have to be in packages which are scanned by spring. This can for example be done by having them in a package below your applications main class, or by explicitly adding the respective packages to the component scan (`@ComponentScan` annotation).
+
+b) Plain Java application: You have to instantiate the extension classes and hand them over to the `PolicyDecisionPointFactory`:
+
+```java
+	EmbeddedPolicyDecisionPoint pdp;
+		if (path != null) {
+			pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List.of(new EchoPIP()),
+					List.of(new SimpleFunctionLibrary()));
+		}
+```
