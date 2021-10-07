@@ -45,7 +45,7 @@ import reactor.core.publisher.Mono;
  * runtime.
  */
 @PolicyInformationPoint(name = "demo", description = "Some documenting text for the PIP.")
-public class DemoPIP {
+public class DemoPolicyInformationPoint {
 
 	@Attribute(name = "toggle", docs = "Periodically turns from true to false.")
 	public Flux<Val> toggle(Val leftHand, Map<String, JsonNode> variables) {

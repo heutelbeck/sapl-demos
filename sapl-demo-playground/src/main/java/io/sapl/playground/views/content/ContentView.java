@@ -615,8 +615,8 @@ public class ContentView extends Div {
 			printableDecision.set("obligations", authDecision.getObligations().get());
 		}
 		
-		if(authDecision.getAdvices().isPresent()) {
-			printableDecision.set("advices", authDecision.getAdvices().get());
+		if(authDecision.getAdvice().isPresent()) {
+			printableDecision.set("advice", authDecision.getAdvice().get());
 		}
 		
 		if(authDecision.getResource().isPresent()) {

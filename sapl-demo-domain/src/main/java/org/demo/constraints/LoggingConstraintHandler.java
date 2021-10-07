@@ -41,10 +41,10 @@ public class LoggingConstraintHandler extends AbstractConstraintHandler {
 	 * 
 	 * The PEP must first check if the runtime environment has the ability to handle
 	 * the constraint, as it must deny access to the resource if the constraint is
-	 * an obligation that cannot be handled. In this case no other advices or
+	 * an obligation that cannot be handled. In this case no other advice or
 	 * obligations have to be followed.
 	 * 
-	 * It is a good practice to validate the overall contraint object given, as an
+	 * It is a good practice to validate the overall constraint object given, as an
 	 * invalid constraint cannot be handled and declining a constrAint at this stage
 	 * leads to a clean behavior in case of obligations.
 	 */

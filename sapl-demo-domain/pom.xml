@@ -31,7 +31,7 @@
 			<artifactId>sapl-extensions-api</artifactId>
 			<version>${sapl.version}</version>
 		</dependency>
-		<!-- To implement constraint handlers for obligations and advices which 
+		<!-- To implement constraint handlers for obligations and advice which 
 			are automatically discovered in a spring-boot application, the sapl-spring-security 
 			is required -->
 		<dependency>

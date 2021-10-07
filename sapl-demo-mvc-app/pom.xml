@@ -15,7 +15,7 @@
 	<packaging>jar</packaging>
 
 	<name>SAPL Demo Spring MVC Application</name>
-	<description>A complete Spring Boot MVC application, demonstrating SAPL in aspect oriented programming, manual enforcement, using external data sources for policy decisions, content filtering and how to handle constraints, i.e. obligations and advices.</description>
+	<description>A complete Spring Boot MVC application, demonstrating SAPL in aspect oriented programming, manual enforcement, using external data sources for policy decisions, content filtering and how to handle constraints, i.e. obligations and advice.</description>
 
 	<dependencies>
 		<dependency>
