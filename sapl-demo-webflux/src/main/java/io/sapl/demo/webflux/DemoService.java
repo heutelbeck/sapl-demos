@@ -63,7 +63,27 @@ public class DemoService {
 		return Mono.just("data returnded by Mono");
 	}
 
-//	@PreEnforce
+	/**
+	 * The @PostEnforce annotation is typically used, if the return object of a
+	 * protected method is required to make the decision, or if the return object
+	 * has potentially to be modified via a transformation statement in a policy.
+	 * 
+	 * As an AuthorizationSubscription has to be constructed supplying the resource
+	 * to be modified, and this value has to be well-defined, this annotation is
+	 * only applicable to methods returning a Mono<>.
+	 * 
+	 * In this case, adding the SpEL expression {code return="returnObject"} to the
+	 * annotation has the effect to tell the PEP to set the return object of the
+	 * mono as the resource value of the AuthorizationSubscription to the PDP.
+	 * 
+	 * Please note, that in the AuthorizationSubscription the object has to be
+	 * marshaled to JSON. For this to work one has to ensure, that the default
+	 * Jackson ObjectMapper in the application context knows to to do this for the
+	 * given type. Thus, it may be necessary to deploy matching custom serializers
+	 * or to annotate the class with the matching Jackson annotations.
+	 * 
+	 * @return a protected string
+	 */
 	@PostEnforce(resource = "returnObject")
 	public Mono<String> getMonoStringWithPreAndPost() {
 		return Mono.just("I will be decorated with * on the left and right, because the policy said so");

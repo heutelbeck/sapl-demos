@@ -61,6 +61,12 @@ public class DemoFunctionLibrary {
 		return Val.of(parameter.get().asText().length());
 	}
 
+	/**
+	 * SAPL functions support variable number of arguments. 
+	 * 
+	 * @param parameters 1 or more text or number parameters
+	 * @return a string concatenating the parameters
+	 */
 	@Function
 	public Val append(@Text @Number Val... parameters) {
 		var builder = new StringBuilder();
