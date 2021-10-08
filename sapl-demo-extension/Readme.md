@@ -74,3 +74,6 @@ b) Plain Java application: You have to instantiate the extension classes and han
 					List.of(new SimpleFunctionLibrary()));
 		}
 ```
+
+Finally, this extension also supplies a simple function library and exposes the functions `simple.length` and `simple.append`. The function `length` return the length of a string or array, while `append` concatenates an arbitrary number of strings and numbers into a simgle string.
+
