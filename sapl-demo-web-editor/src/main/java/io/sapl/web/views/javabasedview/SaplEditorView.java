@@ -18,7 +18,6 @@ import io.sapl.web.MainView;
 @Route(value = "", layout = MainView.class)
 @PageTitle("Sapl Editor Demo")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-@SuppressWarnings("serial")
 public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
 	private Button addDocumentChangedListenerButton;

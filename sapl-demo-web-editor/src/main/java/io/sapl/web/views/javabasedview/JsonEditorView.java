@@ -15,7 +15,6 @@ import io.sapl.web.MainView;
 @Route(value = "jsoneditor", layout = MainView.class)
 @PageTitle("JSON Editor Demo")
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
-@SuppressWarnings("serial")
 public class JsonEditorView extends Div implements DocumentChangedListener {
 
 	private JsonEditor jsonEditor;

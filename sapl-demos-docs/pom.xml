@@ -21,7 +21,7 @@
 		<java.version>11</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.asciidoctor>2.1.0</version.asciidoctor>
+		<version.asciidoctor>2.2.1</version.asciidoctor>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -41,7 +41,6 @@
 						</goals>
 						<configuration>
 							<backend>html5</backend>
-							<sourceHighlighter>coderay</sourceHighlighter>
 							<attributes>
 								<imagesdir>./images</imagesdir>
 								<toc>left</toc>
@@ -50,6 +49,7 @@
 								<idprefix />
 								<idseparator>-</idseparator>
 								<docinfo1>true</docinfo1>
+								<sourceHighlighter>coderay</sourceHighlighter>
 							</attributes>
 						</configuration>
 					</execution>

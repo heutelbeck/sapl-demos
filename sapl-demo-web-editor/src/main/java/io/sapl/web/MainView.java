@@ -22,60 +22,55 @@ import io.sapl.web.views.javabasedview.SaplEditorView;
  * The main view is a top-level placeholder for other views.
  */
 @JsModule("./styles/shared-styles.js")
-//@PWA(name = "SAPL Demo Web Editor", shortName = "SAPL Demo Web Editor")
 @Theme(value = Lumo.class, variant = Lumo.DARK)
-@SuppressWarnings("serial")
 public class MainView extends AppLayout {
 
-    private final Tabs menu;
+	private final Tabs menu;
 
-    public MainView() {
-        menu = createMenuTabs();
-        addToNavbar(menu);
-    }
+	public MainView() {
+		menu = createMenuTabs();
+		addToNavbar(menu);
+	}
 
-    private static Tabs createMenuTabs() {
-        final Tabs tabs = new Tabs();
-        tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-        tabs.add(getAvailableTabs());
-        return tabs;
-    }
+	private static Tabs createMenuTabs() {
+		final Tabs tabs = new Tabs();
+		tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
+		tabs.add(getAvailableTabs());
+		return tabs;
+	}
 
-    private static Tab[] getAvailableTabs() {
-        final List<Tab> tabs = new ArrayList<>();
-        tabs.add(createTab("SAPL Editor Demo", SaplEditorView.class));
-        tabs.add(createTab("JSON Editor Demo", JsonEditorView.class));
-        return tabs.toArray(new Tab[tabs.size()]);
-    }
+	private static Tab[] getAvailableTabs() {
+		final List<Tab> tabs = new ArrayList<>();
+		tabs.add(createTab("SAPL Editor Demo", SaplEditorView.class));
+		tabs.add(createTab("JSON Editor Demo", JsonEditorView.class));
+		return tabs.toArray(new Tab[tabs.size()]);
+	}
 
-    private static Tab createTab(String title,
-            Class<? extends Component> viewClass) {
-    	RouterLink routerLink = new RouterLink(null, viewClass);
-    	routerLink.add(title);
-    	return createTab(routerLink);
-    }
+	private static Tab createTab(String title, Class<? extends Component> viewClass) {
+		RouterLink routerLink = new RouterLink(null, viewClass);
+		routerLink.add(title);
+		return createTab(routerLink);
+	}
 
-    private static Tab createTab(Component content) {
-        final Tab tab = new Tab();
-        tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-        tab.add(content);
-        return tab;
-    }
-    
-    @Override
-    protected void afterNavigation() {
-        super.afterNavigation();
-        selectTab();
-    }
+	private static Tab createTab(Component content) {
+		final Tab tab = new Tab();
+		tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+		tab.add(content);
+		return tab;
+	}
 
-    private void selectTab() {
-        String target = RouteConfiguration.forSessionScope()
-                .getUrl(getContent().getClass());
-        Optional<Component> tabToSelect = menu.getChildren().filter(tab -> {
-            Component child = tab.getChildren().findFirst().get();
-            return child instanceof RouterLink
-                    && ((RouterLink) child).getHref().equals(target);
-        }).findFirst();
-        tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
-    }
+	@Override
+	protected void afterNavigation() {
+		super.afterNavigation();
+		selectTab();
+	}
+
+	private void selectTab() {
+		String target = RouteConfiguration.forSessionScope().getUrl(getContent().getClass());
+		Optional<Component> tabToSelect = menu.getChildren().filter(tab -> {
+			Component child = tab.getChildren().findFirst().get();
+			return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
+		}).findFirst();
+		tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
+	}
 }

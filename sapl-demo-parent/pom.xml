@@ -28,7 +28,7 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.lombok>1.18.20</version.lombok>
+		<version.lombok>1.18.22</version.lombok>
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker-registry-url>ghcr.io/heutelbeck</docker-registry-url>
 	</properties>
