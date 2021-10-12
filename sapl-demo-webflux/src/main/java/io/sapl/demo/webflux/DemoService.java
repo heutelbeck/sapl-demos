@@ -4,8 +4,9 @@ import java.time.Duration;
 
 import org.springframework.stereotype.Service;
 
-import io.sapl.spring.method.annotations.PostEnforce;
-import io.sapl.spring.method.annotations.PreEnforce;
+import io.sapl.spring.method.metadata.EnforceTillDenied;
+import io.sapl.spring.method.metadata.PostEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -125,4 +126,9 @@ public class DemoService {
 		return Flux.just(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).delayElements(Duration.ofMillis(500L));
 	}
 
+	@EnforceTillDenied
+	public Flux<String> getFluxString() {
+		return Flux.just("<-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute->)")
+				.repeat().delayElements(Duration.ofMillis(200L));
+	}
 }

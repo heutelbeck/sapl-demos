@@ -17,6 +17,7 @@ package io.sapl.demo.webflux;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -52,4 +53,11 @@ public class DemoController {
 	public Mono<String> changedstring() {
 		return service.getMonoStringWithPreAndPost();
 	}
+
+	@GetMapping(value = "/enforcetilldeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
+	public Flux<ServerSentEvent<String>> changedStringTillDeny() {
+		return service.getFluxString().onErrorResume(AccessDeniedException.class, __ -> Flux.just("ACCESS DENIED"))
+				.map(value -> ServerSentEvent.<String>builder().data(value).build());
+	}
+
 }
