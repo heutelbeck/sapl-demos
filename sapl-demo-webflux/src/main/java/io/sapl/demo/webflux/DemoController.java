@@ -55,8 +55,14 @@ public class DemoController {
 	}
 
 	@GetMapping(value = "/enforcetilldeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<String>> changedStringTillDeny() {
+	public Flux<ServerSentEvent<String>> tillDeny() {
 		return service.getFluxString().onErrorResume(AccessDeniedException.class, __ -> Flux.just("ACCESS DENIED"))
+				.map(value -> ServerSentEvent.<String>builder().data(value).build());
+	}
+	
+	@GetMapping(value = "/enforcedropwhiledeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
+	public Flux<ServerSentEvent<String>> dropWhileDeny() {
+		return service.getFluxStringDroppable().onErrorResume(AccessDeniedException.class, __ -> Flux.just("ACCESS DENIED"))
 				.map(value -> ServerSentEvent.<String>builder().data(value).build());
 	}
 
