@@ -548,7 +548,7 @@ public class ContentView extends Div {
     }
     
 	private EvaluationContext getEvalContextForMockJson(List<MockingModel> mocks) {
-		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext, null);
+		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
 		var functionCtx = new MockingFunctionContext(this.defaultFuntionContext);
 		var variables = new HashMap<String, JsonNode>(1);
 		this.attrReturnValues = new LinkedList<>();
