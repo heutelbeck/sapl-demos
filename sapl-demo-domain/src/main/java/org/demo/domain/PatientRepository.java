@@ -8,8 +8,8 @@ import javax.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import io.sapl.spring.method.annotations.PostEnforce;
-import io.sapl.spring.method.annotations.PreEnforce;
+import io.sapl.spring.method.metadata.PostEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 
 public interface PatientRepository {
 

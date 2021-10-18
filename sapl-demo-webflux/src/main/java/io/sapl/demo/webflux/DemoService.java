@@ -1,11 +1,15 @@
 package io.sapl.demo.webflux;
 
 import java.time.Duration;
+import java.time.Instant;
 
 import org.springframework.stereotype.Service;
 
-import io.sapl.spring.method.annotations.PostEnforce;
-import io.sapl.spring.method.annotations.PreEnforce;
+import io.sapl.spring.method.metadata.EnforceDropWhileDenied;
+import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
+import io.sapl.spring.method.metadata.EnforceTillDenied;
+import io.sapl.spring.method.metadata.PostEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -125,4 +129,21 @@ public class DemoService {
 		return Flux.just(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).delayElements(Duration.ofMillis(500L));
 	}
 
+	@EnforceTillDenied
+	public Flux<String> getFluxString() {
+		return Flux.just("<-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute->)")
+				.repeat().delayElements(Duration.ofMillis(500L));
+	}
+	
+	@EnforceDropWhileDenied
+	public Flux<String> getFluxStringDroppable() {
+		return Flux.just("TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
+				.repeat().delayElements(Duration.ofMillis(500L)).map(message -> String.format(message, Instant.now()));
+	}
+	
+	@EnforceRecoverableIfDenied
+	public Flux<String> getFluxStringRecoverable() {
+		return Flux.just("TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. The DENY will be logged by the consumer of the service which is aware of the deny. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
+				.repeat().delayElements(Duration.ofMillis(500L)).map(message -> String.format(message, Instant.now()));
+	}
 }
