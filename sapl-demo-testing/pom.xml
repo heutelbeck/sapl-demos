@@ -9,7 +9,7 @@
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>sapl-demo-testing</artifactId>
-	<name>SAPL Testing</name>
+	<name>SAPL Demo Policy Testing</name>
 	<description>Example for testing your SAPL policies</description>
 
 	<dependencies>

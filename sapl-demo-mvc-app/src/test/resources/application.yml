@@ -1,0 +1,5 @@
+spring.main.banner-mode: OFF
+logging.level:
+  root: OFF
+  io.sapl: OFF
+  org.springframework.security: OFF

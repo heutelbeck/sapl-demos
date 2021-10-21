@@ -34,7 +34,6 @@
 	</licenses>
 
 	<modules>
-		<module>sapl-demos-docs</module>
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-mvc-app</module>
