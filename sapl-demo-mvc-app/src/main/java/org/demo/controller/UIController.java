@@ -143,7 +143,7 @@ public class UIController {
 	}
 
 	private boolean isPermitted(Object subject, Object action, Object resource) {
-		return pep.isPermitted(AuthorizationSubscription.of(subject, action, resource));
+		return pep.isPermitted(AuthorizationSubscription.of(subject, action, resource)).block();
 	}
 
 }
