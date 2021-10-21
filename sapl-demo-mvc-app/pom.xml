@@ -34,20 +34,7 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-demo-domain</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<!-- transitive jackson dependency brings in an old guava version it 
-						overrides the xtext dependencies and causes problems in JDK16+ environments -->
-					<groupId>com.google.guava</groupId>
-					<artifactId>guava</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>

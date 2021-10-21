@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.sapl.api.pdp.Decision;
+import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.spring.method.metadata.PreEnforce;
 import io.sapl.spring.pep.PolicyEnforcementPoint;
 import lombok.RequiredArgsConstructor;
@@ -143,7 +143,7 @@ public class UIController {
 	}
 
 	private boolean isPermitted(Object subject, Object action, Object resource) {
-		return pep.enforce(subject, action, resource).blockFirst() == Decision.PERMIT;
+		return pep.isPermitted(AuthorizationSubscription.of(subject, action, resource));
 	}
 
 }
