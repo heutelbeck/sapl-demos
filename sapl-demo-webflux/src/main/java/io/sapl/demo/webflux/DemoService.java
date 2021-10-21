@@ -131,19 +131,22 @@ public class DemoService {
 
 	@EnforceTillDenied
 	public Flux<String> getFluxString() {
-		return Flux.just("<-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute->)")
+		return Flux.just(
+				"<-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute->)")
 				.repeat().delayElements(Duration.ofMillis(500L));
 	}
-	
+
 	@EnforceDropWhileDenied
 	public Flux<String> getFluxStringDroppable() {
-		return Flux.just("TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
+		return Flux.just(
+				"TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
 				.repeat().delayElements(Duration.ofMillis(500L)).map(message -> String.format(message, Instant.now()));
 	}
-	
+
 	@EnforceRecoverableIfDenied
 	public Flux<String> getFluxStringRecoverable() {
-		return Flux.just("TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. The DENY will be logged by the consumer of the service which is aware of the deny. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
+		return Flux.just(
+				"TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. The DENY will be logged by the consumer of the service which is aware of the deny. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
 				.repeat().delayElements(Duration.ofMillis(500L)).map(message -> String.format(message, Instant.now()));
 	}
 }

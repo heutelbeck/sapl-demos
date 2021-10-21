@@ -1,24 +1,27 @@
-package org.demo.constraints;
+package io.sapl.demo.webflux;
+
+import java.util.function.Consumer;
 
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.spring.constraints.AbstractConstraintHandler;
+import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class demonstrates the implementation of a custom constraint handler for
- * the SAE spring-boot integration All spring components/beans implementing the
+ * the SAPL spring-boot integration All spring components/beans implementing the
  * interface ContratintHandler are automatically discovered and registered by
  * the spring policy enforcement points.
  */
 @Slf4j
 @Component
-public class EmailConstraintHandler extends AbstractConstraintHandler {
+public class EmailConstraintHandlerProvider implements ConsumerConstraintHandlerProvider<Object> {
 
-	public EmailConstraintHandler() {
-		super(0); // Priority 0
+	@Override
+	public Class<Object> getSupportedType() {
+		return Object.class;
 	}
 
 	/**
@@ -60,13 +63,11 @@ public class EmailConstraintHandler extends AbstractConstraintHandler {
 	 * implied behavior of the application.
 	 */
 	@Override
-	public boolean preBlockingMethodInvocationOrOnAccessDenied(JsonNode constraint) {
-		if (isResponsible(constraint)) {
+	public Consumer<Object> getHandler(JsonNode constraint) {
+		return value -> {
 			sendEmail(constraint.findValue("recipient").asText(), constraint.findValue("subject").asText(),
 					constraint.findValue("message").asText());
-			return true;
-		}
-		return false;
+		};
 	}
 
 	/**
@@ -82,6 +83,5 @@ public class EmailConstraintHandler extends AbstractConstraintHandler {
 		log.info("An E-Mail has been sent to {} with the subject '{}' and the message '{}'.", recipient, subject,
 				message);
 	}
-
 
 }

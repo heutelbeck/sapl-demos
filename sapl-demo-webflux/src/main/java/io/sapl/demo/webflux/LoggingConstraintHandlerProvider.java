@@ -1,24 +1,27 @@
-package org.demo.constraints;
+package io.sapl.demo.webflux;
+
+import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.spring.constraints.AbstractConstraintHandler;
+import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class demonstrates the implementation of a custom constraint handler for
- * the SAE spring-boot integration All spring components/beans implementing the
+ * the SAPL spring-boot integration All spring components/beans implementing the
  * interface ContratintHandler are automatically discovered and registered by
  * the spring policy enforcement points.
  */
 @Slf4j
 @Service
-public class LoggingConstraintHandler extends AbstractConstraintHandler {
+public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandlerProvider<Object> {
 
-	public LoggingConstraintHandler() {
-		super(1); // Priority 1
+	@Override
+	public Class<Object> getSupportedType() {
+		return Object.class;
 	}
 
 	/**
@@ -59,12 +62,10 @@ public class LoggingConstraintHandler extends AbstractConstraintHandler {
 	 * implied behavior of the application.
 	 */
 	@Override
-	public boolean preBlockingMethodInvocationOrOnAccessDenied(JsonNode constraint) {
-		if (isResponsible(constraint) && constraint.has("message")) {
+	public Consumer<Object> getHandler(JsonNode constraint) {
+		return value -> {
 			log.info(constraint.findValue("message").asText());
-			return true;
-		}
-		return false;
+		};
 	}
 
 }
