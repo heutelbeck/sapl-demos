@@ -1,12 +1,8 @@
-# Tutorial  sapl-demo-filterchain
+# Demo: Using SAPL in the filterchain (non-reactive web server)
 
 This demo shows how to filter incoming Requests with a `Policy Enforcement Filter` (`PEF`) that uses Sapl Policies. If you use the `Policy Enforcement Filter`, it is a `Policy Enforcement Point` (`PEP`) of your Application. The `PFE` first creates a request for the `SAPLAuthorizer`, which gets a `Response` from the `Policy Decision Point` (`PDP`) and then does the advice and obligation handling and the mapping.
 
-## Tutorial for using the Policy Enforcement Filter
-
-First add the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) to your application as described in the [tutorial](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc).
-
-When using the [sapl-spring-boot-starter](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-boot-starter) , a bean of type `policyEnforcementFilter` will be automatically provided, if the following parameter is set in the `application.properties`:
+When using the [SAPL Spring Security Integration](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-spring-security) , a bean of type `SaplFilterPolicyEnforcementPoint` will be automatically provided, if the following parameter is set in the `application.properties`:
 
 ```java
 pdp.policyEnforcementFilter=true
@@ -34,7 +30,7 @@ Now you can filter incoming Requests using Sapl Policies. In the Policy Enforcem
 boolean permission = sapl.authorize(authentication, request, request);
 ```
 
-The `Authentication` represents the authenticated user, while the request is the `HttpServletRequest` that runs through the filterchain. It is recommended to use Sapl Mapping to map `Authentication` and `HttpServletRequest` to something you can provide to your policies. You can find more information on Sapl Mapping in the [Introduction](https://github.com/heutelbeck/sapl-demos/blob/master/docs/src/asciidoc/tutorial.adoc). With the mappers used in this example a request could be transformed to something like this:
+The `Authentication` represents the authenticated user, while the request is the `HttpServletRequest` that runs through the filterchain. It is recommended to use Sapl Mapping to map `Authentication` and `HttpServletRequest` to something you can provide to your policies. 
 
 ```json
   subject:{"name":"Julia","authorities":[{"authority":"DOCTOR"}],"details":null} 

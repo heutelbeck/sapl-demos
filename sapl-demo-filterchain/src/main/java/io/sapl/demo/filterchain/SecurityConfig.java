@@ -1,4 +1,4 @@
-package org.demo.config;
+package io.sapl.demo.filterchain;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,8 +11,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().and().formLogin().loginPage("/login").permitAll().and().logout().logoutUrl("/logout")
-				.logoutSuccessUrl("/login").permitAll().and().httpBasic().and().csrf().disable();
+		// @formatter:off
+		http.authorizeRequests()
+		    .and().formLogin()
+		          .loginPage("/login")
+		          .permitAll()
+		    .and().logout()
+		          .logoutUrl("/logout")
+		          .logoutSuccessUrl("/login")
+		          .permitAll()
+		    .and().httpBasic()
+		    .and().csrf().disable();
+		// @formatter:on
 	}
 
 }

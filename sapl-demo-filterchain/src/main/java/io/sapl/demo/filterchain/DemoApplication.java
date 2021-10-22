@@ -1,4 +1,4 @@
-package org.demo;
+package io.sapl.demo.filterchain;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

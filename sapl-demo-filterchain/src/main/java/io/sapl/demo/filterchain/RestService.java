@@ -1,4 +1,4 @@
-package org.demo.controller;
+package io.sapl.demo.filterchain;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
