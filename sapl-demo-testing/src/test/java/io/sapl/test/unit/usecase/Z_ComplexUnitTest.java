@@ -1,24 +1,20 @@
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.hamcrest.Matchers.anyVal;
-import static io.sapl.hamcrest.Matchers.hasObligationMatching;
-import static io.sapl.hamcrest.Matchers.isPermit;
-import static io.sapl.hamcrest.Matchers.isResourceMatching;
-import static io.sapl.test.Imports.whenParameters;
-import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.is;
+import static io.sapl.hamcrest.Matchers.*;
+import static io.sapl.test.Imports.whenFunctionParams;
+import static org.hamcrest.CoreMatchers.*;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class Z_ComplexUnitTest {
 
@@ -41,9 +37,9 @@ public class Z_ComplexUnitTest {
 			.givenAttribute("clock.ticker", timestamp0, timestamp1, timestamp2)
 			.givenFunctionOnce("time.dayOfWeekFrom", Val.of("SATURDAY"), Val.of("SUNDAY"), Val.of("MONDAY"))
 			.givenAttribute("company.reportmode", Val.of("ALL"))
-			.givenFunction("company.subjectConverter", Val.of("ROLE_ADMIN"), whenParameters(is(Val.of("ADMIN")), anyVal()))
-			.givenFunction("company.subjectConverter", Val.of("ROLE_ADMIN"), whenParameters(is(Val.of("USER")), is(Val.of("nikolai"))))
-			.givenFunction("company.subjectConverter", Val.of("ROLE_USER"), whenParameters(is(Val.of("USER")), anyVal()))
+			.givenFunction("company.subjectConverter", whenFunctionParams(is(Val.of("ADMIN")), anyVal()), Val.of("ROLE_ADMIN"))
+			.givenFunction("company.subjectConverter", whenFunctionParams(is(Val.of("USER")), is(Val.of("nikolai"))), Val.of("ROLE_ADMIN"))
+			.givenFunction("company.subjectConverter", whenFunctionParams(is(Val.of("USER")), anyVal()), Val.of("ROLE_USER"))
 			.when(AuthorizationSubscription.of("nikolai", "read", "report"))
 			.expectNextDeny(2)
 			.expectNext(
