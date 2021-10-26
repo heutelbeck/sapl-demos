@@ -46,5 +46,6 @@ where
 policy "Reading scopes a raw JWT token available as a subject attribute"
 permit resource == "bestiary"
 where
-	"bestiary.read" in  log.debug("Scopes:", jwt.parseJwt(subject.principal.tokenValue).payload.scope);
+	log.debug(jwt.parseJwt(subject.principal.tokenValue));
+	"bestiary.read" in log.debugSpy("Scopes:", jwt.parseJwt(subject.principal.tokenValue).payload.scope);
 
