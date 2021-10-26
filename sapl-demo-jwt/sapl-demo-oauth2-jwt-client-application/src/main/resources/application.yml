@@ -4,10 +4,13 @@ server:
 logging:
   level:
     root: INFO
-    org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
-#    org.springframework.boot.autoconfigure: DEBUG
+    io:
+      sapl: DEBUG
+    org:
+      springframework:
+        web: INFO
+        security: INFO
+
 
 spring:
   thymeleaf:

@@ -7,10 +7,12 @@ logging:
 #    console: "%-5level [%thread]: %message%n"
   level:
     root: INFO
-    io.sapl: TRACE
-    org.springframework.web: INFO
-    org.springframework.security: INFO
-    org.springframework.security.oauth2: INFO
+    io:
+      sapl: DEBUG
+    org:
+      springframework:
+        web: INFO
+        security: INFO
 
 spring:
   security:

@@ -29,6 +29,7 @@ public class DefaultSecurityConfig {
 	// @formatter:off
 	@Bean
 	UserDetailsService users() {
+		@SuppressWarnings("deprecation") // use is intended here in the context of a demo
 		UserDetails user = User.withDefaultPasswordEncoder()
 				.username("user1")
 				.password("password")
