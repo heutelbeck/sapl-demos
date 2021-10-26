@@ -60,6 +60,7 @@ public class AuthorizationServerConfig {
 				.scope(OidcScopes.OPENID)
 				.scope("faculty.read")
 				.scope("books.read")
+				.scope("bestiary.read")
 				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
 				.build();
 

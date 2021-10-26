@@ -30,14 +30,14 @@ spring:
             client-secret: secret
             authorization-grant-type: authorization_code
             redirect-uri: "http://127.0.0.1:8080/authorized"
-            scope: books.read,faculty.read
+            scope: books.read,faculty.read,bestiary.read
             client-name: miskatonic-client-authorization-code
           miskatonic-client-client-credentials:
             provider: spring
             client-id: miskatonic-client
             client-secret: secret
             authorization-grant-type: client_credentials
-            scope: books.read,faculty.read
+            scope: books.read,faculty.read,bestiary.read
             client-name: miskatonic-client-client-credentials
         provider:
           spring:

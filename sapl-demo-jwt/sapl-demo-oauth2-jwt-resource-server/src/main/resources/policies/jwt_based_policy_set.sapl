@@ -32,7 +32,7 @@ where
 policy "Reading scopes as a claim from JWT JSON in the 'token' attribute of the subject"
 permit resource == "faculty"
 where
-	"faculty.read" in  log.debug("Scopes:", subject.token.claims.scope);
+	"faculty.read" in log.debugSpy("Scopes:", subject.token.claims.scope);
 
 /*
  * If the raw JWT token is contained as an attribute in the subject, the JWT function 
@@ -46,6 +46,6 @@ where
 policy "Reading scopes a raw JWT token available as a subject attribute"
 permit resource == "bestiary"
 where
-	log.debug(jwt.parseJwt(subject.principal.tokenValue));
+	log.debug("JWT Token: ", jwt.parseJwt(subject.principal.tokenValue));
 	"bestiary.read" in log.debugSpy("Scopes:", jwt.parseJwt(subject.principal.tokenValue).payload.scope);
 

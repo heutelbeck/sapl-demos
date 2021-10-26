@@ -1,7 +1,10 @@
 server:
   port: 8090
 
+
 logging:
+#  pattern:
+#    console: "%-5level [%thread]: %message%n"
   level:
     root: INFO
     io.sapl: TRACE
