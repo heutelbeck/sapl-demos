@@ -1,21 +1,52 @@
 package io.sapl.demo.jwt.resourceserver.controller;
 
+import java.security.Principal;
+import java.time.Duration;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.method.metadata.PreEnforce;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+import reactor.util.function.Tuples;
 
 @RestController
+@RequiredArgsConstructor
 public class MiskatonicUniversityController {
+
+	private final PolicyDecisionPoint pdp;
+	private final ObjectMapper mapper;
 
 	@GetMapping("/books")
 	@PreEnforce(action = "'read'", resource = "'books'")
-	public String[] books() {
+	public String[] books(Principal principal) {
+
+		/*
+		 * Uncomment to following line to see how a decision may change dynamically once
+		 * the token expires:
+		 */
+
+		// doATimeoutDemoTest(principal);
+
 		// @formatter:off
 		return new String[] {	"Necronomicon", 
 								"Nameless Cults", 
 								"Book of Eibon"	};
 		// @formatter:on
+	}
+
+	public void doATimeoutDemoTest(Principal principal) {
+		var authzSub = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
+		var decisions = pdp.decide(authzSub).map(AuthorizationDecision::getDecision);
+		var ticktock = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
+		var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
+		decisionsWithTicker.log().subscribe();
 	}
 
 	@GetMapping("/faculty")
