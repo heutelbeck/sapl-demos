@@ -17,7 +17,7 @@ public class DefaultSecurityConfig {
 	// @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		http
+		http.authorizeRequests().mvcMatchers("/public-key/**").permitAll().and()
 			.authorizeRequests(authorizeRequests ->
 				authorizeRequests.anyRequest().authenticated()
 			)

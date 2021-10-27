@@ -35,6 +35,10 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import io.sapl.demo.jwt.authorizationserver.keyserver.KeyRepository;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
 
@@ -44,9 +48,12 @@ public class AuthorizationServerConfig {
 	@Value("${oauth.kid}")
 	private String kid;
 
+	private final KeyRepository keyRepo;
+	
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+		http.authorizeRequests().mvcMatchers("/public-key/**").permitAll();
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		return http.formLogin(Customizer.withDefaults()).build();
 	}
@@ -94,6 +101,8 @@ public class AuthorizationServerConfig {
 	public JWKSource<SecurityContext> jwkSource() throws JOSEException {
 		JWK jwk = JWK.parseFromPEMEncodedObjects(privateKey);
 		jwk = new RSAKey.Builder(jwk.toRSAKey()).keyID(kid).build();
+		// JWK jwk = Jwks.generateRsa();
+		keyRepo.add(jwk);
 		JWKSet jwkSet = new JWKSet(jwk);
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
