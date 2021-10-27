@@ -3,15 +3,10 @@
 	"variables": {
 				   "jwt": {
 		                    "publicKeyServer": {
-                                                 "uri":    "http://authz-server:9000/public-key/{id}",
+                                                 "uri":    "http://auth-server:9000/public-key/{kid}",
                                                  "method": "POST"
                                                },
-					        "whitelist" : {
-								            "key id" : "public key"
-					    		          },
-					        "blacklist" : {
-					                        "key id" : "public key"
-					    		          }
+					        "whitelist" : { }					     
 	                       }
                   }
 }

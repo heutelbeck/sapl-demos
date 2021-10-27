@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "oauth.key",
+    "type": "java.lang.String",
+    "description": "PEM RSA Key"
+  },
+  {
+    "name": "oauth.kid",
+    "type": "java.lang.String",
+    "description": "fixed ID for the key"
+  }
+]}

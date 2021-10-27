@@ -1,0 +1,14 @@
+{
+	"algorithm": "DENY_UNLESS_PERMIT",
+	"variables": {
+				   "jwt": {
+		                    "publicKeyServer": {
+                                                 "uri":    "http://auth-server:9000/public-key/{kid}",
+                                                 "method": "POST"
+                                               },
+					        "whitelist" : {
+								            "6c3039b0-6358-41af-882d-2f223ba58559" : "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu5tR5A5X9thYFYufEj84ySmbFSCoLESYLUfwAh6PsEx4MeVBQfRrE7MFuNgoG_P_cqS-i5Nzco4BfLahjZz57EOyC3JEN2cM9CRXmNZEDslpvbKrIHvIe8adLqF6ES9kZGH9BvnbyT6XVFVtl_7VSwsRNE6cuZM_1YtYP-RsuFZ9ogISUkDsTf4qlaVnOm9pTkAyx9iF-IIgghDgnh0Zx7CFhIzavDkZKrL1YbRtunXwy2PYtb5vvOqI0YBvnaH5PmJaW6qW_8pLcB3G83zFIe1DmvJQxJaQ8F5J4YSu5EY4oyxXuIKSEmICjDnq0HvzHOtn41l1UlBpZ4fesTkIaQIDAQAB"
+					    		          }
+	                       }
+                  }
+}
