@@ -8,7 +8,7 @@ logging:
   level:
     root: INFO
     io:
-      sapl: DEBUG
+      sapl: TRACE
     org:
       springframework:
         web: INFO

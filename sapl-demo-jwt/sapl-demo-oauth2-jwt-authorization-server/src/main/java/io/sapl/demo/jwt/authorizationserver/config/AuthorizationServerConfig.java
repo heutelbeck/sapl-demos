@@ -2,6 +2,7 @@ package io.sapl.demo.jwt.authorizationserver.config;
 
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -27,16 +28,21 @@ import org.springframework.security.oauth2.server.authorization.config.ClientSet
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
-import io.sapl.demo.jwt.authorizationserver.jose.Jwks;
-
-
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
+
+	@Value("${oauth.key}")
+	private String privateKey;
+
+	@Value("${oauth.kid}")
+	private String kid;
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
@@ -85,9 +91,10 @@ public class AuthorizationServerConfig {
 	}
 
 	@Bean
-	public JWKSource<SecurityContext> jwkSource() {
-		RSAKey rsaKey = Jwks.generateRsa();
-		JWKSet jwkSet = new JWKSet(rsaKey);
+	public JWKSource<SecurityContext> jwkSource() throws JOSEException {
+		JWK jwk = JWK.parseFromPEMEncodedObjects(privateKey);
+		jwk = new RSAKey.Builder(jwk.toRSAKey()).keyID(kid).build();
+		JWKSet jwkSet = new JWKSet(jwk);
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
 

@@ -1,6 +1,38 @@
 server:
   port: 9000
 
+oauth:
+  key: |-
+    -----BEGIN PRIVATE KEY-----
+    MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7m1HkDlf22FgV
+    i58SPzjJKZsVIKgsRJgtR/ACHo+wTHgx5UFB9GsTswW42Cgb8/9ypL6Lk3NyjgF8
+    tqGNnPnsQ7ILckQ3Zwz0JFeY1kQOyWm9sqsge8h7xp0uoXoRL2RkYf0G+dvJPpdU
+    VW2X/tVLCxE0Tpy5kz/Vi1g/5Gy4Vn2iAhJSQOxN/iqVpWc6b2lOQDLH2IX4giCC
+    EOCeHRnHsIWEjNq8ORkqsvVhtG26dfDLY9i1vm+86ojRgG+dofk+Ylpbqpb/yktw
+    HcbzfMUh7UOa8lDElpDwXknhhK7kRjijLFe4gpISYgKMOerQe/Mc62fjWXVSUGln
+    h96xOQhpAgMBAAECggEAAiDbd3pgLhk7OpdYaSUVeFbD/yPdNI9cqJrZ0rRVDft4
+    G5zNtjlXI6SSyouNPO/yNHNBBCVamHCa/La3s3sV7MPB19ZmhrhhEb39zmqT4BUR
+    4YiO33H4DstsihRj5aEDgw4HiFY6U5ilr9u+QAywj8bi3ZSMu6A7h6kqiaMGRrsT
+    d0LL7wbzTqjoKA9MmnyhhigZyQYbFVHP9FeM4lWxCMXRXkNpHBi+cpc2MhRP6fp2
+    VpMS1rzps0xS/HG5jDTx9pkaQjL90fUpNIiBGrgWd+VAEwCNsbb1FmmPKXQEKrgh
+    W33kXc3UTiKhGIyFxWlBaE/h3GRo2j6R4/G29FviWQKBgQDylvHXW3nME9vB39Yz
+    PlJnwjFSXWSrYXeKifiVuXH8MGqRpS8hQSv6rQmGdbipGI4Of+WsCmOeMkyAXKSx
+    oRhc0HiAjX69zyKhV5o2cMz3zmsG0xZccx8vw0LWb0h4wyNzwuxJicfRKoOtC2zd
+    HlcFwj0+x0AUWteeldWMrE3WxQKBgQDF+kYMirO6nZGDwCd22yZ4lPenu5OqlVsP
+    zeoTf2m9ieVStDr9/1HLkTura+ULokrwOiKdq5zGy4NAJLthC1h8vL1PoVLr+Q3e
+    4bH//g7w+ARmWy7eBHWNz2cAyMUJSX2kd9YN8V+k2ya7tDxUedbUXjIlknOBc5//
+    fq4NIWFlVQKBgQDIeSMsdIUHuFWAN0ldmaAh7OIzjciWtHpEe9Z5bQIchapb6CU1
+    lxUQGJVpj7llzEwBAYK8lO1UG38LCQR1YoqukP00Rzo5A4c7zBg96yQHmYbq4eB1
+    0BEyuGtwqBA89A5FKQ15jCob2cVtaKazaNJDiQxx59k1uQi9HleW5AGDfQKBgQC7
+    nbkii5NVp5tOCxybI4XqwemMmFORVectLAvHHHj9uR+M5+X77Sj7zI+KnT47bzqr
+    O7ywRQDW1+hzMhwtFE5wL4EMZKqrm6NMdAB2w7IvJCsvQPxCRGGO2V0YvisT6QRb
+    h4FgRz1HgrPLMDv4JlqzeOz29DnoFMYsn0WcheTB3QKBgQCKMUmHIAQqSKySVdN2
+    m9pxg49RKdvr2nfMuahPQ2bqn9+DFEXxHsAie2T0A1Kd9s+P7+N/OqZhpfnRqlrY
+    TO8XuXvGpqxe8m9ZEK5Op9RcPkBNx0Nz7Ado4w9lN8F45Pv5Oqsma9Xr5mgWEhBB
+    BXptLkEhQRsf2mIbL+nRtbm0kA==
+    -----END PRIVATE KEY-----
+  kid: 6c3039b0-6358-41af-882d-2f223ba58559  
+
 logging:
   level:
     root: INFO
