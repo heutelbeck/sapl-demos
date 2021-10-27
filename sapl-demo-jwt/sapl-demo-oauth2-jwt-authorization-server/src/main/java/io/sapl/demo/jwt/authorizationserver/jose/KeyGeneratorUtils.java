@@ -11,10 +11,10 @@ import java.security.spec.EllipticCurve;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-final class KeyGeneratorUtils {
+import lombok.experimental.UtilityClass;
 
-	private KeyGeneratorUtils() {
-	}
+@UtilityClass
+final class KeyGeneratorUtils {
 
 	static SecretKey generateSecretKey() {
 		SecretKey hmacKey;

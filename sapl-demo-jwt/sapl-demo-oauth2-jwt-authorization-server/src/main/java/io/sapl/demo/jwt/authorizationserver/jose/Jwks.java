@@ -14,10 +14,10 @@ import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.OctetSequenceKey;
 import com.nimbusds.jose.jwk.RSAKey;
 
-public final class Jwks {
+import lombok.experimental.UtilityClass;
 
-	private Jwks() {
-	}
+@UtilityClass
+public final class Jwks {
 
 	public static RSAKey generateRsa() {
 		KeyPair keyPair = KeyGeneratorUtils.generateRsaKey();
