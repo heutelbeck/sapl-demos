@@ -56,9 +56,9 @@ public class DemoService {
 	 * of the reactive stream, consider using the @Enforce annotation instead.
 	 * 
 	 * The @PreEnforce annotation can be combined with a @PostEnforce annotation,
-	 * only if the Publisher is of type Mono<?>. It cannot be combined with @Enforce
-	 * on the same method. Also it cannot be combined with Spring security method
-	 * security annotations, e.g., @PreAuthorize.
+	 * only if the Publisher is of type Mono<?>. It cannot be combined with
+	 * other @EnforceX annotations on the same method. Also it cannot be combined
+	 * with Spring security method security annotations, e.g., @PreAuthorize.
 	 * 
 	 * @return a protected String
 	 */
@@ -76,9 +76,9 @@ public class DemoService {
 	 * to be modified, and this value has to be well-defined, this annotation is
 	 * only applicable to methods returning a Mono<>.
 	 * 
-	 * In this case, adding the SpEL expression {code return="returnObject"} to the
+	 * In this case, adding the SpEL expression {code resource="returnObject"} to the
 	 * annotation has the effect to tell the PEP to set the return object of the
-	 * mono as the resource value of the AuthorizationSubscription to the PDP.
+	 * Mono as the resource value of the AuthorizationSubscription to the PDP.
 	 * 
 	 * Please note, that in the AuthorizationSubscription the object has to be
 	 * marshaled to JSON. For this to work one has to ensure, that the default
@@ -129,6 +129,30 @@ public class DemoService {
 		return Flux.just(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).delayElements(Duration.ofMillis(500L));
 	}
 
+	/**
+	 * The @EnforceTillDenied annotation wraps the Flux<> in a PEP.
+	 * 
+	 * The access control only starts when a subscriber subscribes to the wrapped
+	 * Flux<>, not at construction time of the Flux<>.
+	 * 
+	 * The basic concept of the @EnforceTillDenied PEP is to grant access to the
+	 * FLux<> upon an initial PERMIT decision and to grant access until a non-PERMIT
+	 * decision is received.
+	 * 
+	 * Upon the initial PERMIT, the PEP subscribes to the original Flux<>. During
+	 * access to the Flux<>, all constraints are enforced.
+	 * 
+	 * Upon receiving a new PERMIT decision with different constraints, the
+	 * constraint handling is updated accordingly.
+	 * 
+	 * Upon receiving a non-PERMIT decision, the final constraints are enforced, and
+	 * an AccessDeniedException ends the Flux<>.
+	 * 
+	 * The @EnforceTillDenied annotation cannot be combined with any other
+	 * enforcement annotation.
+	 * 
+	 * @return a protected sequence of messages, each delayed by 500ms.
+	 */
 	@EnforceTillDenied
 	public Flux<String> getFluxString() {
 		return Flux.just(
@@ -136,6 +160,36 @@ public class DemoService {
 				.repeat().delayElements(Duration.ofMillis(500L));
 	}
 
+	/**
+	 * The @EnforceDropWhileDenied annotation wraps the Flux<> in a PEP.
+	 * 
+	 * The access control only starts when a subscriber subscribes to the wrapped
+	 * Flux<>, not at construction time of the Flux<>.
+	 * 
+	 * The basic concept of the @EnforceDropWhileDenied PEP is to grant access to
+	 * the FLux<> upon an initial PERMIT decision and to grant access until the
+	 * client cancels the subscription, or the original Flux<> completes. However,
+	 * whenever a non-PERMIT decision is received, all messages are dropped from the
+	 * Flux<> until a new PERMIT decision is received.
+	 * 
+	 * The subscriber will not be made aware of the fact that events are dropped
+	 * from the stream.
+	 * 
+	 * Upon the initial PERMIT, the PEP subscribes to the original Flux<>. During
+	 * access to the Flux<>, all constraints are enforced.
+	 * 
+	 * Upon receiving a new PERMIT decision with different constraints, the
+	 * constraint handling is updated accordingly.
+	 * 
+	 * Upon receiving a non-PERMIT decision, the constraints are enforced, and
+	 * messages are dropped without sending a AccessDeniedException downstream. The
+	 * date resumes on receiving a new PERMIT decision.
+	 * 
+	 * The @EnforceDropWhileDenied annotation cannot be combined with any other
+	 * enforcement annotation.
+	 * 
+	 * @return a protected sequence of messages, each delayed by 500ms.
+	 */
 	@EnforceDropWhileDenied
 	public Flux<String> getFluxStringDroppable() {
 		return Flux.just(
@@ -143,6 +197,33 @@ public class DemoService {
 				.repeat().delayElements(Duration.ofMillis(500L)).map(message -> String.format(message, Instant.now()));
 	}
 
+	/**
+	 * The @EnforceRecoverableIfDenied annotation wraps the Flux<> in a PEP.
+	 * 
+	 * The access control only starts when a subscriber subscribes to the wrapped
+	 * Flux<>, not at construction time of the Flux<>.
+	 * 
+	 * The basic concept of the @EnforceRecoverableIfDenied PEP is to grant access
+	 * to the FLux<> upon an initial PERMIT decision and to grant access until the
+	 * client cancels the subscription, or the original Flux<> completes. However,
+	 * whenever a non-PERMIT decision is received, all messages are dropped from the
+	 * Flux<> until a new PERMIT decision is received.
+	 * 
+	 * The subscriber will be made not be made aware of the fact that events are
+	 * dropped from the stream by sending AccessDeniedExceptions on a non-PERMIT
+	 * decision.
+	 * 
+	 * The subscriber can then decide to stay subscribed via .onErrorContinue().
+	 * Without .onErrorContinue this behaves similar to to @EnforceTillDenied. With
+	 * .onErrorContinue() this behaves similar to @EnforceDropWhileDenied however
+	 * the subscriber can explicitly handle the event that access is denied and
+	 * choose to stay subscribed or not.
+	 * 
+	 * The @EnforceRecoverableIfDenied annotation cannot be combined with any other
+	 * enforcement annotation.
+	 * 
+	 * @return a protected sequence of messages, each delayed by 500ms.
+	 */
 	@EnforceRecoverableIfDenied
 	public Flux<String> getFluxStringRecoverable() {
 		return Flux.just(
