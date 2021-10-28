@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.pdp.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.PolicyDecisionPointFactory;
@@ -38,16 +37,20 @@ import picocli.CommandLine.Option;
  * the PDP. The demo runs a few performance tests and illustrates different ways
  * of invoking the PDP.
  */
-@Command(description = "This demo shows how to manually construct a PDP without infrastructure support. "
+@Command(name = "sapl-demo-embedded", version = "2.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "This demo shows how to manually construct a PDP without infrastructure support. "
 		+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
-		+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP.")
+		+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP. " + "By default, ")
 public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
 	@Option(names = { "-p",
-			"-path" }, description = "Path to the folder in the filesystem where the demo will look for the configuration file 'pdp.json' and the '*.sapl' policy documents. Deafults to '~/sapl/policies'")
-	private String path = "~/sapl/policies";
+			"--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Deafults to '~/sapl/policies'")
+	String path = "~/sapl/policies";
+
+	@Option(names = { "-f",
+			"--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead from the bundled resources. Set path with -p.")
+	boolean filesystem;
 
 	private static final String SUBJECT = "willi";
 	private static final String ACTION_READ = "read";
@@ -69,16 +72,41 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	@Override
 	public Integer call() throws Exception {
-		// A PDP is constructed using the factory pattern
-		// register the custom PIP and function library
 		EmbeddedPolicyDecisionPoint pdp;
-		if (path != null) {
+		if (filesystem) {
+			/*
+			 * The factory method PolicyDecisionPointFactory.filesystemPolicyDecisionPoint
+			 * creates a PDP witch is retrieving the policies and its configuration form the
+			 * file system.
+			 * 
+			 * It takes a parameter with the path and lists of extensions to load.
+			 * 
+			 * The first list contains policy information points. The second list contains
+			 * function libraries.
+			 *
+			 * The PDP will monitor the path at runtime for any changes made to the policies
+			 * an update any subscribed PEPs accordingly.
+			 */
 			pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List.of(new EchoPIP()),
 					List.of(new SimpleFunctionLibrary()));
+		} else {
+			/*
+			 * The factory method PolicyDecisionPointFactory.resourcesPolicyDecisionPoint
+			 * creates a PDP witch is retrieving the policies from the resources bundled
+			 * with the application.
+			 * 
+			 * In a typical project structure, policies are then located in the folder
+			 * 'src/main/resources/policies'.
+			 * 
+			 * The first list contains policy information points. The second list contains
+			 * function libraries.
+			 *
+			 * The PDP will monitor the path at runtime for any changes made to the policies
+			 * an update any subscribed PEPs accordingly.
+			 */
+			pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List.of(new EchoPIP()),
+					List.of(new SimpleFunctionLibrary()));
 		}
-		// by default the policies are loaded from bundled resources.
-		pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List.of(new EchoPIP()),
-				List.of(new SimpleFunctionLibrary()));
 
 		blockingUsageDemo(pdp);
 
@@ -87,10 +115,6 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 		runPerformanceDemoSingleBlocking(pdp);
 
 		runPerformanceDemoSingleSequentialReactive(pdp);
-
-		runPerformanceDemoMulti(pdp);
-
-		runPerformanceDemoMultiAll(pdp);
 
 		LOGGER.info("End of demo.");
 		pdp.dispose();
@@ -103,11 +127,15 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	 * runtime will likely complain, that this behavior is not permitted.
 	 */
 	private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
-		LOGGER.info("Single blocking decision by using .blockFirst()...");
+		LOGGER.info("");
+		LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using .blockFirst()");
 		final AuthorizationDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
-		LOGGER.info("Decision for action 'read': {}", readDecision != null ? readDecision.getDecision() : "null");
+		LOGGER.info("Decision for action 'read' : {}", readDecision != null ? readDecision.getDecision() : "null");
 		final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
 		LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
+		LOGGER.info("");
+		LOGGER.info("------------------------------------------------------------------------");
+
 	}
 
 	/**
@@ -117,11 +145,16 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	 * schedulers.
 	 */
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
+		LOGGER.info("");
+		LOGGER.info("Demo Part 2: Accessing the PDP in a reactive manner using .take(1).subscribe()");
+
 		LOGGER.info("Single reactive decision by using .take(1) and .subscribe()...");
 		pdp.decide(READ_SUBSCRIPTION).take(1)
 				.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
 		pdp.decide(WRITE_SUBSCRIPTION).take(1)
 				.subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
+		LOGGER.info("");
+		LOGGER.info("------------------------------------------------------------------------");
 	}
 
 	private static void handleAuthorizationDecision(String action, AuthorizationDecision authzDecision) {
@@ -129,74 +162,44 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	}
 
 	private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance using sequential .blockFirst()");
+		LOGGER.info("");
+		LOGGER.info("Demo Part 3: Perform a small benchmark for blocking decisions.");
 
-		LOGGER.info("Warming up...");
+		LOGGER.info("Warming up for {} runs...", RUNS);
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		}
-		LOGGER.info("Measuring...");
+		LOGGER.info("Measure time for {} runs...", RUNS);
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		}
 		long end = System.nanoTime();
-		logResults("Single Blocking Results:", RUNS, start, end);
+		LOGGER.info("");
+		logResults("Benchmark results for blocking PDP access:", RUNS, start, end);
+		LOGGER.info("");
+		LOGGER.info("------------------------------------------------------------------------");
 	}
 
 	private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance using sequential .take(1)");
+		LOGGER.info("");
+		LOGGER.info("Demo Part 4: Perform a small benchmark for sequential .take(1) decisions.");
 
-		LOGGER.info("Warming up...");
+		LOGGER.info("Warming up for {} runs...", RUNS);
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
 		}
-		LOGGER.info("Measuring...");
+		LOGGER.info("Measure time for {} runs...", RUNS);
 
 		long start = System.nanoTime();
 		for (int i = 0; i < RUNS; i++) {
 			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
 		}
 		long end = System.nanoTime();
-		logResults("Single Reactive Results:", RUNS, start, end);
-	}
-
-	protected static void runPerformanceDemoMulti(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance Multi...");
-
-		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
-		multiSubscription.addAuthorizationSubscription("sub", SUBJECT, ACTION_READ, RESOURCE);
-
-		LOGGER.info("Warming up...");
-		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(multiSubscription).take(1).subscribe();
-		}
-		LOGGER.info("Measuring...");
-
-		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
-			pdp.decide(multiSubscription).take(1).subscribe();
-		}
-		long end = System.nanoTime();
-		logResults("MultiAuthorizationSubscription decide Results:", RUNS, start, end);
-	}
-
-	protected static void runPerformanceDemoMultiAll(PolicyDecisionPoint pdp) {
-		LOGGER.info("Performance Multi All...");
-
-		final MultiAuthorizationSubscription multiSubscription = new MultiAuthorizationSubscription();
-		multiSubscription.addAuthorizationSubscription("read", SUBJECT, ACTION_READ, RESOURCE);
-		LOGGER.info("Warming up...");
-		for (int i = 0; i < RUNS; i++) {
-			pdp.decideAll(multiSubscription).take(1).subscribe();
-		}
-		LOGGER.info("Measuring...");
-		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
-			pdp.decideAll(multiSubscription).take(1).subscribe();
-		}
-		long end = System.nanoTime();
-		logResults("MultiAuthorizationSubscription decideAll Results:", RUNS, start, end);
+		LOGGER.info("");
+		logResults("Benchmark results for .take(1) access:", RUNS, start, end);
+		LOGGER.info("");
+		LOGGER.info("------------------------------------------------------------------------");
 	}
 
 	private static double nanoToMs(double nanoseconds) {
