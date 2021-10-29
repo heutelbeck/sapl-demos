@@ -2,7 +2,14 @@
 
 # SAPL Demo Projects
 
-This project contains some demo modules demonstrating the usage of the SAPL engine:
+This project contains some demo modules demonstrating the usage of the SAPL engine.
+A good point to start exploring SAPL is by running and experimenting with modifying these demo projects.
+
+If you are interested in how SAPL would be used in an application, you should take a look at [sapl-demo-mvc-app](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mvc-app) and [sapl-demo-webflux](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux).
+
+If you want to get familiar with using a PDP directly, start with [sapl-demo-embedded](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-embedded).
+
+After that pich a demo that matches your interest.
 
 * [sapl-demo-webflux](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux): Demonstrates how to hook a SAPL PEP into method security with Spring Security and Webflux.
 
