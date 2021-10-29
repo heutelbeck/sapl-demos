@@ -18,13 +18,19 @@ The way you have to enter the command to run the server depends on both the OS a
 For example for running the servers (here we use the LT server, the command for CE is analogous) on Windows using the traditional Windows command prompt is:
 
 ```
-   java  -Dloader.path="c:\PATH TO JAR WITH DEPENDECIES" -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+   java  -Dloader.path="c:\PATH TO JAR WITH DEPENDECIES FOLDER" -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
 ```
 
 Under PowerShell the strings are escaped differently:
 
 ```
-   java  -D'loader.path'='c:\PATH TO JAR WITH DEPENDECIES' -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+   java  -D'loader.path'='c:\PATH TO JAR WITH DEPENDECIES FOLDER' -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+```
+
+Under Linux and Bash the command can be:
+
+```
+   java  -Dloader.path=file:/PATH_TO_JAR_WITH_DEPENDECIES_FOLDER -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
 ```
 
 Please take a look at the POM file of this project. There all dependencies and build steps are explained in detail. 
