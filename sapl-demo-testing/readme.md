@@ -1,6 +1,6 @@
 # SAPL Demo Testing
 
-This is a sample repository for testing SAPL policies executed by Maven.
+This is a sample repository for testing SAPL policies executed by [Maven](https://maven.apache.org/).
 
 ## Folder structure
 
@@ -28,6 +28,7 @@ This is a sample repository for testing SAPL policies executed by Maven.
             | simplelogger.properties
 ```
 
+It's using the default project structure of a [Maven](https://maven.apache.org/) project
 
 ## Executing the tests
 
@@ -41,7 +42,6 @@ Running the Maven "test" goal is executing the JUnit Tests containing the SAPL p
 ```
 maven test
 ```
-
 
 Running the Maven "verify" goal is executing in addition the [sapl-maven-plugin](https://github.com/heutelbeck/sapl-policy-engine/sapl-maven-plugin). The plugin generates the configured reports and breaks the maven lifecycle if the configured SAPL coverage criterias are not met.
 
