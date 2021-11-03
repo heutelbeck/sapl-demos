@@ -9,7 +9,7 @@ infrastructure or framework support like Spring Boot.
 
 ## Running the Demo
 
-For running the demo, a local install of JDK 11 or newer and Maven is required.
+For running the demo, a local install of JDK 11 or newer and Maven are required.
 
 First build the demo, by changing into the `sapl-demo-embedded` folder and execute the command:
 
@@ -17,7 +17,7 @@ First build the demo, by changing into the `sapl-demo-embedded` folder and execu
 mvn install
 ```
 
-After the build completes, the executable JAR file will be located in the `target` folder. 
+After the build completes, the `target` folder contains the executable JAR.
 Change into this folder and execute the following command to run the demo:
 
 ```
@@ -32,12 +32,12 @@ The demo accepts the following command line parameters:
                         path with -p.
   -h, --help          Show this help message and exit.
   -p, --path=<path>   Sets the path for looking up policies and PDP
-                        configuration if the -f parameter is set. Deafults to
+                        configuration if the -f parameter is set. Defaults to
                         '~/sapl/policies'
   -V, --version       Print version information and exit.
 ```
 
-The demo will now outputs some messages on the console documenting the progress of the demo process, 
+The demo will now output some messages on the console documenting the progress of the demo process, 
 together with some explanations of what is happening:
 
 ```

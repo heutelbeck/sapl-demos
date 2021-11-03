@@ -1,10 +1,8 @@
 # Demo: Full Stack MVC Application
 
-This demo application how to use the Spring aspect oriented programming model to easily establish policy enforcement points in your application code by using the   `@PdpAuthorize` annotation. 
-
 ## What does it do?
 
-The demo consists of a full stack Spring MVC application, where the controllers establish policy enforcement points using the `@PdpAuthorize` annotation.
+The demo consists of a full-stack Spring MVC application, where the controllers establish policy enforcement points using the `@PdpAuthorize` annotation.
   
 ## Try it
 
@@ -15,17 +13,17 @@ The Password is always "password".
 
 ## The SAPL annotations 
 
-In this environment in a blocking Servlet Container SAPL offers two annotations to establish Policy Enforcement Points at method level.
+In this environment, in a blocking Servlet Container, SAPL offers two annotations to establish Policy Enforcement Points at the method level.
 
-* `@PreEnforce`: The annotation deploys a PEP as a wrapper for the method, which retrieves a single decision from a SAPL PolicyDecision Point (PDP) and based on the decision it will enforce constraints (advice, obligations) and grand or deny access. If granted, the method will be called, else an `AccessDeniedException` will be raised.
+* `@PreEnforce`: The annotation deploys a PEP as a wrapper for the method, which retrieves a single decision from a SAPL PolicyDecision Point (PDP). The PEP will enforce constraints (advice, obligations) and grand or deny access based on the decision. If granted, the PEP calls the method, and else it raises an `AccessDeniedException`.
 
-* `@PostEnforce`: The annotation deploys a PEP as a wrapper for the method. It will call the method and then, potentially based on the value of the object returned by the method retrieve a single decision from a SAPL PolicyDecision Point (PDP). Based on the decision it will enforce constraints (advice, obligations) and grand or deny access. If granted, the return value of the method will be returned, else an `AccessDeniedException` will be raised.
+* `@PostEnforce`: The annotation deploys a PEP as a wrapper for the method. It will call the method and then, potentially based on the object's value returned by the method, retrieve a single decision from a SAPL PolicyDecision Point (PDP). The PEP will enforce constraints (advice, obligations) and grand or deny access based on the decision. If granted, the PEP calls the method, and else it raises an `AccessDeniedException`.
 
-If no parameters are provided to the annotations, the PEP will formulate a authorization subscription based on the `Principal` in the `SecurityContext` and based on the method invocation itself. Potentially taking into account the context of a web request.
+If the developer does not provide any parameters in the annotations, the PEP will formulate an authorization subscription based on the `Principal` in the `SecurityContext` and the method invocation itself. The PEP will take into account the context of a web request, if available.
 
-You can customize the subscription by adding `subject`, `action` or `resource` to the annotation, which use Spring Expression Language.
+You can customize the subscription by adding `subject`, `action`, or `resource` to the annotation, which uses Spring Expression Language.
 
-Some examples can be ound in the [`PatientRepository`](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
+Some examples can be found in the [`PatientRepository`](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
 
 ```java
 public interface PatientRepository {

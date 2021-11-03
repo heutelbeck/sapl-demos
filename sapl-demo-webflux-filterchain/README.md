@@ -1,6 +1,6 @@
 # Demo - Webflux filter chain enforcement
 
-To add a reactive filter, use the custom AuthorizationManager supplied in the SAPL Spring Security packages by supplying the following configuration in you application:
+To add a reactive filter, use the custom AuthorizationManager supplied in the SAPL Spring Security packages by supplying the following configuration in the application:
 
 ```java
 

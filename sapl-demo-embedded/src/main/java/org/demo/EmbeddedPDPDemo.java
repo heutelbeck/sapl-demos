@@ -45,11 +45,11 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
 	@Option(names = { "-p",
-			"--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Deafults to '~/sapl/policies'")
+			"--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
 	String path = "~/sapl/policies";
 
 	@Option(names = { "-f",
-			"--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead from the bundled resources. Set path with -p.")
+			"--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")
 	boolean filesystem;
 
 	private static final String SUBJECT = "willi";
