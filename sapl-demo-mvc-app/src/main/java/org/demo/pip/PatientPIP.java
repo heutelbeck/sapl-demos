@@ -55,7 +55,7 @@ public class PatientPIP {
 	 * This implementation does not track changes in the repository, i.e. this is a
 	 * non-streaming PIP.
 	 * 
-	 * @param patientId the id of the patient. This parameter must be a number, as
+	 * @param value     the id of the patient. This parameter must be a number, as
 	 *                  defined by the @Number annotation.
 	 * @param variables the variables in the current evaluation context
 	 * @return the relatives of the patient as registered in the relationRepo.
