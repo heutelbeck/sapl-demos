@@ -1,7 +1,6 @@
 package io.sapl.test.unit.usecase;
 
 import static io.sapl.hamcrest.Matchers.anyVal;
-import static io.sapl.test.Imports.*;
 import static org.hamcrest.CoreMatchers.is;
 
 import io.sapl.api.interpreter.Val;

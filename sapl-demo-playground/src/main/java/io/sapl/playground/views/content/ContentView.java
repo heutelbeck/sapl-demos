@@ -101,8 +101,8 @@ public class ContentView extends Div {
 	private final SAPLInterpreter saplInterpreter;
 	private List<AttributeMockReturnValues> attrReturnValues;
 	private final ObjectMapper objectMapper;
-	private AttributeContext defaultAttrContext;
-	private FunctionContext defaultFuntionContext;
+	private final AttributeContext defaultAttrContext;
+	private final FunctionContext defaultFunctionContext;
 
 	private boolean ignoreNextPolicyEditorChangedEvent = false;
 	private boolean ignoreNextAuthzSubJsonEditorChangedEvent = false;
@@ -122,10 +122,10 @@ public class ContentView extends Div {
     	this.objectMapper = new ObjectMapper();
     	this.defaultAttrContext = new AnnotationAttributeContext();
     	this.defaultAttrContext.loadPolicyInformationPoint(new ClockPolicyInformationPoint());
-    	this.defaultFuntionContext = new AnnotationFunctionContext();
-    	this.defaultFuntionContext.loadLibrary(new FilterFunctionLibrary());
-    	this.defaultFuntionContext.loadLibrary(new StandardFunctionLibrary());
-    	this.defaultFuntionContext.loadLibrary(new TemporalFunctionLibrary());
+    	this.defaultFunctionContext = new AnnotationFunctionContext();
+    	this.defaultFunctionContext.loadLibrary(new FilterFunctionLibrary());
+    	this.defaultFunctionContext.loadLibrary(new StandardFunctionLibrary());
+    	this.defaultFunctionContext.loadLibrary(new TemporalFunctionLibrary());
     	
         setId("content-view");
         
@@ -189,14 +189,14 @@ public class ContentView extends Div {
         
         Div page3MockHelpText = createRightUpperSideTab3();
 		
-		createRightUpperSideTabVisibileLogic(page1JsonEditorDiv, page2MockInput, page3MockHelpText);
+		createRightUpperSideTabVisibleLogic(page1JsonEditorDiv, page2MockInput, page3MockHelpText);
 		
 		div.add(tabs, page1JsonEditorDiv, page2MockInput, page3MockHelpText);
 		return div;
 	}
 
-	private void createRightUpperSideTabVisibileLogic(Div page1JsonEditorDiv, Div page2MockInput,
-			Div page3MockHelpText) {
+	private void createRightUpperSideTabVisibleLogic(Div page1JsonEditorDiv, Div page2MockInput,
+													 Div page3MockHelpText) {
 		this.tabsToPages = new HashMap<>();
 		tabsToPages.put(this.tab1AuthzSubInput, page1JsonEditorDiv);
 		tabsToPages.put(this.tab2MockInput, page2MockInput);
@@ -278,7 +278,7 @@ public class ContentView extends Div {
         JsonEditorConfiguration mockJsonEditorConfig = new JsonEditorConfiguration();
         mockJsonEditorConfig.setTextUpdateDelay(500);
 	    this.mockDefinitionEditor = new JsonEditor(mockJsonEditorConfig);
-	    this.mockDefinitionEditor.addDocumentChangedListener(event -> this.onMockingJsonEditorInputChanged(event));
+	    this.mockDefinitionEditor.addDocumentChangedListener(this::onMockingJsonEditorInputChanged);
 		page2MockInput.add(this.mockDefinitionEditor);
 		
 		this.mockDefinitionJsonInputError = new Paragraph("Input JSON is not valid");
@@ -295,7 +295,7 @@ public class ContentView extends Div {
         JsonEditorConfiguration authzSubEditorConfig = new JsonEditorConfiguration();
         authzSubEditorConfig.setTextUpdateDelay(500);
 		this.authzSubEditor = new JsonEditor(authzSubEditorConfig);
-		this.authzSubEditor.addDocumentChangedListener(event -> this.onAuthzSubJsonInputChanged(event));
+		this.authzSubEditor.addDocumentChangedListener(this::onAuthzSubJsonInputChanged);
 		
 		page1JsonEditorDiv.add(this.authzSubEditor);
 		
@@ -348,8 +348,6 @@ public class ContentView extends Div {
 	/**
 	 * updating the editor components triggers the document changed event and therefore multiple evaluations of the policy
 	 * to prevent these multiple concurrent evaluations, ignore the documentChanged events
-	 * @param example
-	 * @param ignoreNextChangedEvents
 	 */
 	private void updateComponentsWithNewExample(Example example, boolean ignoreNextChangedEvents) {
 		this.getUI().ifPresent(ui -> ui.access(() -> {
@@ -504,9 +502,9 @@ public class ContentView extends Div {
 	private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(EvaluationContext ctxForAuthzSub,
 			Step<AuthorizationDecision> steps) {
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
-		    String fullname = mock.getFullName();
+		    String fullName = mock.getFullName();
 		    for (Val val : mock.getMockReturnValues()) {
-		        steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthzSub.getAttributeCtx()).mockEmit(fullname, val));
+		        steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthzSub.getAttributeCtx()).mockEmit(fullName, val));
 		    }
 		}
 		return steps;
@@ -549,7 +547,7 @@ public class ContentView extends Div {
     
 	private EvaluationContext getEvalContextForMockJson(List<MockingModel> mocks) {
 		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
-		var functionCtx = new MockingFunctionContext(this.defaultFuntionContext);
+		var functionCtx = new MockingFunctionContext(this.defaultFunctionContext);
 		var variables = new HashMap<String, JsonNode>(1);
 		this.attrReturnValues = new LinkedList<>();
 		
@@ -562,7 +560,7 @@ public class ContentView extends Div {
 					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
 				} else {
 					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<Val>(mock.getSequence())));
+					this.attrReturnValues.add(AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<>(mock.getSequence())));
 				}
 				break;
 			case FUNCTION:
@@ -582,7 +580,7 @@ public class ContentView extends Div {
 	
 	 
     private AuthorizationSubscription getAuthzSubForJsonString(String jsonInputString) {
-    	JsonNode jsonInput = null;
+    	JsonNode jsonInput;
 		if(jsonInputString == null) {
 			return null;
 		}
@@ -660,8 +658,7 @@ public class ContentView extends Div {
 			if(clearOutput) {
 				this.jsonOutput.setDocument("");				
 			}
-			 
-    		return;
+
 		}));
     }
 }

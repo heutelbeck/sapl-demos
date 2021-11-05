@@ -32,22 +32,24 @@ public class G_PolicyWithComplexExpectStepTest {
 		public String name = "Willi";
 		public String authority = "ROLE_ADMIN";
 	}
-	private Object subject = new SubjectDTO();
+	private final Object subject = new SubjectDTO();
 	
 	static class ActionDTO {
 		static class JavaDTO {
 			public String name = "findById";
 		}
 		public JavaDTO java = new JavaDTO();
-	};
-	private Object action = new ActionDTO();
+	}
+
+	private final Object action = new ActionDTO();
 	
 	static class ResourceDTO {
 		public String id = "56";
 		public String diagnosisText = "diagnosisText";
 		public String icd11Code = "icd11Code";
-	};
-	private Object resource = new ResourceDTO();
+	}
+
+	private final Object resource = new ResourceDTO();
 
 	@BeforeEach
 	public void setUp() throws InitializationException {
@@ -134,17 +136,14 @@ public class G_PolicyWithComplexExpectStepTest {
 					////hasObligation(mapper.createObjectNode().put("foo", "bar")),
 					// or Predicate
 					hasObligationMatching((JsonNode obligation) -> {
-						if(obligation.has("type") && obligation.get("type").asText().equals("logAccess") 
-								&& obligation.has("message") && obligation.get("message").asText().equals("Willi has accessed patient data (id=56) as an administrator.")) {
-							return true;
-						}
-						return false;
+						return obligation.has("type") && obligation.get("type").asText().equals("logAccess")
+								&& obligation.has("message") && obligation.get("message").asText().equals("Willi has accessed patient data (id=56) as an administrator.");
 					}),
 					
 					hasObligationContainingKeyValue("type", "logAccess"),
 					
 					
-					//check Adivce
+					//check advice
 					// via .equals()					
 					////hasAdvice(mapper.createObjectNode().put("foo", "bar")),
 					//or Predicate
@@ -156,11 +155,9 @@ public class G_PolicyWithComplexExpectStepTest {
 					// via .equals()	
 					////isResourceEquals(new ObjectMapper().createObjectNode().put("foo", "bar")), 
 					//or Predicate
-					isResourceMatching((JsonNode resource) -> {
-						return resource.has("id") && resource.get("id").asText().equals("56")
-								&& resource.has("diagnosisText") && resource.get("diagnosisText").asText().equals("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588")
-								&& resource.has("icd11Code") && resource.get("icd11Code").asText().equals("ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
-					})
+					isResourceMatching((JsonNode resource) -> resource.has("id") && resource.get("id").asText().equals("56")
+							&& resource.has("diagnosisText") && resource.get("diagnosisText").asText().equals("\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588")
+							&& resource.has("icd11Code") && resource.get("icd11Code").asText().equals("ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"))
 				)
 			)
 			.verify();

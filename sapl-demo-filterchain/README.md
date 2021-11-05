@@ -34,14 +34,16 @@ The `Authentication` represents the authenticated user, while the request is the
 Developers can customize the mapping of the requests to match the domain-specific needs of an application. 
 
 ```json
-  subject:{"name":"Julia","authorities":[{"authority":"DOCTOR"}],"details":null} 
-  action:{"DELETE"} 
-  resource:{"/patient"}
+{
+  "subject" : {"name":"Julia","authorities":[{"authority":"DOCTOR"}],"details":null}, 
+  "action"  : "DELETE",
+  "resource": "/patient"
+}
 ```
 
 This request can be evaluated to `permit` by a policy like that:
 
-```json
+```
 policy "permit_doctor_delete_patient"
 permit
     action == "DELETE"

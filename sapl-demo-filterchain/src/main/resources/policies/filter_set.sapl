@@ -7,7 +7,7 @@ set "filter_set"
 permit-unless-deny
 
 /*
- * This policy black-lists GET requests to the resuestURI '/secret' for all 
+ * This policy black-lists GET requests to the requestURI '/secret' for all
  * unauthenticated users. 
  */
 policy "deny_secret"

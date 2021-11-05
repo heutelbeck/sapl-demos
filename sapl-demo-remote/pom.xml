@@ -59,14 +59,14 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>1.7.30</version>
+			<version>1.7.32</version>
 		</dependency>
 
 		<!-- A library for parsing command-line parameters -->
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.5.2</version>
+			<version>4.6.1</version>
 		</dependency>
 	</dependencies>
 

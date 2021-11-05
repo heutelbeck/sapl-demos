@@ -30,7 +30,7 @@ import com.vaadin.flow.server.PWA;
 @JsModule("./styles/shared-styles.js")
 public class MainView extends AppLayout {
 
-	private ExampleSelectedViewBus exampleSelectedViewBus;
+	private final ExampleSelectedViewBus exampleSelectedViewBus;
 	private Map<String, Example> examples;
 	
     public MainView(ExampleSelectedViewBus exampleSelectedViewBus) {
@@ -50,7 +50,7 @@ public class MainView extends AppLayout {
         
         headerSetLogo(header);
         
-        headerAddTitel(header);
+        headerAddTitle(header);
         
         headerAddButtons(header);
         
@@ -77,7 +77,7 @@ public class MainView extends AppLayout {
         header.add(buttons);
 	}
 
-	private void headerAddTitel(HorizontalLayout header) {
+	private void headerAddTitle(HorizontalLayout header) {
 		header.add(new H1("SAPL Playground"));
 	}
 

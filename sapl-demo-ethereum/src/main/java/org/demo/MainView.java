@@ -81,9 +81,9 @@ public class MainView extends VerticalLayout {
 
 	private final ObjectMapper mapper;
 
-	private Set<String> disabledItems = new LinkedHashSet<>();
+	private final Set<String> disabledItems = new LinkedHashSet<>();
 
-	private PrinterUser user;
+	private final PrinterUser user;
 
 	private String currentPrinterImage;
 
@@ -171,22 +171,19 @@ public class MainView extends VerticalLayout {
 			}
 		});
 
-		logout.addClickListener(e -> {
-			getUI().ifPresent(ui -> {
-				printerPep.dispose();
-				paymentPep.dispose();
-				crowdPep.dispose();
-				SecurityContextHolder.clearContext();
-				ui.getPage().setLocation("/logout");
-				ui.getSession().close();
-			});
-
-		});
+		logout.addClickListener(e -> getUI().ifPresent(ui -> {
+			printerPep.dispose();
+			paymentPep.dispose();
+			crowdPep.dispose();
+			SecurityContextHolder.clearContext();
+			ui.getPage().setLocation("/logout");
+			ui.getSession().close();
+		}));
 
 	}
 
 	private VaadinPEP<Button> createPrinterPep(PolicyDecisionPoint pdp) {
-		VaadinPEP<Button> printerPep = new VaadinPEP<Button>(printerButton, printerSub(printerSelect.getValue()), pdp,
+		VaadinPEP<Button> printerPep = new VaadinPEP<>(printerButton, printerSub(printerSelect.getValue()), pdp,
 				UI.getCurrent());
 		printerPep.onPermit((component, decision) -> {
 			log.info("New printer access decision: {}", decision.getDecision());
@@ -205,30 +202,26 @@ public class MainView extends VerticalLayout {
 	}
 
 	private VaadinPEP<Select<String>> createCrowdPep(PolicyDecisionPoint pdp) {
-		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<Select<String>>(templateSelect, crowdSub(), pdp,
+		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<>(templateSelect, crowdSub(), pdp,
 				UI.getCurrent());
 		crowdPep.onPermit((component, decision) -> {
 			log.info("New crowd access decision: {}", decision.getDecision());
 			disabledItems.remove(BALL);
 			component.setItemEnabledProvider(this::itemEnabledCheck);
 		});
-		crowdPep.onDeny((component, decision) -> {
-			log.info("New crowd access decision: {}", decision.getDecision());
-		});
+		crowdPep.onDeny((component, decision) -> log.info("New crowd access decision: {}", decision.getDecision()));
 		return crowdPep;
 	}
 
 	private VaadinPEP<Select<String>> createPaymentPep(PolicyDecisionPoint pdp) {
-		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<Select<String>>(templateSelect, paidSub(), pdp,
+		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<>(templateSelect, paidSub(), pdp,
 				UI.getCurrent());
 		paymentPep.onPermit((component, decision) -> {
 			log.info("New paid access decision: {}", decision.getDecision());
 			disabledItems.remove(CUBES);
 			component.setItemEnabledProvider(this::itemEnabledCheck);
 		});
-		paymentPep.onDeny((component, decision) -> {
-			log.info("New paid access decision: {}", decision.getDecision());
-		});
+		paymentPep.onDeny((component, decision) -> log.info("New paid access decision: {}", decision.getDecision()));
 		return paymentPep;
 	}
 
@@ -312,9 +305,7 @@ public class MainView extends VerticalLayout {
 	}
 
 	private boolean itemEnabledCheck(String item) {
-		if (disabledItems.contains(item))
-			return false;
-		return true;
+		return !disabledItems.contains(item);
 	}
 
 	private Button createLogoutButton() {

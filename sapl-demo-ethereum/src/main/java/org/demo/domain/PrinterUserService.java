@@ -18,7 +18,7 @@ public class PrinterUserService implements UserDetailsService {
 
 	private final HashMap<String, PrinterUser> allPrinterUsers = new HashMap<>();
 
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
 	public PrinterUserService(PasswordEncoder passwordEncoder) {
 		this.passwordEncoder = passwordEncoder;

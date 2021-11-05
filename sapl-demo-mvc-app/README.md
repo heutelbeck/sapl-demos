@@ -28,13 +28,14 @@ Some examples can be found in the [`PatientRepository`](https://github.com/heute
 ```java
 public interface PatientRepository {
 
-	@PostEnforce(resource = "returnObject")
-	Optional<Patient> findById(Long id);
+    @PostEnforce(resource = "returnObject")
+    Optional<Patient> findById(Long id);
 
-	@PreEnforce
-	Optional<Patient> findByName(String name);
+    @PreEnforce
+    Optional<Patient> findByName(String name);
 
-...
+    // ...
+}
 ```
 
 The corresponding policy can be found [here](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-mvc-app/src/main/resources/policies/patient_repository_policyset.sapl).

@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017-2018 Dominic Heutelbeck (dheutelbeck@ftk.de)
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package org.demo;
 
 import java.text.DecimalFormat;
@@ -46,7 +31,8 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	@Option(names = { "-p",
 			"--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
-	String path = "~/sapl/policies";
+    final
+    String path = "~/sapl/policies";
 
 	@Option(names = { "-f",
 			"--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")

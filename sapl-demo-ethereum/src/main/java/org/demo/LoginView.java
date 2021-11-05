@@ -17,7 +17,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
 
 	public static final String ROUTE = "login";
 
-	private LoginOverlay login = new LoginOverlay();
+	private final LoginOverlay login = new LoginOverlay();
 
 	public LoginView() {
 		login.setAction("login");

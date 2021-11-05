@@ -43,10 +43,10 @@ You have to open three terminals. One for each of the three applications to run.
    3. Run: `mvn spring-boot:run` .
 
 5. To access the client application, go to <http://localhost:8080>. 
-   The default user name is `user1` and the password is `password`.
+   The default username is `user1` and the password is `password`.
 
 # Acknowledgement
 
-The demo is a derivate of the sample projects of the [Spring Authorization Server](https://github.com/spring-projects/spring-authorization-server).
+The demo is derived from the sample projects of the [Spring Authorization Server](https://github.com/spring-projects/spring-authorization-server).
 
 

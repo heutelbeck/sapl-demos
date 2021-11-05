@@ -18,9 +18,9 @@ public class AccessCertificate {
 
 	private static final BigInteger GAS_LIMIT = BigInteger.valueOf(6721975L);
 
-	private CertificateAddressProvider addressProvider;
+	private final CertificateAddressProvider addressProvider;
 
-	private Web3j web3j;
+	private final Web3j web3j;
 
 	public AccessCertificate(CertificateAddressProvider addressProvider, Web3j web3j) {
 		this.addressProvider = addressProvider;

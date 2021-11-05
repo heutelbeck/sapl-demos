@@ -114,8 +114,7 @@ public class CertificateAddressProvider {
 	private JsonNode getVariables() {
 		try {
 			JsonNode config = mapper.readValue(ResourceUtils.getFile(CONFIG_PATH), JsonNode.class);
-			JsonNode variables = config.get("variables");
-			return variables;
+			return config.get("variables");
 		}
 		catch (IOException | NullPointerException e) {
 			log.info("No PDP configuration file found. Deploying contracts...");

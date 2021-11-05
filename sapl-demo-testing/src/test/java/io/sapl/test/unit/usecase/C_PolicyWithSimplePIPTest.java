@@ -46,7 +46,7 @@ public class C_PolicyWithSimplePIPTest {
 	
 	
 	@Test
-	void test_policyWithSimplePIP_mockedWhenParameters() throws InitializationException {
+	void test_policyWithSimplePIP_mockedWhenParameters() {
 		
 		fixture.constructTestCaseWithMocks()
 			.givenAttribute("test.upper", whenParentValue(val("willi")), Val.of("WILLI"))

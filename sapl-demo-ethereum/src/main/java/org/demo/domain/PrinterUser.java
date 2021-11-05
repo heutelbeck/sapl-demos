@@ -49,12 +49,9 @@ public class PrinterUser extends User {
 		else if (!ethereumAddress.equals(other.ethereumAddress))
 			return false;
 		if (transactionHash == null) {
-			if (other.transactionHash != null)
-				return false;
+			return other.transactionHash == null;
 		}
-		else if (!transactionHash.equals(other.transactionHash))
-			return false;
-		return true;
+		else return transactionHash.equals(other.transactionHash);
 	}
 
 	public PrinterUser copy() {

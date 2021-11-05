@@ -24,7 +24,7 @@ import io.sapl.api.validation.Text;
  * infrastructure. The 'name' field is optional. If left empty, the name will be
  * the class name. The name determines how the functions can be addressed in
  * policies. The semantics are similar to Java packages. In policies the
- * 'import' statement can be used to provide short hand access to functions.
+ * 'import' statement can be used to provide short-hand access to functions.
  * 
  * The 'description' field can be used to add some documentation. This is used
  * to automatically generate documentation pages in the PDP servers with a
@@ -46,7 +46,7 @@ public class DemoFunctionLibrary {
 	 * instructed to validate the type of the parameter before invoking the method
 	 * implementing the function. If any annotation from the
 	 * {@code io.sapl.api.validation} package present, this means that the function
-	 * only accepts parameters of the indicated types. Thus any off the annotated
+	 * only accepts parameters of the indicated types. Thus, any off the annotated
 	 * types is legal and all other parameter types will result in a policy
 	 * evaluation error.
 	 * 

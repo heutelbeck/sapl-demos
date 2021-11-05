@@ -8,7 +8,7 @@ In this demo, we will use a client to connect to a dedicated PDP server.
 
 ## Running the Demo
 
-For running the demo, a local install of JDK 11 or newer and Maven are required.
+For running the demo, JDK 11 or newer and Maven are required.
 
 Also, a PDP server has to be running. Please refer to the [SAPL Server LT](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-server-lt/README.md) for an easy way to run a demo server.
 

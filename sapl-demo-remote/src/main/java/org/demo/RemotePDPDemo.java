@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright 2017-2018 Dominic Heutelbeck (dheutelbeck@ftk.de)
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License.  You may obtain a copy
- * of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
- * License for the specific language governing permissions and limitations under
- * the License.
- ******************************************************************************/
 package org.demo;
 
 import java.util.concurrent.Callable;
@@ -37,26 +22,26 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	@Option(names = { "-h",
 			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-	private String host = "https://localhost:8443";
+	private final String host = "https://localhost:8443";
 
 	// The default option set here are the default credentials of the pdp-server-lt
 
 	@Option(names = { "-k",
 			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
-	private String clientKey = "YJidgyT2mfdkbmL";
+	private final String clientKey = "YJidgyT2mfdkbmL";
 	@Option(names = { "-s",
 			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-	private String clientSecret = "Fa4zvYQdiwHZVXh";
+	private final String clientSecret = "Fa4zvYQdiwHZVXh";
 
 	public static void main(String... args) {
 		System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
 	}
 
-	public Integer call() throws SSLException, InterruptedException {
+	public Integer call() throws SSLException {
 		LOG.warn("INSECURE SSL SETTINGS! This demo uses an insecure SslContext for "
 				+ "testing purposes only. It will accept all certificates. "
 				+ "This is only for testing local servers with self-signed certificates easily. "
-				+ "NERVER USE SUCH A CONFIURATION IN PRODUCTION!");
+				+ "NEVER USE SUCH A CONFIGURATION IN PRODUCTION!");
 		var sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
 		var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret, sslContext);
 

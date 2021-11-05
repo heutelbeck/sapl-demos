@@ -8,7 +8,7 @@ Its UI consists out of
 - and the resulting  output on the lower left side
 
 The playground can be run locally via maven or by executing the JAR. 
-Alternatively, a prebuild container image is available.
+Alternatively, a container image is available.
 
 This playground uses [Vaadin](https://vaadin.com/)
 
@@ -16,7 +16,7 @@ This playground uses [Vaadin](https://vaadin.com/)
 
 ### Running the Server from Source
 
-Vaadin uses Spring Boot so you can start the playground via
+Vaadin uses Spring Boot, so you can start the playground via
 
 ```shell
 mvn spring-boot:run

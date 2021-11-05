@@ -46,11 +46,9 @@ public class Z_ComplexUnitTest {
 					allOf(
 						isPermit(),
 						hasObligationMatching(ob -> ob.get("type").asText().equals("logAccess")),
-						isResourceMatching(jsonNode -> {
-							return jsonNode.has("report")
-									&& jsonNode.get("report").has("numberOfCurrentPatients")
-									&& jsonNode.get("report").get("numberOfCurrentPatients").asInt() == 34;
-						})
+						isResourceMatching(jsonNode -> jsonNode.has("report")
+								&& jsonNode.get("report").has("numberOfCurrentPatients")
+								&& jsonNode.get("report").get("numberOfCurrentPatients").asInt() == 34)
 					))
 			.verify();
 	}

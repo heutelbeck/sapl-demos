@@ -17,8 +17,8 @@ import io.sapl.web.MainView;
 @CssImport("./styles/views/javabasedview/javabased-view-view.css")
 public class JsonEditorView extends Div implements DocumentChangedListener {
 
-	private JsonEditor jsonEditor;
-	private Button addDocumentChangedListenerButton;
+	private final JsonEditor jsonEditor;
+	private final Button addDocumentChangedListenerButton;
 	private Button removeDocumentChangedListenerButton;
 	
 	public JsonEditorView() {
@@ -81,15 +81,12 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 		Button setJsonDocumentButton = new Button();
 		setJsonDocumentButton.setText("Set Document to Default");
 		setJsonDocumentButton.addClickListener(e -> {
-			String document = defaultJsonString;
-			jsonEditor.setDocument(document);
+			jsonEditor.setDocument(defaultJsonString);
 		});
 		add(setJsonDocumentButton);
 		
 		Button toggleReadOnlyButton = new Button("Toggle ReadOnly");
-		toggleReadOnlyButton.addClickListener(e -> {
-			jsonEditor.setReadOnly(!jsonEditor.isReadOnly());
-		});
+		toggleReadOnlyButton.addClickListener(e -> jsonEditor.setReadOnly(!jsonEditor.isReadOnly()));
 		add(toggleReadOnlyButton);
 		
 		jsonEditor.setDocument(defaultJsonString);

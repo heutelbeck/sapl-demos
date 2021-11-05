@@ -11,13 +11,13 @@ import io.sapl.api.pdp.PolicyDecisionPoint;
 import reactor.core.Disposable;
 
 public class VaadinPEP<Component> {
-	private PolicyDecisionPoint pdp;
+	private final PolicyDecisionPoint pdp;
 
 	private AuthorizationSubscription subscription;
 
-	private Component component;
+	private final Component component;
 
-	private UI ui;
+	private final UI ui;
 
 	private BiConsumer<Component, AuthorizationDecision> permitListener;
 

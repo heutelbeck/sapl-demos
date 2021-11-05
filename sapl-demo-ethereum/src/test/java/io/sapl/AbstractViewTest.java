@@ -18,7 +18,7 @@ import com.vaadin.testbench.parallel.ParallelTest;
  * The tests use Chrome driver (see pom.xml for integration-tests profile) to
  * run integration tests on a headless Chrome. If a property {@code test.use
  * .hub} is set to true, {@code AbstractViewTest} will assume that the
- * TestBench test is running in a CI environment. In order to keep the this
+ * TestBench test is running in a CI environment. In order to keep the
  * class light, it makes certain assumptions about the CI environment (such
  * as available environment variables). It is not advisable to use this class
  * as a base class for you own TestBench tests.

@@ -10,10 +10,6 @@ class HtmlbasedviewView extends PolymerElement {
         }
       </style>
 	<script type="text/javascript">
-		console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-		console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-		console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-	
 		var baseUrl = "/";
 		var editor = xtext.createEditor({baseUrl: baseUrl,});
 		console.log("Editor = "+editor);

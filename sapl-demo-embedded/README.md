@@ -9,7 +9,7 @@ infrastructure or framework support like Spring Boot.
 
 ## Running the Demo
 
-For running the demo, a local install of JDK 11 or newer and Maven are required.
+For running the demo, JDK 11 or newer and Maven are required.
 
 First build the demo, by changing into the `sapl-demo-embedded` folder and execute the command:
 

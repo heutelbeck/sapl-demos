@@ -1,7 +1,6 @@
 package io.sapl.test.unit.usecase;
 
 import static io.sapl.hamcrest.Matchers.val;
-import static io.sapl.test.Imports.*;
 
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationSubscription;

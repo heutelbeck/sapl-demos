@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
  * difficult. However, if obligations are to be applied on HTTP level, the PEPs
  * should be established on the controller.
  * 
- * Also there is no reason why different tiers of the application should not be
+ * Also, there is no reason why different tiers of the application should not be
  * secured independently. This may even be required to achieve the protection
  * goals.
  * 
@@ -45,7 +45,7 @@ public class DemoService {
 	 * 
 	 * If the decision contained constraints, i.e., advice or obligations, them the
 	 * PEP hooks the execution of the constraint handling into the matching signal
-	 * handlers of the reactive stream, e.g., onSubscription, onNext, onError etc..
+	 * handlers of the reactive stream, e.g., onSubscription, onNext, onError etc.
 	 * 
 	 * This means, that constraints contained within the one decision made by the
 	 * PDP are enforces continuously throughout the lifetime of the reactive stream.
@@ -57,14 +57,14 @@ public class DemoService {
 	 * 
 	 * The @PreEnforce annotation can be combined with a @PostEnforce annotation,
 	 * only if the Publisher is of type Mono<?>. It cannot be combined with
-	 * other @EnforceX annotations on the same method. Also it cannot be combined
+	 * other @EnforceX annotations on the same method. Also, it cannot be combined
 	 * with Spring security method security annotations, e.g., @PreAuthorize.
 	 * 
 	 * @return a protected String
 	 */
 	@PreEnforce
 	public Mono<String> getMonoString() {
-		return Mono.just("data returnded by Mono");
+		return Mono.just("data returned by Mono");
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class DemoService {
 	 * 
 	 * Please note, that in the AuthorizationSubscription the object has to be
 	 * marshaled to JSON. For this to work one has to ensure, that the default
-	 * Jackson ObjectMapper in the application context knows to to do this for the
+	 * Jackson ObjectMapper in the application context knows to do this for the
 	 * given type. Thus, it may be necessary to deploy matching custom serializers
 	 * or to annotate the class with the matching Jackson annotations.
 	 * 
@@ -107,7 +107,7 @@ public class DemoService {
 	 * 
 	 * If the decision contained constraints, i.e., advice or obligations, them the
 	 * PEP hooks the execution of the constraint handling into the matching signal
-	 * handlers of the reactive stream, e.g., onSubscription, onNext, onError etc..
+	 * handlers of the reactive stream, e.g., onSubscription, onNext, onError etc.
 	 * 
 	 * This means, that constraints contained within the one decision made by the
 	 * PDP are enforces continuously throughout the lifetime of the reactive stream.
@@ -119,7 +119,7 @@ public class DemoService {
 	 * 
 	 * The @PreEnforce annotation can be combined with a @PostEnforce annotation,
 	 * only if the Publisher is of type Mono<?>. It cannot be combined with @Enforce
-	 * on the same method. Also it cannot be combined with Spring security method
+	 * on the same method. Also, it cannot be combined with Spring security method
 	 * security annotations, e.g., @PreAuthorize.
 	 * 
 	 * @return a protected sequence of Integers, each delayed by 500ms.
@@ -214,7 +214,7 @@ public class DemoService {
 	 * decision.
 	 * 
 	 * The subscriber can then decide to stay subscribed via .onErrorContinue().
-	 * Without .onErrorContinue this behaves similar to to @EnforceTillDenied. With
+	 * Without .onErrorContinue this behaves similar to @EnforceTillDenied. With
 	 * .onErrorContinue() this behaves similar to @EnforceDropWhileDenied however
 	 * the subscriber can explicitly handle the event that access is denied and
 	 * choose to stay subscribed or not.

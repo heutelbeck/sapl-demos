@@ -6,6 +6,6 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface RelationRepository extends CrudRepository<Relation, Long> {
 
-	List<Relation> findByPatientid(Long id);
+	List<Relation> findByPatientId(Long id);
 
 }

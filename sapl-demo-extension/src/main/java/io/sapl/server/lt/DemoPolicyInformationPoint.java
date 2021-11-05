@@ -58,17 +58,17 @@ public class DemoPolicyInformationPoint {
 	 * 
 	 * The annotation @Attribute makes the PDP register the attribute. The name
 	 * parameter can be used to set the name. If not set, the method name is used.
-	 * The docs parameter is used to add documentation to the PDP. This is used to
+	 * The doc's parameter is used to add documentation to the PDP. This is used to
 	 * automatically generate documentation pages in the PDP servers with a
 	 * graphical front-end. It has no impact on the evaluation of policies at
 	 * runtime.
 	 * 
 	 * This attribute checks if a host is currently reachable within the network.
 	 * 
-	 * Each attribute can have a left hand input value and additional parameters.
+	 * Each attribute can have a left-hand input value and additional parameters.
 	 * 
-	 * The left hand input is what is noted left of the angled brackets within a
-	 * policy. This left hand attribute is the entity of which this method returns
+	 * The left-hand input is what is noted left of the angled brackets within a
+	 * policy. This left-hand attribute is the entity of which this method returns
 	 * an attribute. In this case reachability is an attribute of the host described
 	 * by the host name.
 	 * 
@@ -93,22 +93,20 @@ public class DemoPolicyInformationPoint {
 	 * @param timeoutMsParameter        a numeric Val providing the timeout in
 	 *                                  milliseconds where if the host fails to
 	 *                                  reply within this time the host is
-	 *                                  considered to be not reachable. Must me
+	 *                                  considered to be not reachable. Must be
 	 *                                  smaller than timeoutMsParameter.
-	 * @return A boolean Flux indication the hosts availability.
+	 * @return A boolean Flux indication the host's availability.
 	 */
-	@Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable(5000,6000)> checks if the address returns a package within 5000ms and repeats this pingin action every 6000ms. The timeout must be smaller than the repetition interval.")
+	@Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable(5000,6000)> checks if the address returns a package within 5000ms and repeats this pinging action every 6000ms. The timeout must be smaller than the repetition interval.")
 	public Flux<Val> reachable(@Text Val leftHandHostnameParameter, Map<String, JsonNode> variables,
 			Flux<Val> pollingIntervalParameter, Flux<Val> timeoutMsParameter) {
-		return Flux.combineLatest(values -> {
-			return new Val[] { (Val) values[0], (Val) values[1] };
-		}, timeoutMsParameter, pollingIntervalParameter).flatMap(parameters -> {
+		return Flux.combineLatest(values -> new Val[] { (Val) values[0], (Val) values[1] }, timeoutMsParameter, pollingIntervalParameter).flatMap(parameters -> {
 			var hostname = leftHandHostnameParameter.getText();
 			var timeoutMs = parameters[0].get().asInt();
 			var pollingIntervalMs = parameters[1].get().asLong();
 			if (pollingIntervalMs < timeoutMs)
 				return Flux.error(new PolicyEvaluationException(
-						"When checking for reachablility of a host, the timeout must be smaller than the polling interval. The timout was %dms and the polling intervall was set to %dms",
+						"When checking for reachability of a host, the timeout must be smaller than the polling interval. The timout was %dms and the polling interval was set to %dms",
 						timeoutMs, pollingIntervalMs));
 			return reachable(hostname, pollingIntervalMs, timeoutMs).map(Val::of);
 		});
@@ -122,7 +120,7 @@ public class DemoPolicyInformationPoint {
 	 * @param hostname          the host name to resolve
 	 * @param pollingIntervalMs the polling time in ms
 	 * @param timeout           the timeout in ms
-	 * @return A boolean Flux indication the hosts availability.
+	 * @return A boolean Flux indication the host's availability.
 	 */
 	private Flux<Boolean> reachable(String hostname, long pollingIntervalMs, int timeout) {
 		return dnsLookup(hostname).repeat().delayElements(Duration.ofMillis(pollingIntervalMs))
@@ -136,7 +134,7 @@ public class DemoPolicyInformationPoint {
 	 * asynchronous implementations available and one has no resources to implement
 	 * an asynchronous replacement. There generally are asynchronous libraries
 	 * available. However, as this is just a tutorial project we omit additional
-	 * dependencies for simplicity sake.
+	 * dependencies for simplicity's sake.
 	 * 
 	 * @param hostname the hostname to resolve.
 	 * @return the resolved hostname
@@ -152,9 +150,8 @@ public class DemoPolicyInformationPoint {
 	 * asynchronous implementations available and one has no resources to implement
 	 * an asynchronous replacement. There generally are asynchronous libraries
 	 * available. However, as this is just a tutorial project we omit additional
-	 * dependencies for simplicity sake.
+	 * dependencies for simplicity's sake.
 	 * 
-	 * @param timeout
 	 * @return true if the host replied in time
 	 */
 	private Function<InetAddress, Mono<Boolean>> reachable(int timeout) {

@@ -53,7 +53,7 @@ public class DemoData implements CommandLineRunner {
 	 * This method is executed upon startup, when the application context is loaded.
 	 */
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		/*
 		 * In the demos, the different repositories are potentially secured by policy
 		 * enforcement points (PEPs). Thus, back-end services like this should identify
@@ -77,7 +77,7 @@ public class DemoData implements CommandLineRunner {
 		}
 		// Establish relations between users and patients, if none are present
 		// (else assume they are in persistent storage and do nothing)
-		if (StreamSupport.stream(relationRepository.findAll().spliterator(), false).count() == 0) {
+		if (StreamSupport.stream(relationRepository.findAll().spliterator(), false).findAny().isEmpty()) {
 			relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
 			relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).get().getId()));
 			relationRepository.save(new Relation(NAME_ALINA, patientRepository.findByName(NAME_KARL).get().getId()));

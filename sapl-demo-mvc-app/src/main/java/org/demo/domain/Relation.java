@@ -21,11 +21,11 @@ public class Relation {
 
 	String username;
 
-	Long patientid;
+	Long patientId;
 
-	public Relation(String username, Long patientid) {
+	public Relation(String username, Long patientId) {
 		this.username = username;
-		this.patientid = patientid;
+		this.patientId = patientId;
 	}
 
 }

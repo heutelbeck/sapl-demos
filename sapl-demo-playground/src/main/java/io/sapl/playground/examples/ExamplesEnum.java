@@ -6,7 +6,7 @@ public enum ExamplesEnum {
 	SpringData("Spring Data");
 	
 	
-	private String displayValue;
+	private final String displayValue;
 	 
 	ExamplesEnum(String displayValue) {
         this.displayValue = displayValue;

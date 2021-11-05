@@ -26,7 +26,7 @@ public class EthConnect {
 
 	private static final String BOB_PRIVATE_KEY = "a5e729c5ad3500fd6b8a5ecc7ab7a21190fe2f4595aa52e6c3b8615420e6ddfe";
 
-	private Web3j web3j;
+	private final Web3j web3j;
 
 	public EthConnect(Web3j web3j) {
 		this.web3j = web3j;

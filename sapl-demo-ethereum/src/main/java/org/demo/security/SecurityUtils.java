@@ -22,8 +22,7 @@ public final class SecurityUtils {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Object principal = context.getAuthentication().getPrincipal();
 		if (principal instanceof PrinterUser) {
-			PrinterUser printerUser = (PrinterUser) context.getAuthentication().getPrincipal();
-			return printerUser;
+            return (PrinterUser) context.getAuthentication().getPrincipal();
 		}
 		return null;
 	}
@@ -42,7 +41,7 @@ public final class SecurityUtils {
 	}
 
 	/**
-	 * Tests if some user is authenticated. As Spring Security always will create an
+	 * Tests if some user is authenticated. As Spring Security will always create an
 	 * {@link AnonymousAuthenticationToken} we have to ignore those tokens explicitly.
 	 */
 	static boolean isUserLoggedIn() {

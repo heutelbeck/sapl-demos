@@ -11,7 +11,7 @@ If you are running the servers in a docker/kubernetes environment, please refer 
 * [Sapl Server LT](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt)
 * [Sapl Server CE](https://github.com/heutelbeck/sapl-server/tree/main/sapl-server-ce)
 
-If you want to test this with a locally running server, the process differs a little bit. Locally you cannot start the server using `mvn spring-boot:run` or the equivalent tools of your IDE. This is due to how Spring sets up class loading in this case. You must invoke the server by running the JAR directly and providing  the path where the `sapl-demo-extension-0.0.1-SNAPSHOT-jar-with-dependencies.jar` is located.
+If you want to test this with a locally running server, the process differs a little. Locally you cannot start the server using `mvn spring-boot:run` or the equivalent tools of your IDE. This is due to how Spring sets up class loading in this case. You must invoke the server by running the JAR directly and providing  the path where the `sapl-demo-extension-0.0.1-SNAPSHOT-jar-with-dependencies.jar` is located.
 
 The way you have to enter the command to run the server depends on both the OS and the shell you are using. The basic command is the same everywhere. However, the way you have to escape certain strings in the command differs from shell to shell.
 
@@ -64,9 +64,9 @@ where
   resource.<demo.reachable(500,300)>;
 ```
 
-This policy will ping the host every 500ms and return false if it is not reachable within 300ms. The decision will only change if the reachability status changes. If you now run the sapl-demo-remote code with your phone's IP address in the subscriptions resource field, you can see the decision changing when you turn on and off your phone's WiFi connection. Of course, this will only work if your test machine and your phone are in the same local network. There may also be some differences with phone settings and local routing that may prevent this from working. However, this is only a teaching example and should get across how the custom PIP and policies may interact.
+This policy will ping the host every 500ms and return false if it is not reachable within 300ms. The decision will only change if the reachability status changes. If you now run the sapl-demo-remote code with your phone's IP address in the subscription's resource field, you can see the decision changing when you turn on and off your phone's Wi-Fi connection. Of course, this will only work if your test machine and your phone are in the same local network. There may also be some differences with phone settings and local routing that may prevent this from working. However, this is only a teaching example and should get across how the custom PIP and policies may interact.
 
-If you do not want to deploy the extensions with a Server, but with an embedded PDP, you must declare a dependency in your project's POM to include the module containing your PIP classes. You could alternatively just put the source of the extensions directly in your applications module.
+If you do not want to deploy the extensions with a Server, but with an embedded PDP, you must declare a dependency in your project's POM to include the module containing your PIP classes. You could alternatively just put the source of the extensions directly in your application's module.
 There are two ways to instantiate the extensions:
 
 a) Spring application: Make sure to have the PIPs and function library classes as Beans in your application context. The PDP will pick them up automatically. Of course, Spring hast to scan and detect the classes/configuration. 

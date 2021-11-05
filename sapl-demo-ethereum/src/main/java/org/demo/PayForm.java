@@ -17,7 +17,7 @@ public class PayForm extends VerticalLayout {
 
 	private static final long serialVersionUID = 4408538774854701163L;
 
-	private Button pay;
+	private final Button pay;
 
 	public PayForm(PrinterUser user) {
 

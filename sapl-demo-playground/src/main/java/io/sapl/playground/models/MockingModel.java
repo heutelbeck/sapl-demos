@@ -72,11 +72,11 @@ public class MockingModel {
 				
 			}
 			var valuesArray = (ArrayNode) values;
-			List<Val> vals = new LinkedList<>();
+			List<Val> valList = new LinkedList<>();
 			for (var specifiedValue : valuesArray) {
-				vals.add(Val.of(specifiedValue));
+				valList.add(Val.of(specifiedValue));
 			}
-			mockModel.setSequence(vals);
+			mockModel.setSequence(valList);
 		}
 	}
 
@@ -109,7 +109,7 @@ public class MockingModel {
 			
 			String importNameString = mockElement.get(KeyValue_ImportName).asText();
 			
-			if(importNameString.isEmpty() || !importNameString.contains(".")) {
+			if(!importNameString.contains(".")) {
 				throw new MockDefinitionParsingException("Expecting a string value with a dot like \"function.name\" for field \"" + KeyValue_ImportName + "\"!");
 			} else {
 				mockModel.setImportName(importNameString);

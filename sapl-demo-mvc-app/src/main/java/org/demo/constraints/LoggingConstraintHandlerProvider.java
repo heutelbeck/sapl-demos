@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * This class demonstrates the implementation of a custom constraint handler for
  * the SAPL spring-boot integration All spring components/beans implementing the
- * interface ContratintHandler are automatically discovered and registered by
+ * interface ConstraintHandler are automatically discovered and registered by
  * the spring policy enforcement points.
  */
 @Slf4j
@@ -48,7 +48,7 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
 	 * obligations have to be followed.
 	 * 
 	 * It is a good practice to validate the overall constraint object given, as an
-	 * invalid constraint cannot be handled and declining a constrAint at this stage
+	 * invalid constraint cannot be handled and declining a constraint at this stage
 	 * leads to a clean behavior in case of obligations.
 	 */
 	@Override
@@ -63,9 +63,7 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
 	 */
 	@Override
 	public Consumer<Object> getHandler(JsonNode constraint) {
-		return value -> {
-			log.info(constraint.findValue("message").asText());
-		};
+		return value -> log.info(constraint.findValue("message").asText());
 	}
 
 }

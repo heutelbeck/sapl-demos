@@ -55,7 +55,7 @@ public class E_PolicyStreamingTest {
 	}
 	
 	@Test
-	@Disabled("Unmocked PIPs with time-based attributes aren't reliable working with virtual time." +
+	@Disabled("Original PIPs with time-based attributes aren't reliable working with virtual time." +
             "Sometimes on some systems there is a Exception thrown, because the Attribute is emitting on event too few")
 	void test_streamingPolicyWithVirtualTime() throws InitializationException {
 		
@@ -166,23 +166,5 @@ public class E_PolicyStreamingTest {
 			.verify(); // three times mock of function -> three times called
 	
 	}
-	
-	
 
-	/*
-	@Test
-	void test_policyWithSimpleMockedFunction_CheckArgument() {
-		
-		fixture.constructTestCaseWithMocks()
-			.givenFunction("time.dayOfWeekFrom", Val.of("SATURDAY"), argThat(Val.of("")))
-			.when(AuthorizationSubscription.of("willi", "read", "something"))
-			.expectPermit()
-			.verify();
-	
-	}
-	*/
-	
-	
-	
-	
 }

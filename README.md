@@ -9,18 +9,18 @@ If you are interested in how SAPL would be used in an application, you should ta
 
 If you want to get familiar with using a PDP directly, start with [sapl-demo-embedded](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-embedded).
 
-After that pich a demo that matches your interest.
+After that pick a demo that matches your interest.
 
 * [sapl-demo-webflux](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux): Demonstrates how to hook a SAPL PEP into method security with Spring Security and Webflux.
 
 
-* [sapl-demo-webflux-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security reactive filterchain in Webflux.
+* [sapl-demo-webflux-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security reactive filter chain in Webflux.
 
 
 * [sapl-demo-mvc-app](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mvc-app): A full stack Spring MVC application secured with SAPL. Demonstrates non-reactive declarative Policy Enforcement Points via annotations.
 
 
-* [sapl-demo-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security filterchain for non-reactive environments.
+* [sapl-demo-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security filter chain for non-reactive environments.
 
 
 * [sapl-demo-embedded](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-embedded): Manually instantiating a SAPL Policy Decision Point (PDP) and basic PDP interaction. Reading policies from bundled resources or monitoring a file system.

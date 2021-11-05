@@ -21,7 +21,7 @@ mvn install
 
 ### Setting up the testnet with Ganache
 For our application to work correctly, we need a local testnet.
-Therefore you must download the Ganache client from [here](https://www.trufflesuite.com/ganache).
+Therefore, you must download the Ganache client from [here](https://www.trufflesuite.com/ganache).
 
 - Start the ganache client and select **New workspace**. 
 - Choose a name for your workspace.
@@ -43,7 +43,7 @@ mvn spring-boot:run
 ### Advanced: Deploying and using your contracts
 This section is not necessary to run the demo application. It is important in the case that the application should be used with another demo application or if you simply wish to have persistent certificates.
 
-The demo application will generate new contracts on the blockchain each time it is started. Therefore issued certificates will not persist between runs. But the application also provides the possibility to always use the same contracts. To do so, you have to save the addresses of your deployed contracts in the `variables` of the `pdp.json` configuration file of the PDP, which you can find under `src/main/resources/policies`. Please use the printer names provided in the [MainView](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-ethereum/src/main/java/org/demo/MainView.java). A correct configuration could look like this:
+The demo application will generate new contracts on the blockchain each time it is started. Therefore, issued certificates will not persist between runs. But the application also provides the possibility to always use the same contracts. To do so, you have to save the addresses of your deployed contracts in the `variables` of the `pdp.json` configuration file of the PDP, which you can find under `src/main/resources/policies`. Please use the printer names provided in the [MainView](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-ethereum/src/main/java/org/demo/MainView.java). A correct configuration could look like this:
 
 ```json
 {
@@ -106,7 +106,7 @@ where
 ```
 
 ### The crowdfunding feature
-Another template will only be unlocked if the application owner's account (which is the first in the accounts list of our Ganache client) holds a certain amount of Ether. This decision does not depend on an attribute of the currently logged in user but can also be expressed in the policies:
+Another template will only be unlocked if the application owner's account (which is the first in the accounts list of our Ganache client) holds a certain amount of Ether. This decision does not depend on an attribute of the currently logged-in user but can also be expressed in the policies:
 
 ```
 policy "crowdTemplate"

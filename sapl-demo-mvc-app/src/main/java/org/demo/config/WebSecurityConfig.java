@@ -30,8 +30,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inmen = auth.inMemoryAuthentication();
-		DemoData.loadUsers(inmen, passwordEncoder());
+		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMemoryManager = auth.inMemoryAuthentication();
+		DemoData.loadUsers(inMemoryManager, passwordEncoder());
 	}
 
 	@Bean

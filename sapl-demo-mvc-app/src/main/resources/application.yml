@@ -4,16 +4,16 @@ io.sapl.pdp:
 # or FILESYSTEM (loading policies and configuration from a folder on the filesystem
   embedded:
     pdp-config-type: RESOURCES
-    # definees the path (in resources or filesystem respectively) for the pdp.json file with combining algorithm and variables
+    # defines the path (in resources or filesystem respectively) for the pdp.json file with combining algorithm and variables
     config-path: /policies
-    # definees the path (in resources or filesystem respectively) containing .sapl files with policies and policy sets
+    # defines the path (in resources or filesystem respectively) containing .sapl files with policies and policy sets
     policies-path: /policies
 # The following lines of configuration are for connecting the application to a remote PDP.
 # To do so, replace the dependency to sapl-spring-pdp-embedded with sapl-spring-pdp-remote
-# The following settings are select that it will connect to a sapl-server-lt you started locally witv mvn spring-boot:run
+# The following settings are select that it will connect to a sapl-server-lt you started locally with mvn spring-boot:run
   remote:
     host: https://localhost:8443
-    # These are the default credentials configured for the sapl-server-ltwhen running with the 'local' profile
+    # These are the default credentials configured for the sapl-server-lt when running with the 'local' profile
     key: YJidgyT2mfdkbmL
     secret: Fa4zvYQdiwHZVXh
     # Do not add this parameter in production! This is only for testing with self-signed localhost certificates during development

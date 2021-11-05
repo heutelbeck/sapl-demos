@@ -67,8 +67,7 @@ The `@PreEnforce` annotation can be combined with a @PostEnforce annotation, onl
 
 # `@PostEnforce`
 
-The `@PostEnforce` annotation is typically used if the return object of a
-a protected method is required to make the decision, or if the return object can be modified via a transformation statement in a policy.
+The `@PostEnforce` annotation is typically used if the return object of a protected method is required to make the decision, or if the return object can be modified via a transformation statement in a policy.
  
 As an AuthorizationSubscription has to be constructed supplying the resource to be modified, and this value has to be well-defined, this annotation is only applicable to methods returning a `Mono<>`.
 

@@ -209,18 +209,14 @@ hs_err_pid*
 ### STS ###
 .apt_generated
 .classpath
-.factorypath
 .project
 .settings
-.springBeans
 .sts4-cache
 
 ### IntelliJ IDEA ###
 .idea
-*.iws
 *.iml
 *.ipr
-out/
 
 ### NetBeans ###
 /nbproject/private/
@@ -238,5 +234,3 @@ package-lock.json
 webpack.config.js
 webpack.generated.js
 node_modules/
-
-target/
