@@ -34,7 +34,7 @@ public class Z_ComplexUnitTest {
 		var timestamp2 = Val.of(ZonedDateTime.of(2021, 1, 9, 0, 0, 2, 0, ZoneId.of("UTC")).toString());
 			
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.ticker", timestamp0, timestamp1, timestamp2)
+			.givenAttribute("time.now", timestamp0, timestamp1, timestamp2)
 			.givenFunctionOnce("time.dayOfWeekFrom", Val.of("SATURDAY"), Val.of("SUNDAY"), Val.of("MONDAY"))
 			.givenAttribute("company.reportmode", Val.of("ALL"))
 			.givenFunction("company.subjectConverter", whenFunctionParams(is(Val.of("ADMIN")), anyVal()), Val.of("ROLE_ADMIN"))

@@ -7,7 +7,7 @@ public class BasicExample extends Example {
 		this.mockDefinition = "[\n"
 				+ "  {\n"
 				+ "    \"type\"	   : \"ATTRIBUTE\",\n"
-				+ "    \"importName\": \"clock.now\",\n"
+				+ "    \"importName\": \"time.now\",\n"
 				+ "    \"sequence\": [1, 2, 3]\n"
 				+ "  }, \n"
 				+ "  {\n"
@@ -22,7 +22,7 @@ public class BasicExample extends Example {
 				+ "    action == \"read\"\n"
 				+ "where\n"
 				+ "    subject == \"WILLI\";\n"
-				+ "    time.dayOfWeekFrom(\"UTC\".<clock.now>) =~ \"MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY\";";
+				+ "    time.dayOfWeekFrom(<time.now>) =~ \"MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY\";";
 		
 		
 		this.authzSub = "{\n"

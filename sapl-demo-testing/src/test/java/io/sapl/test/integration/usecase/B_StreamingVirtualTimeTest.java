@@ -33,7 +33,7 @@ class B_StreamingVirtualTimeTest {
 
         fixture.constructTestCaseWithMocks()
                 .withVirtualTime()
-                .givenAttribute("clock.ticker", Duration.ofSeconds(5), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+                .givenAttribute("time.now", Duration.ofSeconds(5), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
                 .when(AuthorizationSubscription.of("WILLI", "read", "bar"))
                 .thenAwait(Duration.ofSeconds(5))
                 .expectNextDeny()
@@ -46,7 +46,7 @@ class B_StreamingVirtualTimeTest {
     void test_mockedFunctionAndAttribute_ArrayOfReturnValues() {
 
         fixture.constructTestCaseWithMocks()
-                .givenAttribute("clock.ticker", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
+                .givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
                 .givenFunctionOnce("time.localSecond", Val.of(3), Val.of(4), Val.of(5))
                 .when(AuthorizationSubscription.of("WILLI", "read", "bar"))
                 .expectNextDeny()

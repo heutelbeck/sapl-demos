@@ -15,7 +15,7 @@ import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.interpreter.InitializationException;
-import io.sapl.pip.ClockPolicyInformationPoint;
+import io.sapl.pip.TimePolicyInformationPoint;
 import io.sapl.test.SaplTestException;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
@@ -42,13 +42,12 @@ public class E_PolicyStreamingTest {
 		var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
 			
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.ticker", timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+			.givenAttribute("time.now", timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextNotApplicable()
 			.expectNextNotApplicable()
 			.expectNextNotApplicable()
 			.expectNextNotApplicable()
-			//.expectNextNotApplicable(4)
 			.expectNextPermit()
 			.expectNextPermit()
 			.verify();
@@ -59,7 +58,7 @@ public class E_PolicyStreamingTest {
             "Sometimes on some systems there is a Exception thrown, because the Attribute is emitting on event too few")
 	void test_streamingPolicyWithVirtualTime() throws InitializationException {
 		
-		fixture.registerPIP(new ClockPolicyInformationPoint())
+		fixture.registerPIP(new TimePolicyInformationPoint())
 			.constructTestCaseWithMocks()
 			.withVirtualTime()
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
@@ -89,7 +88,7 @@ public class E_PolicyStreamingTest {
 			
 		fixture.constructTestCaseWithMocks()
 			.withVirtualTime()
-			.givenAttribute("clock.ticker", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+			.givenAttribute("time.now", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.thenAwait(Duration.ofSeconds(10))
 			.expectNextNotApplicable()
@@ -118,7 +117,7 @@ public class E_PolicyStreamingTest {
 			
 		Assertions.assertThatExceptionOfType(SaplTestException.class).isThrownBy(
 				() -> fixture.constructTestCaseWithMocks()
-					.givenAttribute("clock.ticker", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+					.givenAttribute("time.now", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
 					);
 			
 	}
@@ -131,7 +130,7 @@ public class E_PolicyStreamingTest {
 		var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
 		
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.ticker", timestamp0, timestamp1)
+			.givenAttribute("time.now", timestamp0, timestamp1)
 			.givenFunctionOnce("time.localSecond", Val.of(4))
 			.givenFunctionOnce("time.localSecond", Val.of(5))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
@@ -145,7 +144,7 @@ public class E_PolicyStreamingTest {
 	void test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues() {
 		
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.ticker", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
+			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
 			.givenFunctionOnce("time.localSecond", Val.of(3), Val.of(4), Val.of(5))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextNotApplicable()
@@ -159,7 +158,7 @@ public class E_PolicyStreamingTest {
 	void test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled() {
 		
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.ticker", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
+			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
 			.givenFunction("time.localSecond", Val.of(5), times(3))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextPermit(3)

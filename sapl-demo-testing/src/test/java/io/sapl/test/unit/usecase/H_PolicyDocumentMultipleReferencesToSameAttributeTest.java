@@ -25,7 +25,7 @@ public class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
 	void test_withFunctionSequenceMock() {
 
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
+			.givenAttribute("time.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
 			.givenFunctionOnce("time.localSecond", Val.of(1), Val.of(15), Val.of(25), Val.of(25), Val.of(35), Val.of(35), Val.of(45), Val.of(45), Val.of(45), Val.of(55), Val.of(55), Val.of(55))
 			.when(AuthorizationSubscription.of("WILLI", "read", "something"))
 			.expectNext(allOf(isPermit(), hasObligation("A")))
@@ -43,7 +43,7 @@ public class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
 	void test_withFunctionForParametersMock() {
 
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("clock.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
+			.givenAttribute("time.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
 			.givenFunction("time.localSecond", whenFunctionParams(val(1)), Val.of(1))
 			.givenFunction("time.localSecond", whenFunctionParams(val(2)), Val.of(15))
 			.givenFunction("time.localSecond", whenFunctionParams(val(3)), Val.of(25))
