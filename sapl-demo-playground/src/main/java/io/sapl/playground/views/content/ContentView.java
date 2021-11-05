@@ -504,7 +504,7 @@ public class ContentView extends Div {
 	private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(EvaluationContext ctxForAuthzSub,
 			Step<AuthorizationDecision> steps) {
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
-		    String fullname = mock.getFullname();
+		    String fullname = mock.getFullName();
 		    for (Val val : mock.getMockReturnValues()) {
 		        steps = steps.then(() -> ((MockingAttributeContext) ctxForAuthzSub.getAttributeCtx()).mockEmit(fullname, val));
 		    }
@@ -632,10 +632,10 @@ public class ContentView extends Div {
     	Map<String, Integer> countValues = new HashMap<>();
     	
     	for(AttributeMockReturnValues mock : this.attrReturnValues) {
-    		if(countValues.containsKey(mock.getFullname())) {
-    			countValues.put(mock.getFullname(), countValues.get(mock.getFullname() + mock.getMockReturnValues().size()));
+    		if(countValues.containsKey(mock.getFullName())) {
+    			countValues.put(mock.getFullName(), countValues.get(mock.getFullName() + mock.getMockReturnValues().size()));
     		} else {
-    			countValues.put(mock.getFullname(), mock.getMockReturnValues().size());
+    			countValues.put(mock.getFullName(), mock.getMockReturnValues().size());
     		}
     	}
     	
