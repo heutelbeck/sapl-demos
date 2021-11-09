@@ -1,5 +1,6 @@
 package io.sapl.playground.views.content;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -22,7 +23,7 @@ import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.interpreter.pip.AttributeContext;
-import io.sapl.pip.ClockPolicyInformationPoint;
+import io.sapl.pip.TimePolicyInformationPoint;
 import io.sapl.playground.examples.BasicExample;
 import io.sapl.playground.examples.Example;
 import io.sapl.playground.models.MockDefinitionParsingException;
@@ -121,7 +122,7 @@ public class ContentView extends Div {
     	this.saplInterpreter = new DefaultSAPLInterpreter();
     	this.objectMapper = new ObjectMapper();
     	this.defaultAttrContext = new AnnotationAttributeContext();
-    	this.defaultAttrContext.loadPolicyInformationPoint(new ClockPolicyInformationPoint());
+    	this.defaultAttrContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
     	this.defaultFunctionContext = new AnnotationFunctionContext();
     	this.defaultFunctionContext.loadLibrary(new FilterFunctionLibrary());
     	this.defaultFunctionContext.loadLibrary(new StandardFunctionLibrary());
