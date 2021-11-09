@@ -4,6 +4,7 @@ package io.sapl.test.unit.usecase;
 import static io.sapl.hamcrest.Matchers.anyDecision;
 import static io.sapl.test.Imports.times;
 
+import java.time.Clock;
 import java.time.Duration;
 
 import org.assertj.core.api.Assertions;
@@ -58,7 +59,7 @@ public class E_PolicyStreamingTest {
             "Sometimes on some systems there is a Exception thrown, because the Attribute is emitting on event too few")
 	void test_streamingPolicyWithVirtualTime() throws InitializationException {
 		
-		fixture.registerPIP(new TimePolicyInformationPoint())
+		fixture.registerPIP(new TimePolicyInformationPoint(Clock.systemUTC()))
 			.constructTestCaseWithMocks()
 			.withVirtualTime()
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))

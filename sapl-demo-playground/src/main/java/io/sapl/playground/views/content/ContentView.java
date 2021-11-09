@@ -1,5 +1,6 @@
 package io.sapl.playground.views.content;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -121,7 +122,7 @@ public class ContentView extends Div {
     	this.saplInterpreter = new DefaultSAPLInterpreter();
     	this.objectMapper = new ObjectMapper();
     	this.defaultAttrContext = new AnnotationAttributeContext();
-    	this.defaultAttrContext.loadPolicyInformationPoint(new TimePolicyInformationPoint());
+    	this.defaultAttrContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
     	this.defaultFunctionContext = new AnnotationFunctionContext();
     	this.defaultFunctionContext.loadLibrary(new FilterFunctionLibrary());
     	this.defaultFunctionContext.loadLibrary(new StandardFunctionLibrary());
