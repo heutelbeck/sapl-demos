@@ -34,13 +34,16 @@ public class AuthorizationController {
 			@RegisteredOAuth2AuthorizedClient("miskatonic-client-authorization-code") OAuth2AuthorizedClient authorizedClient) {
 
 		String[] books = fetchWithAttributes("/books", oauth2AuthorizedClient(authorizedClient));
-		model.addAttribute("books", books);
+		if (books != null && books.length > 0)
+			model.addAttribute("books", books);
 
 		String[] faculty = fetchWithAttributes("/faculty", oauth2AuthorizedClient(authorizedClient));
-		model.addAttribute("faculty", faculty);
+		if (faculty != null && faculty.length > 0)
+			model.addAttribute("faculty", faculty);
 
 		String[] bestiary = fetchWithAttributes("/bestiary", oauth2AuthorizedClient(authorizedClient));
-		model.addAttribute("bestiary", bestiary);
+		if (bestiary != null && bestiary.length > 0)
+			model.addAttribute("bestiary", bestiary);
 
 		return "index";
 	}
@@ -62,21 +65,24 @@ public class AuthorizationController {
 	public String clientCredentialsGrant(Model model) {
 
 		String[] books = fetchWithAttributes("/books", clientRegistrationId("miskatonic-client-client-credentials"));
-		model.addAttribute("books", books);
+		if (books != null && books.length > 0)
+			model.addAttribute("books", books);
 
 		String[] faculty = fetchWithAttributes("/faculty",
 				clientRegistrationId("miskatonic-client-client-credentials"));
-		model.addAttribute("faculty", faculty);
+		if (faculty != null && faculty.length > 0)
+			model.addAttribute("faculty", faculty);
 
 		String[] bestiary = fetchWithAttributes("/bestiary",
 				clientRegistrationId("miskatonic-client-client-credentials"));
-		model.addAttribute("bestiary", bestiary);
+		if (bestiary != null && bestiary.length > 0)
+			model.addAttribute("bestiary", bestiary);
 
 		return "index";
 	}
 
 	private String[] fetchWithAttributes(String path, Consumer<Map<String, Object>> attributesConsumer) {
 		return this.webClient.get().uri(this.messagesBaseUri + path).attributes(attributesConsumer).retrieve()
-				.bodyToMono(String[].class).block();
+				.bodyToMono(String[].class).onErrorReturn(new String[0]).block();
 	}
 }
