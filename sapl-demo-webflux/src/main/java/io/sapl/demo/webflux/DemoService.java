@@ -126,7 +126,7 @@ public class DemoService {
 	 */
 	@PreEnforce
 	public Flux<Integer> getFluxNumbers() {
-		return Flux.just(0, 1, 2, 3, 4, 5, 6, 7, 8, 9).delayElements(Duration.ofMillis(500L));
+		return Flux.concat(Flux.just(0), Flux.just(1, 2, 3, 4, 5, 6, 7, 8, 9).delayElements(Duration.ofMillis(500L)));
 	}
 
 	/**
