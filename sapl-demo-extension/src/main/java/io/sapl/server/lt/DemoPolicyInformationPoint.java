@@ -7,12 +7,9 @@ package io.sapl.server.lt;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.time.Duration;
-import java.util.Map;
 import java.util.function.Function;
 
 import org.springframework.stereotype.Component;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.interpreter.Val;
@@ -47,9 +44,16 @@ import reactor.core.publisher.Mono;
 @PolicyInformationPoint(name = "demo", description = "Some documenting text for the PIP.")
 public class DemoPolicyInformationPoint {
 
+	private final static long DEFAULT_POLLING_INTERVAL_MS = 2_000L;
+	private final static int DEFAULT_TIMEOUT_MS = 1_000;
+
+	/**
+	 * @return A Flux of Boolean values inverting every 500ms, starting with true.
+	 */
 	@Attribute(name = "toggle", docs = "Periodically turns from true to false.")
-	public Flux<Val> toggle(Val leftHand, Map<String, JsonNode> variables) {
-		return Flux.just(true, false).repeat().delayElements(Duration.ofMillis(500)).map(Val::of);
+	public Flux<Val> toggle() {
+		return Flux.concat(Flux.just(true), Flux.just(true, false).repeat().delayElements(Duration.ofMillis(500)))
+				.map(Val::of);
 	}
 
 	/**
@@ -83,10 +87,6 @@ public class DemoPolicyInformationPoint {
 	 * @param leftHandHostnameParameter a textual Val containing a host name, either
 	 *                                  in number notation (e.g. "192.168.1.2") or
 	 *                                  as domain name (e.g. "example.com").
-	 * @param variables                 this map contains the current variables
-	 *                                  available in the current policy evaluation
-	 *                                  context. This attribute finder does not make
-	 *                                  use of the variables.
 	 * @param pollingIntervalParameter  a numeric Val providing the interval in
 	 *                                  milliseconds in which host is probed. Must
 	 *                                  be larger than timeoutMsParameter.
@@ -98,18 +98,34 @@ public class DemoPolicyInformationPoint {
 	 * @return A boolean Flux indication the host's availability.
 	 */
 	@Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable(5000,6000)> checks if the address returns a package within 5000ms and repeats this pinging action every 6000ms. The timeout must be smaller than the repetition interval.")
-	public Flux<Val> reachable(@Text Val leftHandHostnameParameter, Map<String, JsonNode> variables,
-			Flux<Val> pollingIntervalParameter, Flux<Val> timeoutMsParameter) {
-		return Flux.combineLatest(values -> new Val[] { (Val) values[0], (Val) values[1] }, timeoutMsParameter, pollingIntervalParameter).flatMap(parameters -> {
-			var hostname = leftHandHostnameParameter.getText();
-			var timeoutMs = parameters[0].get().asInt();
-			var pollingIntervalMs = parameters[1].get().asLong();
-			if (pollingIntervalMs < timeoutMs)
-				return Flux.error(new PolicyEvaluationException(
-						"When checking for reachability of a host, the timeout must be smaller than the polling interval. The timout was %dms and the polling interval was set to %dms",
-						timeoutMs, pollingIntervalMs));
-			return reachable(hostname, pollingIntervalMs, timeoutMs).map(Val::of);
-		});
+	public Flux<Val> reachable(@Text Val leftHandHostnameParameter, Flux<Val> pollingIntervalParameter,
+			Flux<Val> timeoutMsParameter) {
+		return Flux.combineLatest(values -> new Val[] { (Val) values[0], (Val) values[1] }, timeoutMsParameter,
+				pollingIntervalParameter).flatMap(parameters -> {
+					var hostname = leftHandHostnameParameter.getText();
+					var timeoutMs = parameters[0].get().asInt();
+					var pollingIntervalMs = parameters[1].get().asLong();
+					if (pollingIntervalMs < timeoutMs)
+						return Flux.error(new PolicyEvaluationException(
+								"When checking for reachability of a host, the timeout must be smaller than the polling interval. The timout was %dms and the polling interval was set to %dms",
+								timeoutMs, pollingIntervalMs));
+					return reachable(hostname, pollingIntervalMs, timeoutMs).map(Val::of);
+				});
+	}
+
+	/**
+	 * Overloads the reachable attribute. This version uses default polling interval
+	 * and timeout.
+	 * 
+	 * @param leftHandHostnameParameter a textual Val containing a host name, either
+	 *                                  in number notation (e.g. "192.168.1.2") or
+	 *                                  as domain name (e.g. "example.com").
+	 * @return A boolean Flux indication the host's availability.
+	 */
+	@Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable> checks if the address returns a package within 1000ms and repeats this pinging action every 2000ms. The timeout must be smaller than the repetition interval.")
+	public Flux<Val> reachable(@Text Val leftHandHostnameParameter) {
+		var hostname = leftHandHostnameParameter.getText();
+		return reachable(hostname, DEFAULT_POLLING_INTERVAL_MS, DEFAULT_TIMEOUT_MS).map(Val::of);
 	}
 
 	/**
