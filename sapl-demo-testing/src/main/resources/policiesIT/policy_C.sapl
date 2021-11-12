@@ -3,4 +3,4 @@ permit
   resource == "bar"
 where
   subject == "WILLI";
-  time.localSecond(<time.now(2000)>) > 4;
+  time.secondOf(<time.now>) > 4;

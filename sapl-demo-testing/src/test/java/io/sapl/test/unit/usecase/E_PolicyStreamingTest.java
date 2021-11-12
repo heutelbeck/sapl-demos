@@ -28,7 +28,6 @@ public class E_PolicyStreamingTest {
 	@BeforeEach
 	void setUp() throws InitializationException {
 		fixture = new SaplUnitTestFixture("policyStreaming")
-				//.registerPIP(null)
 				.registerFunctionLibrary(new TemporalFunctionLibrary());
 	}
 
@@ -89,21 +88,21 @@ public class E_PolicyStreamingTest {
 			
 		fixture.constructTestCaseWithMocks()
 			.withVirtualTime()
-			.givenAttribute("time.now", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+			.givenAttribute("time.now", Duration.ofSeconds(1), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextPermit()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.expectNextPermit()
-			.thenAwait(Duration.ofSeconds(10))
+			.thenAwait(Duration.ofSeconds(1))
 			.verify();
 	}
 	
@@ -132,8 +131,8 @@ public class E_PolicyStreamingTest {
 		
 		fixture.constructTestCaseWithMocks()
 			.givenAttribute("time.now", timestamp0, timestamp1)
-			.givenFunctionOnce("time.localSecond", Val.of(4))
-			.givenFunctionOnce("time.localSecond", Val.of(5))
+			.givenFunctionOnce("time.secondOf", Val.of(4))
+			.givenFunctionOnce("time.secondOf", Val.of(5))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextNotApplicable()
 			.expectNextPermit()
@@ -146,7 +145,7 @@ public class E_PolicyStreamingTest {
 		
 		fixture.constructTestCaseWithMocks()
 			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-			.givenFunctionOnce("time.localSecond", Val.of(3), Val.of(4), Val.of(5))
+			.givenFunctionOnce("time.secondOf", Val.of(3), Val.of(4), Val.of(5))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextNotApplicable()
 			.expectNextNotApplicable()
@@ -160,7 +159,7 @@ public class E_PolicyStreamingTest {
 		
 		fixture.constructTestCaseWithMocks()
 			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-			.givenFunction("time.localSecond", Val.of(5), times(3))
+			.givenFunction("time.secondOf", Val.of(5), times(3))
 			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
 			.expectNextPermit(3)
 			.verify(); // three times mock of function -> three times called
