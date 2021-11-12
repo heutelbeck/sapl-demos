@@ -3,5 +3,4 @@ permit
   resource == "bar"
 where
   subject == "WILLI";
-  var interval = 2;
-  time.localSecond(<time.now(interval)>) > 4;
+  time.localSecond(<time.now(2000)>) > 4;
