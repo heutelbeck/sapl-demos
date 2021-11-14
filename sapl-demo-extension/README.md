@@ -84,3 +84,6 @@ b) Plain Java application: You have to instantiate the extension classes and han
 
 Finally, this extension also supplies a simple function library and exposes the functions `simple.length` and `simple.append`. The function `length` returns the length of a string or array, while `append` concatenates an arbitrary number of strings and numbers into a single string.
 
+
+*Note*: Developers must add  `-parameters` parameter to the compilation to ensure that the automatically generated documentation does contain the names of the parameters used in the methods.
+
