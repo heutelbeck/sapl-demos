@@ -46,50 +46,50 @@ import com.vaadin.flow.server.PWA;
 public class MainView extends AppLayout {
 
 	private final ExampleSelectedViewBus exampleSelectedViewBus;
+
 	private Map<String, Example> examples;
-	
-    public MainView(ExampleSelectedViewBus exampleSelectedViewBus) {
-        this.exampleSelectedViewBus = exampleSelectedViewBus;
-        initializeExamples();
-    	HorizontalLayout header = createHeader();
-        addToNavbar(header);
-    }
- 
-    private HorizontalLayout createHeader() {
-        HorizontalLayout header = new HorizontalLayout();
-        header.setPadding(false);
-        header.setSpacing(false);
-        header.setWidthFull();        
-        header.setAlignItems(FlexComponent.Alignment.CENTER);
-        header.setId("header");
-        
-        headerSetLogo(header);
-        
-        headerAddTitle(header);
-        
-        headerAddButtons(header);
-        
-        return header;
-    }
+
+	public MainView(ExampleSelectedViewBus exampleSelectedViewBus) {
+		this.exampleSelectedViewBus = exampleSelectedViewBus;
+		initializeExamples();
+		HorizontalLayout header = createHeader();
+		addToNavbar(header);
+	}
+
+	private HorizontalLayout createHeader() {
+		HorizontalLayout header = new HorizontalLayout();
+		header.setPadding(false);
+		header.setSpacing(false);
+		header.setWidthFull();
+		header.setAlignItems(FlexComponent.Alignment.CENTER);
+		header.setId("header");
+
+		headerSetLogo(header);
+
+		headerAddTitle(header);
+
+		headerAddButtons(header);
+
+		return header;
+	}
 
 	private void headerAddButtons(HorizontalLayout header) {
 		Div buttons = new Div();
-        buttons.setClassName("alignRight");
-        
-        Anchor linkToDocs = new Anchor("https://sapl.io/docs/sapl-reference.html", "Docs");
-        linkToDocs.setId("linkToDocsButton");
-        buttons.add(linkToDocs);
-        
-        Select<String> select = new Select<>();
-        select.setPlaceholder("Examples");
-        select.setItems(this.examples.keySet());
-        select.setId("dropdownButton");
-        select.addValueChangeListener(
-                event -> this.exampleSelectedViewBus.getContentView().setExample(this.examples.get(event.getValue()), true));
-        buttons.add(select);
-        
-        
-        header.add(buttons);
+		buttons.setClassName("alignRight");
+
+		Anchor linkToDocs = new Anchor("https://sapl.io/docs/sapl-reference.html", "Docs");
+		linkToDocs.setId("linkToDocsButton");
+		buttons.add(linkToDocs);
+
+		Select<String> select = new Select<>();
+		select.setPlaceholder("Examples");
+		select.setItems(this.examples.keySet());
+		select.setId("dropdownButton");
+		select.addValueChangeListener(event -> this.exampleSelectedViewBus.getContentView()
+				.setExample(this.examples.get(event.getValue()), true));
+		buttons.add(select);
+
+		header.add(buttons);
 	}
 
 	private void headerAddTitle(HorizontalLayout header) {
@@ -98,22 +98,23 @@ public class MainView extends AppLayout {
 
 	private void headerSetLogo(HorizontalLayout header) {
 		Image logo = new Image("images/logo-header.png", "SAPL Logo");
-        logo.setId("logo");
-        header.add(logo);
+		logo.setId("logo");
+		header.add(logo);
 	}
-    
-    private void initializeExamples() {
-        this.examples = new HashMap<>();
-        
-    	Example example;
-    	
-    	example = new BasicExample();
-    	this.examples.put(example.getDisplayName(), example);
-    	
-    	example = new SpringSecurityExample();
-    	this.examples.put(example.getDisplayName(), example);
-    	
-    	example = new SpringDataExample();
-    	this.examples.put(example.getDisplayName(), example);
-    }
+
+	private void initializeExamples() {
+		this.examples = new HashMap<>();
+
+		Example example;
+
+		example = new BasicExample();
+		this.examples.put(example.getDisplayName(), example);
+
+		example = new SpringSecurityExample();
+		this.examples.put(example.getDisplayName(), example);
+
+		example = new SpringDataExample();
+		this.examples.put(example.getDisplayName(), example);
+	}
+
 }

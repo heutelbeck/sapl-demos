@@ -35,17 +35,18 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
 
-	@Option(names = { "-h",
-			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
+	@Option(names = { "-h", "-host" },
+			description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
 	private final String host = "https://localhost:8443";
 
 	// The default option set here are the default credentials of the pdp-server-lt
 
-	@Option(names = { "-k",
-			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
+	@Option(names = { "-k", "-key" },
+			description = "Client key for the demo application, to be obtained from the PDP administrator.")
 	private final String clientKey = "YJidgyT2mfdkbmL";
-	@Option(names = { "-s",
-			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
+
+	@Option(names = { "-s", "-secret" },
+			description = "Client secret for the demo application, to be obtained from the PDP administrator.")
 	private final String clientSecret = "Fa4zvYQdiwHZVXh";
 
 	public static void main(String... args) {
@@ -63,7 +64,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 		/*
 		 * To have the client use the default SSL verification use this constructor
 		 * instead, or provide your own TrustManager/SslContext accordingly.
-		 * 
+		 *
 		 * var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret);
 		 */
 
@@ -71,10 +72,10 @@ public class RemotePDPDemo implements Callable<Integer> {
 		LOG.info("Subscription: {}", authzSubscription);
 		/*
 		 * This just consumes the first decision in a blocking fashion to quickly
-		 * terminate the demo application. If not using blockFirst() or take(1), the
-		 * Flux will continue to listen to the PDP server and receive updated
-		 * authorization decisions when applicable. For alternative patterns of
-		 * invocation, consult the sapl-demo-pdp-embedded
+		 * terminate the demo application. If not using blockFirst() or take(1), the Flux
+		 * will continue to listen to the PDP server and receive updated authorization
+		 * decisions when applicable. For alternative patterns of invocation, consult the
+		 * sapl-demo-pdp-embedded
 		 */
 		pdp.decide(authzSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockLast();
 		return 0;

@@ -35,7 +35,8 @@ final class KeyGeneratorUtils {
 		SecretKey hmacKey;
 		try {
 			hmacKey = KeyGenerator.getInstance("HmacSha256").generateKey();
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 		return hmacKey;
@@ -47,7 +48,8 @@ final class KeyGeneratorUtils {
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 			keyPairGenerator.initialize(2048);
 			keyPair = keyPairGenerator.generateKeyPair();
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 		return keyPair;
@@ -70,9 +72,11 @@ final class KeyGeneratorUtils {
 			KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
 			keyPairGenerator.initialize(ecParameterSpec);
 			keyPair = keyPairGenerator.generateKeyPair();
-		} catch (Exception ex) {
+		}
+		catch (Exception ex) {
 			throw new IllegalStateException(ex);
 		}
 		return keyPair;
 	}
+
 }

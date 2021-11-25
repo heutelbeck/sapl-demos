@@ -15,7 +15,6 @@
  */
 package io.sapl.test.unit.usecase;
 
-
 import static io.sapl.hamcrest.Matchers.anyDecision;
 import static io.sapl.test.Imports.times;
 
@@ -39,14 +38,12 @@ import io.sapl.test.unit.SaplUnitTestFixture;
 public class E_PolicyStreamingTest {
 
 	private SaplTestFixture fixture;
-	
+
 	@BeforeEach
 	void setUp() throws InitializationException {
-		fixture = new SaplUnitTestFixture("policyStreaming")
-				.registerFunctionLibrary(new TemporalFunctionLibrary());
+		fixture = new SaplUnitTestFixture("policyStreaming").registerFunctionLibrary(new TemporalFunctionLibrary());
 	}
 
-	
 	@Test
 	void test_streamingPolicy() {
 		var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
@@ -55,43 +52,27 @@ public class E_PolicyStreamingTest {
 		var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
 		var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
 		var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
-			
+
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("time.now", timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.expectNextNotApplicable()
-			.expectNextNotApplicable()
-			.expectNextNotApplicable()
-			.expectNextNotApplicable()
-			.expectNextPermit()
-			.expectNextPermit()
-			.verify();
+				.givenAttribute("time.now", timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
+				.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
+				.expectNextNotApplicable().expectNextNotApplicable().expectNextNotApplicable().expectNextPermit()
+				.expectNextPermit().verify();
 	}
-	
+
 	@Test
-	@Disabled("Original PIPs with time-based attributes aren't reliable working with virtual time." +
-            "Sometimes on some systems there is a Exception thrown, because the Attribute is emitting on event too few")
+	@Disabled("Original PIPs with time-based attributes aren't reliable working with virtual time."
+			+ "Sometimes on some systems there is a Exception thrown, because the Attribute is emitting on event too few")
 	void test_streamingPolicyWithVirtualTime() throws InitializationException {
-		
-		fixture.registerPIP(new TimePolicyInformationPoint(Clock.systemUTC()))
-			.constructTestCaseWithMocks()
-			.withVirtualTime()
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.thenAwait(Duration.ofSeconds(2))
-			.expectNext(anyDecision())
-			.verify();
+
+		fixture.registerPIP(new TimePolicyInformationPoint(Clock.systemUTC())).constructTestCaseWithMocks()
+				.withVirtualTime().when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
+				.thenAwait(Duration.ofSeconds(2)).expectNext(anyDecision()).thenAwait(Duration.ofSeconds(2))
+				.expectNext(anyDecision()).thenAwait(Duration.ofSeconds(2)).expectNext(anyDecision())
+				.thenAwait(Duration.ofSeconds(2)).expectNext(anyDecision()).thenAwait(Duration.ofSeconds(2))
+				.expectNext(anyDecision()).thenAwait(Duration.ofSeconds(2)).expectNext(anyDecision()).verify();
 	}
-	
+
 	@Test
 	void test_streamingPolicy_TimingAttributeMock() {
 		var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
@@ -100,27 +81,18 @@ public class E_PolicyStreamingTest {
 		var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
 		var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
 		var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
-			
-		fixture.constructTestCaseWithMocks()
-			.withVirtualTime()
-			.givenAttribute("time.now", Duration.ofSeconds(1), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextNotApplicable()
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextPermit()
-			.thenAwait(Duration.ofSeconds(1))
-			.expectNextPermit()
-			.thenAwait(Duration.ofSeconds(1))
-			.verify();
+
+		fixture.constructTestCaseWithMocks().withVirtualTime()
+				.givenAttribute("time.now", Duration.ofSeconds(1), timestamp0, timestamp1, timestamp2, timestamp3,
+						timestamp4, timestamp5)
+				.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
+				.thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable().thenAwait(Duration.ofSeconds(1))
+				.expectNextNotApplicable().thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable()
+				.thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable().thenAwait(Duration.ofSeconds(1))
+				.expectNextPermit().thenAwait(Duration.ofSeconds(1)).expectNextPermit().thenAwait(Duration.ofSeconds(1))
+				.verify();
 	}
-	
+
 	@Test
 	void test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime() {
 		var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
@@ -129,56 +101,51 @@ public class E_PolicyStreamingTest {
 		var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
 		var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
 		var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
-			
+
 		Assertions.assertThatExceptionOfType(SaplTestException.class).isThrownBy(
-				() -> fixture.constructTestCaseWithMocks()
-					.givenAttribute("time.now", Duration.ofSeconds(10), timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
-					);
-			
+				() -> fixture.constructTestCaseWithMocks().givenAttribute("time.now", Duration.ofSeconds(10),
+						timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5));
+
 	}
-	
-	
+
 	@Test
 	void test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls() {
-		
+
 		var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
 		var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
-		
-		fixture.constructTestCaseWithMocks()
-			.givenAttribute("time.now", timestamp0, timestamp1)
-			.givenFunctionOnce("time.secondOf", Val.of(4))
-			.givenFunctionOnce("time.secondOf", Val.of(5))
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.expectNextNotApplicable()
-			.expectNextPermit()
-			.verify(); // two times mock of function -> verify two times called
-	
+
+		fixture.constructTestCaseWithMocks().givenAttribute("time.now", timestamp0, timestamp1)
+				.givenFunctionOnce("time.secondOf", Val.of(4)).givenFunctionOnce("time.secondOf", Val.of(5))
+				.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
+				.expectNextPermit().verify(); // two times mock of function -> verify two
+												// times called
+
 	}
-	
+
 	@Test
 	void test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues() {
-		
+
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-			.givenFunctionOnce("time.secondOf", Val.of(3), Val.of(4), Val.of(5))
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.expectNextNotApplicable()
-			.expectNextNotApplicable()
-			.expectNextPermit()
-			.verify(); // three times mock of function -> verify two times called
-	
+				.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
+				.givenFunctionOnce("time.secondOf", Val.of(3), Val.of(4), Val.of(5))
+				.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
+				.expectNextNotApplicable().expectNextPermit().verify(); // three times
+																		// mock of
+																		// function ->
+																		// verify two
+																		// times called
+
 	}
-	
+
 	@Test
 	void test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled() {
-		
+
 		fixture.constructTestCaseWithMocks()
-			.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-			.givenFunction("time.secondOf", Val.of(5), times(3))
-			.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-			.expectNextPermit(3)
-			.verify(); // three times mock of function -> three times called
-	
+				.givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
+				.givenFunction("time.secondOf", Val.of(5), times(3))
+				.when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextPermit(3)
+				.verify(); // three times mock of function -> three times called
+
 	}
 
 }

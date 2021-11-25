@@ -54,7 +54,7 @@ public class XtextServletConfiguration {
 		registration.setEnabled(false);
 		return registration;
 	}
-	
+
 	@Bean
 	public FunctionContext functionContext() throws InitializationException {
 		FunctionContext context = new AnnotationFunctionContext(new FilterFunctionLibrary(),
@@ -68,4 +68,5 @@ public class XtextServletConfiguration {
 		context.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
 		return context;
 	}
+
 }

@@ -32,8 +32,9 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("/")
 public class DemoController {
+
 	private final static JsonNodeFactory JSON = JsonNodeFactory.instance;
-	
+
 	@GetMapping(value = "/numbers", produces = MediaType.APPLICATION_NDJSON_VALUE)
 	public Flux<ServerSentEvent<JsonNode>> numbers() {
 		return Flux.range(0, 10).repeat().delayElements(Duration.ofMillis(500L))
@@ -49,4 +50,5 @@ public class DemoController {
 	public Mono<String> secretData() {
 		return Mono.just("Secret information");
 	}
+
 }

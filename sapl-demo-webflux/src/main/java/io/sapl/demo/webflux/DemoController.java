@@ -78,4 +78,5 @@ public class DemoController {
 						+ "') (data will automatically resume once access is granted again) - reason: " + reason))
 				.map(value -> ServerSentEvent.<String>builder().data(value).build());
 	}
+
 }

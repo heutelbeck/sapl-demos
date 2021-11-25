@@ -21,10 +21,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 class CustomRequestCache extends HttpSessionRequestCache {
+
 	/**
 	 * {@inheritDoc}
 	 *
-	 * If the method is considered an internal request from the framework, we skip saving it.
+	 * If the method is considered an internal request from the framework, we skip saving
+	 * it.
 	 *
 	 */
 	@Override

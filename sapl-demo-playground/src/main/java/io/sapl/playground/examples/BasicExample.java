@@ -18,34 +18,20 @@ package io.sapl.playground.examples;
 public class BasicExample extends Example {
 
 	public BasicExample() {
-		
-		this.mockDefinition = "[\n"
-				+ "  {\n"
-				+ "    \"type\"	   : \"ATTRIBUTE\",\n"
-				+ "    \"importName\": \"time.now\",\n"
-				+ "    \"sequence\": [1, 2, 3]\n"
-				+ "  }, \n"
-				+ "  {\n"
-				+ "    \"type\": \"FUNCTION\",\n"
-				+ "    \"importName\": \"time.dayOfWeekFrom\",\n"
-				+ "    \"sequence\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\"]\n"
-				+ "  }\n"
-				+ "]";
-		
-		this.policy = "policy \"policy 1\"\n"
-				+ "permit\n"
-				+ "    action == \"read\"\n"
-				+ "where\n"
+
+		this.mockDefinition = "[\n" + "  {\n" + "    \"type\"	   : \"ATTRIBUTE\",\n"
+				+ "    \"importName\": \"time.now\",\n" + "    \"sequence\": [1, 2, 3]\n" + "  }, \n" + "  {\n"
+				+ "    \"type\": \"FUNCTION\",\n" + "    \"importName\": \"time.dayOfWeekFrom\",\n"
+				+ "    \"sequence\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\"]\n" + "  }\n" + "]";
+
+		this.policy = "policy \"policy 1\"\n" + "permit\n" + "    action == \"read\"\n" + "where\n"
 				+ "    subject == \"WILLI\";\n"
 				+ "    time.dayOfWeekFrom(<time.now>) =~ \"MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY\";";
-		
-		
-		this.authzSub = "{\n"
-    			+ " \"subject\"     : \"WILLI\",\n"
-    			+ " \"action\"      : \"read\",\n"
-    			+ " \"resource\"    : \"something\"\n"
-    			+ "}";
-		
+
+		this.authzSub = "{\n" + " \"subject\"     : \"WILLI\",\n" + " \"action\"      : \"read\",\n"
+				+ " \"resource\"    : \"something\"\n" + "}";
+
 		this.displayName = "Basic";
 	}
+
 }

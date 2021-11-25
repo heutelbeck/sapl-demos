@@ -15,7 +15,6 @@
  */
 package org.demo.domain;
 
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,30 +30,30 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Patient {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 
-    String medicalRecordNumber;
+	String medicalRecordNumber;
 
-    String name;
+	String name;
 
-    String icd11Code;
+	String icd11Code;
 
-    String diagnosisText;
+	String diagnosisText;
 
 	String attendingDoctor;
 
 	String attendingNurse;
 
-    String phoneNumber;
+	String phoneNumber;
 
-    String roomNumber;
+	String roomNumber;
 
-    public static Patient clone(Patient template) {
-        return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
+	public static Patient clone(Patient template) {
+		return new Patient(template.id, template.medicalRecordNumber, template.name, template.icd11Code,
 				template.diagnosisText, template.attendingDoctor, template.attendingNurse, template.phoneNumber,
 				template.roomNumber);
-    }
+	}
 
 }

@@ -33,8 +33,8 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 
 /**
- * This class is for loading a demo data set into the database. The run method
- * is executed after the application context is loaded.
+ * This class is for loading a demo data set into the database. The run method is executed
+ * after the application context is loaded.
  */
 @Component
 @RequiredArgsConstructor
@@ -43,25 +43,39 @@ public class DemoData implements CommandLineRunner {
 	// Demo Data Strings
 
 	private static final String ROLE_DOCTOR = "DOCTOR";
+
 	private static final String ROLE_NURSE = "NURSE";
+
 	private static final String ROLE_VISITOR = "VISITOR";
+
 	private static final String ROLE_ADMIN = "ADMIN";
 
 	private static final String NAME_DOMINIC = "Dominic";
+
 	private static final String NAME_JULIA = "Julia";
+
 	private static final String NAME_PETER = "Peter";
+
 	private static final String NAME_ALINA = "Alina";
+
 	private static final String NAME_THOMAS = "Thomas";
+
 	private static final String NAME_BRIGITTE = "Brigitte";
+
 	private static final String NAME_JANOSCH = "Janosch";
+
 	private static final String NAME_JANINA = "Janina";
+
 	private static final String NAME_LENNY = "Lenny";
+
 	private static final String NAME_KARL = "Karl";
+
 	private static final String NAME_HORST = "Horst";
 
 	private static final String DEFAULT_RAW_PASSWORD = "password";
 
 	private final PatientRepository patientRepository;
+
 	private final RelationRepository relationRepository;
 
 	/**
@@ -74,7 +88,7 @@ public class DemoData implements CommandLineRunner {
 		 * enforcement points (PEPs). Thus, back-end services like this should identify
 		 * themselves as such, that the policy decision point (PDP) can make the correct
 		 * decision and grant access to write this data.
-		 * 
+		 *
 		 * In this case, the process indicates that it is the user 'system' with the
 		 * authority 'ROLE_SYSTEM'.
 		 */
@@ -103,8 +117,7 @@ public class DemoData implements CommandLineRunner {
 	/**
 	 * This method is used by the demo applications to load user credentials into an
 	 * in-memory UserDetailsManager.
-	 * 
-	 * @param inMem   an InMemoryUserDetailsManagerConfigurer
+	 * @param inMem an InMemoryUserDetailsManagerConfigurer
 	 * @param encoder the selected password encoder
 	 */
 	public static void loadUsers(InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMem,

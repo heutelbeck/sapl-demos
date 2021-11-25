@@ -66,7 +66,8 @@ public class PrinterUser extends User {
 		if (transactionHash == null) {
 			return other.transactionHash == null;
 		}
-		else return transactionHash.equals(other.transactionHash);
+		else
+			return transactionHash.equals(other.transactionHash);
 	}
 
 	public PrinterUser copy() {

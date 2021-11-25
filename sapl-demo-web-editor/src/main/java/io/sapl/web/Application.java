@@ -25,8 +25,8 @@ import com.vaadin.flow.spring.annotation.EnableVaadin;
 @EnableVaadin("io.sapl.web")
 public class Application extends SpringBootServletInitializer {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(Application.class, args);
+	}
 
 }

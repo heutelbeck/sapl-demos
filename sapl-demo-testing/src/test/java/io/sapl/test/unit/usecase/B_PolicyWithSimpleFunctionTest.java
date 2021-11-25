@@ -28,48 +28,41 @@ import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
 public class B_PolicyWithSimpleFunctionTest {
-	
+
 	private SaplTestFixture fixture;
-	
+
 	@BeforeEach
 	void setUp() {
 		fixture = new SaplUnitTestFixture("policyWithSimpleFunction");
-			//Registration of Functions or PIPs for every test case
-			//.registerFunction(new TemporalFunctionLibrary())
+		// Registration of Functions or PIPs for every test case
+		// .registerFunction(new TemporalFunctionLibrary())
 	}
 
-	
 	@Test
 	void test_policyWithSimpleFunction() throws InitializationException {
-			
-		fixture
-			.registerFunctionLibrary(new TemporalFunctionLibrary()) //do not mock function in this unit test
-			.constructTestCase()
-			.when(AuthorizationSubscription.of("willi", "read", "something"))
-			.expectPermit()
-			.verify();
-	
+
+		fixture.registerFunctionLibrary(new TemporalFunctionLibrary()) // do not mock
+																		// function in
+																		// this unit test
+				.constructTestCase().when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit()
+				.verify();
+
 	}
-	
+
 	@Test
 	void test_policyWithSimpleMockedFunction() {
-		
-		fixture.constructTestCaseWithMocks()
-			.givenFunction("time.dayOfWeek", Val.of("SATURDAY"))
-			.when(AuthorizationSubscription.of("willi", "read", "something"))
-			.expectPermit()
-			.verify();
-	
+
+		fixture.constructTestCaseWithMocks().givenFunction("time.dayOfWeek", Val.of("SATURDAY"))
+				.when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
+
 	}
-	
+
 	@Test
 	void test_policyWithSimpleMockedFunction_VerifyTimesCalled() {
-		
-		fixture.constructTestCaseWithMocks()
-			.givenFunction("time.dayOfWeek", Val.of("SATURDAY"), times(1))
-			.when(AuthorizationSubscription.of("willi", "read", "something"))
-			.expectPermit()
-			.verify();
-	
+
+		fixture.constructTestCaseWithMocks().givenFunction("time.dayOfWeek", Val.of("SATURDAY"), times(1))
+				.when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
+
 	}
+
 }

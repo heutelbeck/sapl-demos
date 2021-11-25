@@ -33,39 +33,25 @@ import io.sapl.web.MainView;
 public class JsonEditorView extends Div implements DocumentChangedListener {
 
 	private final JsonEditor jsonEditor;
+
 	private final Button addDocumentChangedListenerButton;
+
 	private Button removeDocumentChangedListenerButton;
-	
+
 	public JsonEditorView() {
-		final String defaultJsonString = 
-				"[\r\n"
-				+ " {\r\n"
-				+ "  _id: \"post 1\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 5\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 2\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 9\r\n"
-				+ " },\r\n"
-				+ " {\r\n"
-				+ "  \"_id\": \"post 3\",\r\n"
-				+ "  \"author\": \"Bob\",\r\n"
-				+ "  \"content\": \"...\",\r\n"
-				+ "  \"page_views\": 8\r\n"
-				+ " }\r\n"
-				+ "]\r\n"
-				+ "";
-		
+		final String defaultJsonString = "[\r\n" + " {\r\n" + "  _id: \"post 1\",\r\n" + "  \"author\": \"Bob\",\r\n"
+				+ "  \"content\": \"...\",\r\n" + "  \"page_views\": 5\r\n" + " },\r\n" + " {\r\n"
+				+ "  \"_id\": \"post 2\",\r\n" + "  \"author\": \"Bob\",\r\n" + "  \"content\": \"...\",\r\n"
+				+ "  \"page_views\": 9\r\n" + " },\r\n" + " {\r\n" + "  \"_id\": \"post 3\",\r\n"
+				+ "  \"author\": \"Bob\",\r\n" + "  \"content\": \"...\",\r\n" + "  \"page_views\": 8\r\n" + " }\r\n"
+				+ "]\r\n" + "";
+
 		setId("json-editor-view");
-		
+
 		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
 		jsonEditor.addDocumentChangedListener(this);
 		add(jsonEditor);
-		
+
 		addDocumentChangedListenerButton = new Button();
 		addDocumentChangedListenerButton.setText("Add Change Listener");
 		addDocumentChangedListenerButton.addClickListener(e -> {
@@ -84,7 +70,7 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
 		add(removeDocumentChangedListenerButton);
-		
+
 		Button showJsonDocumentButton = new Button();
 		showJsonDocumentButton.setText("Show Document in Console");
 		showJsonDocumentButton.addClickListener(e -> {
@@ -99,11 +85,11 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 			jsonEditor.setDocument(defaultJsonString);
 		});
 		add(setJsonDocumentButton);
-		
+
 		Button toggleReadOnlyButton = new Button("Toggle ReadOnly");
 		toggleReadOnlyButton.addClickListener(e -> jsonEditor.setReadOnly(!jsonEditor.isReadOnly()));
 		add(toggleReadOnlyButton);
-		
+
 		jsonEditor.setDocument(defaultJsonString);
 	}
 
@@ -111,4 +97,5 @@ public class JsonEditorView extends Div implements DocumentChangedListener {
 	public void onDocumentChanged(DocumentChangedEvent event) {
 		System.out.println("JSON value changed: " + event.getNewValue());
 	}
+
 }

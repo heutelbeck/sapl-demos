@@ -22,10 +22,10 @@
 	* Update the version of all modules:
 	  mvn versions:set -DnewVersion=2.0.0-RC1 -DprocessAllModules -DgenerateBackupPoms=false
 	  
-	* Correct the license headers of all source files:
+	* Correct the license headers of all source files: (only working where the demo parent is used)
 	  mvn license:format
 	  
-	* Format the code according to Spring code formatting conventions:
+	* Format the code according to Spring code formatting conventions: (only working where the demo parent is used)
 	  mvn spring-javaformat:apply 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"

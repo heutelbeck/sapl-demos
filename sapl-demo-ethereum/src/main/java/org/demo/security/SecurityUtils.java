@@ -37,15 +37,15 @@ public final class SecurityUtils {
 		SecurityContext context = SecurityContextHolder.getContext();
 		Object principal = context.getAuthentication().getPrincipal();
 		if (principal instanceof PrinterUser) {
-            return (PrinterUser) context.getAuthentication().getPrincipal();
+			return (PrinterUser) context.getAuthentication().getPrincipal();
 		}
 		return null;
 	}
 
 	/**
-	 * Tests if the request is an internal framework request. The test consists of checking if the request parameter is
-	 * present and if its value is consistent with any of the request types know.
-	 *
+	 * Tests if the request is an internal framework request. The test consists of
+	 * checking if the request parameter is present and if its value is consistent with
+	 * any of the request types know.
 	 * @param request {@link HttpServletRequest}
 	 * @return true if is an internal framework request. False otherwise.
 	 */
@@ -64,4 +64,5 @@ public final class SecurityUtils {
 		return authentication != null && !(authentication instanceof AnonymousAuthenticationToken)
 				&& authentication.isAuthenticated();
 	}
+
 }

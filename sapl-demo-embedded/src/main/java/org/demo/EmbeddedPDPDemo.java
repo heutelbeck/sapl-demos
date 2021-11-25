@@ -32,39 +32,47 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
 /**
- * This demo shows how to manually construct a PDP without infrastructure
- * support. A Custom Policy Information Point and Function Library are bound to
- * the PDP. The demo runs a few performance tests and illustrates different ways
- * of invoking the PDP.
+ * This demo shows how to manually construct a PDP without infrastructure support. A
+ * Custom Policy Information Point and Function Library are bound to the PDP. The demo
+ * runs a few performance tests and illustrates different ways of invoking the PDP.
  */
-@Command(name = "sapl-demo-embedded", version = "2.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "This demo shows how to manually construct a PDP without infrastructure support. "
-		+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
-		+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP. " + "By default, ")
+@Command(name = "sapl-demo-embedded", version = "2.0.0-SNAPSHOT", mixinStandardHelpOptions = true,
+		description = "This demo shows how to manually construct a PDP without infrastructure support. "
+				+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
+				+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP. "
+				+ "By default, ")
 public class EmbeddedPDPDemo implements Callable<Integer> {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
-	@Option(names = { "-p",
-			"--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
-    final
-    String path = "~/sapl/policies";
+	@Option(names = { "-p", "--path" },
+			description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
+	final String path = "~/sapl/policies";
 
-	@Option(names = { "-f",
-			"--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")
+	@Option(names = { "-f", "--filesystem" },
+			description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")
 	boolean filesystem;
 
 	private static final String SUBJECT = "willi";
+
 	private static final String ACTION_READ = "read";
+
 	private static final String ACTION_WRITE = "write";
+
 	private static final String RESOURCE = "something";
+
 	private static final AuthorizationSubscription READ_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_READ, RESOURCE);
+
 	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_WRITE, RESOURCE);
 
 	private static final int RUNS = 20_000;
+
 	private static final double BILLION = 1_000_000_000.0D;
+
 	private static final double MILLION = 1_000_000.0D;
+
 	private static final DecimalFormat decFormat = new DecimalFormat("#.####");
 
 	public static void main(String... args) {
@@ -77,33 +85,34 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 		if (filesystem) {
 			/*
 			 * The factory method PolicyDecisionPointFactory.filesystemPolicyDecisionPoint
-			 * creates a PDP witch is retrieving the policies and its configuration form the
-			 * file system.
-			 * 
+			 * creates a PDP witch is retrieving the policies and its configuration form
+			 * the file system.
+			 *
 			 * It takes a parameter with the path and lists of extensions to load.
-			 * 
+			 *
 			 * The first list contains policy information points. The second list contains
 			 * function libraries.
 			 *
-			 * The PDP will monitor the path at runtime for any changes made to the policies
-			 * an update any subscribed PEPs accordingly.
+			 * The PDP will monitor the path at runtime for any changes made to the
+			 * policies an update any subscribed PEPs accordingly.
 			 */
 			pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List.of(new EchoPIP()),
 					List.of(new SimpleFunctionLibrary()));
-		} else {
+		}
+		else {
 			/*
 			 * The factory method PolicyDecisionPointFactory.resourcesPolicyDecisionPoint
 			 * creates a PDP witch is retrieving the policies from the resources bundled
 			 * with the application.
-			 * 
+			 *
 			 * In a typical project structure, policies are then located in the folder
 			 * 'src/main/resources/policies'.
-			 * 
+			 *
 			 * The first list contains policy information points. The second list contains
 			 * function libraries.
 			 *
-			 * The PDP will monitor the path at runtime for any changes made to the policies
-			 * an update any subscribed PEPs accordingly.
+			 * The PDP will monitor the path at runtime for any changes made to the
+			 * policies an update any subscribed PEPs accordingly.
 			 */
 			pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List.of(new EchoPIP()),
 					List.of(new SimpleFunctionLibrary()));
@@ -140,10 +149,9 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	}
 
 	/**
-	 * If only one result is required, the appropriate way to consume exactly one
-	 * decision event is to use .take(1) and subscribe accordingly. In this demo
-	 * these will be processed sequentially, as this application is not declaring
-	 * schedulers.
+	 * If only one result is required, the appropriate way to consume exactly one decision
+	 * event is to use .take(1) and subscribe accordingly. In this demo these will be
+	 * processed sequentially, as this application is not declaring schedulers.
 	 */
 	private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
 		LOGGER.info("");

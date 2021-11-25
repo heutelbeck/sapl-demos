@@ -36,9 +36,13 @@ import io.sapl.web.MainView;
 public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
 
 	private final Button addDocumentChangedListenerButton;
+
 	private Button removeDocumentChangedListenerButton;
+
 	private final Button addValidationChangedListenerButton;
+
 	private Button removeValidationChangedListenerButton;
+
 	private final SaplEditor saplEditor;
 
 	public SaplEditorView() {
@@ -126,4 +130,5 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 			System.out.println(issue.getDescription());
 		}
 	}
+
 }

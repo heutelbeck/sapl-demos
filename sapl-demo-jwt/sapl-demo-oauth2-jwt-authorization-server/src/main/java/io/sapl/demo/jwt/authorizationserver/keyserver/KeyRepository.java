@@ -35,4 +35,5 @@ public class KeyRepository {
 	public Optional<JWK> findById(String keyId) {
 		return Optional.ofNullable(keysById.get(keyId));
 	}
+
 }

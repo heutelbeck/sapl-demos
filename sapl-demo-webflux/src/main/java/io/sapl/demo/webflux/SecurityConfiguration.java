@@ -23,13 +23,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 
 /**
- * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration
- * class to activate the reactive method security for methods returning a
- * Publisher<?>.
+ * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration class to
+ * activate the reactive method security for methods returning a Publisher<?>.
  */
 @EnableWebFluxSecurity
 @EnableReactiveSaplMethodSecurity
 public class SecurityConfiguration {
+
 	@Bean
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		// @formatter:off

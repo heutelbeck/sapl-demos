@@ -29,9 +29,11 @@ public class SimpleFunctionLibrary {
 	public Val length(Val parameter) {
 		if (parameter.isArray()) {
 			return Val.of(parameter.get().size());
-		} else if (parameter.isTextual()) {
+		}
+		else if (parameter.isTextual()) {
 			return Val.of(parameter.get().asText().length());
-		} else {
+		}
+		else {
 			throw new PolicyEvaluationException("length() parameter must be a string or an array, found "
 					+ (parameter.isUndefined() ? "undefined" : parameter.get().getNodeType()) + ".");
 		}
@@ -43,7 +45,8 @@ public class SimpleFunctionLibrary {
 		for (var parameter : parameters) {
 			if (parameter.isTextual()) {
 				builder.append(parameter.get().asText());
-			} else if (parameter.isNumber()) {
+			}
+			else if (parameter.isNumber()) {
 				builder.append(parameter.get().asInt());
 			}
 		}

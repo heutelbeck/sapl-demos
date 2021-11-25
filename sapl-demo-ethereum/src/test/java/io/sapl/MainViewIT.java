@@ -25,29 +25,30 @@ import com.vaadin.flow.theme.lumo.Lumo;
 
 public class MainViewIT extends AbstractViewTest {
 
-    @Test
-    public void clickingButtonShowsNotification() {
-        Assert.assertFalse($(NotificationElement.class).exists());
+	@Test
+	public void clickingButtonShowsNotification() {
+		Assert.assertFalse($(NotificationElement.class).exists());
 
-        $(ButtonElement.class).first().click();
+		$(ButtonElement.class).first().click();
 
-        Assert.assertTrue($(NotificationElement.class).waitForFirst().isOpen());
-    }
+		Assert.assertTrue($(NotificationElement.class).waitForFirst().isOpen());
+	}
 
-    @Test
-    public void clickingButtonTwiceShowsTwoNotifications() {
-        Assert.assertFalse($(NotificationElement.class).exists());
+	@Test
+	public void clickingButtonTwiceShowsTwoNotifications() {
+		Assert.assertFalse($(NotificationElement.class).exists());
 
-        ButtonElement button = $(ButtonElement.class).first();
-        button.click();
-        button.click();
+		ButtonElement button = $(ButtonElement.class).first();
+		button.click();
+		button.click();
 
-        Assert.assertEquals(2, $(NotificationElement.class).all().size());
-    }
+		Assert.assertEquals(2, $(NotificationElement.class).all().size());
+	}
 
-    @Test
-    public void buttonIsUsingLumoTheme() {
-        WebElement element = $(ButtonElement.class).first();
-        assertThemePresentOnElement(element, Lumo.class);
-    }
+	@Test
+	public void buttonIsUsingLumoTheme() {
+		WebElement element = $(ButtonElement.class).first();
+		assertThemePresentOnElement(element, Lumo.class);
+	}
+
 }

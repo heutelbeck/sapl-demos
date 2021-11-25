@@ -36,6 +36,7 @@ import reactor.util.function.Tuples;
 public class MiskatonicUniversityController {
 
 	private final PolicyDecisionPoint pdp;
+
 	private final ObjectMapper mapper;
 
 	@GetMapping("/books")
@@ -50,8 +51,8 @@ public class MiskatonicUniversityController {
 		// doATimeoutDemoTest(principal);
 
 		// @formatter:off
-		return new String[] {	"Necronomicon", 
-								"Nameless Cults", 
+		return new String[] {	"Necronomicon",
+								"Nameless Cults",
 								"Book of Eibon"	};
 		// @formatter:on
 	}
@@ -68,12 +69,12 @@ public class MiskatonicUniversityController {
 	@PreEnforce(action = "'read'", resource = "'faculty'")
 	public String[] getMessages() {
 		// @formatter:off
-		return new String[] { 	"Dr. Henry Armitage", 
-								"Professor Ferdinand C. Ashley", 
+		return new String[] { 	"Dr. Henry Armitage",
+								"Professor Ferdinand C. Ashley",
 								"Professor Atwood",
-								"Professor Dexter", 
-								"Professor William Dyer", 
-								"Professor Ellery", 
+								"Professor Dexter",
+								"Professor William Dyer",
+								"Professor Ellery",
 								"Professor Tyler M. Freeborn",
 								"Dr. Allen Halsey",
 								"Professor Lake",

@@ -217,8 +217,7 @@ public class MainView extends VerticalLayout {
 	}
 
 	private VaadinPEP<Select<String>> createCrowdPep(PolicyDecisionPoint pdp) {
-		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<>(templateSelect, crowdSub(), pdp,
-				UI.getCurrent());
+		VaadinPEP<Select<String>> crowdPep = new VaadinPEP<>(templateSelect, crowdSub(), pdp, UI.getCurrent());
 		crowdPep.onPermit((component, decision) -> {
 			log.info("New crowd access decision: {}", decision.getDecision());
 			disabledItems.remove(BALL);
@@ -229,8 +228,7 @@ public class MainView extends VerticalLayout {
 	}
 
 	private VaadinPEP<Select<String>> createPaymentPep(PolicyDecisionPoint pdp) {
-		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<>(templateSelect, paidSub(), pdp,
-				UI.getCurrent());
+		VaadinPEP<Select<String>> paymentPep = new VaadinPEP<>(templateSelect, paidSub(), pdp, UI.getCurrent());
 		paymentPep.onPermit((component, decision) -> {
 			log.info("New paid access decision: {}", decision.getDecision());
 			disabledItems.remove(CUBES);

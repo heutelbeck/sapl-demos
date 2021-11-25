@@ -26,6 +26,7 @@ import io.sapl.api.pdp.PolicyDecisionPoint;
 import reactor.core.Disposable;
 
 public class VaadinPEP<Component> {
+
 	private final PolicyDecisionPoint pdp;
 
 	private AuthorizationSubscription subscription;

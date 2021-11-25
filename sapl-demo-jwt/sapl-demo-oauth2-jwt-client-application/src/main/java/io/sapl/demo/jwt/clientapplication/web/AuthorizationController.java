@@ -36,7 +36,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Controller
 public class AuthorizationController {
+
 	private final WebClient webClient;
+
 	private final String messagesBaseUri;
 
 	public AuthorizationController(WebClient webClient, @Value("${miskatonic.base-uri}") String messagesBaseUri) {
@@ -100,4 +102,5 @@ public class AuthorizationController {
 		return this.webClient.get().uri(this.messagesBaseUri + path).attributes(attributesConsumer).retrieve()
 				.bodyToMono(String[].class).onErrorReturn(new String[0]).block();
 	}
+
 }

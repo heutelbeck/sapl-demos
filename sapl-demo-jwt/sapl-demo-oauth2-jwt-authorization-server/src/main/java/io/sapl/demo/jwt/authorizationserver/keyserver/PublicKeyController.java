@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class PublicKeyController {
+
 	private static Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
 
 	// TODO: replace with ? private final JWKSource<SecurityContext> jwkSource;

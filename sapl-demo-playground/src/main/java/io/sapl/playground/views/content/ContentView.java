@@ -87,42 +87,59 @@ import reactor.test.StepVerifier.Step;
 @RouteAlias(value = "", layout = MainView.class)
 @CssImport("./styles/views/content/content-view.css")
 public class ContentView extends Div {
+
 	// UI element references
 	private SaplEditor saplEditor;
 
 	private JsonEditor mockDefinitionEditor;
+
 	private Paragraph mockDefinitionJsonInputError;
 
 	private JsonEditor authzSubEditor;
+
 	private Paragraph authzSubJsonInputError;
 
 	private List<MockingModel> currentMockingModel;
+
 	private AuthorizationSubscription currentAuthzSub;
+
 	private SAPL currentPolicy;
 
 	private JsonEditor jsonOutput;
+
 	private Paragraph evaluationError;
 
 	private Map<Tab, Component> tabsToPages;
+
 	private Tabs tabs;
+
 	private Tab tab1AuthzSubInput;
+
 	private Tab tab2MockInput;
+
 	private Tab tab3MockHelpText;
 
 	// Internal global variables
 	private final SAPLInterpreter saplInterpreter;
+
 	private List<AttributeMockReturnValues> attrReturnValues;
+
 	private final ObjectMapper objectMapper;
+
 	private final AnnotationAttributeContext defaultAttrContext;
+
 	private final AnnotationFunctionContext defaultFunctionContext;
 
 	private boolean ignoreNextPolicyEditorChangedEvent = false;
+
 	private boolean ignoreNextAuthzSubJsonEditorChangedEvent = false;
+
 	private boolean ignoreNextMockJsonEditorChangedEvent = false;
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
 
 	private final String propertyNameClassName = "property-name";
+
 	private final String propertyDescriptionClassName = "property-description";
 
 	public ContentView(ExampleSelectedViewBus exampleSelectedViewBus) throws InitializationException {
@@ -356,9 +373,9 @@ public class ContentView extends Div {
 	}
 
 	/**
-	 * updating the editor components triggers the document changed event and
-	 * therefore multiple evaluations of the policy to prevent these multiple
-	 * concurrent evaluations, ignore the documentChanged events
+	 * updating the editor components triggers the document changed event and therefore
+	 * multiple evaluations of the policy to prevent these multiple concurrent
+	 * evaluations, ignore the documentChanged events
 	 */
 	private void updateComponentsWithNewExample(Example example, boolean ignoreNextChangedEvents) {
 		this.getUI().ifPresent(ui -> ui.access(() -> {
@@ -463,7 +480,8 @@ public class ContentView extends Div {
 			StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
 					.consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
 
-		} else {
+		}
+		else {
 
 			Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthzSub));
 
@@ -483,7 +501,8 @@ public class ContentView extends Div {
 		try {
 			this.jsonOutput
 					.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedResult));
-		} catch (JsonProcessingException e) {
+		}
+		catch (JsonProcessingException e) {
 			log.error("Error deserializing AuthorizationDecisions: " + e);
 			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!", false);
 		}
@@ -493,7 +512,8 @@ public class ContentView extends Div {
 		try {
 			steps.thenCancel().verify(Duration.ofSeconds(10));
 			log.debug("Evaluation finished");
-		} catch (AssertionError err) {
+		}
+		catch (AssertionError err) {
 			log.debug("Evaluation error", err);
 			// do nothing because number of generated AuthorizationDecision's were not
 			// equals number of maximal generated AuthzDec
@@ -530,7 +550,8 @@ public class ContentView extends Div {
 		if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
 			updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
 			return null;
-		} else {
+		}
+		else {
 			return this.saplInterpreter.parse(saplString);
 		}
 	}
@@ -539,14 +560,16 @@ public class ContentView extends Div {
 		JsonNode mockInput;
 		try {
 			mockInput = this.objectMapper.readTree(json);
-		} catch (JsonProcessingException e) {
+		}
+		catch (JsonProcessingException e) {
 			updateErrorParagraph(this.mockDefinitionJsonInputError, "Cannot parse JSON!", true);
 			return null;
 		}
 		List<MockingModel> mocks = null;
 		try {
 			mocks = MockingModel.parseMockingJsonInputToModel(mockInput);
-		} catch (MockDefinitionParsingException e) {
+		}
+		catch (MockDefinitionParsingException e) {
 			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage(), true);
 		}
 
@@ -566,7 +589,8 @@ public class ContentView extends Div {
 					attributeCtx.markAttributeMock(mock.getImportName());
 					this.attrReturnValues
 							.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
-				} else {
+				}
+				else {
 					attributeCtx.markAttributeMock(mock.getImportName());
 					this.attrReturnValues.add(
 							AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<>(mock.getSequence())));
@@ -575,7 +599,8 @@ public class ContentView extends Div {
 			case FUNCTION:
 				if (mock.getAlways() != null) {
 					functionCtx.loadFunctionMockAlwaysSameValue(mock.getImportName(), mock.getAlways());
-				} else {
+				}
+				else {
 					functionCtx.loadFunctionMockReturnsSequence(mock.getImportName(),
 							mock.getSequence().toArray(new Val[0]));
 				}
@@ -595,7 +620,8 @@ public class ContentView extends Div {
 		}
 		try {
 			jsonInput = objectMapper.readTree(jsonInputString);
-		} catch (JsonProcessingException e) {
+		}
+		catch (JsonProcessingException e) {
 			updateErrorParagraph(this.authzSubJsonInputError, "Input JSON is not valid", true);
 			return null;
 		}
@@ -636,7 +662,8 @@ public class ContentView extends Div {
 			if (countValues.containsKey(mock.getFullName())) {
 				countValues.put(mock.getFullName(),
 						countValues.get(mock.getFullName() + mock.getMockReturnValues().size()));
-			} else {
+			}
+			else {
 				countValues.put(mock.getFullName(), mock.getMockReturnValues().size());
 			}
 		}
@@ -664,4 +691,5 @@ public class ContentView extends Div {
 
 		}));
 	}
+
 }

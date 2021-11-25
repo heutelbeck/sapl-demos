@@ -64,7 +64,7 @@ public class AuthorizationServerConfig {
 	private String kid;
 
 	private final KeyRepository keyRepo;
-	
+
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {

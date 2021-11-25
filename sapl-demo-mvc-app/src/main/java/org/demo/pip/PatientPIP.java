@@ -37,13 +37,13 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
 /**
- * This class realizes a custom Policy Information Point (PIP) which can
- * retrieve attributes of patients from the Patient and Relation repositories.
- * 
+ * This class realizes a custom Policy Information Point (PIP) which can retrieve
+ * attributes of patients from the Patient and Relation repositories.
+ *
  * This PIP is registered under the name 'patient'.
- * 
- * As it is registered as a Spring @Service, the embedded Spring SAPL PDP will
- * pick it up automatically during the auto-configuration process.
+ *
+ * As it is registered as a Spring @Service, the embedded Spring SAPL PDP will pick it up
+ * automatically during the auto-configuration process.
  */
 @Service
 @RequiredArgsConstructor
@@ -58,23 +58,21 @@ public class PatientPIP {
 
 	/**
 	 * This attribute is accessed in a SAPL policy through an expression like this:
-	 * 
+	 *
 	 * resource.patientId.<patient.relatives>
-	 * 
-	 * The value on the left-hand side of the <> expression is fed into the function
-	 * as the first parameter as a Val. The attribute is identified within the <>
-	 * and consists of the name of the PIP and the name of the attribute:
-	 * 'patient.relatives' Import statements in a policy can be used to provide a
-	 * shorthand in the policy.
-	 * 
+	 *
+	 * The value on the left-hand side of the <> expression is fed into the function as
+	 * the first parameter as a Val. The attribute is identified within the <> and
+	 * consists of the name of the PIP and the name of the attribute: 'patient.relatives'
+	 * Import statements in a policy can be used to provide a shorthand in the policy.
+	 *
 	 * This implementation does not track changes in the repository, i.e. this is a
 	 * non-streaming PIP.
-	 * 
-	 * @param value     the id of the patient. This parameter must be a number, as
-	 *                  defined by the @Number annotation.
+	 * @param value the id of the patient. This parameter must be a number, as defined by
+	 * the @Number annotation.
 	 * @param variables the variables in the current evaluation context
 	 * @return the relatives of the patient as registered in the relationRepo.
-	 * 
+	 *
 	 */
 	@Attribute(name = "relatives")
 	public Flux<Val> getRelations(@Number Val value, Map<String, JsonNode> variables) {
@@ -86,23 +84,22 @@ public class PatientPIP {
 
 	/**
 	 * This attribute is accessed in a SAPL policy through an expression like this:
-	 * 
+	 *
 	 * resource.patientId.<patient.patientRecord>
-	 * 
-	 * The value on the left-hand side of the <> expression is fed into the function
-	 * as the first parameter as a Val. The attribute is identified within the <>
-	 * and consists of the name of the PIP and the name of the attribute:
-	 * 'patient.patientRecord' Import statements in a policy can be used to provide
-	 * a shorthand in the policy.
-	 * 
+	 *
+	 * The value on the left-hand side of the <> expression is fed into the function as
+	 * the first parameter as a Val. The attribute is identified within the <> and
+	 * consists of the name of the PIP and the name of the attribute:
+	 * 'patient.patientRecord' Import statements in a policy can be used to provide a
+	 * shorthand in the policy.
+	 *
 	 * This implementation does not track changes in the repository, i.e. this is a
 	 * non-streaming PIP.
-	 * 
-	 * @param patientId the id of the patient. This parameter must be a number, as
-	 *                  defined by the @Number annotation.
+	 * @param patientId the id of the patient. This parameter must be a number, as defined
+	 * by the @Number annotation.
 	 * @param variables the variables in the current evaluation context
 	 * @return the patient record or null. This is a Flux containing only one value.
-	 * 
+	 *
 	 */
 	@Attribute(name = "patientRecord")
 	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, JsonNode> variables) {
@@ -111,7 +108,8 @@ public class PatientPIP {
 					.orElseThrow(PolicyEvaluationException::new);
 			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
 			return Flux.just(Val.of(jsonNode));
-		} catch (IllegalArgumentException | PolicyEvaluationException e) {
+		}
+		catch (IllegalArgumentException | PolicyEvaluationException e) {
 			return Flux.just(Val.NULL);
 		}
 	}

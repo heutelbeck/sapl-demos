@@ -68,4 +68,5 @@ public class XtextServletConfiguration {
 		context.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
 		return context;
 	}
+
 }
