@@ -1,12 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright © 2018 Dominic Heutelbeck (dheutelbeck@ftk.de) Licensed under 
-	the Apache License, Version 2.0 (the "License"); you may not use this file 
-	except in compliance with the License. You may obtain a copy of the License 
-	at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable 
-	law or agreed to in writing, software distributed under the License is distributed 
-	on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-	express or implied. See the License for the specific language governing permissions 
-	and limitations under the License. -->
+<!--
+
+    Copyright © 2017-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!-- 
+	Utility goals supported by the POM:
+	
+	* Update the version of all modules:
+	  mvn versions:set -DnewVersion=2.0.0-RC1 -DprocessAllModules -DgenerateBackupPoms=false
+	  
+	* Correct the license headers of all source files:
+	  mvn license:format
+	  
+	* Format the code according to Spring code formatting conventions:
+	  mvn spring-javaformat:apply 
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -50,5 +71,55 @@
 		<module>sapl-demo-jwt/sapl-demo-oauth2-jwt-authorization-server</module>
 		<module>sapl-demo-jwt/sapl-demo-oauth2-jwt-client-application</module>
 	</modules>
+
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>io.spring.javaformat</groupId>
+					<artifactId>spring-javaformat-maven-plugin</artifactId>
+					<version>0.0.28</version>
+				</plugin>
+				<plugin>
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+					<version>3.0</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<configuration>
+					<header>APACHE-2.txt</header>
+					<properties>
+						<owner>Dominic Heutelbeck</owner>
+						<email>dominic@heutelbeck.com</email>
+					</properties>
+					<excludes>
+						<exclude>**/README</exclude>
+						<exclude>node_modules/**</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+						<exclude>.gitattributes</exclude>
+					</excludes>
+					<mapping>
+						<md>XML_STYLE</md>
+						<java>SLASHSTAR_STYLE</java>
+						<adoc>DOUBLESLASH_STYLE</adoc>
+						<ad>DOUBLESLASH_STYLE</ad>
+						<genmodel>XML_STYLE</genmodel>
+						<config>SCRIPT_STYLE</config>
+					</mapping>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
