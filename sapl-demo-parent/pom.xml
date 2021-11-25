@@ -157,8 +157,35 @@
 			<plugin>
 				<groupId>io.spring.javaformat</groupId>
 				<artifactId>spring-javaformat-maven-plugin</artifactId>
-				<version>0.0.15</version>
+				<version>0.0.29</version>
 			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>4.1</version>
+				<configuration>
+					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+					<properties>
+						<owner>Dominic Heutelbeck</owner>
+						<email>dominic@heutelbeck.com</email>
+					</properties>
+					<excludes>
+						<exclude>**/README</exclude>
+						<exclude>node_modules/**</exclude>
+						<exclude>src/test/resources/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+						<exclude>.gitattributes</exclude>
+					</excludes>
+					<mapping>
+						<md>XML_STYLE</md>
+						<java>SLASHSTAR_STYLE</java>
+						<adoc>DOUBLESLASH_STYLE</adoc>
+						<ad>DOUBLESLASH_STYLE</ad>
+						<genmodel>XML_STYLE</genmodel>
+						<config>SCRIPT_STYLE</config>
+					</mapping>
+				</configuration>
+			</plugin>			
 		</plugins>
 		<pluginManagement>
 			<plugins>
