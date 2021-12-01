@@ -2,7 +2,7 @@
 
 This demo shows how to write custom Policy Information Points (PIPs) and function libraries.
 
-Once you build this project, there will be a `sapl-demo-extension-0.0.1-SNAPSHOT-jar-with-dependencies.jar` available in the target folder.
+Once you build this project, there will be a `sapl-demo-extension-2.0.0-jar-with-dependencies.jar` available in the target folder.
 
 This JAR can be deployed with a sapl-server-lt or sapl-server-ce. 
 
@@ -11,26 +11,26 @@ If you are running the servers in a docker/kubernetes environment, please refer 
 * [Sapl Server LT](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt)
 * [Sapl Server CE](https://github.com/heutelbeck/sapl-server/tree/main/sapl-server-ce)
 
-If you want to test this with a locally running server, the process differs a little. Locally you cannot start the server using `mvn spring-boot:run` or the equivalent tools of your IDE. This is due to how Spring sets up class loading in this case. You must invoke the server by running the JAR directly and providing  the path where the `sapl-demo-extension-0.0.1-SNAPSHOT-jar-with-dependencies.jar` is located.
+If you want to test this with a locally running server, the process differs a little. Locally you cannot start the server using `mvn spring-boot:run` or the equivalent tools of your IDE. This is due to how Spring sets up class loading in this case. You must invoke the server by running the JAR directly and providing  the path where the `sapl-demo-extension-2.0.0-jar-with-dependencies.jar` is located.
 
 The way you have to enter the command to run the server depends on both the OS and the shell you are using. The basic command is the same everywhere. However, the way you have to escape certain strings in the command differs from shell to shell.
 
 For example, for running the servers (here we use the LT server, the command for CE is analogous) on Windows using the traditional Windows command prompt is:
 
 ```
-   java  -Dloader.path="c:\PATH TO JAR WITH DEPENDECIES FOLDER" -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+   java  -Dloader.path="c:\PATH TO JAR WITH DEPENDECIES FOLDER" -jar .\sapl-server-lt-2.0.0.jar
 ```
 
 Under PowerShell the strings are escaped differently:
 
 ```
-   java  -D'loader.path'='c:\PATH TO JAR WITH DEPENDECIES FOLDER' -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+   java  -D'loader.path'='c:\PATH TO JAR WITH DEPENDECIES FOLDER' -jar .\sapl-server-lt-2.0.0.jar
 ```
 
 Under Linux and Bash the command can be:
 
 ```
-   java  -Dloader.path=file:/PATH_TO_JAR_WITH_DEPENDECIES_FOLDER -jar .\sapl-server-lt-2.0.0-SNAPSHOT.jar
+   java  -Dloader.path=file:/PATH_TO_JAR_WITH_DEPENDECIES_FOLDER -jar .\sapl-server-lt-2.0.0.jar
 ```
 
 Please take a look at the POM file of this project. There all dependencies and build steps are explained in detail. 
