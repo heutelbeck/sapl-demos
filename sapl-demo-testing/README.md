@@ -52,7 +52,7 @@ maven verify
 
 ## Reviewing the results
 
-    [INFO] --- sapl-maven-plugin:2.0.0:report-coverage-information (coverage) @ sapl-demo-testing ---
+    [INFO] --- sapl-maven-plugin:2.1.0-SNAPSHOT:report-coverage-information (coverage) @ sapl-demo-testing ---
     [INFO]
     [INFO]
     [INFO] Measured SAPL coverage information:

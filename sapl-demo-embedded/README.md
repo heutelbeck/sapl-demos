@@ -21,7 +21,7 @@ After the build completes, the `target` folder contains the executable JAR.
 Change into this folder and execute the following command to run the demo:
 
 ```
-java -jar sapl-demo-embedded-2.0.0-jar-with-dependencies.jar
+java -jar sapl-demo-embedded-2.1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 The demo accepts the following command line parameters:
@@ -42,7 +42,7 @@ together with some explanations of what is happening:
 
 ```
 [INFO] Loading the PDP configuration from bundled resources: '/policies'
-[INFO] reading config from jar jar:file:/C:/devkit/git/sapl-demos/sapl-demo-embedded/target/sapl-demo-embedded-2.0.0-jar-with-dependencies.jar!/policies
+[INFO] reading config from jar jar:file:/C:/devkit/git/sapl-demos/sapl-demo-embedded/target/sapl-demo-embedded-2.1.0-SNAPSHOT-jar-with-dependencies.jar!/policies
 [INFO] Loading a static set of policies from the bundled ressources
 [INFO] load SAPL document: policies/policy_1.sapl
 [INFO] load SAPL document: policies/policy_2.sapl

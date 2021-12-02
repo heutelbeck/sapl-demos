@@ -27,5 +27,5 @@ mvn spring-boot:run
 To run the server locally for testing in an environment like Docker Desktop, you can run the current image as follows:
 
 ```shell
-docker run -d --name sapl-demo-playground -p 8080:8080 ghcr.io/heutelbeck/sapl-demo-playground:2.0.0
+docker run -d --name sapl-demo-playground -p 8080:8080 ghcr.io/heutelbeck/sapl-demo-playground:2.1.0-SNAPSHOT
 ```
