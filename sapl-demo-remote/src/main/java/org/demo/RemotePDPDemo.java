@@ -22,9 +22,13 @@ import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -35,31 +39,33 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
 
-	@Option(names = { "-h", "-host" },
-			description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-	private final String host = "https://localhost:8443";
+	@Option(names = { "-h",
+			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
+	private String host = "http://localhost:8080";
 
 	// The default option set here are the default credentials of the pdp-server-lt
 
-	@Option(names = { "-k", "-key" },
-			description = "Client key for the demo application, to be obtained from the PDP administrator.")
-	private final String clientKey = "YJidgyT2mfdkbmL";
+	@Option(names = { "-k",
+			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
+	private String clientKey = "YJidgyT2mfdkbmL";
 
-	@Option(names = { "-s", "-secret" },
-			description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-	private final String clientSecret = "Fa4zvYQdiwHZVXh";
+	@Option(names = { "-s",
+			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
+	private String clientSecret = "Fa4zvYQdiwHZVXh";
 
-	public static void main(String... args) {
+	public static void main(String... args)
+	{
 		System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
 	}
 
-	public Integer call() throws SSLException {
+	public Integer call() throws SSLException, JsonProcessingException
+	{
 		LOG.warn("INSECURE SSL SETTINGS! This demo uses an insecure SslContext for "
 				+ "testing purposes only. It will accept all certificates. "
 				+ "This is only for testing local servers with self-signed certificates easily. "
 				+ "NEVER USE SUCH A CONFIGURATION IN PRODUCTION!");
 		var sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-		var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret, sslContext);
+		var pdp        = new RemotePolicyDecisionPoint(host, clientKey, clientSecret, sslContext);
 
 		/*
 		 * To have the client use the default SSL verification use this constructor
@@ -70,14 +76,26 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 		var authzSubscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
 		LOG.info("Subscription: {}", authzSubscription);
+
+		var multiSubscription = new MultiAuthorizationSubscription()
+				.addAuthorizationSubscription("id-1", AuthorizationSubscription.of("bs@simpsons.com", "read",
+						"file://example/med/record/patient/BartSimpson"))
+				.addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
+						"file://example/med/record/patient/Maggieimpson"));
+		LOG.info("Multi: {}", multiSubscription.toString());
+		var mapper = new ObjectMapper();
+		var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
+		LOG.info("JSON: {}", json);
+		
+		
 		/*
 		 * This just consumes the first decision in a blocking fashion to quickly
-		 * terminate the demo application. If not using blockFirst() or take(1), the Flux
-		 * will continue to listen to the PDP server and receive updated authorization
-		 * decisions when applicable. For alternative patterns of invocation, consult the
-		 * sapl-demo-pdp-embedded
+		 * terminate the demo application. If not using blockFirst() or take(1), the
+		 * Flux will continue to listen to the PDP server and receive updated
+		 * authorization decisions when applicable. For alternative patterns of
+		 * invocation, consult the sapl-demo-pdp-embedded
 		 */
-		pdp.decide(authzSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockLast();
+		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockLast();
 		return 0;
 	}
 
