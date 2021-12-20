@@ -40,6 +40,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
+    - name: Set up Web3j in case servers for releases should be unreachable
+      run: |
+        mkdir ~/.web3j
+        mkdir ~/.web3j/solc
+        cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
+
     - name: Run tests
       run: mvn -B test
 
@@ -80,6 +86,12 @@ jobs:
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
+
+    - name: Set up Web3j in case servers for releases should be unreachable
+      run: |
+        mkdir ~/.web3j
+        mkdir ~/.web3j/solc
+        cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
 
     - name: Run analysis (JaCoCo, Sonar)
       env:
