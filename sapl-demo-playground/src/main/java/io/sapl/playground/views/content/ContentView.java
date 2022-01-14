@@ -56,11 +56,12 @@ import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
-import io.sapl.interpreter.EvaluationContext;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.SAPLInterpreter;
+import io.sapl.interpreter.context.AuthorizationContext;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
+import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pip.TimePolicyInformationPoint;
 import io.sapl.playground.examples.BasicExample;
 import io.sapl.playground.examples.Example;
@@ -81,6 +82,7 @@ import io.sapl.vaadin.ValidationFinishedEvent;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
+import reactor.util.context.Context;
 
 @Route(value = "", layout = MainView.class)
 @PageTitle("SAPL Playground")
@@ -146,8 +148,8 @@ public class ContentView extends Div {
 
 		exampleSelectedViewBus.setContentView(this);
 
-		this.saplInterpreter = new DefaultSAPLInterpreter();
-		this.objectMapper = new ObjectMapper();
+		this.saplInterpreter    = new DefaultSAPLInterpreter();
+		this.objectMapper       = new ObjectMapper();
 		this.defaultAttrContext = new AnnotationAttributeContext();
 		this.defaultAttrContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
 		this.defaultFunctionContext = new AnnotationFunctionContext();
@@ -223,7 +225,9 @@ public class ContentView extends Div {
 		return div;
 	}
 
-	private void createRightUpperSideTabVisibleLogic(Div page1JsonEditorDiv, Div page2MockInput,
+	private void createRightUpperSideTabVisibleLogic(
+			Div page1JsonEditorDiv,
+			Div page2MockInput,
 			Div page3MockHelpText) {
 		this.tabsToPages = new HashMap<>();
 		tabsToPages.put(this.tab1AuthzSubInput, page1JsonEditorDiv);
@@ -233,7 +237,7 @@ public class ContentView extends Div {
 
 		this.tabs.addSelectedChangeListener(event -> {
 			this.tabsToPages.values().forEach(page -> page.setVisible(false));
-			Component selectedTab = this.tabs.getSelectedTab();
+			Component selectedTab  = this.tabs.getSelectedTab();
 			Component selectedPage = this.tabsToPages.get(selectedTab);
 			if (selectedTab.equals(tab2MockInput)) {
 				mockDefinitionEditor.refresh();
@@ -254,8 +258,8 @@ public class ContentView extends Div {
 				"Expecting an array of JSON objects, each object consisting of the following properties:"));
 
 		UnorderedList properties = new UnorderedList();
-		ListItem item1 = new ListItem();
-		Span item11 = new Span("\"" + MockingModel.KeyValue_Type + "\"");
+		ListItem      item1      = new ListItem();
+		Span          item11     = new Span("\"" + MockingModel.KeyValue_Type + "\"");
 		item11.setClassName(propertyNameClassName);
 		item1.add(item11);
 		Span item12 = new Span(" - (Required): Allowed values are \"ATTRIBUTE\" or \"FUNCTION\"");
@@ -263,8 +267,8 @@ public class ContentView extends Div {
 		item1.add(item12);
 		properties.add(item1);
 
-		ListItem item2 = new ListItem();
-		Span item21 = new Span("\"" + MockingModel.KeyValue_ImportName + "\"");
+		ListItem item2  = new ListItem();
+		Span     item21 = new Span("\"" + MockingModel.KeyValue_ImportName + "\"");
 		item21.setClassName(propertyNameClassName);
 		item2.add(item21);
 		Span item22 = new Span(
@@ -273,8 +277,8 @@ public class ContentView extends Div {
 		item2.add(item22);
 		properties.add(item2);
 
-		ListItem item3 = new ListItem();
-		Span item31 = new Span("\"" + MockingModel.KeyValue_AlwaysReturnValue + "\"");
+		ListItem item3  = new ListItem();
+		Span     item31 = new Span("\"" + MockingModel.KeyValue_AlwaysReturnValue + "\"");
 		item31.setClassName(propertyNameClassName);
 		item3.add(item31);
 		Span item32 = new Span(
@@ -283,8 +287,8 @@ public class ContentView extends Div {
 		item3.add(item32);
 		properties.add(item3);
 
-		ListItem item4 = new ListItem();
-		Span item41 = new Span("\"" + MockingModel.KeyValue_ReturnSequenceValues + "\"");
+		ListItem item4  = new ListItem();
+		Span     item41 = new Span("\"" + MockingModel.KeyValue_ReturnSequenceValues + "\"");
 		item41.setClassName(propertyNameClassName);
 		item4.add(item41);
 		Span item42 = new Span(" - (Optional): An array of JSON values to be returned by the attribute or function.");
@@ -365,17 +369,17 @@ public class ContentView extends Div {
 
 		updateComponentsWithNewExample(example, ignoreNextChangedEvents);
 
-		this.currentAuthzSub = getAuthzSubForJsonString(example.getAuthzSub());
-		this.currentPolicy = getSAPLDocument(example.getPolicy());
+		this.currentAuthzSub     = getAuthzSubForJsonString(example.getAuthzSub());
+		this.currentPolicy       = getSAPLDocument(example.getPolicy());
 		this.currentMockingModel = parseMockingModels(example.getMockDefinition());
 
 		evaluatePolicy();
 	}
 
 	/**
-	 * updating the editor components triggers the document changed event and therefore
-	 * multiple evaluations of the policy to prevent these multiple concurrent
-	 * evaluations, ignore the documentChanged events
+	 * updating the editor components triggers the document changed event and
+	 * therefore multiple evaluations of the policy to prevent these multiple
+	 * concurrent evaluations, ignore the documentChanged events
 	 */
 	private void updateComponentsWithNewExample(Example example, boolean ignoreNextChangedEvents) {
 		this.getUI().ifPresent(ui -> ui.access(() -> {
@@ -453,8 +457,12 @@ public class ContentView extends Div {
 		evaluatePolicy();
 	}
 
-	private boolean isPolicyMatchingAuthzSub(EvaluationContext ctxForAuthzSub) {
-		var matchesResult = this.currentPolicy.matches(ctxForAuthzSub).block();
+	private boolean isPolicyMatchingAuthzSub() {
+		var attributeCtx  = new MockingAttributeContext(this.defaultAttrContext);
+		var matchesResult = this.currentPolicy.matches()
+				.contextWrite(ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel,
+						this.currentAuthzSub))
+				.block();
 
 		if (!matchesResult.isBoolean()) {
 			updateErrorParagraph(this.evaluationError, matchesResult.toString(), true);
@@ -472,20 +480,20 @@ public class ContentView extends Div {
 		this.evaluationError.setVisible(false);
 		ArrayNode aggregatedResult = this.objectMapper.createArrayNode();
 
-		var ctxForAuthzSub = getEvalContextForMockJson(this.currentMockingModel)
-				.forAuthorizationSubscription(this.currentAuthzSub);
-
-		if (!isPolicyMatchingAuthzSub(ctxForAuthzSub)) {
+		if (!isPolicyMatchingAuthzSub()) {
 
 			StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
 					.consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
 
-		}
-		else {
+		} else {
 
-			Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate(ctxForAuthzSub));
+			var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
 
-			steps = emitTestPublishersInStepVerifier(ctxForAuthzSub, steps);
+			Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate().contextWrite(
+					ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel,
+							this.currentAuthzSub)));
+
+			steps = emitTestPublishersInStepVerifier(attributeCtx, steps);
 
 			steps = consumeDecisionsFromStepVerifier(aggregatedResult, steps);
 
@@ -501,8 +509,7 @@ public class ContentView extends Div {
 		try {
 			this.jsonOutput
 					.setDocument(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(aggregatedResult));
-		}
-		catch (JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			log.error("Error deserializing AuthorizationDecisions: " + e);
 			updateErrorParagraph(this.evaluationError, "Error printing Evaluation Result!", false);
 		}
@@ -512,15 +519,15 @@ public class ContentView extends Div {
 		try {
 			steps.thenCancel().verify(Duration.ofSeconds(10));
 			log.debug("Evaluation finished");
-		}
-		catch (AssertionError err) {
+		} catch (AssertionError err) {
 			log.debug("Evaluation error", err);
 			// do nothing because number of generated AuthorizationDecision's were not
 			// equals number of maximal generated AuthzDec
 		}
 	}
 
-	private Step<AuthorizationDecision> consumeDecisionsFromStepVerifier(ArrayNode aggregatedResult,
+	private Step<AuthorizationDecision> consumeDecisionsFromStepVerifier(
+			ArrayNode aggregatedResult,
 			Step<AuthorizationDecision> steps) {
 		for (int i = 0; i < countNumberOfMaximalExpectedDecisions(); i++) {
 			steps = steps.consumeNextWith(consumeAuthDecision(aggregatedResult));
@@ -528,13 +535,14 @@ public class ContentView extends Div {
 		return steps;
 	}
 
-	private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(EvaluationContext ctxForAuthzSub,
+	private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(
+			AttributeContext attributeCtx,
 			Step<AuthorizationDecision> steps) {
 		for (AttributeMockReturnValues mock : this.attrReturnValues) {
 			String fullName = mock.getFullName();
 			for (Val val : mock.getMockReturnValues()) {
 				steps = steps.then(
-						() -> ((MockingAttributeContext) ctxForAuthzSub.getAttributeCtx()).mockEmit(fullName, val));
+						() -> ((MockingAttributeContext) attributeCtx).mockEmit(fullName, val));
 			}
 		}
 		return steps;
@@ -550,8 +558,7 @@ public class ContentView extends Div {
 		if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
 			updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
 			return null;
-		}
-		else {
+		} else {
 			return this.saplInterpreter.parse(saplString);
 		}
 	}
@@ -560,57 +567,60 @@ public class ContentView extends Div {
 		JsonNode mockInput;
 		try {
 			mockInput = this.objectMapper.readTree(json);
-		}
-		catch (JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			updateErrorParagraph(this.mockDefinitionJsonInputError, "Cannot parse JSON!", true);
 			return null;
 		}
 		List<MockingModel> mocks = null;
 		try {
 			mocks = MockingModel.parseMockingJsonInputToModel(mockInput);
-		}
-		catch (MockDefinitionParsingException e) {
+		} catch (MockDefinitionParsingException e) {
 			updateErrorParagraph(this.mockDefinitionJsonInputError, e.getMessage(), true);
 		}
 
 		return mocks;
 	}
 
-	private EvaluationContext getEvalContextForMockJson(List<MockingModel> mocks) {
-		var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
+	private Context getEvalContextForMockJson(
+			Context ctx,
+			MockingAttributeContext attributeCtx,
+			List<MockingModel> mocks,
+			AuthorizationSubscription authzSubscription) {
 		var functionCtx = new MockingFunctionContext(this.defaultFunctionContext);
-		var variables = new HashMap<String, JsonNode>(1);
+		var variables   = new HashMap<String, JsonNode>(1);
 		this.attrReturnValues = new LinkedList<>();
 
 		for (var mock : mocks) {
 			switch (mock.getType()) {
-			case ATTRIBUTE:
-				if (mock.getAlways() != null) {
-					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues
-							.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
-				}
-				else {
-					attributeCtx.markAttributeMock(mock.getImportName());
-					this.attrReturnValues.add(
-							AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<>(mock.getSequence())));
-				}
-				break;
-			case FUNCTION:
-				if (mock.getAlways() != null) {
-					functionCtx.loadFunctionMockAlwaysSameValue(mock.getImportName(), mock.getAlways());
-				}
-				else {
-					functionCtx.loadFunctionMockReturnsSequence(mock.getImportName(),
-							mock.getSequence().toArray(new Val[0]));
-				}
-				break;
-			default:
-				break;
+				case ATTRIBUTE:
+					if (mock.getAlways() != null) {
+						attributeCtx.markAttributeMock(mock.getImportName());
+						this.attrReturnValues
+								.add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
+					} else {
+						attributeCtx.markAttributeMock(mock.getImportName());
+						this.attrReturnValues.add(
+								AttributeMockReturnValues.of(mock.getImportName(),
+										new LinkedList<>(mock.getSequence())));
+					}
+					break;
+				case FUNCTION:
+					if (mock.getAlways() != null) {
+						functionCtx.loadFunctionMockAlwaysSameValue(mock.getImportName(), mock.getAlways());
+					} else {
+						functionCtx.loadFunctionMockReturnsSequence(mock.getImportName(),
+								mock.getSequence().toArray(new Val[0]));
+					}
+					break;
+				default:
+					break;
 			}
 		}
-
-		return new EvaluationContext(attributeCtx, functionCtx, variables);
+		ctx = AuthorizationContext.setAttributeContext(ctx, attributeCtx);
+		ctx = AuthorizationContext.setFunctionContext(ctx, functionCtx);
+		ctx = AuthorizationContext.setVariables(ctx, variables);
+		ctx = AuthorizationContext.setSubscriptionVariables(ctx, authzSubscription);
+		return ctx;
 	}
 
 	private AuthorizationSubscription getAuthzSubForJsonString(String jsonInputString) {
@@ -620,8 +630,7 @@ public class ContentView extends Div {
 		}
 		try {
 			jsonInput = objectMapper.readTree(jsonInputString);
-		}
-		catch (JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			updateErrorParagraph(this.authzSubJsonInputError, "Input JSON is not valid", true);
 			return null;
 		}
@@ -662,8 +671,7 @@ public class ContentView extends Div {
 			if (countValues.containsKey(mock.getFullName())) {
 				countValues.put(mock.getFullName(),
 						countValues.get(mock.getFullName() + mock.getMockReturnValues().size()));
-			}
-			else {
+			} else {
 				countValues.put(mock.getFullName(), mock.getMockReturnValues().size());
 			}
 		}
