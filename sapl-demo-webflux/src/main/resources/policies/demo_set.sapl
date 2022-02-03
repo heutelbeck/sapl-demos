@@ -40,7 +40,7 @@ obligation
 		"type" 		: "logAccess",
 		"message"	: "DENY ! Time < 60"
 	}
-
+/*
 policy "Permit All"
 permit 
 obligation
@@ -55,4 +55,4 @@ advice
 		"type" 		: "logAccess",
 		"message"	: ("User " + subject.name + " has accessed: " + action.http.requestedURI)
 	}
-	
+	*/

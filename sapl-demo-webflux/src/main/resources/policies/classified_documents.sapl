@@ -1,0 +1,30 @@
+set "classified documents"
+first-applicable
+
+policy "Clearance (1/3)"
+permit action.http.contextPath == "/documents"
+where
+  time.secondOf(<time.now>) < 20; 
+obligation
+	{
+		"type" 		: "filterClassifiedDocuments",
+		"clearance" : "NATO_RESTRICTED"
+	}
+
+policy "Clearance (2/3)"
+permit action.http.contextPath == "/documents"
+where
+  time.secondOf(<time.now>) < 40; 
+obligation
+	{
+		"type" 		: "filterClassifiedDocuments",
+		"clearance" : "COSMIC_TOP_SECRET"
+	}
+
+policy "Clearance (3/3)"
+permit action.http.contextPath == "/documents"
+obligation
+	{
+		"type" 		: "filterClassifiedDocuments",
+		"clearance" : "NATO_UNCLASSIFIED"
+	}
