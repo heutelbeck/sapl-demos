@@ -1,0 +1,53 @@
+/* This set of policies shows the interaction with lifecyclehandling.
+There are three policies. The first is used by the builder-pattern.
+The second is responsible for the annotation-page.
+The last policy permits every other page for users and admins.
+*/
+set "lifecycle_event_constraint_policy"
+first-applicable
+
+// This policy routes via builderpattern. See Admin-Page for implementation
+policy "lifecycle_adminpage_for_admin_via_builder"
+deny
+where
+    action == "enter";
+    !("ROLE_Admin" in subject.roles);
+    resource.target == "io.sapl.vaadindemo.views.AdminPage";
+advice {
+    "type": "saplVaadin",
+    "id":   "showNotification",
+    "message": "Sorry, you are not allowed to access this page!"
+}
+
+
+// This policy routes via annotation. See Annotation-Page for implementation
+policy "lifecycle_reroute_users_via_annotation"
+deny
+where
+    action == "navigate_to";
+    !("ROLE_Admin" in subject.roles);
+    resource.name ==  "io.sapl.vaadindemo.views.AnnotationPage";
+advice {
+    "type": "saplVaadin",
+    "id":   "showNotification",
+    "message": "Sorry, you are not allowed to access this page!"
+}
+
+// This policy permits access to the AdminPage and opens a notification.
+policy "admin_notification"
+permit
+where
+    "ROLE_Admin" in subject.roles;
+    resource.target == "io.sapl.vaadindemo.views.AdminPage";
+    action == "enter";
+advice {
+    "type": "saplVaadin",
+    "id":   "showNotification",
+    "message": "Admin Page: You only see this page as an administrator."
+}
+
+// This policy permits every other request except the first two.
+policy "other"
+permit
+where
+    action == "navigate_to";

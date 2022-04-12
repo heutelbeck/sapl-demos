@@ -1,0 +1,114 @@
+import filter.replace
+set "next_validate_transactions"
+deny-overrides
+
+/* Limits the number of pizzas via JSON-Schema.
+ * See: https://json-schema.org/
+ */
+policy "deny_huge_transactions"
+permit action == "display"
+where
+    action == "display";
+    resource == "pizzaForm";
+obligation
+    {
+        "type" 		: "saplVaadin",
+        "id"        : "validation",
+        "fields": {
+            "cheese": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "number",
+                "maximum": 20,
+                "message": "cheese limit of 20"
+            },
+            "veggie": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "number",
+                "maximum": 30,
+                "message": "veggie limit of 30"
+            },"pepperoni": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "number",
+                "maximum": 10,
+                "message": "pepperoni limit of 10"
+            },"time": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "string",
+                "format": "time",
+                "formatMinimum": "08:00:00",
+                "message": "time format is invalid"
+            }
+        }
+    }
+
+/* Beer consumption is only allowed at a certain time. (number type validation AND maximum validation)*/
+policy "allow_beer_consumption"
+permit action == "display"
+where
+    action == "display";
+    resource == "pizzaForm";
+    time.secondOf(<time.now>) <= 30;
+obligation
+    {
+        "type" 		: "saplVaadin",
+        "id"        : "validation",
+        "fields": {
+            "beer": {
+                "type": "number",
+                "maximum": 0,
+                "message": "no beer at this time"
+            }
+        }
+    }
+
+/* Beer consumption is only allowed at a certain time. (only number type validation, no maximum validation)*/
+policy "deny_beer_consumption"
+permit action == "display"
+where
+    action == "display";
+    resource == "pizzaForm";
+    time.secondOf(<time.now>) > 30;
+obligation
+    {
+        "type" 		: "saplVaadin",
+        "id"        : "validation",
+        "fields": {
+            "beer": {
+                "type": "number"
+            }
+        }
+    }
+
+/* The customer must order at least XXX pizzas.
+ * The number of pizzas depends on the time.
+ */
+policy "minimum_order"
+permit action == "display"
+where
+    action == "display";
+    resource == "pizzaForm";
+obligation
+    {
+        "type" 		: "saplVaadin",
+        "id"        : "minPizza",
+        "min": time.secondOf(<time.now>)%10
+    }
+
+/* Shows a dialog and logs a message when the site is visited outside of opening hours. */
+policy "opening_hours_dialog"
+permit action == "opening_hours_dialog"
+where
+    !(<time.localTimeIsBetween(resource.startTime, resource.endTime)>);
+obligation
+	{
+	    "id"        : "requestConfirmation",
+		"type" 		: "saplVaadin",
+		"header"    : "We're closed",
+		"text"	    : "Visit this page during our opening hours. (between " + resource.startTime + "-" + resource.endTime + ")",
+		"confirmText": "Okay"
+	}
+advice
+	{
+		"type" 		: "log",
+		"message"	: "Pizza form was visited outside opening hours."
+	}

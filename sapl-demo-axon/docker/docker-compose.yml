@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  axonserver:
+    image: axoniq/axonserver
+    environment:
+      - AXONSERVER_HOSTNAME=axonserver
+      - AXONSERVER_NAME=axonserver
+    ports:
+      - "8024:8024"
+
+  demo-app-backend:
+    image: sapl-demo-axon:2.1.0-SNAPSHOT
+    environment:
+      - SPRING_PROFILES_ACTIVE=backend-async-axonserver
+    depends_on:
+      - axonserver
+    ports:
+      - "8081:8081"
+
+  demo-app-client:
+    image: sapl-demo-axon:2.1.0-SNAPSHOT
+    environment:
+      - SPRING_PROFILES_ACTIVE=client-axonserver
+    depends_on:
+      - axonserver
+    ports:
+      - "8080:8080"

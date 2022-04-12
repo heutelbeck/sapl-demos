@@ -1,0 +1,21 @@
+.descriptionPadding {
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.formValidationNote {
+    background-color: #ffffcc;
+}
+
+span {
+	margin-top: 0px;
+    white-space:pre;
+}
+
+.infoIconMarginLeft {
+    margin-left: 20px;
+}
+
+.infoIconMarginTop {
+    margin-top: 10px;
+}
