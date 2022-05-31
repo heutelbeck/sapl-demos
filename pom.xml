@@ -73,6 +73,7 @@
 		<module>sapl-demo-multi-tenant</module>
 		<module>sapl-demo-axon</module>
 		<module>sapl-demo-vaadin</module>
+		<module>sapl-demo-argumentchange</module>
 	</modules>
 
 </project>
