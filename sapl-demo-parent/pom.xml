@@ -24,11 +24,11 @@
 		<java.version>11</java.version>
 		<sapl.version>2.1.0-SNAPSHOT</sapl.version>
 		<junit.version>4.13.2</junit.version>
-		<springboot.version>2.6.6</springboot.version>
+		<springboot.version>2.6.8</springboot.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
-		<version.lombok>1.18.22</version.lombok>
+		<version.lombok>1.18.24</version.lombok>
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker-registry-url>ghcr.io/heutelbeck</docker-registry-url>
 	</properties>
