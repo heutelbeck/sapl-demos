@@ -12,6 +12,7 @@ import org.axonframework.eventhandling.AllowReplay;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedEvent;
@@ -34,6 +35,7 @@ import io.sapl.spring.method.metadata.PostEnforce;
 
 @Service
 @AllowReplay
+@Profile("backend")
 @ProcessingGroup("medicalRecordProjection")
 public class MedicalRecordSummaryProjection {
 

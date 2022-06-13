@@ -4,10 +4,12 @@ import java.util.Map;
 
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.WebRequest;
 
 @Component
+@Profile("client")
 public class ExtendedErrorAttributes extends DefaultErrorAttributes {
 
     @Override

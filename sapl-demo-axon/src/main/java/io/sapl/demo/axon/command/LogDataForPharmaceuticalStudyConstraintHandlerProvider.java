@@ -3,6 +3,7 @@ package io.sapl.demo.axon.command;
 import java.util.function.Consumer;
 
 import org.axonframework.commandhandling.CommandMessage;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
+@Profile("backend")
 public class LogDataForPharmaceuticalStudyConstraintHandlerProvider implements
 		MessageConsumerConstraintHandlerProvider<UpdateMedicalRecordCommand, CommandMessage<UpdateMedicalRecordCommand>> {
 
