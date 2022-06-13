@@ -1,24 +1,23 @@
-package io.sapl.axondemo.constraints;
+package io.sapl.demo.axon.command;
 
 import java.util.function.Consumer;
 
-import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.CommandMessage;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.axon.constraints.MessageConsumerConstraintHandlerProvider;
-import io.sapl.axondemo.domain.MedicalRecordAPI;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 public class LogDataForPharmaceuticalStudyConstraintHandlerProvider implements
-		MessageConsumerConstraintHandlerProvider<MedicalRecordAPI.UpdateMedicalRecordCommand,
-				CommandMessage<MedicalRecordAPI.UpdateMedicalRecordCommand>> {
+		MessageConsumerConstraintHandlerProvider<UpdateMedicalRecordCommand, CommandMessage<UpdateMedicalRecordCommand>> {
 
 	@Override
-	public Consumer<CommandMessage<MedicalRecordAPI.UpdateMedicalRecordCommand>> getHandler(JsonNode constraint) {
+	public Consumer<CommandMessage<UpdateMedicalRecordCommand>> getHandler(JsonNode constraint) {
 		return this::logDataForStudy;
 	}
 
@@ -27,8 +26,8 @@ public class LogDataForPharmaceuticalStudyConstraintHandlerProvider implements
 	}
 
 	@Override
-	public Class<MedicalRecordAPI.UpdateMedicalRecordCommand> getSupportedMessagePayloadType() {
-		return MedicalRecordAPI.UpdateMedicalRecordCommand.class;
+	public Class<UpdateMedicalRecordCommand> getSupportedMessagePayloadType() {
+		return UpdateMedicalRecordCommand.class;
 	}
 
 	@Override

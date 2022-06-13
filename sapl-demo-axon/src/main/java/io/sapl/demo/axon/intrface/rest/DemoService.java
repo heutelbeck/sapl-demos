@@ -1,4 +1,4 @@
-package io.sapl.axondemo;
+package io.sapl.demo.axon.intrface.rest;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -11,33 +11,31 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.sapl.axon.client.gateway.SaplQueryGateway;
-import io.sapl.axondemo.domain.MedicalRecordAPI.CreateBloodCountCommand;
-import io.sapl.axondemo.domain.MedicalRecordAPI.CreateMedicalRecord;
-import io.sapl.axondemo.domain.MedicalRecordAPI.CreateMedicalRecordWithClinical;
-import io.sapl.axondemo.domain.MedicalRecordAPI.FetchMedicalRecordSummaryQuery;
-import io.sapl.axondemo.domain.MedicalRecordAPI.FetchOxygenSaturationQuery;
-import io.sapl.axondemo.domain.MedicalRecordAPI.FetchPulseQuery;
-import io.sapl.axondemo.domain.MedicalRecordAPI.FetchSinglePulseQuery;
-import io.sapl.axondemo.domain.MedicalRecordAPI.MedicalRecordSummary;
-import io.sapl.axondemo.domain.MedicalRecordAPI.PulseRecord;
-import io.sapl.axondemo.domain.MedicalRecordAPI.ReducedRecord;
-import io.sapl.axondemo.domain.MedicalRecordAPI.UpdateBloodCount;
-import io.sapl.axondemo.domain.MedicalRecordAPI.UpdateMedicalRecordCommand;
-import io.sapl.axondemo.domain.MedicalRecordAPI.UpdateMedicalRecordCommandConstraintHandler;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateBloodCountCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecord;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinical;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCount;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommandConstraintHandler;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.FetchMedicalRecordSummaryQuery;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.FetchOxygenSaturationQuery;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.FetchPulseQuery;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.FetchSinglePulseQuery;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.MedicalRecordSummary;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.PulseRecord;
+import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.ReducedRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 
 @Slf4j
 @Service
-@Profile("client")
 @RequiredArgsConstructor
 public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
     private final static String subscriptionScenarioID = "1";

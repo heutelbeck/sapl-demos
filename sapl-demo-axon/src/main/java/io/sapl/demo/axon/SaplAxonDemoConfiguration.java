@@ -1,4 +1,4 @@
-package io.sapl.axondemo.configuration;
+package io.sapl.demo.axon;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.client.MongoClient;

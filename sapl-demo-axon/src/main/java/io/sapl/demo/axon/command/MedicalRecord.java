@@ -1,4 +1,4 @@
-package io.sapl.axondemo.domain;
+package io.sapl.demo.axon.command;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 
@@ -13,54 +13,50 @@ import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateMember;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.context.annotation.Profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.axon.annotations.ConstraintHandler;
-import io.sapl.axondemo.domain.MedicalRecordAPI.CreateMedicalRecord;
-import io.sapl.axondemo.domain.MedicalRecordAPI.CreateMedicalRecordWithClinical;
-import io.sapl.axondemo.domain.MedicalRecordAPI.MedicalRecordCreatedEvent;
-import io.sapl.axondemo.domain.MedicalRecordAPI.MedicalRecordCreatedWithClinicalEvent;
-import io.sapl.axondemo.domain.MedicalRecordAPI.MedicalRecordUpdatedEvent;
-import io.sapl.axondemo.domain.MedicalRecordAPI.UpdateMedicalRecordCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordEvent;
+import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountCreatedEvent;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateBloodCountCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecord;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinical;
+import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedEvent;
+import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedWithClinicalEvent;
+import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordUpdatedEvent;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
 import io.sapl.spring.method.metadata.PreEnforce;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Aggregate
-@Profile("backend")
 @NoArgsConstructor
 public class MedicalRecord {
 
 	@AggregateIdentifier
-	private String patientId;
-	@Getter
-	private String patientName;
-	@SuppressWarnings("unused")
-	private double pulse;
-	@SuppressWarnings("unused")
-	private double oxygenSaturation;
+	private String                 patientId;
 	@AggregateMember
-	private final List<BloodCount> bloodExaminations = new ArrayList<>();
-	private boolean hasClinicalRecordAvailable = false;
+	private final List<BloodCount> bloodExaminations          = new ArrayList<>();
+	private boolean                hasClinicalRecordAvailable = false;
 
 	@PreEnforce
 	@CommandHandler
 	public MedicalRecord(CreateMedicalRecord command) {
 		apply(new MedicalRecordCreatedEvent(command.getId(), command.getName()));
 	}
-	
+
 	@PreEnforce(action = "hasClinicalRecordAvailable")
 	@CommandHandler
 	public MedicalRecord(CreateMedicalRecordWithClinical command) {
-		apply(new MedicalRecordCreatedWithClinicalEvent(command.getId(), command.getName(), command.isHasClinicalRecordAvailable()));
+		apply(new MedicalRecordCreatedWithClinicalEvent(command.getId(), command.getName(),
+				command.isHasClinicalRecordAvailable()));
 	}
 
-	@PreEnforce(resource = "patientName" )
+	@PreEnforce(resource = "patientName")
 	@CommandHandler
 	public void handle(UpdateMedicalRecordCommand command) {
 		apply(new MedicalRecordUpdatedEvent(patientId, command.getPulse(), command.getOxygenSaturation()));
@@ -68,24 +64,23 @@ public class MedicalRecord {
 
 	@PreEnforce
 	@CommandHandler
-	public void handle(MedicalRecordAPI.CreateBloodCountCommand command) {
+	public void handle(CreateBloodCountCommand command) {
 		apply(new MedicalRecordAPI.BloodCountCreatedEvent(command.getExaminationId()));
 	}
 
 	@CommandHandler
-	public void handle(MedicalRecordAPI.AddClinicalRecordCommand command) {
+	public void handle(AddClinicalRecordCommand command) {
 		log.info("handle(AddClinicalRecordCommand)");
 		apply(new MedicalRecordAPI.AddClinicalRecordEvent());
 	}
 
 	@ConstraintHandler("#constraint.get('checkForEmployeesOnProbation').asText().equals('if no clinical record must be created')")
 	public void checkIfClinicalRecordIsAvailable(UpdateMedicalRecordCommand command, JsonNode constraint,
-												MetaData metaData, CommandBus commandBus, ObjectMapper mapper) {
+			MetaData metaData, CommandBus commandBus, ObjectMapper mapper) {
 		if (!hasClinicalRecordAvailable) {
 			log.info("Doctor on probation + no clinical record available, create a clinical record");
-			commandBus.dispatch(new GenericCommandMessage<>(new MedicalRecordAPI.AddClinicalRecordCommand(patientId)));
-		}
-		else {
+			commandBus.dispatch(new GenericCommandMessage<>(new AddClinicalRecordCommand(patientId)));
+		} else {
 			log.info("Doctor is on probation, a clinical record is available");
 		}
 	}
@@ -93,23 +88,21 @@ public class MedicalRecord {
 	@EventSourcingHandler
 	public void on(MedicalRecordCreatedEvent event) {
 		patientId = event.getId();
-		patientName = event.getName();
 	}
 
 	@EventSourcingHandler
-	public void on(MedicalRecordAPI.AddClinicalRecordEvent event) {
+	public void on(AddClinicalRecordEvent event) {
 		hasClinicalRecordAvailable = true;
 	}
-	
+
 	@EventSourcingHandler
 	public void on(MedicalRecordCreatedWithClinicalEvent event) {
-		patientId = event.getId();
-		patientName = event.getName();
+		patientId                  = event.getId();
 		hasClinicalRecordAvailable = event.isHasClinicalRecordAvailable();
 	}
 
 	@EventSourcingHandler
-	public void handle(MedicalRecordAPI.BloodCountCreatedEvent event) {
+	public void handle(BloodCountCreatedEvent event) {
 		bloodExaminations.add(new BloodCount(event.getExaminationId()));
 	}
 }

@@ -37,7 +37,6 @@ public class SecurityConfiguration {
 				   .anyExchange()
 				   .permitAll()
 				   .and().build();
-		// @formatter:off
-
+		// @formatter:on
 	}
 }
