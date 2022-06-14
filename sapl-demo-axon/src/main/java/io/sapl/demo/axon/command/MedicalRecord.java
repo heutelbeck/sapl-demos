@@ -30,6 +30,7 @@ import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedWithClinic
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordUpdatedEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
 import io.sapl.spring.method.metadata.PreEnforce;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,6 +42,8 @@ public class MedicalRecord {
 
 	@AggregateIdentifier
 	private String                 patientId;
+	@Getter
+	private String 				   patientName; // used in SpEL example policy
 	@AggregateMember
 	private final List<BloodCount> bloodExaminations          = new ArrayList<>();
 	private boolean                hasClinicalRecordAvailable = false;
@@ -67,13 +70,13 @@ public class MedicalRecord {
 	@PreEnforce
 	@CommandHandler
 	public void handle(CreateBloodCountCommand command) {
-		apply(new MedicalRecordAPI.BloodCountCreatedEvent(command.getExaminationId()));
+		apply(new BloodCountCreatedEvent(command.getExaminationId()));
 	}
 
 	@CommandHandler
 	public void handle(AddClinicalRecordCommand command) {
 		log.info("handle(AddClinicalRecordCommand)");
-		apply(new MedicalRecordAPI.AddClinicalRecordEvent());
+		apply(new AddClinicalRecordEvent());
 	}
 
 	@ConstraintHandler("#constraint.get('checkForEmployeesOnProbation').asText().equals('if no clinical record must be created')")
@@ -90,6 +93,7 @@ public class MedicalRecord {
 	@EventSourcingHandler
 	public void on(MedicalRecordCreatedEvent event) {
 		patientId = event.getId();
+		patientName = event.getName();
 	}
 
 	@EventSourcingHandler
