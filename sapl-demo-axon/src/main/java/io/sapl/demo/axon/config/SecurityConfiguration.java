@@ -1,11 +1,8 @@
-package io.sapl.demo.axon;
+package io.sapl.demo.axon.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,19 +10,12 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration {
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
-        http.csrf().disable();
-    }
-
-
-    @SuppressWarnings("deprecation")
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
+	@Bean
+	@SuppressWarnings("deprecation")
+	public UserDetailsService userDetailsService() {
+		// @formatter:off
         UserDetails axon1 =
                 User.withDefaultPasswordEncoder()
                         .username("admin")
@@ -68,7 +58,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         .password("pwd")
                         .roles("EXTERNAL_SERVICE")
                         .build();
-        return new InMemoryUserDetailsManager(axon1, axon2,axon3, axon4, axon5, axon6, externalService);
-    }
+		// @formatter:on
+		return new InMemoryUserDetailsManager(axon1, axon2, axon3, axon4, axon5, axon6, externalService);
+	}
 
 }

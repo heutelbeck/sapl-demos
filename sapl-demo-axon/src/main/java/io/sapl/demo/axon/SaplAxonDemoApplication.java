@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AxonDemoApplication {
+public class SaplAxonDemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AxonDemoApplication.class, args);
+        SpringApplication.run(SaplAxonDemoApplication.class, args);
     }
 
 }
