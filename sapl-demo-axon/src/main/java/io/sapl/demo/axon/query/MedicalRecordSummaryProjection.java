@@ -32,6 +32,7 @@ import io.sapl.spring.method.metadata.EnforceDropWhileDenied;
 import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
 import io.sapl.spring.method.metadata.EnforceTillDenied;
 import io.sapl.spring.method.metadata.PostEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 
 @Service
 @AllowReplay
@@ -70,6 +71,7 @@ public class MedicalRecordSummaryProjection {
 				new ReducedRecord(summary.getPatientName(), summary.getOxygenSaturation()));
 	}
 
+	@PreEnforce
 	@QueryHandler
 	public List<MedicalRecordSummary> handle(FetchMedicalRecordSummariesQuery query) {
 		MedicalRecordSummary[] medicalRecordSummaryArray = medicalSummaryReadModel.values()

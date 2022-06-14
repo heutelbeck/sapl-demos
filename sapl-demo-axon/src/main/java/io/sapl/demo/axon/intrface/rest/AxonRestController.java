@@ -1,5 +1,6 @@
 package io.sapl.demo.axon.intrface.rest;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.context.annotation.Profile;
@@ -17,6 +18,7 @@ import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.PulseRecord;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @Profile("client")
@@ -29,6 +31,12 @@ public class AxonRestController {
 	@Operation(summary = "Create a medical record", description = "some test description")
 	void createMedicalRecords(@RequestParam String id, @RequestParam String name) {
 		demoService.createMedicalRecord(id, name);
+	}
+
+	@GetMapping("medicalrecords")
+	@Operation(summary = "Create a medical record", description = "some test description")
+	public Mono<List<MedicalRecordSummary>> fetchMedicalRecords() {
+		return demoService.getMedicalRecords();
 	}
 
 	@PostMapping("medicalrecords/clinical")
