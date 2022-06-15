@@ -39,7 +39,7 @@ obligation
 
 policy "Example Entity log"    
 permit
-    action.name == "UpdateBloodCount"
+    action.name == "UpdateBloodCountCommand"
 
 where
     subject.name == "doctorOnProbation";
@@ -62,7 +62,7 @@ obligation
         "applyMapping" : "map pulse to range"
         }
 
-policy "Logging Policy with Obligation, if user='user2"
+policy "Logging Policy with Obligation, if user='user2'"
 
 permit
     action.name == "UpdateMedicalRecordCommand"
@@ -132,7 +132,7 @@ policy "nurse can only create medical records when clinical available"
 permit
 	"ROLE_NURSE" in subject..authority
 where
-	action.name == "CreateMedicalRecordWithClinical";
+	action.name == "CreateMedicalRecordWithClinicalCommand";
 	action.hasClinicalRecordAvailable == true;
 	
     

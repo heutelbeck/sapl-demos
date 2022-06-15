@@ -12,14 +12,14 @@ public class MedicalRecordAPI {
 	/* Commands */
 
 	@Value
-	public static class CreateMedicalRecord {
+	public static class CreateMedicalRecordCommand {
 		@TargetAggregateIdentifier
 		String id;
 		String name;
 	}
 
 	@Value
-	public static class CreateMedicalRecordWithClinical {
+	public static class CreateMedicalRecordWithClinicalCommand {
 		@TargetAggregateIdentifier
 		String  id;
 		String  name;
@@ -56,7 +56,7 @@ public class MedicalRecordAPI {
 	}
 
 	@Value
-	public static class UpdateBloodCount {
+	public static class UpdateBloodCountCommand {
 		@TargetAggregateIdentifier
 		String id;
 		int    examinationId;

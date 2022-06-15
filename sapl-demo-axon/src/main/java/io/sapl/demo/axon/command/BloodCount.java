@@ -11,12 +11,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.sapl.axon.annotations.ConstraintHandler;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountLogEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountUpdatedEvent;
-import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCount;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCountCommand;
 import io.sapl.spring.method.metadata.PreEnforce;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
+@Slf4j
 @NoArgsConstructor
 public class BloodCount {
 	@EntityId
@@ -28,14 +30,16 @@ public class BloodCount {
 
 	@PreEnforce
 	@CommandHandler
-	public void handle(UpdateBloodCount command) {
+	public void handle(UpdateBloodCountCommand command) {
 		apply(new BloodCountUpdatedEvent(command.getHematocritValue()));
 	}
 
 	@ConstraintHandler("#constraint.get('log event').asText().equals('blood count event')")
-	public void logClinicalRecordOnlyIfRequired(UpdateBloodCount command, JsonNode constraint, MetaData metaData)
+	public void logClinicalRecordOnlyIfRequired(UpdateBloodCountCommand command, JsonNode constraint, MetaData metaData)
 			throws Exception {
-		apply(new BloodCountLogEvent(examinationId, command.getHematocritValue()));
+		var logEvent = new BloodCountLogEvent(examinationId, command.getHematocritValue());
+		log.info("Sending BloodCountLogEvent from @ConstraintHandler:\t" + logEvent);
+		apply(logEvent);
 	}
 
 }

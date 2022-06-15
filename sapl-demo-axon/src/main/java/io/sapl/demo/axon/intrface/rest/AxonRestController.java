@@ -85,9 +85,9 @@ public class AxonRestController {
 
 	@GetMapping(value = "medicalrecords/{id}")
 	@Operation(summary = "Get a medical record by its id")
-	public MedicalRecordSummary getCurrentMedicalRecordByID(@PathVariable String id)
+	public Mono<MedicalRecordSummary> getCurrentMedicalRecordByID(@PathVariable String id)
 			throws ExecutionException, InterruptedException {
-		return demoService.getMedicalRecordById(id).get();
+		return Mono.fromFuture(demoService.getMedicalRecordById(id));
 	}
 
 	@Operation(summary = "Subscribe to a medical record by id")
