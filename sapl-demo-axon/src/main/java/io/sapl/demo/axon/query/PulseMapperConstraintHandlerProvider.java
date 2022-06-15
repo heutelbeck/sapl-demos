@@ -19,7 +19,6 @@ public class PulseMapperConstraintHandlerProvider implements MappingConstraintHa
 	@Override
 	public Function<PulseRecord, PulseRecord> getHandler(JsonNode constraint) {
 		return record -> {
-			log.info("mapping the pulse value");
 			double pulse = record.getPulse();
 			double pulseMapped;
 			if (pulse < 65)
@@ -28,6 +27,7 @@ public class PulseMapperConstraintHandlerProvider implements MappingConstraintHa
 				pulseMapped = 1.0;
 			else
 				pulseMapped = 2.0;
+			log.info("mapping the pulse value: " + pulse + " -> " + pulseMapped);
 			return new PulseRecord(pulseMapped);
 		};
 	}

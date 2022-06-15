@@ -41,9 +41,11 @@ public class ClientSideSaplAxonConfiguration {
 	 * the corresponding QueryHandler is annotated with @EnforceRecoverableIfDenied
 	 */
 	@Bean
-	public SaplQueryGateway registerQueryGateWay(QueryBus queryBus) {
-		return SaplQueryGateway.builder().queryBus(queryBus).build();
-	}
+    public SaplQueryGateway registerQueryGateWay(QueryBus queryBus, ObjectMapper mapper) {
+        var sd = SaplQueryGateway.builder().queryBus(queryBus).build();
+        sd.registerDispatchInterceptor(new DefaultSaplQueryInterceptor(mapper)); // - enable subject in monolith-query-handling
+        return sd;
+    }
 
 	/**
 	 * Subjects requesting to perform an action (here a query) are required by the

@@ -20,9 +20,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.sapl.axon.client.gateway.SaplQueryGateway;
 import io.sapl.demo.axon.command.MedicalRecordAPI.CreateBloodCountCommand;
-import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecord;
-import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinical;
-import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCount;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinicalCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCountCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommandConstraintHandler;
 import io.sapl.demo.axon.query.MedicalRecordSummaryAPI.FetchMedicalRecordSummariesQuery;
@@ -53,18 +53,18 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
 		executor.schedule(() -> {
-			commandGateway.send(new GenericCommandMessage<>(new CreateMedicalRecord(subscriptionScenarioID, "Mueller"))
+			commandGateway.send(new GenericCommandMessage<>(new CreateMedicalRecordCommand(subscriptionScenarioID, "Mueller"))
 					.withMetaData(demoappUser()));
 			createAndUpdateMedicalRecordsForDemo();
 		}, 5, TimeUnit.SECONDS);
 	}
 
 	void createMedicalRecord(String id, String name) {
-		commandGateway.sendAndWait(new CreateMedicalRecord(id, name));
+		commandGateway.sendAndWait(new CreateMedicalRecordCommand(id, name));
 	}
 
 	void createMedicalRecordWithClinical(String id, String name, boolean hasClinicalRecordAvailable) {
-		commandGateway.sendAndWait(new CreateMedicalRecordWithClinical(id, name, hasClinicalRecordAvailable));
+		commandGateway.sendAndWait(new CreateMedicalRecordWithClinicalCommand(id, name, hasClinicalRecordAvailable));
 	}
 
 	void updateMedicalRecord(String id, double pulse, double oxygenSaturation) {
@@ -84,7 +84,7 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 	}
 
 	void updateBloodCount(String id, int examinationId, double hematicritValue) {
-		commandGateway.sendAndWait(new UpdateBloodCount(id, examinationId, hematicritValue));
+		commandGateway.sendAndWait(new UpdateBloodCountCommand(id, examinationId, hematicritValue));
 	}
 
 	CompletableFuture<MedicalRecordSummary> getMedicalRecordById(String id) {
@@ -97,8 +97,7 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 		var result = queryGateway.subscriptionQuery(new FetchMedicalRecordSummaryQuery(id),
 				ResponseTypes.instanceOf(MedicalRecordSummary.class),
 				ResponseTypes.instanceOf(MedicalRecordSummary.class));
-		result.initialResult().block();
-		return result.updates().doOnError(exc -> log.info("Exception : {}", exc.toString()))
+		return Flux.concat(result.initialResult(), result.updates()).doOnError(exc -> log.info("Exception : {}", exc.toString()))
 				.doFinally(it -> result.close());
 	}
 
@@ -107,16 +106,14 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 		var result = queryGateway.recoverableSubscriptionQuery(new FetchPulseQuery(id),
 				ResponseTypes.instanceOf(ReducedRecord.class), ResponseTypes.instanceOf(ReducedRecord.class),
 				exc -> log.info("Exception: {}", exc.toString()));
-		result.initialResult().block();
-		return result.updates().doFinally(it -> result.close());
+		return Flux.concat(result.initialResult(), result.updates()).doFinally(it -> result.close());
 	}
 
 	public Flux<ReducedRecord> subscribeToOxygenSaturation(String id) {
 		startUpdateCommand();
 		var result = queryGateway.subscriptionQuery(new FetchOxygenSaturationQuery(id),
 				ResponseTypes.instanceOf(ReducedRecord.class), ResponseTypes.instanceOf(ReducedRecord.class));
-		result.initialResult().block();
-		return result.updates().doFinally(it -> result.close());
+		return Flux.concat(result.initialResult(), result.updates()).doFinally(it -> result.close());
 	}
 
 	public void stopUpdates() {
@@ -139,11 +136,11 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 	}
 
 	private void createAndUpdateMedicalRecordsForDemo() {
-		var createCommand = new CreateMedicalRecord("42", "Doe participates in trial");
+		var createCommand = new CreateMedicalRecordCommand("42", "Doe participates in trial");
 		commandGateway.send(new GenericCommandMessage<>(createCommand).withMetaData(demoappUser()));
-		createCommand = new CreateMedicalRecord("43", "Smith");
+		createCommand = new CreateMedicalRecordCommand("43", "Smith");
 		commandGateway.send(new GenericCommandMessage<>(createCommand).withMetaData(demoappUser()));
-		createCommand = new CreateMedicalRecord("40", "Jones");
+		createCommand = new CreateMedicalRecordCommand("40", "Jones");
 		commandGateway.send(new GenericCommandMessage<>(createCommand).withMetaData(demoappUser()));
 		var update43Command = new UpdateMedicalRecordCommand("43", getRandomNumber(40, 170), getRandomNumber(90, 100));
 		commandGateway.send(new GenericCommandMessage<>(update43Command).withMetaData(demoappUser()));

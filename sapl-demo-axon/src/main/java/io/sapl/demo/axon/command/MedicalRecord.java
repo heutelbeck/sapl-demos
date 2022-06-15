@@ -23,8 +23,8 @@ import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountCreatedEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.CreateBloodCountCommand;
-import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecord;
-import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinical;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordCommand;
+import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinicalCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedWithClinicalEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordUpdatedEvent;
@@ -46,17 +46,18 @@ public class MedicalRecord {
 	private String 				   patientName; // used in SpEL example policy
 	@AggregateMember
 	private final List<BloodCount> bloodExaminations          = new ArrayList<>();
+	@Getter
 	private boolean                hasClinicalRecordAvailable = false;
 
 	@PreEnforce
 	@CommandHandler
-	public MedicalRecord(CreateMedicalRecord command) {
+	public MedicalRecord(CreateMedicalRecordCommand command) {
 		apply(new MedicalRecordCreatedEvent(command.getId(), command.getName()));
 	}
 
 	@PreEnforce(action = "hasClinicalRecordAvailable")
 	@CommandHandler
-	public MedicalRecord(CreateMedicalRecordWithClinical command) {
+	public MedicalRecord(CreateMedicalRecordWithClinicalCommand command) {
 		apply(new MedicalRecordCreatedWithClinicalEvent(command.getId(), command.getName(),
 				command.isHasClinicalRecordAvailable()));
 	}
@@ -88,6 +89,12 @@ public class MedicalRecord {
 		} else {
 			log.info("Doctor is on probation, a clinical record is available");
 		}
+	}
+	
+	@ConstraintHandler("#constraint.get('type').asText().equals('logAccess')")
+	public void logAccessForUser(UpdateMedicalRecordCommand command, JsonNode constraint,
+			MetaData metaData, CommandBus commandBus, ObjectMapper mapper) {
+		log.info(constraint.get("message").asText());
 	}
 
 	@EventSourcingHandler
