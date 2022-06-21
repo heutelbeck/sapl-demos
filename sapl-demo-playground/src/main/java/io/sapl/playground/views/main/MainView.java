@@ -18,12 +18,6 @@ package io.sapl.playground.views.main;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.sapl.playground.examples.BasicExample;
-import io.sapl.playground.examples.Example;
-import io.sapl.playground.examples.SpringDataExample;
-import io.sapl.playground.examples.SpringSecurityExample;
-import io.sapl.playground.views.ExampleSelectedViewBus;
-
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -34,14 +28,18 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.server.PWA;
+
+import io.sapl.playground.examples.BasicExample;
+import io.sapl.playground.examples.Example;
+import io.sapl.playground.examples.SpringDataExample;
+import io.sapl.playground.examples.SpringSecurityExample;
+import io.sapl.playground.views.ExampleSelectedViewBus;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 @CssImport(value = "./styles/views/main/main-view.css", themeFor = "vaadin-app-layout")
 @CssImport("./styles/views/main/main-view.css")
-@PWA(name = "SAPL Playground", shortName = "SAPL", enableInstallPrompt = false, iconPath = "images/favicon.png")
 @JsModule("./styles/shared-styles.js")
 public class MainView extends AppLayout {
 
@@ -77,7 +75,7 @@ public class MainView extends AppLayout {
 		Div buttons = new Div();
 		buttons.setClassName("alignRight");
 
-		Anchor linkToDocs = new Anchor("https://sapl.io/docs/sapl-reference.html", "Docs");
+		Anchor linkToDocs = new Anchor("https://sapl.io", "SAPL Homepage");
 		linkToDocs.setId("linkToDocsButton");
 		buttons.add(linkToDocs);
 
