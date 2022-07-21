@@ -18,6 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.axon.client.gateway.SaplQueryGateway;
+import io.sapl.axon.client.metadata.AbstractSaplQueryInterceptor;
 import io.sapl.axon.client.metadata.DefaultSaplCommandInterceptor;
 import io.sapl.axon.client.metadata.DefaultSaplQueryInterceptor;
 
@@ -41,9 +42,11 @@ public class ClientSideSaplAxonConfiguration {
 	 * the corresponding QueryHandler is annotated with @EnforceRecoverableIfDenied
 	 */
 	@Bean
-    public SaplQueryGateway registerQueryGateWay(QueryBus queryBus, ObjectMapper mapper) {
-        var sd = SaplQueryGateway.builder().queryBus(queryBus).build();
-        sd.registerDispatchInterceptor(new DefaultSaplQueryInterceptor(mapper)); // - enable subject in monolith-query-handling
+    public SaplQueryGateway registerQueryGateWay(QueryBus queryBus, AbstractSaplQueryInterceptor abstractSaplQueryInterceptor, ObjectMapper mapper) {
+        var sd = SaplQueryGateway.builder()
+        		.queryBus(queryBus)
+        		.abstractSaplQueryInterceptor(abstractSaplQueryInterceptor)
+        		.build();
         return sd;
     }
 
