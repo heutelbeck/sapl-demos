@@ -79,6 +79,7 @@
 		<module>sapl-demo-axon</module>
 		<module>sapl-demo-vaadin</module>
 		<module>sapl-demo-argumentchange</module>
+		<module>sapl-demo-books</module>
 	</modules>
 
 </project>
