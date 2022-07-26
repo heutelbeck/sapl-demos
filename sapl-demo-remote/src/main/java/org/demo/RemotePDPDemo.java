@@ -41,7 +41,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	@Option(names = { "-h",
 			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-	private String host = "http://localhost:8080";
+	private String host = "http://localhost:8443";
 
 	// The default option set here are the default credentials of the pdp-server-lt
 
@@ -81,7 +81,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 				.addAuthorizationSubscription("id-1", AuthorizationSubscription.of("bs@simpsons.com", "read",
 						"file://example/med/record/patient/BartSimpson"))
 				.addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
-						"file://example/med/record/patient/Maggieimpson"));
+						"file://example/med/record/patient/MaggieSimpson"));
 		LOG.info("Multi: {}", multiSubscription.toString());
 		var mapper = new ObjectMapper();
 		var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
