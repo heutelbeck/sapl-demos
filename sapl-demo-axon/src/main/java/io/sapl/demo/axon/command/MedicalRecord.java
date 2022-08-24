@@ -13,12 +13,11 @@ import org.axonframework.messaging.MetaData;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.modelling.command.AggregateMember;
 import org.axonframework.spring.stereotype.Aggregate;
-import org.springframework.context.annotation.Profile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.sapl.axon.annotations.ConstraintHandler;
+import io.sapl.axon.annotation.ConstraintHandler;
 import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.AddClinicalRecordEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountCreatedEvent;
@@ -30,24 +29,21 @@ import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordCreatedWithClinic
 import io.sapl.demo.axon.command.MedicalRecordAPI.MedicalRecordUpdatedEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateMedicalRecordCommand;
 import io.sapl.spring.method.metadata.PreEnforce;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Aggregate
-@Profile("backend")
 @NoArgsConstructor
 public class MedicalRecord {
 
 	@AggregateIdentifier
-	private String                 patientId;
-	@Getter
-	private String 				   patientName; // used in SpEL example policy
+	private String patientId;
+	public String  patientName;
+	public boolean hasClinicalRecordAvailable = false;
+
 	@AggregateMember
-	private final List<BloodCount> bloodExaminations          = new ArrayList<>();
-	@Getter
-	private boolean                hasClinicalRecordAvailable = false;
+	private final List<BloodCount> bloodExaminations = new ArrayList<>();
 
 	@PreEnforce
 	@CommandHandler
@@ -55,15 +51,15 @@ public class MedicalRecord {
 		apply(new MedicalRecordCreatedEvent(command.getId(), command.getName()));
 	}
 
-	@PreEnforce(action = "hasClinicalRecordAvailable")
 	@CommandHandler
+	@PreEnforce(action = "hasClinicalRecordAvailable")
 	public MedicalRecord(CreateMedicalRecordWithClinicalCommand command) {
 		apply(new MedicalRecordCreatedWithClinicalEvent(command.getId(), command.getName(),
 				command.isHasClinicalRecordAvailable()));
 	}
 
-	@PreEnforce(resource = "patientName")
 	@CommandHandler
+	@PreEnforce(resource = "patientName")
 	public void handle(UpdateMedicalRecordCommand command) {
 		apply(new MedicalRecordUpdatedEvent(patientId, command.getPulse(), command.getOxygenSaturation()));
 	}
@@ -90,16 +86,16 @@ public class MedicalRecord {
 			log.info("Doctor is on probation, a clinical record is available");
 		}
 	}
-	
+
 	@ConstraintHandler("#constraint.get('type').asText().equals('logAccess')")
-	public void logAccessForUser(UpdateMedicalRecordCommand command, JsonNode constraint,
-			MetaData metaData, CommandBus commandBus, ObjectMapper mapper) {
+	public void logAccessForUser(UpdateMedicalRecordCommand command, JsonNode constraint, MetaData metaData,
+			CommandBus commandBus, ObjectMapper mapper) {
 		log.info(constraint.get("message").asText());
 	}
 
 	@EventSourcingHandler
 	public void on(MedicalRecordCreatedEvent event) {
-		patientId = event.getId();
+		patientId   = event.getId();
 		patientName = event.getName();
 	}
 

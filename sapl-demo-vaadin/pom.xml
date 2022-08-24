@@ -188,6 +188,11 @@
 
 		<dependency>
 			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-security</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>io.sapl</groupId>
 			<artifactId>sapl-vaadin</artifactId>
 		</dependency>
 

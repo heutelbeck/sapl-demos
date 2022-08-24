@@ -12,13 +12,12 @@ import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.sapl.axon.client.gateway.SaplQueryGateway;
+import io.sapl.axon.queryhandling.SaplQueryGateway;
 import io.sapl.demo.axon.command.MedicalRecordAPI.CreateBloodCountCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordCommand;
 import io.sapl.demo.axon.command.MedicalRecordAPI.CreateMedicalRecordWithClinicalCommand;
@@ -40,7 +39,6 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Service
-@Profile("client")
 @RequiredArgsConstructor
 public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 	private final static String               subscriptionScenarioID = "1";
@@ -53,8 +51,9 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 	@Override
 	public void onApplicationEvent(final ApplicationReadyEvent event) {
 		executor.schedule(() -> {
-			commandGateway.send(new GenericCommandMessage<>(new CreateMedicalRecordCommand(subscriptionScenarioID, "Mueller"))
-					.withMetaData(demoappUser()));
+			commandGateway
+					.send(new GenericCommandMessage<>(new CreateMedicalRecordCommand(subscriptionScenarioID, "Mueller"))
+							.withMetaData(demoappUser()));
 			createAndUpdateMedicalRecordsForDemo();
 		}, 5, TimeUnit.SECONDS);
 	}
@@ -97,15 +96,15 @@ public class DemoService implements ApplicationListener<ApplicationReadyEvent> {
 		var result = queryGateway.subscriptionQuery(new FetchMedicalRecordSummaryQuery(id),
 				ResponseTypes.instanceOf(MedicalRecordSummary.class),
 				ResponseTypes.instanceOf(MedicalRecordSummary.class));
-		return Flux.concat(result.initialResult(), result.updates()).doOnError(exc -> log.info("Exception : {}", exc.toString()))
-				.doFinally(it -> result.close());
+		return Flux.concat(result.initialResult(), result.updates())
+				.doOnError(exc -> log.info("Exception : {}", exc.toString())).doFinally(it -> result.close());
 	}
 
 	public Flux<ReducedRecord> subscribeToPulse(String id) {
 		startUpdateCommand();
 		var result = queryGateway.recoverableSubscriptionQuery(new FetchPulseQuery(id),
 				ResponseTypes.instanceOf(ReducedRecord.class), ResponseTypes.instanceOf(ReducedRecord.class),
-				exc -> log.info("Exception: {}", exc.toString()));
+				() -> log.info("Access Denied"));
 		return Flux.concat(result.initialResult(), result.updates()).doFinally(it -> result.close());
 	}
 

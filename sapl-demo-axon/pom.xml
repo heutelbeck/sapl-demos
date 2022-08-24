@@ -40,13 +40,7 @@
 		<!-- SAPL-Axon -->
 		<dependency>
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-axon-backend</artifactId>
-		</dependency>
-
-		<!-- SAPL Axon Client -->
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-axon-client</artifactId>
+			<artifactId>sapl-axon</artifactId>
 		</dependency>
 
 		<!-- Spring -->

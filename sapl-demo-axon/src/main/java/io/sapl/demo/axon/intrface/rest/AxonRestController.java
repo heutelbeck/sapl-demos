@@ -3,7 +3,6 @@ package io.sapl.demo.axon.intrface.rest;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +20,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@Profile("client")
 @RequiredArgsConstructor
 public class AxonRestController {
 

@@ -8,7 +8,7 @@ import org.axonframework.modelling.command.EntityId;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.sapl.axon.annotations.ConstraintHandler;
+import io.sapl.axon.annotation.ConstraintHandler;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountLogEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.BloodCountUpdatedEvent;
 import io.sapl.demo.axon.command.MedicalRecordAPI.UpdateBloodCountCommand;
