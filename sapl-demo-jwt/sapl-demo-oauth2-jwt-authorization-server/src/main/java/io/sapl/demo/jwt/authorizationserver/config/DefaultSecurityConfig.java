@@ -23,6 +23,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -44,14 +46,21 @@ public class DefaultSecurityConfig {
 	// @formatter:off
 	@Bean
 	UserDetailsService users() {
-		@SuppressWarnings("deprecation") // use is intended here in the context of a demo
-		UserDetails user = User.withDefaultPasswordEncoder()
-				.username("user1")
+		var userDetailsService = new InMemoryUserDetailsManager();
+		var user = User
+				.withUsername("user1")
 				.password("password")
 				.roles("USER")
 				.build();
-		return new InMemoryUserDetailsManager(user);
+		userDetailsService.createUser(user);
+		return userDetailsService;
 	}
 	// @formatter:on
+
+	@Bean
+	public PasswordEncoder passwordEncoder(){
+		//noinspection deprecation
+		return NoOpPasswordEncoder.getInstance();
+	}
 
 }
