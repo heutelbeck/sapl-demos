@@ -1,0 +1,17 @@
+axon:
+  axonserver.enabled: false
+  serializer:
+    general:  jackson
+    events:   jackson
+    messages: jackson
+spring:
+  mongodb.embedded.version: 4.4.13 # Select embedded Mongo Version. See: de.flapdoodle.embed.mongo.distribution.Version.Main.PRODUCTION
+  data.mongodb.port: 8888
+  task.scheduling.pool.size: 5
+logging:
+  pattern.console: "%d{yy-MM-dd HH:mm:ss} %-5level %-40.40logger{40} | %msg%n"
+  level:
+    io.sapl: DEBUG
+    de.flapdoodle: WARN
+    org.springframework.boot.autoconfigure.mongo.embedded: WARN
+    org.springframework.context.support: WARN
