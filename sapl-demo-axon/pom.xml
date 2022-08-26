@@ -18,10 +18,10 @@
 		<axon.version>4.5.15</axon.version>
 		<sapl.version>2.1.0-SNAPSHOT</sapl.version>
 	</properties>
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<!-- Configure SAPL dependencies -->
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-bom</artifactId>
 				<version>${sapl.version}</version>
@@ -38,38 +38,18 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
+		<!-- Spting Boot -->
 		<dependency>
-			<groupId>org.axonframework</groupId>
-			<artifactId>axon-spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.axonframework.extensions.mongo</groupId>
-			<artifactId>axon-mongo</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.axonframework.extensions.reactor</groupId>
-			<artifactId>axon-reactor-spring-boot-starter</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-pdp-embedded</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-axon</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.heutelbeck</groupId>
-			<artifactId>base64uuid</artifactId>
-			<version>1.0.0</version>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -83,26 +63,56 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Axon Framework -->
+		<dependency>
+			<groupId>org.axonframework.extensions.reactor</groupId>
+			<artifactId>axon-reactor-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.axonframework.extensions.mongo</groupId>
+			<artifactId>axon-mongo</artifactId>
+		</dependency>
+
+		<!-- SAPL Engine -->
+		<dependency>
+			<!-- 
+				This module provides Policy Enforcement Points for Axon and Spring Boot
+			-->
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-axon</artifactId>
+		</dependency>
+		<dependency>
+			<!-- 
+				You have to choose if you want to use an embedded policy engine implementing 
+				a Policy Decision Point, or if you want to use a PDP Server remotely. 
+			 -->
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-pdp-embedded</artifactId>
+			<!-- <artifactId>sapl-spring-pdp-remote</artifactId> -->
+		</dependency>
+
+		<!-- Utilities -->
+		<dependency>
+			<groupId>com.heutelbeck</groupId>
+			<artifactId>base64uuid</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.ajbrown</groupId>
 			<artifactId>name-machine</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+		
+		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embed.mongo</artifactId>
-			<!--	<scope>test</scope> -->
 		</dependency>
 		<dependency>
 			<groupId>io.projectreactor</groupId>
@@ -113,6 +123,9 @@
 
 	<repositories>
 		<repository>
+			<!--
+				The central snapshot repository makes the SAPL -SNAPSHOT releases available. 
+			-->
 			<id>ossrh</id>
 			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
 			<snapshots>

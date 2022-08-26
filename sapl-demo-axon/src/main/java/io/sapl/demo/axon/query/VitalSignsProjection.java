@@ -13,12 +13,14 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.stereotype.Service;
 
+import io.sapl.axon.annotation.EnforceDropUpdatesWhileDenied;
 import io.sapl.demo.axon.command.MonitorAPI.MeasurementTaken;
 import io.sapl.demo.axon.command.PatientCommandAPI.MonitorConnectedToPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.MonitorDisconnectedFromPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientRegistered;
+import io.sapl.demo.axon.query.PatientQueryAPI.FetchSingleVitalSignOfPatient;
 import io.sapl.demo.axon.query.PatientQueryAPI.FetchVitalSignsOfPatient;
-import io.sapl.demo.axon.query.PatientQueryAPI.MonitorSingleVitalSignOfPatient;
+import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,8 +47,9 @@ public class VitalSignsProjection {
 		repository.findByMonitorId(evt.monitorId()).map(VitalSignsDocument.withMeasurement(measurement, timestamp))
 				.ifPresentOrElse(v -> {
 					saveAndUpdate(v);
-					updateEmitter.emit(MonitorSingleVitalSignOfPatient.class,
-							q -> q.patientId().equals(v.patientId()) && q.type().equals(evt.monitorType()), measurement);
+					updateEmitter.emit(FetchSingleVitalSignOfPatient.class,
+							q -> q.patientId().equals(v.patientId()) && q.type().equals(evt.monitorType()),
+							measurement);
 				}, () -> log.trace("No patient has monitor {} connected", evt.monitorId()));
 	}
 
@@ -63,11 +66,13 @@ public class VitalSignsProjection {
 	}
 
 	@QueryHandler
-	Optional<Measurement> handle(MonitorSingleVitalSignOfPatient query) {
-		return repository.findById(query.patientId()).map(v->v.lastKnownMeasurements().get(query.type()));
+	@EnforceDropUpdatesWhileDenied(action = "'read'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
+	Optional<Measurement> handle(FetchSingleVitalSignOfPatient query) {
+		return repository.findById(query.patientId()).map(v -> v.lastKnownMeasurements().get(query.type()));
 	}
 
 	@QueryHandler
+	@EnforceRecoverableIfDenied(action = "'read'", resource = "{ 'type':'measurements', 'id':#payload.patientId() }")
 	Optional<VitalSignsDocument> handle(FetchVitalSignsOfPatient query) {
 		return repository.findById(query.patientId());
 	}

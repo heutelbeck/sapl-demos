@@ -10,7 +10,7 @@ public class PatientQueryAPI {
 	public record FetchPatient 						(String patientId) {};
 	public record FetchVitalSignsOfPatient 			(String patientId) {};
 	public record MonitorAllVitalSignsOfPatient 	(String patientId) {};
-	public record MonitorSingleVitalSignOfPatient 	(String patientId, String type) {};
+	public record FetchSingleVitalSignOfPatient 	(String patientId, String type) {};
 	// @formatter:on
 	
 }

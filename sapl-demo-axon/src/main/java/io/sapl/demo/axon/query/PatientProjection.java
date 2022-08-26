@@ -11,6 +11,8 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.stereotype.Component;
 
+import io.sapl.axon.annotation.PostHandleEnforce;
+import io.sapl.axon.annotation.PreHandleEnforce;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientDiagnosed;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientDischarged;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientHospitalised;
@@ -30,7 +32,7 @@ public class PatientProjection {
 
 	@EventHandler
 	void on(PatientRegistered evt, @Timestamp Instant timestamp) {
-		log.trace("Project: {}", evt);
+		log.debug("Project: {}", evt);
 		var patientDoc = new PatientDocument(evt.id(), evt.name(), null, null, evt.ward(), timestamp);
 		saveAndUpdate(patientDoc);
 	}
@@ -54,12 +56,15 @@ public class PatientProjection {
 	}
 
 	@QueryHandler
+	//@EnforceDropUpdatesWhileDenied(action="'Fetch'", resource="{ 'type':'patient', 'id':#payload.patientId() }")
+	@PostHandleEnforce(action="'Fetch'", resource="{ 'type':'patient', 'value':#queryResult }")
 	Optional<PatientDocument> handle(FetchPatient query) {
-		log.trace("Handle: {}", query);
+		log.trace("Handle: {}", query); 
 		return patientsRepository.findById(query.patientId());
 	}
 
 	@QueryHandler
+	@PreHandleEnforce(action="'FetchAll'", resource="{ 'type':'patient' }")
 	Iterable<PatientDocument> handle(FetchAllPatients query) {
 		log.trace("Handle: {}", query);
 		return patientsRepository.findAll();

@@ -20,7 +20,7 @@ public record PatientDocument (
 	String  name,
 	String  latestIcd11Code,
 	String  latestDiagnosisText,
-	Ward  ward,
+	Ward    ward,
 	Instant updatedAt) {
 	// @formatter:on
 

@@ -22,7 +22,7 @@ public record VitalSignsDocument (
 	
 	Map<String,Measurement> lastKnownMeasurements,
 	Set<String> connectedSensors,
-		
+	
 	Instant updatedAt
 ) {
 	//@formatter:on

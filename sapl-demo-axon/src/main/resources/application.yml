@@ -13,5 +13,6 @@ logging:
   level:
     io.sapl: DEBUG
     de.flapdoodle: WARN
+    org.mongodb.driver.connection: WARN
     org.springframework.boot.autoconfigure.mongo.embedded: WARN
     org.springframework.context.support: WARN
