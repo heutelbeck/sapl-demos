@@ -1,4 +1,4 @@
-package io.sapl.demo.axon.query;
+package io.sapl.demo.axon.query.patients.api;
 
 import java.time.Instant;
 import java.util.function.Function;

@@ -1,5 +1,9 @@
 package io.sapl.demo.axon.data;
 
+import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.BLOOD_PRESSURE;
+import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.BODY_TEMPERATURE;
+import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.HEART_RATE;
+import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.RESPIRATION_RATE;
 import static io.sapl.demo.axon.command.Position.ADMINISTRATOR;
 import static io.sapl.demo.axon.command.Position.DOCTOR;
 import static io.sapl.demo.axon.command.Position.NURSE;
@@ -9,10 +13,8 @@ import static io.sapl.demo.axon.command.Ward.ICCU;
 import static io.sapl.demo.axon.command.Ward.NONE;
 import static io.sapl.demo.axon.command.Ward.SICU;
 
-import java.util.random.RandomGenerator;
+import java.util.List;
 
-import org.ajbrown.namemachine.Name;
-import org.ajbrown.namemachine.NameGenerator;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -20,31 +22,28 @@ import org.springframework.stereotype.Component;
 
 import com.heutelbeck.uuid.Base64Id;
 
-import io.sapl.demo.axon.adapter.monitors.MonitorFactory;
 import io.sapl.demo.axon.authentication.HospitalStaff;
 import io.sapl.demo.axon.authentication.HospitalStappUserDetailsService;
 import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
+import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.MakeDiagnosisForPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.RegisterPatient;
 import io.sapl.demo.axon.command.Position;
 import io.sapl.demo.axon.command.Ward;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
-	private final static RandomGenerator RANDOM             = RandomGenerator.getDefault();
-	private static final int             NUMBER_OF_PATIENTS = 10;
-	private static final String          PASSWORD           = "pwd";
-	private static final String          NOOP               = "{noop}";
-	private static final String[]        DOCTORS            = { "cheryl", "neil", "david" };
-	private static final String[]        ICD11              = { "1B21.3", "1B95", "1E31", "2A90.7", "6A25.3", "6C73",
+
+	private static final String                   PASSWORD  = "pwd";
+	private static final String                   NOOP      = "{noop}";
+	private static final String[]                 ICD11     = { "1B21.3", "1B95", "1E31", "2A90.7", "6A25.3", "6C73",
 			"6D51", "6E40.2", "9A82", "9A96.2", "9B02.2", "AB11.1", "BD11.1", "BC02.30", "DA20", "DC10", "LB70.1",
 			"LB79.0", "LB99.2", "NA01.3", "NA01.5", "PF13", "PJ00" };
-	private static final String[]        DIAGNOSIS          = { "Disseminated non-tuberculous mycobacterial infection",
+	private static final String[]                 DIAGNOSIS = { "Disseminated non-tuberculous mycobacterial infection",
 			"Brucellosis", "Influenza due to identified zoonotic or pandemic influenza virus",
 			"Enteropathy associated T-cell lymphoma", "Manic mood symptoms in primary psychotic disorders",
 			"Intermittent explosive disorder", "Factitious disorder imposed on another",
@@ -56,14 +55,13 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 			"Acquired anatomical alterations of gallbladder or bile ducts", "Wormian bones", "Fused fingers",
 			"Radial hemimelia", "Laceration with foreign body of head", "Puncture wound with foreign body of head",
 			"Assault by exposure to radiation", "Victim of lightning" };
-
 	private final ReactorCommandGateway           commandGateway;
 	private final HospitalStappUserDetailsService userDetailsService;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		generatePatients();
 		generateHospitalStaff();
+		generatePatients();
 	}
 
 	// @formatter:off
@@ -91,29 +89,39 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 	}
 
 	private void generatePatients() {
-		var generator = new NameGenerator();
-		var names     = generator.generateNames(NUMBER_OF_PATIENTS);
-		names.stream().forEach(this::createPatientWithName);
-	}
-
-	void createPatientWithName(Name name) {
-		var i      = RANDOM.nextInt(ICD11.length);
-		var doctor = DOCTORS[RANDOM.nextInt(DOCTORS.length)];
+		log.info("");
+		log.info("This demo is pre-configured with the follwoing patients:");
+		log.info("");
+		log.info(" Id  | Name                 | Ward");
+		log.info("-----+----------------------+-------------------------------------");
 		// @formatter:off
-		commandGateway
-			.send(new RegisterPatient(Base64Id.randomID(), name.toString())).cast(String.class)	
-			.flatMap(id -> newMonitor(id,MonitorFactory.HEART_RATE)
-							.then(newMonitor(id,MonitorFactory.BLOOD_PRESSURE))
-							.then(newMonitor(id,MonitorFactory.BODY_TEMPERATURE))
-							.then(newMonitor(id,MonitorFactory.RESPIRATION_RATE))
-							.then(commandGateway.send(new MakeDiagnosisForPatient(id, doctor,  ICD11[i], DIAGNOSIS[i])))
-							)
-			.subscribe();
+		loadPatient("0","Mona Vance",       List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), ICCU,    "cheryl",ICD11[1], DIAGNOSIS[1]  );
+		loadPatient("1","Martin Pape",      List.of(HEART_RATE, BLOOD_PRESSURE),                                     ICCU,    "cheryl",ICD11[4], DIAGNOSIS[4]  );
+		loadPatient("2","Richard Lewis",    List.of(HEART_RATE,                 BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[6], DIAGNOSIS[6]  );
+		loadPatient("3","Jesse Ramos",      List.of(            BLOOD_PRESSURE,                   RESPIRATION_RATE), CCU,     "neil",  ICD11[8], DIAGNOSIS[8]  );
+		loadPatient("4","Lester Romaniak",  List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[11],DIAGNOSIS[11] );
+		loadPatient("5","Matthew Cortazar", List.of(HEART_RATE,                                   RESPIRATION_RATE), SICU,    "david", ICD11[15],DIAGNOSIS[15] );
+		loadPatient("6","Timothy Favero",   List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), SICU,    "david", ICD11[17],DIAGNOSIS[17] );
+		loadPatient("7","Louise Colley",    List.of(                                              RESPIRATION_RATE), GENERAL, "david", ICD11[22],DIAGNOSIS[22] );
+		loadPatient("8","Bret Gerson",      List.of(                            BODY_TEMPERATURE                  ), ICCU,    "cheryl",ICD11[7], DIAGNOSIS[7]  );
+		loadPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl",ICD11[19],DIAGNOSIS[19] );
 		// @formatter:on
+		log.info("");
 	}
 
-	Mono<Object> newMonitor(String patientId, String type) {
-		return commandGateway.send(new ConnectMonitorToPatient(patientId, Base64Id.randomID(), type));
+	private void loadPatient(String patientId, String name, List<String> monitors, Ward ward, String doctor,
+			String icd11, String diagnosis) {
+		log.info(String.format(" %-3.3s | %-20.20s | %s ", patientId, name,
+				ward.getDescription() + " (" + ward + ")"));
+		var creationProcess = commandGateway.send(new RegisterPatient(patientId, name.toString())).cast(String.class);
+		creationProcess = creationProcess.then(commandGateway.send(new HospitalisePatient(patientId, ward)));
+		for (var monitor : monitors) {
+			creationProcess = creationProcess
+					.then(commandGateway.send(new ConnectMonitorToPatient(patientId, Base64Id.randomID(), monitor)));
+		}
+		creationProcess = creationProcess
+				.then(commandGateway.send(new MakeDiagnosisForPatient(patientId, doctor, icd11, diagnosis)));
+		creationProcess.subscribe();
 	}
 
 }

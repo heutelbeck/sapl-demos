@@ -16,3 +16,4 @@ logging:
     org.mongodb.driver.connection: WARN
     org.springframework.boot.autoconfigure.mongo.embedded: WARN
     org.springframework.context.support: WARN
+    org.axonframework.eventhandling.TrackingEventProcessor: WARN

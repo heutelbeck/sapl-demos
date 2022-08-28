@@ -16,20 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.sapl.demo.axon.command.PatientCommandAPI.DischargePatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
+import io.sapl.demo.axon.query.patients.api.PatientDocument;
+import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchAllPatients;
+import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchPatient;
+import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.MonitorPatient;
 import io.sapl.demo.axon.command.Ward;
-import io.sapl.demo.axon.query.Measurement;
-import io.sapl.demo.axon.query.PatientDocument;
-import io.sapl.demo.axon.query.PatientQueryAPI.FetchAllPatients;
-import io.sapl.demo.axon.query.PatientQueryAPI.FetchPatient;
-import io.sapl.demo.axon.query.PatientQueryAPI.FetchSingleVitalSignOfPatient;
-import io.sapl.demo.axon.query.PatientQueryAPI.FetchVitalSignsOfPatient;
-import io.sapl.demo.axon.query.VitalSignsDocument;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-@RequiredArgsConstructor
 @RestController
+@RequiredArgsConstructor
 public class PatientsController {
 
 	private final ReactorQueryGateway   queryGateway;
@@ -46,41 +43,10 @@ public class PatientsController {
 				.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
 
-	@GetMapping("/api/patients/{id}/vitals")
-	Mono<ResponseEntity<VitalSignsDocument>> fetchVitals(@PathVariable String id) {
-		return queryGateway.query(new FetchVitalSignsOfPatient(id), ResponseTypes.instanceOf(VitalSignsDocument.class))
-				.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
-	}
-
-	@GetMapping("/api/patients/{id}/vitals/stream")
-	Flux<ServerSentEvent<VitalSignsDocument>> streamVitals(@PathVariable String id) {
-		return queryGateway
-				.subscriptionQuery(new FetchVitalSignsOfPatient(id), ResponseTypes.instanceOf(VitalSignsDocument.class),
-						ResponseTypes.instanceOf(VitalSignsDocument.class))
-				.flatMapMany(result -> Flux.concat(result.initialResult(), result.updates()))
-				.map(view -> ServerSentEvent.<VitalSignsDocument>builder().data(view).build());
-	}
-
-	@GetMapping("/api/patients/{id}/vitals/{type}")
-	Mono<ResponseEntity<Measurement>> fetchSingleVital(@PathVariable String id, @PathVariable String type) {
-		return queryGateway
-				.query(new FetchSingleVitalSignOfPatient(id, type), ResponseTypes.instanceOf(Measurement.class))
-				.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
-	}
-
-	@GetMapping("/api/patients/{id}/vitals/{type}/stream")
-	Flux<ServerSentEvent<Measurement>> streamSingleVital(@PathVariable String id, @PathVariable String type) {
-		return queryGateway
-				.subscriptionQuery(new FetchSingleVitalSignOfPatient(id, type),
-						ResponseTypes.instanceOf(Measurement.class), ResponseTypes.instanceOf(Measurement.class))
-				.flatMapMany(result -> Flux.concat(result.initialResult(), result.updates()))
-				.map(view -> ServerSentEvent.<Measurement>builder().data(view).build());
-	}
-
 	@GetMapping(value = "/api/patients/{id}/stream", produces = MediaType.APPLICATION_NDJSON_VALUE)
 	Flux<ServerSentEvent<PatientDocument>> streamPatient(@PathVariable String id) {
 		return queryGateway
-				.subscriptionQuery(new FetchPatient(id), ResponseTypes.instanceOf(PatientDocument.class),
+				.subscriptionQuery(new MonitorPatient(id), ResponseTypes.instanceOf(PatientDocument.class),
 						ResponseTypes.instanceOf(PatientDocument.class))
 				.flatMapMany(result -> Flux.concat(result.initialResult(), result.updates()))
 				.map(view -> ServerSentEvent.<PatientDocument>builder().data(view).build());

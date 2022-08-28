@@ -65,6 +65,10 @@
 
 		<!-- Axon Framework -->
 		<dependency>
+			<groupId>org.axonframework</groupId>
+			<artifactId>axon-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.axonframework.extensions.reactor</groupId>
 			<artifactId>axon-reactor-spring-boot-starter</artifactId>
 		</dependency>
@@ -98,16 +102,11 @@
 			<version>1.0.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ajbrown</groupId>
-			<artifactId>name-machine</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
+
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -1,4 +1,4 @@
-package io.sapl.demo.axon.configuration;
+package io.sapl.demo.axon.iface.rest;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +12,6 @@ public class RedirectController {
 
 	@GetMapping("/")
 	public RedirectView redirectToApi(RedirectAttributes attributes) {
-		return new RedirectView("/api/patients");
+		return new RedirectView("/swagger-ui/index.html");
 	}
 }

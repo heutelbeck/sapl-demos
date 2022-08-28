@@ -5,24 +5,24 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.axon.constrainthandling.api.ResultConstraintHandlerProvider;
-import io.sapl.demo.axon.query.Measurement;
+import io.sapl.demo.axon.query.vitals.api.VitalSignMeasurement;
 
 @Service
-public class BodyTemperatureClassificationPovider implements ResultConstraintHandlerProvider<Measurement> {
+public class BodyTemperatureClassificationPovider implements ResultConstraintHandlerProvider<VitalSignMeasurement> {
 
 	@Override
 	public boolean isResponsible(JsonNode constraint) {
-		return constraint.isTextual() && "catrgorise body temperature".equals(constraint.textValue());
+		return constraint.isTextual() && "categorise body temperature".equals(constraint.textValue());
 	}
 
 	@Override
-	public Class<Measurement> getSupportedType() {
-		return Measurement.class;
+	public Class<VitalSignMeasurement> getSupportedType() {
+		return VitalSignMeasurement.class;
 	}
 
 	@Override
-	public Object mapPayload(Object payload, Class<?> clazz) {
-		var measurement     = (Measurement) payload;
+	public Object mapPayload(JsonNode constraint, Object payload, Class<?> clazz) {
+		var measurement     = (VitalSignMeasurement) payload;
 		var bodyTemperature = Double.valueOf(measurement.value());
 		var unit            = measurement.value();
 		if ("°F".equals(unit))
@@ -34,26 +34,26 @@ public class BodyTemperatureClassificationPovider implements ResultConstraintHan
 					"Body temperature measurement in unknown unit. Unly supports °C, °K, K. Was: " + unit);
 
 		if (bodyTemperature < 35.0D)
-			return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Hypothermia",
+			return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Hypothermia",
 					"Body Temperature Category", measurement.timestamp());
 
 		if (bodyTemperature <= 37.5D)
-			return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Normal",
+			return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Normal",
 					"Body Temperature Category", measurement.timestamp());
 
 		if (bodyTemperature <= 38.3D)
-			return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Hyperthermia",
+			return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Hyperthermia",
 					"Body Temperature Category", measurement.timestamp());
 
 		if (bodyTemperature <= 40.0D)
-			return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Fever",
+			return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Fever",
 					"Body Temperature Category", measurement.timestamp());
 
 		if (bodyTemperature <= 41.5D)
-			return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Hyperpyrexia",
+			return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Hyperpyrexia",
 					"Body Temperature Category", measurement.timestamp());
 
-		return new Measurement(measurement.monitorDeviceId(), measurement.type(), "Critical Emergency",
+		return new VitalSignMeasurement(measurement.monitorDeviceId(), measurement.type(), "Critical Emergency",
 				"Body Temperature Category", measurement.timestamp());
 
 	}

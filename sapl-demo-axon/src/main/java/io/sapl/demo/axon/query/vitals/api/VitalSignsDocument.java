@@ -1,4 +1,4 @@
-package io.sapl.demo.axon.query;
+package io.sapl.demo.axon.query.vitals.api;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -20,7 +20,7 @@ public record VitalSignsDocument (
 	@Id
 	String      patientId,
 	
-	Map<String,Measurement> lastKnownMeasurements,
+	Map<String,VitalSignMeasurement> lastKnownMeasurements,
 	Set<String> connectedSensors,
 	
 	Instant updatedAt
@@ -42,7 +42,7 @@ public record VitalSignsDocument (
 		};
 	}
 
-	public static Function<VitalSignsDocument, VitalSignsDocument> withMeasurement(Measurement measurement,
+	public static Function<VitalSignsDocument, VitalSignsDocument> withMeasurement(VitalSignMeasurement measurement,
 			Instant timestamp) {
 		return vitals -> {
 			var measurements = new HashMap<>(vitals.lastKnownMeasurements);

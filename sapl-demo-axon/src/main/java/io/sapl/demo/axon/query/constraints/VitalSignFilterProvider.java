@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.axon.constrainthandling.api.UpdateFilterConstraintHandlerProvider;
-import io.sapl.demo.axon.query.Measurement;
+import io.sapl.demo.axon.query.vitals.api.VitalSignMeasurement;
 
 @Service
-public class VitalSignFilterProvider implements UpdateFilterConstraintHandlerProvider<Measurement> {
+public class VitalSignFilterProvider implements UpdateFilterConstraintHandlerProvider<VitalSignMeasurement> {
 
 	@Override
 	public boolean isResponsible(JsonNode constraint) {
@@ -29,12 +29,12 @@ public class VitalSignFilterProvider implements UpdateFilterConstraintHandlerPro
 	}
 
 	@Override
-	public Class<Measurement> getSupportedType() {
-		return Measurement.class;
+	public Class<VitalSignMeasurement> getSupportedType() {
+		return VitalSignMeasurement.class;
 	}
 
 	@Override
-	public Predicate<ResultMessage<Measurement>> getHandler(JsonNode constraint) {
+	public Predicate<ResultMessage<VitalSignMeasurement>> getHandler(JsonNode constraint) {
 		var blockedType = constraint.get("blockType").textValue();
 		return measurement -> !blockedType.equals(measurement.getPayload().type());
 	}

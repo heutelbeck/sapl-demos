@@ -18,12 +18,11 @@ Also, port 8080 (for the demo application) and port 8888 (used by the embedded M
 
 ## Running the Demo
 
-To run the demo, execute ``mvn spring-boot:run`` in the demos root folder. You can then access the demo by navigating to [http://localhost:8080](http://localhost:8080). Here you will be greeted by a login form.
+To run the demo, execute ``mvn spring-boot:run`` in the demos root folder. You can then access the demo by navigating to [http://localhost:8080](http://localhost:8080). Here you will be greeted by a login form. And after logging in you will be forwarded to a Swagger API page [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 
-
+## 
 
 ## The Demo Hospital Domain
-
 
 The demo implements a simple hospital scenario. The central and only aggregate in the system is the ```Patient``` aggregate. 
 Each patient can be registered, hospitalized, discharged, and diagnosed. Further, the staff can connect monitoring devices to patients to take measurements of vital signs, such as heart rate, blood pressure, body temperature, and respiration rate.
@@ -43,3 +42,34 @@ You can impersonate the following pre-configured staff members by logging in:
 |  eleanore  | pwd      | NURSE          | General Ward (GENERAL)              |
 |  david     | pwd      | DOCTOR         | Surgical intensive care Unit (SICU) |
 |  donna     | pwd      | ADMINISTRATOR  | Not Assigned (NONE)                 |
+
+Whenever a monitoring device is connected to a patient, the monitor starts publishing events with measurements taken.
+
+The different commands and queries are secured with different policy enforcement points and policies. 
+The policies are not modeled after real-world hospital requirements, but to demonstrate different features of SAPL and 
+the Axon Framework integration.
+
+### Use Case Query 1: Access Patient Diagnosis 
+
+The Patient aggregate is projected into a MongoDB document:
+
+```java
+@Document
+@JsonInclude(Include.NON_NULL)
+public record PatientDocument (
+	@Id
+	String  id,
+	String  name,
+	String  latestIcd11Code,      // International Classification of Diseases 11th Revision
+	String  latestDiagnosisText,  // Clear text explaining the diagnosis going along with the ICD11 code
+	Ward    ward,
+	Instant updatedAt) { };
+```
+
+These documents can be accessed via the following queries which are individually exposed through a REST controller: 
+
+* ```record FetchAllPatients () {};```: Standard Query [http://localhost:8080/api/patients](http://localhost:8080/api/patients).
+* ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
+* ```record FetchPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
+
+
