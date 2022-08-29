@@ -1,5 +1,10 @@
 package io.sapl.demo.axon.adapter.monitors;
 
+import static io.sapl.demo.axon.command.MonitorType.BLOOD_PRESSURE;
+import static io.sapl.demo.axon.command.MonitorType.BODY_TEMPERATURE;
+import static io.sapl.demo.axon.command.MonitorType.HEART_RATE;
+import static io.sapl.demo.axon.command.MonitorType.RESPIRATION_RATE;
+
 import java.time.Duration;
 import java.util.Locale;
 import java.util.function.BiFunction;
@@ -11,6 +16,7 @@ import org.axonframework.extensions.reactor.eventhandling.gateway.ReactorEventGa
 import org.springframework.stereotype.Service;
 
 import io.sapl.demo.axon.command.MonitorAPI.MeasurementTaken;
+import io.sapl.demo.axon.command.MonitorType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -22,16 +28,11 @@ import reactor.util.function.Tuples;
 @RequiredArgsConstructor
 public class MonitorFactory {
 
-	public static final String BLOOD_PRESSURE   = "blood pressure";
-	public static final String BODY_TEMPERATURE = "body temperature";
-	public static final String RESPIRATION_RATE = "respiration rate";
-	public static final String HEART_RATE       = "heart rate";
-
 	protected final static RandomGenerator RANDOM = RandomGenerator.getDefault();
 
 	private final ReactorEventGateway eventGateway;
 
-	public Flux<EventMessage<?>> createMonitor(String id, String type) {
+	public Flux<EventMessage<?>> createMonitor(String id, MonitorType type) {
 		return switch (type) {
 		case HEART_RATE -> createPulseMonitor(id);
 		case RESPIRATION_RATE -> createRespirationRateMonitor(id);
@@ -45,27 +46,27 @@ public class MonitorFactory {
 	}
 
 	protected Flux<EventMessage<?>> createPulseMonitor(String id) {
-		return randomSequence(Duration.ofSeconds(1L), 30.0D, 120.0D, 2.0D, 0.0D, 270.0D).map(
+		return randomSequence(Duration.ofSeconds(4L), 30.0D, 120.0D, 2.0D, 0.0D, 270.0D).map(
 				pulse -> new MeasurementTaken(id, HEART_RATE, String.format(Locale.ENGLISH, "%3.2f", pulse), "BPM"))
 				.map(GenericEventMessage::asEventMessage).flatMap(eventGateway::publish);
 	}
 
 	protected Flux<EventMessage<?>> createRespirationRateMonitor(String id) {
-		return randomSequence(Duration.ofSeconds(1L), 12.0D, 25.0D, 0.5D, 0.0D, 35.0D)
+		return randomSequence(Duration.ofMillis(4200L), 12.0D, 25.0D, 0.5D, 0.0D, 35.0D)
 				.map(pulse -> new MeasurementTaken(id, RESPIRATION_RATE, String.format(Locale.ENGLISH, "%3.2f", pulse),
 						"BPM"))
 				.flatMap(eventGateway::publish);
 	}
 
 	protected Flux<EventMessage<?>> createBodyTemperatureMonitor(String id) {
-		return randomSequence(Duration.ofSeconds(1L), 36.5D, 37.5D, 0.1D, 25.0D, 42.3D)
+		return randomSequence(Duration.ofMillis(4500L), 36.5D, 37.5D, 0.1D, 25.0D, 42.3D)
 				.map(pulse -> new MeasurementTaken(id, BODY_TEMPERATURE, String.format(Locale.ENGLISH, "%3.2f", pulse),
 						"°C"))
 				.flatMap(eventGateway::publish);
 	}
 
 	protected Flux<EventMessage<?>> createBloodPressureMonitor(String id) {
-		return Flux.interval(Duration.ofSeconds(1L)).scan(randomBloodPressure(), this::nextBloodPressure)
+		return Flux.interval(Duration.ofSeconds(8L)).scan(randomBloodPressure(), this::nextBloodPressure)
 				.map(t -> new MeasurementTaken(id, BLOOD_PRESSURE,
 						String.format(Locale.ENGLISH, "%.0f/%.0f", t.getT1(), t.getT2()), "systolic/diastolic mmHg"))
 				.flatMap(eventGateway::publish);

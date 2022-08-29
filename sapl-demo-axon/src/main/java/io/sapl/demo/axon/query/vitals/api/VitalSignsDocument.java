@@ -13,6 +13,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import io.sapl.demo.axon.command.MonitorType;
+
 //@formatter:off
 @Document
 @JsonInclude(Include.NON_NULL)
@@ -20,7 +22,7 @@ public record VitalSignsDocument (
 	@Id
 	String      patientId,
 	
-	Map<String,VitalSignMeasurement> lastKnownMeasurements,
+	Map<MonitorType,VitalSignMeasurement> lastKnownMeasurements,
 	Set<String> connectedSensors,
 	
 	Instant updatedAt

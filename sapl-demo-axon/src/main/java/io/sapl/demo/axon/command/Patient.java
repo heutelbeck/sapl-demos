@@ -10,6 +10,10 @@ import org.axonframework.eventsourcing.EventSourcingHandler;
 import org.axonframework.modelling.command.AggregateIdentifier;
 import org.axonframework.spring.stereotype.Aggregate;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import io.sapl.axon.annotation.ConstraintHandler;
+import io.sapl.axon.annotation.PreHandleEnforce;
 import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.DischargePatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.DisconnectMonitorFromPatient;
@@ -22,8 +26,11 @@ import io.sapl.demo.axon.command.PatientCommandAPI.PatientDischarged;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientHospitalised;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientRegistered;
 import io.sapl.demo.axon.command.PatientCommandAPI.RegisterPatient;
+import io.sapl.demo.axon.command.PatientCommandAPI.SuspiciousManipulation;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Aggregate
 @NoArgsConstructor
 public class Patient {
@@ -31,30 +38,34 @@ public class Patient {
 	@AggregateIdentifier
 	public String      id;
 	public Set<String> connectedMonitors = new HashSet<>();
-	public boolean     isHospitalized;
 	public Ward        ward;
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'RegisterPatient'}", resource = "{ 'type':'Patient', 'id':#payload.id(), 'ward':'NONE' }")
 	public Patient(RegisterPatient cmd) {
 		apply(new PatientRegistered(cmd.id(), cmd.name(), Ward.NONE));
 	}
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#payload.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(HospitalisePatient cmd) {
 		apply(new PatientHospitalised(cmd.id(), cmd.ward()));
 	}
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'DischargePatient', 'ward':#payload.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(DischargePatient cmd) {
 		apply(new PatientDischarged(cmd.id(), Ward.NONE));
 	}
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'MakeDiagnosisForPatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(MakeDiagnosisForPatient cmd) {
 		apply(new PatientDiagnosed(cmd.id(), cmd.doctor(), cmd.icd11Code(), cmd.diagnosisText()));
 	}
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'ConnectMonitorToPatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(ConnectMonitorToPatient cmd) {
 		if (connectedMonitors.contains(cmd.monitorDeviceId()))
 			throw new IllegalStateException(
@@ -63,11 +74,18 @@ public class Patient {
 	}
 
 	@CommandHandler
+	@PreHandleEnforce(action = "{'command':'DisconnectMonitorFromPatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(DisconnectMonitorFromPatient cmd) {
 		if (!connectedMonitors.contains(cmd.monitorDeviceId()))
 			throw new IllegalStateException(
 					String.format("Monitor %s is not connected to patient %s.", id, cmd.monitorDeviceId()));
 		apply(new MonitorDisconnectedFromPatient(cmd.id(), cmd.monitorDeviceId()));
+	}
+
+	@ConstraintHandler("#constraint.get('type').textValue() == 'documentSuspisiousManipulation'")
+	public void handleSuspiciousManipulation(JsonNode constraint) {
+		log.debug("Handling constraint: {}", constraint);
+		apply(new SuspiciousManipulation(id, constraint.get("username").textValue()));
 	}
 
 	@EventSourcingHandler
@@ -78,14 +96,12 @@ public class Patient {
 
 	@EventSourcingHandler
 	void on(PatientHospitalised evt) {
-		this.isHospitalized = true;
-		this.ward           = evt.ward();
+		this.ward = evt.ward();
 	}
 
 	@EventSourcingHandler
 	void on(PatientDischarged evt) {
-		this.isHospitalized = false;
-		this.ward           = evt.ward();
+		this.ward = evt.ward();
 	}
 
 	@EventSourcingHandler

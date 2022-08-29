@@ -1,0 +1,37 @@
+import filter.*
+import log.*
+
+set "Patient Aggregate Command Policies" 
+first-applicable
+
+for resource.type == "Patient"
+
+policy "only system infrastructure creates patients"
+permit action.command == "RegisterPatient" & subject == "SYSTEM"
+
+policy "only doctors may hospitalize patients but only into their own wards, system may do it as well"
+permit 	action.command == "HospitalisePatient"
+where 
+		subject == "SYSTEM" || (subject.position == "DOCTOR" && action.ward ==  subject.assignedWard);
+
+policy "only doctors may discharge or diagnose patients but only from their own wards, system may do it as well"
+permit 	action.command == "DischargePatient" | action.command == "MakeDiagnosisForPatient"
+where 
+		subject == "SYSTEM" || (subject.position == "DOCTOR" && resource.ward ==  subject.assignedWard);
+
+policy "all ward staff may connect and disconnect monitors"
+permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
+where 
+		(subject != "anonymous" && resource.ward == subject.assignedWard) || subject == "SYSTEM";
+
+policy "all staff connect and disconnect monitors but it must be documented if they do not belong to the ward"
+permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
+where 
+		subject != "anonymous";
+obligation
+		{
+			"type":"documentSuspisiousManipulation",
+			"username": subject.username
+		}
+
+policy "default to deny" deny

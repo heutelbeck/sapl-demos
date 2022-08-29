@@ -1,0 +1,14 @@
+axon:
+  axonserver.enabled: false
+  serializer:
+    general:  jackson
+    events:   jackson
+    messages: jackson
+spring:
+  main.banner-mode: off
+  mongodb.embedded.version: 4.4.13 # Select embedded Mongo Version. See: de.flapdoodle.embed.mongo.distribution.Version.Main.PRODUCTION
+  data.mongodb.port: 8888
+  task.scheduling.pool.size: 5
+logging:
+  level:
+    root: OFF

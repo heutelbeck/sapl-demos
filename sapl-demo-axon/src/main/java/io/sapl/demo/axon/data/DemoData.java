@@ -1,9 +1,9 @@
 package io.sapl.demo.axon.data;
 
-import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.BLOOD_PRESSURE;
-import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.BODY_TEMPERATURE;
-import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.HEART_RATE;
-import static io.sapl.demo.axon.adapter.monitors.MonitorFactory.RESPIRATION_RATE;
+import static io.sapl.demo.axon.command.MonitorType.BLOOD_PRESSURE;
+import static io.sapl.demo.axon.command.MonitorType.BODY_TEMPERATURE;
+import static io.sapl.demo.axon.command.MonitorType.HEART_RATE;
+import static io.sapl.demo.axon.command.MonitorType.RESPIRATION_RATE;
 import static io.sapl.demo.axon.command.Position.ADMINISTRATOR;
 import static io.sapl.demo.axon.command.Position.DOCTOR;
 import static io.sapl.demo.axon.command.Position.NURSE;
@@ -24,12 +24,14 @@ import com.heutelbeck.uuid.Base64Id;
 
 import io.sapl.demo.axon.authentication.HospitalStaff;
 import io.sapl.demo.axon.authentication.HospitalStappUserDetailsService;
+import io.sapl.demo.axon.command.MonitorType;
 import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.MakeDiagnosisForPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.RegisterPatient;
 import io.sapl.demo.axon.command.Position;
 import io.sapl.demo.axon.command.Ward;
+import io.sapl.demo.axon.configuration.ImpersonationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,8 +62,10 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
+		var authn = ImpersonationUtil.impersonateSystemUser();
 		generateHospitalStaff();
 		generatePatients();
+		ImpersonationUtil.setUser(authn);
 	}
 
 	// @formatter:off
@@ -109,10 +113,9 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 		log.info("");
 	}
 
-	private void loadPatient(String patientId, String name, List<String> monitors, Ward ward, String doctor,
+	private void loadPatient(String patientId, String name, List<MonitorType> monitors, Ward ward, String doctor,
 			String icd11, String diagnosis) {
-		log.info(String.format(" %-3.3s | %-20.20s | %s ", patientId, name,
-				ward.getDescription() + " (" + ward + ")"));
+		log.info(String.format(" %-3.3s | %-20.20s | %s ", patientId, name, ward.getDescription() + " (" + ward + ")"));
 		var creationProcess = commandGateway.send(new RegisterPatient(patientId, name.toString())).cast(String.class);
 		creationProcess = creationProcess.then(commandGateway.send(new HospitalisePatient(patientId, ward)));
 		for (var monitor : monitors) {

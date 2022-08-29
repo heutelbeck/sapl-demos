@@ -13,7 +13,7 @@ public class PatientCommandAPI {
 	public record DischargePatient				(@TargetAggregateIdentifier String id) {};
 	public record MakeDiagnosisForPatient 		(@TargetAggregateIdentifier String id, String doctor, 
 																			String icd11Code, String diagnosisText) {};
-	public record ConnectMonitorToPatient 		(@TargetAggregateIdentifier String id, String monitorDeviceId, String monitorType) {};
+	public record ConnectMonitorToPatient 		(@TargetAggregateIdentifier String id, String monitorDeviceId, MonitorType monitorType) {};
 	public record DisconnectMonitorFromPatient	(@TargetAggregateIdentifier String id, String monitorDeviceId) {};
 	// @formatter:on
 
@@ -22,8 +22,9 @@ public class PatientCommandAPI {
 	public record PatientHospitalised			(String id, Ward ward) {};
 	public record PatientDischarged				(String id, Ward ward) {};
 	public record PatientDiagnosed		 		(String id, String doctor, String icd11Code, String diagnosisText) {};
-	public record MonitorConnectedToPatient		(String id, String monitorDeviceId, String monitorType) {};
+	public record MonitorConnectedToPatient		(String id, String monitorDeviceId, MonitorType monitorType) {};
 	public record MonitorDisconnectedFromPatient(String id, String monitorDeviceId) {};
+	public record SuspiciousManipulation        (String id, String user) {};
 	// @formatter:on
 
 }
