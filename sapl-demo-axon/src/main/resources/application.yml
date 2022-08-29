@@ -12,6 +12,7 @@ logging:
   pattern.console: "%d{yy-MM-dd HH:mm:ss} %-5level %-40.40logger{40} | %msg%n"
   level:
     io.sapl: DEBUG
+    #io.sapl.grammar: INFO
     de.flapdoodle: WARN
     org.mongodb.driver.connection: WARN
     org.springframework.boot.autoconfigure.mongo.embedded: WARN

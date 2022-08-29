@@ -13,16 +13,16 @@ import org.axonframework.queryhandling.QueryHandler;
 import org.axonframework.queryhandling.QueryUpdateEmitter;
 import org.springframework.stereotype.Service;
 
-import io.sapl.axon.annotation.EnforceDropUpdatesWhileDenied;
+import io.sapl.axon.annotation.EnforceRecoverableUpdatesIfDenied;
+import io.sapl.axon.annotation.PreHandleEnforce;
 import io.sapl.demo.axon.command.MonitorAPI.MeasurementTaken;
 import io.sapl.demo.axon.command.PatientCommandAPI.MonitorConnectedToPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.MonitorDisconnectedFromPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.PatientRegistered;
 import io.sapl.demo.axon.query.vitals.api.VitalSignMeasurement;
 import io.sapl.demo.axon.query.vitals.api.VitalSignsDocument;
-import io.sapl.demo.axon.query.vitals.api.VitalSignsQueryAPI.FetchVitalSignsOfPatient;
+import io.sapl.demo.axon.query.vitals.api.VitalSignsQueryAPI.FetchVitalSignOfPatient;
 import io.sapl.demo.axon.query.vitals.api.VitalSignsQueryAPI.MonitorVitalSignOfPatient;
-import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,11 +53,11 @@ public class VitalSignsProjection {
 		updateVitals(evt.id(), VitalSignsDocument.withoutSensor(evt.monitorDeviceId(), timestamp));
 	}
 
-
 	@EventHandler
 	void on(MeasurementTaken evt, @Timestamp Instant timestamp) {
 		log.trace("Project: {}", evt);
-		var measurement = new VitalSignMeasurement(evt.monitorId(), evt.monitorType(), evt.value(), evt.unit(), timestamp);
+		var measurement = new VitalSignMeasurement(evt.monitorId(), evt.monitorType(), evt.value(), evt.unit(),
+				timestamp);
 		repository.findByMonitorId(evt.monitorId()).map(VitalSignsDocument.withMeasurement(measurement, timestamp))
 				.ifPresentOrElse(v -> {
 					saveAndUpdate(v);
@@ -68,15 +68,16 @@ public class VitalSignsProjection {
 	}
 
 	@QueryHandler
-	@EnforceDropUpdatesWhileDenied(action = "'read'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
+	@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
 	Optional<VitalSignMeasurement> handle(MonitorVitalSignOfPatient query) {
 		return repository.findById(query.patientId()).map(v -> v.lastKnownMeasurements().get(query.type()));
 	}
 
 	@QueryHandler
-	@EnforceRecoverableIfDenied(action = "'read'", resource = "{ 'type':'measurements', 'id':#payload.patientId() }")
-	Optional<VitalSignsDocument> handle(FetchVitalSignsOfPatient query) {
-		return repository.findById(query.patientId());
+	@PreHandleEnforce(action = "'Fetch'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
+	Optional<VitalSignMeasurement> handle(FetchVitalSignOfPatient query) {
+		return repository.findById(query.patientId())
+				.flatMap(pVitals -> Optional.ofNullable(pVitals.lastKnownMeasurements().get(query.type())));
 	}
 
 	void updateVitals(String id, Function<VitalSignsDocument, VitalSignsDocument> update) {
@@ -89,10 +90,10 @@ public class VitalSignsProjection {
 
 	private void saveAndUpdate(VitalSignsDocument vitals) {
 		repository.save(vitals);
-		updateEmitter.emit(FetchVitalSignsOfPatient.class, idMatches(vitals.patientId()), vitals);
+		updateEmitter.emit(FetchVitalSignOfPatient.class, idMatches(vitals.patientId()), vitals);
 	}
 
-	private Predicate<FetchVitalSignsOfPatient> idMatches(String id) {
+	private Predicate<FetchVitalSignOfPatient> idMatches(String id) {
 		return query -> query.patientId().equals(id);
 	}
 

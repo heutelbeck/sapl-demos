@@ -38,7 +38,7 @@
 		</dependencies>
 	</dependencyManagement>
 	<dependencies>
-		<!-- Spting Boot -->
+		<!-- Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -56,13 +56,13 @@
 			<artifactId>springdoc-openapi-ui</artifactId>
 			<version>1.6.11</version>
 		</dependency>
-		<dependency>
+	<!--	<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
-
+-->
 		<!-- Axon Framework -->
 		<dependency>
 			<groupId>org.axonframework</groupId>

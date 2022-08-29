@@ -76,8 +76,8 @@ public class MonitorFactory {
 	}
 
 	Tuple2<Double, Double> nextBloodPressure(Tuple2<Double, Double> old, Long x) {
-		var systolic  = nextVal(old.getT1(), 0.1D, 40.0D, 200.0D);
-		var diastolic = nextVal(old.getT2(), 0.1D, 10.0D, systolic - 35.0D);
+		var systolic  = nextVal(old.getT1(), 4.0D, 40.0D, 200.0D);
+		var diastolic = nextVal(old.getT2(), 4.0D, 10.0D, systolic - 35.0D);
 		return Tuples.of(systolic, diastolic);
 	}
 
