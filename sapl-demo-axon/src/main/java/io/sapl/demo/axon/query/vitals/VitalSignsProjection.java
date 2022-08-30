@@ -68,13 +68,13 @@ public class VitalSignsProjection {
 	}
 
 	@QueryHandler
-	@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
+	@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", resource = "{ 'type':'measurement', 'id':#query.patientId(), 'monitorType':#query.type() }")
 	Optional<VitalSignMeasurement> handle(MonitorVitalSignOfPatient query) {
 		return repository.findById(query.patientId()).map(v -> v.lastKnownMeasurements().get(query.type()));
 	}
 
 	@QueryHandler
-	@PreHandleEnforce(action = "'Fetch'", resource = "{ 'type':'measurement', 'id':#payload.patientId(), 'monitorType':#payload.type() }")
+	@PreHandleEnforce(action = "'Fetch'", resource = "{ 'type':'measurement', 'id':#query.patientId(), 'monitorType':#query.type() }")
 	Optional<VitalSignMeasurement> handle(FetchVitalSignOfPatient query) {
 		return repository.findById(query.patientId())
 				.flatMap(pVitals -> Optional.ofNullable(pVitals.lastKnownMeasurements().get(query.type())));

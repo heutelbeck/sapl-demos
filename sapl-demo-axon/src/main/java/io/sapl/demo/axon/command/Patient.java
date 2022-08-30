@@ -41,19 +41,19 @@ public class Patient {
 	public Ward        ward;
 
 	@CommandHandler
-	@PreHandleEnforce(action = "{'command':'RegisterPatient'}", resource = "{ 'type':'Patient', 'id':#payload.id(), 'ward':'NONE' }")
+	@PreHandleEnforce(action = "{'command':'RegisterPatient'}", resource = "{ 'type':'Patient', 'id':#command.id(), 'ward':'NONE' }")
 	public Patient(RegisterPatient cmd) {
 		apply(new PatientRegistered(cmd.id(), cmd.name(), Ward.NONE));
 	}
 
 	@CommandHandler
-	@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#payload.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+	@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#command.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(HospitalisePatient cmd) {
 		apply(new PatientHospitalised(cmd.id(), cmd.ward()));
 	}
 
 	@CommandHandler
-	@PreHandleEnforce(action = "{'command':'DischargePatient', 'ward':#payload.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+	@PreHandleEnforce(action = "{'command':'DischargePatient', 'ward':#command.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(DischargePatient cmd) {
 		apply(new PatientDischarged(cmd.id(), Ward.NONE));
 	}

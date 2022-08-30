@@ -72,7 +72,7 @@ public class PatientProjection {
 	}
 
 	@QueryHandler
-	@PreHandleEnforce(action = "'Monitor'", resource = "{ 'type':'patient', 'id':#payload.patientId() }")
+	@PreHandleEnforce(action = "'Monitor'", resource = "{ 'type':'patient', 'id':#query.patientId() }")
 	Optional<PatientDocument> handle(MonitorPatient query) {
 		log.trace("Handle: {}", query);
 		return patientsRepository.findById(query.patientId());
