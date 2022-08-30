@@ -36,7 +36,7 @@ public class VitalSignFilterProvider implements UpdateFilterConstraintHandlerPro
 	@Override
 	public Predicate<ResultMessage<VitalSignMeasurement>> getHandler(JsonNode constraint) {
 		var blockedType = constraint.get("blockType").textValue();
-		return measurement -> !blockedType.equals(measurement.getPayload().type());
+		return measurement -> ! blockedType.equals(measurement.getPayload().type().toString());
 	}
 
 }

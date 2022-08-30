@@ -21,7 +21,7 @@ public class BloodPressureClassificationProvider implements ResultConstraintHand
 	}
 
 	@Override
-	public Object mapPayload(JsonNode constraint, Object payload, Class<?> clazz) {
+	public Object mapPayload(Object payload, Class<?> clazz, JsonNode constraint) {
 		var measurement = (VitalSignMeasurement) payload;
 		var split       = measurement.value().split("/");
 		var systolic    = Double.valueOf(split[0]);

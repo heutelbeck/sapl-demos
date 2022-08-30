@@ -21,7 +21,7 @@ public class BodyTemperatureClassificationPovider implements ResultConstraintHan
 	}
 
 	@Override
-	public Object mapPayload(JsonNode constraint, Object payload, Class<?> clazz) {
+	public Object mapPayload(Object payload, Class<?> clazz, JsonNode constraint) {
 		var measurement     = (VitalSignMeasurement) payload;
 		var bodyTemperature = Double.valueOf(measurement.value());
 		var unit            = measurement.value();
