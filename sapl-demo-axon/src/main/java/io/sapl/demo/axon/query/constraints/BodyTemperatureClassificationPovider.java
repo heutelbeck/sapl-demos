@@ -1,5 +1,9 @@
 package io.sapl.demo.axon.query.constraints;
 
+import java.util.Set;
+
+import org.axonframework.messaging.responsetypes.ResponseType;
+import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -8,7 +12,7 @@ import io.sapl.axon.constrainthandling.api.ResultConstraintHandlerProvider;
 import io.sapl.demo.axon.query.vitals.api.VitalSignMeasurement;
 
 @Service
-public class BodyTemperatureClassificationPovider implements ResultConstraintHandlerProvider<VitalSignMeasurement> {
+public class BodyTemperatureClassificationPovider implements ResultConstraintHandlerProvider {
 
 	@Override
 	public boolean isResponsible(JsonNode constraint) {
@@ -16,8 +20,8 @@ public class BodyTemperatureClassificationPovider implements ResultConstraintHan
 	}
 
 	@Override
-	public Class<VitalSignMeasurement> getSupportedType() {
-		return VitalSignMeasurement.class;
+	public Set<ResponseType<?>> getSupportedResponseTypes() {
+		return Set.of(ResponseTypes.instanceOf(VitalSignMeasurement.class));
 	}
 
 	@Override
