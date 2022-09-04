@@ -36,7 +36,7 @@ permit subject.position == "DOCTOR" | (subject.position == "NURSE" & subject.ass
  * Also, the medical information must be blackened.  
  */
 policy "authenticated users may see filtered" 
-permit subject != "anononymous"
+permit subject != "anonymous"
 obligation
 	{
 		"type" 		: "filterMessagePayloadContent",
