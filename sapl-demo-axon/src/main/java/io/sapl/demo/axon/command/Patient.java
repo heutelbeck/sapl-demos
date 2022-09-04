@@ -53,7 +53,7 @@ public class Patient {
 	}
 
 	@CommandHandler
-	@PreHandleEnforce(action = "{'command':'DischargePatient', 'ward':#command.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+	@PreHandleEnforce(action = "{'command':'DischargePatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 	void handle(DischargePatient cmd) {
 		apply(new PatientDischarged(cmd.id(), Ward.NONE));
 	}
