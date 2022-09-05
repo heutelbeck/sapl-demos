@@ -88,6 +88,8 @@ These documents can be accessed via the following queries which are individually
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
+#### The ```FetchPatient``` Query
+
 First, for the ```FetchPatient``` query the folowing rules are enforced:
 - All doctors may see the complete medical record.
 - All nurses working in the ward where the patient is hospitalised may see the complete medical record.
@@ -254,6 +256,27 @@ public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandle
 		};
 	}
 
+}
+```
+
+#### The ```FetchAllPatients``` Query
+
+```java
+{
+  "subject": {
+    "username": "eleanore",
+    "authorities": [],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true,
+    "enabled": true,
+    "assignedWard": "GENERAL",
+    "position": "NURSE"
+  },
+  "action": "FetchAll",
+  "resource": {
+    "type": "patient"
+  }
 }
 ```
 
