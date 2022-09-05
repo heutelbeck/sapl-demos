@@ -124,10 +124,10 @@ Additionally, an ```AccessAttempt``` event is published to the event store. The 
 
 ```JSON
 {
-    "_id" : ObjectId("63166fc7590d2000f31a9a6a"),
+    "_id" : "63166fc7590d2000f31a9a6a",
     "aggregateIdentifier" : "af6622f9-b0e6-4d7a-82a9-1992d5cd272f",
     "type" : null,
-    "sequenceNumber" : NumberLong(0),
+    "sequenceNumber" : 0,
     "serializedPayload" : "{\"message\":\"Access to a protected resource was attempted/continued by {\\\"username\\\":\\\"eleanore\\\",\\\"authorities\\\":[],\\\"accountNonExpired\\\":true,\\\"accountNonLocked\\\":true,\\\"credentialsNonExpired\\\":true,\\\"enabled\\\":true,\\\"assignedWard\\\":\\\"GENERAL\\\",\\\"position\\\":\\\"NURSE\\\"}. Access was  GRANTED. Means of access: class io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\",\"decision\":{\"decision\":\"PERMIT\",\"resource\":{\"id\":\"0\",\"name\":\"Mona Vance\",\"latestIcd11Code\":\"1B██\",\"latestDiagnosisText\":\"Br█████████\",\"ward\":\"ICCU\",\"updatedAt\":\"2022-09-05T21:52:51.388Z\"},\"obligations\":[\"dispatch access attempt event\"]},\"cause\":{\"queryName\":\"io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\",\"responseType\":{\"expectedResponseType\":\"io.sapl.demo.axon.query.patients.api.PatientDocument\"},\"payload\":{\"patientId\":\"0\"},\"identifier\":\"dfdaef45-67f0-4fb7-895a-be0847b792a1\",\"metaData\":{\"subject\":\"{\\\"username\\\":\\\"eleanore\\\",\\\"authorities\\\":[],\\\"accountNonExpired\\\":true,\\\"accountNonLocked\\\":true,\\\"credentialsNonExpired\\\":true,\\\"enabled\\\":true,\\\"assignedWard\\\":\\\"GENERAL\\\",\\\"position\\\":\\\"NURSE\\\"}\"},\"payloadType\":\"io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\"}}",
     "timestamp" : "2022-09-05T21:53:11.586Z",
     "payloadType" : "io.sapl.demo.axon.query.constraints.LogAccessEventEmitterProvider$AccessAttempt",
