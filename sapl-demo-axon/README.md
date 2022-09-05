@@ -43,6 +43,22 @@ You can impersonate the following pre-configured staff members by logging in:
 |  david     | pwd      | DOCTOR         | Surgical intensive care Unit (SICU) |
 |  donna     | pwd      | ADMINISTRATOR  | Not Assigned (NONE)                 |
 
+Further, the following patients are created on startup:
+
+|  Id  | Name                 | Ward                                | Pre-Connected Monitors                                    |
+|------|----------------------|-------------------------------------|-----------------------------------------------------------|
+|  0   | Mona Vance           | Intensive Cardiac Care Unit (ICCU)  | Pulse, Blood Pressure, Body Temperature, Respiration Rate |
+|  1   | Martin Pape          | Intensive Cardiac Care Unit (ICCU)  | Pulse, Blood Pressure                                     |
+|  2   | Richard Lewis        | Critical Care Unit (CCU)            | Pulse,                 Body Temperature, Respiration Rate |
+|  3   | Jesse Ramos          | Critical Care Unit (CCU)            |        Blood Pressure,                   Respiration Rate |
+|  4   | Lester Romaniak      | Critical Care Unit (CCU)            | Pulse, Blood Pressure, Body Temperature, Respiration Rate |
+|  5   | Matthew Cortazar     | Surgical intensive care Unit (SICU) | Pulse,                                   Respiration Rate |
+|  6   | Timothy Favero       | Surgical intensive care Unit (SICU) | Pulse, Blood Pressure, Body Temperature, Respiration Rate |
+|  7   | Louise Colley        | General Ward (GENERAL)              |                                          Respiration Rate |
+|  8   | Bret Gerson          | Intensive Cardiac Care Unit (ICCU)  |                        Body Temperature                   |
+|  9   | Richard Spreer       | Not Assigned (NONE)                 |        Blood Pressure                                     |
+
+
 Whenever a monitoring device is connected to a patient, the monitor starts publishing events with measurements taken.
 
 The different commands and queries are secured with different policy enforcement points and policies. 
@@ -71,5 +87,16 @@ These documents can be accessed via the following queries which are individually
 * ```record FetchAllPatients () {};```: Standard Query [http://localhost:8080/api/patients](http://localhost:8080/api/patients).
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
 * ```record FetchPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
+
+In the demo, the following access rules are enforced on these queries:
+
+* For ```FetchPatient```:
+ - All doctors may see the complete medical record.
+ - All nurses working in the ward where the patient is hospitalised may see the complete medical record.
+ - All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
+ - Unauthenticated users may not access the document.
+ 
+
+ 
 
 

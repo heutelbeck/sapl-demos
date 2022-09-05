@@ -2,7 +2,6 @@
  * Import the filter library, so that 'blacken' can be used directly instead of using the absolute name 'filter.blacken'.
  */
 import filter.*
-import log.*
 
 /*
  * In each SAPL document, the top level policy or policy set MUST have a unique name.
