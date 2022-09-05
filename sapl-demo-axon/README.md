@@ -88,16 +88,172 @@ These documents can be accessed via the following queries which are individually
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
+First, for the ```FetchPatient``` query the folowing rules are enforced:
+- All doctors may see the complete medical record.
+- All nurses working in the ward where the patient is hospitalised may see the complete medical record.
+- All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
+- Unauthenticated users may not access the document.
 
-In the demo, the following access rules are enforced on these queries:
+For example, if the user ```karl``` who is a nurse in the ICCU, accesses the record of Mona Vance under ```http://localhost:8080/api/patients/0``` the following respone is sent:
 
-* For ```FetchPatient```:
- - All doctors may see the complete medical record.
- - All nurses working in the ward where the patient is hospitalised may see the complete medical record.
- - All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
- - Unauthenticated users may not access the document.
- 
+```JSON
+{
+  "id": "0",
+  "name": "Mona Vance",
+  "latestIcd11Code": "1B95",
+  "latestDiagnosisText": "Brucellosis",
+  "ward": "ICCU",
+  "updatedAt": "2022-09-05T20:06:42.919Z"
+}
+```
 
- 
+Now, if the user ```eleanore``` who is a nurse in the general ward, accesses the same record of  of Mona Vance under ```http://localhost:8080/api/patients/0``` the following respone is sent:
 
+```JSON
+{
+  "id": "0",
+  "name": "Mona Vance",
+  "latestIcd11Code": "1B██",
+  "latestDiagnosisText": "Br█████████",
+  "ward": "ICCU",
+  "updatedAt": "2022-09-05T20:06:42.919Z"
+}
+```
+
+Additionally, an ```AccessAttempt``` event is published to the event store. The demo uses an embedded MongoDB at runtime. You can connect to it via port 8888 and inspect the ```domainevents``` collection. There you can find an event similar to this:
+
+```JSON
+{
+    "_id" : ObjectId("63166fc7590d2000f31a9a6a"),
+    "aggregateIdentifier" : "af6622f9-b0e6-4d7a-82a9-1992d5cd272f",
+    "type" : null,
+    "sequenceNumber" : NumberLong(0),
+    "serializedPayload" : "{\"message\":\"Access to a protected resource was attempted/continued by {\\\"username\\\":\\\"eleanore\\\",\\\"authorities\\\":[],\\\"accountNonExpired\\\":true,\\\"accountNonLocked\\\":true,\\\"credentialsNonExpired\\\":true,\\\"enabled\\\":true,\\\"assignedWard\\\":\\\"GENERAL\\\",\\\"position\\\":\\\"NURSE\\\"}. Access was  GRANTED. Means of access: class io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\",\"decision\":{\"decision\":\"PERMIT\",\"resource\":{\"id\":\"0\",\"name\":\"Mona Vance\",\"latestIcd11Code\":\"1B██\",\"latestDiagnosisText\":\"Br█████████\",\"ward\":\"ICCU\",\"updatedAt\":\"2022-09-05T21:52:51.388Z\"},\"obligations\":[\"dispatch access attempt event\"]},\"cause\":{\"queryName\":\"io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\",\"responseType\":{\"expectedResponseType\":\"io.sapl.demo.axon.query.patients.api.PatientDocument\"},\"payload\":{\"patientId\":\"0\"},\"identifier\":\"dfdaef45-67f0-4fb7-895a-be0847b792a1\",\"metaData\":{\"subject\":\"{\\\"username\\\":\\\"eleanore\\\",\\\"authorities\\\":[],\\\"accountNonExpired\\\":true,\\\"accountNonLocked\\\":true,\\\"credentialsNonExpired\\\":true,\\\"enabled\\\":true,\\\"assignedWard\\\":\\\"GENERAL\\\",\\\"position\\\":\\\"NURSE\\\"}\"},\"payloadType\":\"io.sapl.demo.axon.query.patients.api.PatientQueryAPI$FetchPatient\"}}",
+    "timestamp" : "2022-09-05T21:53:11.586Z",
+    "payloadType" : "io.sapl.demo.axon.query.constraints.LogAccessEventEmitterProvider$AccessAttempt",
+    "payloadRevision" : null,
+    "serializedMetaData" : "{}",
+    "eventIdentifier" : "af6622f9-b0e6-4d7a-82a9-1992d5cd272f"
+}
+```
+
+This is achieved by securing the ```@QueryHandler``` method for ```FetchPatient``` with a SAPL annotation:
+
+```java
+@QueryHandler
+@PostHandleEnforce(action = "'Fetch'", resource = "{ 'type':'patient', 'value':#queryResult }")
+Optional<PatientDocument> handle(FetchPatient query) {
+	return patientsRepository.findById(query.patientId());
+}
+```
+
+The ```@PostHandleEnforce``` annotation establishes a Policy Decision Point (PDP) wrapping the ```handle(FetchPatient query)``` method. This annotation first invokes the method, and then constructs an authorizuation decision evaluating the Sprinf Expression Language expressions in the annotation:
+
+```JSON
+{
+  "subject": {
+    "username": "eleanore",
+    "authorities": [],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true,
+    "enabled": true,
+    "assignedWard": "GENERAL",
+    "position": "NURSE"
+  },
+  "action": "Fetch",
+  "resource": {
+    "type": "patient",
+    "value": {
+      "id": "0",
+      "name": "Mona Vance",
+      "latestIcd11Code": "1B95",
+      "latestDiagnosisText": "Brucellosis",
+      "ward": "ICCU",
+      "updatedAt": "2022-09-05T22:02:14.239Z"
+    }
+  }
+}
+```
+
+As you can see, the ```@PostHandleEnforce``` annotation makes the query result available as ```#queryResult``` in the SpEL expression. With this authorization subscription, the following policy in ```src/main/resources/fetchPatient.sapl``` is triggered:
+
+```
+policy "authenticated users may see filtered" 
+permit subject != "anononymous"
+obligation "dispatch access attempt event"
+transform 
+  // Subtractive template with filters removing content
+  resource.value |- { 
+                       @.latestIcd11Code : blacken(2,0,"\u2588"),
+		       @.latestDiagnosisText : blacken(2,0,"\u2588")
+                    }
+```
+
+The policy states thet access is granted (```permit```) for authenticated users (```subject != "anononymous"```) and that an assess attempt event must be emitted, and if this is not possible, access is denied (```obligation "dispatch access attempt event"```). Further, the ```transform``` expression states, that the queryResult must be replaced with an object, where the ICD11 code and the diagnosis text are blackened. 
+
+Thus, the PDP sends an authorization decision:
+
+```JSON
+{
+  "decision": "PERMIT",
+  "resource": {
+    "id": "0",
+    "name": "Mona Vance",
+    "latestIcd11Code": "1B██",
+    "latestDiagnosisText": "Br█████████",
+    "ward": "ICCU",
+    "updatedAt": "2022-09-05T22:02:14.239Z"
+  },
+  "obligations": [
+    "dispatch access attempt event"
+  ],
+  "advice": []
+}
+```
+
+The PEP then replaces the query result with the object with the ```resource``` of the decision. Before retuning this, the PEP checks if any handler for the obligation ```"dispatch access attempt event"``` is available. In the case of the demo, the Bean ```LogAccessEventEmitterProvider``` does support this type of obligation:
+
+```java
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandlerProvider {
+
+	public record AccessAttempt(String message, AuthorizationDecision decision, Message<?> cause) {
+	};
+
+	private final ReactorEventGateway eventGateway;
+
+	@Override
+	public boolean isResponsible(JsonNode constraint) {
+		return constraint.isTextual() && "dispatch access attempt event".equals(constraint.textValue());
+	}
+
+	@Override
+	public BiConsumer<AuthorizationDecision, Message<?>> getHandler(JsonNode constraint) {
+		return (decision, cause) -> {
+			var message = "Access to a protected resource was attempted/continued by ";
+			var subject = cause.getMetaData().get("subject");
+			if (subject != null)
+				message += subject;
+			else
+				message += "an unknwon actor";
+
+			message += ". Access was ";
+
+			if (decision.getDecision() == Decision.PERMIT)
+				message += " GRANTED. ";
+			else
+				message += " DENIED. ";
+
+			message += "Means of access: "+cause.getPayloadType();
+			eventGateway.publish(new AccessAttempt(message, decision, cause)).subscribe();
+			log.debug("Published access log event to event bus: {}",message);
+
+		};
+	}
+
+}
+```
 
