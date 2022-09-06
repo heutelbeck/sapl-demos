@@ -271,7 +271,7 @@ The ```FetchAllPatients``` query is handled by the following query handler:
 	}
 ```
 
-While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
+This query is exposed as a REST endpoint under [http://localhost:8080/api/patients](http://localhost:8080/api/patients). While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
 
 ```JSON
 {
@@ -386,5 +386,84 @@ In the case of ```karl``` the REST service will return:
   }
   ...
 ]
+```
+
+#### The ```MonitorPatient``` Subscription Query
+
+Subscription queries are useful to monitor changes of the application state withour resorting to polling. For example, in the demo the Query ```MonitorPatient``` subscribes to any changes made to the medical data of the patient. The following query handler is exposed as a Server-Sent Events endpoint at: [http://localhost:8080/api/patients/{id}/stream]([http://localhost:8080/api/patients](http://localhost:8080/api/patients/{id}/stream)), where ```{id}``` is the id of the patient.
+
+```
+  @QueryHandler
+  @PreHandleEnforce(action = "'Monitor'", resource = "{ 'type':'patient', 'id':#query.patientId() }")
+  Optional<PatientDocument> handle(MonitorPatient query) {
+    return patientsRepository.findById(query.patientId());
+  }
+```
+
+When ```karl``` accesseses [http://localhost:8080/api/patients/0/stream]([http://localhost:8080/api/patients](http://localhost:8080/api/patients/0/stream)), he may see the following data stream when using Chrome (note that the ```â–ˆ``` is equal to a ```█``` Chrome does not apply the correct encoding when visualizing Server-Sent-Events):
+
+```
+data:{"id":"0","name":"Mona Vance","latestIcd11Code":"1B95","latestDiagnosisText":"Brucellosis","ward":"ICCU","updatedAt":"2022-09-06T23:07:08.048Z"}
+
+data:{"id":"0","name":"Mona Vance","latestIcd11Code":"1Bâ–ˆâ–ˆ","latestDiagnosisText":"Brâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ","ward":"NONE","updatedAt":"2022-09-06T23:08:15.054Z"}
+```
+
+In this case, first Mona was aggigned to the ICCU and then got discharged by a doctor. Thus Mona was assigned to no ward. And as karl can only see medical data of parients assigned to the ICCU, the updated ```PatientDocument``` was delivered with blackened fields.
+
+This is implemented with the same policy used for ```FetchAllPatients``` the obligation was applied to each individual subscription update. 
+This is expressed in ```src/main/resources/policies/fetchAll.sapl```. This document is a policy set, which is applicable for both queries. As can bee seen in the ```for``` clause of the policy set:
+
+```
+set "fetch patient list policy set"
+
+/*
+ * The 'first-applicable' combination algorithm is used here in oder to avoid 'transformation uncertainty',
+ * i.e., multiple policies which return PERMIT but do not agree about transformation of the resource.
+ * This algorithm evaluates policies from top to bottom in the document and stops as soon as one policy 
+ * yields an applicable result or errors.
+ */
+first-applicable
+
+/*
+ * scope the policy set to be applicable to all authorization subscriptions "Fetch" actions on "patient".
+ */
+for resource.type == "patient" & (action == "FetchAll" | action == "Monitor")
+
+/*
+ * All doctors have full access to medical data of the patients.
+ * All nurses working in the same ward where the patient is hospitalized have full access. 
+ */
+policy "permit doctors full patient access" 
+permit subject.position == "DOCTOR"
+
+/*
+ * All other authenticated staff members have limited access.
+ */
+policy "authenticated users may see filtered" 
+permit subject != "anononymous"
+obligation
+obligation
+  {
+    "type" : "filterMessagePayloadContent",
+    "conditions" : [ 
+                     {
+                        "type"  : "!=",
+                        "path"  : "$.ward",
+		        "value" : subject.assignedWard
+                     }
+		   ],
+    "actions"    : [
+                     { 
+                       "type" : "blacken", 
+                       "path" : "$.latestIcd11Code", 
+                       "discloseLeft": 2
+                     },
+                     { 
+                       "type" : "blacken", 
+                       "path" : "$.latestDiagnosisText",
+                       "discloseLeft": 2						  
+                     }
+                   ]
+  }
 ```
 
