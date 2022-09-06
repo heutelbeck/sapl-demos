@@ -54,3 +54,4 @@ transform
  */
 policy "deny patient access if no other rule applies" 
 deny
+obligation "dispatch access attempt event"

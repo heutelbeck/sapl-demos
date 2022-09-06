@@ -48,7 +48,7 @@ public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandle
 
 			message += "Means of access: "+cause.getPayloadType();
 
-			eventGateway.publish(new AccessAttempt(message, decision, cause));
+			eventGateway.publish(new AccessAttempt(message, decision, cause)).subscribe();
 			
 			log.debug("Published access log event to event bus: {}",message);
 
