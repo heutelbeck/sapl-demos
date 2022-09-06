@@ -84,6 +84,16 @@ These documents can be accessed via the following queries which are individually
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
+
+
+## Use Case Command 1: Simple Authorization
+
+
+
+## Use Case Command 2: Aggregate Constraint Handlers
+
+
+
 ## Use Case Query 1: Access Patient Diagnosis, the ```FetchPatient``` Query
 
 First, for the ```FetchPatient``` query the folowing rules are enforced:
@@ -466,11 +476,6 @@ obligation
 ```
 
 ## Use Case Query 4: Subscription Query for Vital Signs, the ```MonitorVitalSignOfPatient``` SubscriptionQuery
-
-## Use Case Command 1: Simple Authorization
-
-## Use Case Command 2: Aggregate Constraint Handlers
-
 
 
 
