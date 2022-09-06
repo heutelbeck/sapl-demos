@@ -276,14 +276,14 @@ While it is feasible to send an idividual limited size resource in the authoriza
 ```JSON
 {
   "subject": {
-    "username": "eleanore",
+    "username": "karl",
     "authorities": [],
     "accountNonExpired": true,
     "accountNonLocked": true,
     "credentialsNonExpired": true,
     "enabled": true,
     "assignedWard": "GENERAL",
-    "position": "NURSE"
+    "position": "ICCU"
   },
   "action": "FetchAll",
   "resource": {
@@ -292,4 +292,99 @@ While it is feasible to send an idividual limited size resource in the authoriza
 }
 ```
 
-As ```eleanore``` may
+As ```karl``` is assigned to the ICCU ward, he may see all partients, but for all patients not assigned to the ICCU, the diagnosis has to be blackened. This is expressed by the following SAPL policy in ```src/main/resources/policies/fetchAll.sapl```:
+
+```
+policy "authenticated users may see filtered" 
+permit subject != "anononymous"
+obligation
+  {
+    "type" : "filterMessagePayloadContent",
+    "conditions" : [ 
+                     {
+                        "type"  : "!=",
+                        "path"  : "$.ward",
+		        "value" : subject.assignedWard
+                     }
+		   ],
+    "actions"    : [
+                     { 
+                       "type" : "blacken", 
+                       "path" : "$.latestIcd11Code", 
+                       "discloseLeft": 2
+                     },
+                     { 
+                       "type" : "blacken", 
+                       "path" : "$.latestDiagnosisText",
+                       "discloseLeft": 2						  
+                     }
+                   ]
+  }
+```
+
+Which results in the following authorization decision:
+
+```JSON
+{
+  "decision": "PERMIT",
+  "obligations": [
+    {
+      "type": "filterMessagePayloadContent",
+      "conditions": [
+        {
+          "type": "!=",
+          "path": "$.ward",
+          "value": "ICCU"
+        }
+      ],
+      "actions": [
+        {
+          "type": "blacken",
+          "path": "$.latestIcd11Code",
+          "discloseLeft": 2
+        },
+        {
+          "type": "blacken",
+          "path": "$.latestDiagnosisText",
+          "discloseLeft": 2
+        }
+      ]
+    }
+  ]
+}
+```
+
+Which triggers the ```ResponseMessagePayloadFilterProvider``` to handle the obligation with the ```type``` ```filterMessagePayloadContent```. This is a constraint handler provider available by default in the SAPL Axon extension. If the ```conditions``` defined in the constraint are met for the query result, the diffferent ```actions``` modifying the query result are applied. If the result is an array, ```Optiona```, or an ```Iterable```, the conditions and actions are evaluated for each individual element.
+
+In the case of ```karl``` the REST service will return:
+
+```JSON
+[
+  {
+    "id": "0",
+    "name": "Mona Vance",
+    "latestIcd11Code": "1B95",
+    "latestDiagnosisText": "Brucellosis",
+    "ward": "ICCU",
+    "updatedAt": "2022-09-06T22:15:36.321Z"
+  },
+  {
+    "id": "1",
+    "name": "Martin Pape",
+    "latestIcd11Code": "6A25.3",
+    "latestDiagnosisText": "Manic mood symptoms in primary psychotic disorders",
+    "ward": "ICCU",
+    "updatedAt": "2022-09-06T22:15:36.355Z"
+  },
+  {
+    "id": "2",
+    "name": "Richard Lewis",
+    "latestIcd11Code": "6D██",
+    "latestDiagnosisText": "Fa████████████████████████████████████",
+    "ward": "CCU",
+    "updatedAt": "2022-09-06T22:15:36.395Z"
+  }
+  ...
+]
+```
+
