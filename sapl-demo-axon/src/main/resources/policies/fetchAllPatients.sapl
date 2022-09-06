@@ -17,9 +17,9 @@ set "fetch patient list policy set"
 first-applicable
 
 /*
- * scope the policy set to be applicable to all authorization subscriptions "Fetch" actions on "patient".
+ * scope the policy set to be applicable to all authorization subscriptions "Fetch" and "Monitor" actions on "patient".
  */
-for resource.type == "patient" & action == "FetchAll"
+for resource.type == "patient" & (action == "FetchAll" | action == "Monitor")
 
 
 /*
