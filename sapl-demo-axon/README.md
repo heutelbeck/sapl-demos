@@ -261,7 +261,19 @@ public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandle
 
 #### The ```FetchAllPatients``` Query
 
+The ```FetchAllPatients``` query is handled by the following query handler:
+
 ```java
+	@QueryHandler
+	@PreHandleEnforce(action = "'FetchAll'", resource = "{ 'type':'patient' }")
+	Iterable<PatientDocument> handle(FetchAllPatients query) {
+		return patientsRepository.findAll();
+	}
+```
+
+While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
+
+```JSON
 {
   "subject": {
     "username": "eleanore",
@@ -280,3 +292,4 @@ public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandle
 }
 ```
 
+As ```eleanore``` may
