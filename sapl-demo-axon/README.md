@@ -465,3 +465,12 @@ obligation
   }
 ```
 
+## Use Case Query 4: Subscription Query for Vital Signs, the ```MonitorVitalSignOfPatient``` SubscriptionQuery
+
+## Use Case Command 1: Simple Authorization
+
+## Use Case Command 2: Aggregate Constraint Handlers
+
+
+
+
