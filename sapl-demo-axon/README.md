@@ -20,8 +20,6 @@ Also, port 8080 (for the demo application) and port 8888 (used by the embedded M
 
 To run the demo, execute ``mvn spring-boot:run`` in the demos root folder. You can then access the demo by navigating to [http://localhost:8080](http://localhost:8080). Here you will be greeted by a login form. And after logging in you will be forwarded to a Swagger API page [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 
-## 
-
 ## The Demo Hospital Domain
 
 The demo implements a simple hospital scenario. The central and only aggregate in the system is the ```Patient``` aggregate. 
@@ -65,8 +63,6 @@ The different commands and queries are secured with different policy enforcement
 The policies are not modeled after real-world hospital requirements, but to demonstrate different features of SAPL and 
 the Axon Framework integration.
 
-### Use Case Query 1: Access Patient Diagnosis 
-
 The Patient aggregate is projected into a MongoDB document:
 
 ```java
@@ -88,7 +84,7 @@ These documents can be accessed via the following queries which are individually
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
-#### The ```FetchPatient``` Query
+## Use Case Query 1: Access Patient Diagnosis, the ```FetchPatient``` Query
 
 First, for the ```FetchPatient``` query the folowing rules are enforced:
 - All doctors may see the complete medical record.
@@ -259,7 +255,7 @@ public class LogAccessEventEmitterProvider implements OnDecisionConstraintHandle
 }
 ```
 
-#### The ```FetchAllPatients``` Query
+## Use Case Query 2: Access Collections of Patients, the ```FetchAllPatients``` Query
 
 The ```FetchAllPatients``` query is handled by the following query handler:
 
@@ -387,6 +383,8 @@ In the case of ```karl``` the REST service will return:
   ...
 ]
 ```
+
+## Use Case Query 3: Subscription Query for Medical Records, the ```MonitorAllPatients``` SubscriptionQuery
 
 #### The ```MonitorPatient``` Subscription Query
 
