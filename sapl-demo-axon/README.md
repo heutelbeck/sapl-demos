@@ -1,4 +1,4 @@
-# Demo Project - Attribute-based Access Control (ABAC) using Axon Framework, Spring Boot and SAPL
+# Demo Project - Attribute-based Access Control (ABAC) and Attribute Stream-based Access Control (ASBAC) using Axon Framework, Spring Boot and SAPL
 
 This project demonstrates how to implement Attribute-based Access Control (ABAC) and Attribute Stream-based Access Control (ASBAC) 
 in an event-driven application domain implemented with the Axon Framework and Spring Boot.
@@ -85,7 +85,7 @@ These documents can be accessed via the following queries which are individually
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
 
-## Use Case Command 1: Simple Authorization
+## Use Case Command 1: Simple Command Authorization
 
 To establish a Policy Enforcement Point (PEP) for commands, any ```@CommandHandler``` method can me annotated with the ```@PreHandleEnforce``` annotation. For example, the ```HospitalisePatient``` command is handled in the ```Patient``` aggregate as follows:
 
@@ -142,6 +142,51 @@ As the subjects ward is not the same as the target ward indiocated in the comman
 
 ## Use Case Command 2: Aggregate Constraint Handlers
 
+With SAPL, an authorizationd decision may contain additional constraints instructing the application to perform additional actions when cranting or denying access. For an Axon application this may imply that this has to be done within the ```UnitOfWork```covering the command, and that the state of the aggregate may change the same way as through the initial command. For an aggregate, a constraitn from an authorization decision may have to be executed just like an additional command that has to be successfully handled before handling the original command. 
+
+In the demo, the command ```ConnectMonitorToPatient``` os secured in such a way. Whenever a user not from the ward where the patient is hospitalised connects a monitor, this must be recorded in the events of the aggregate. This is expressed in the following policies in the policy set ```src/main/resources/policies/patientCommandSet.sapl```:
+
+```
+policy "all ward staff may connect and disconnect monitors"
+permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
+where 
+		(subject != "anonymous" && resource.ward == subject.assignedWard) || subject == "SYSTEM";
+
+policy "all staff connect and disconnect monitors but it must be documented if they do not belong to the ward"
+permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
+where 
+		subject != "anonymous";
+obligation
+		{
+			"type":"documentSuspisiousManipulation",
+			"username": subject.username
+		}
+
+```
+
+The policy set uses the ```first-applicable``` combining algorithm. Thus, if the ward of the patient and the ward of the user are the same the action is simply permitted without additional constraints (```resource.ward == subject.assignedWard```). For any other authenticated user an obligation is added to the permission, that the suspicious manipulation must be recorded. 
+
+The handling of the command and this obligation is implemented in the ```Patient``` aggregate:
+
+```java
+@CommandHandler
+@PreHandleEnforce(action = "{'command':'ConnectMonitorToPatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+void handle(ConnectMonitorToPatient cmd) {
+	if (connectedMonitors.contains(cmd.monitorDeviceId()))
+		throw new IllegalStateException(String.format("Monitor %s already connected to patient %s.", id, cmd.monitorDeviceId()));
+	
+	apply(new MonitorConnectedToPatient(cmd.id(), cmd.monitorDeviceId(), cmd.monitorType()));
+}
+
+/* ... */
+
+@ConstraintHandler("#constraint.get('type').textValue() == 'documentSuspisiousManipulation'")
+public void handleSuspiciousManipulation(JsonNode constraint) {
+	apply(new SuspiciousManipulation(id, constraint.get("username").textValue()));
+}
+```
+
+Once the PEP receives the decision containing the obligation, it checks if the aggregate possesses a ```@ConstraintHandler``` method where the contained SpEL excpression evaluates to ```true``` for the given constraitn and aggregate state. All of these hadlers are invoked before invoking the command handler. This is also possible for multi-entity aggregates. 
 
 
 ## Use Case Query 1: Access Patient Diagnosis, the ```FetchPatient``` Query
@@ -672,7 +717,3 @@ And at the same time, the application log will contain lines like this:
 22-09-07 15:46:40 WARN  i.s.d.a.iface.rest.VitalSignsController  | Access Denied on BLOOD_PRESSURE for patient 0. Data will resume when access is granted again. 'Access Denied'
 22-09-07 15:47:40 WARN  i.s.d.a.iface.rest.VitalSignsController  | Access Denied on BLOOD_PRESSURE for patient 0. Data will resume when access is granted again. 'Access Denied'
 ```
-
-
-
-
