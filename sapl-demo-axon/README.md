@@ -102,7 +102,7 @@ First, for the ```FetchPatient``` query the folowing rules are enforced:
 - All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
 - Unauthenticated users may not access the document.
 
-For example, if the user ```karl``` who is a nurse in the ICCU, accesses the record of Mona Vance under ```http://localhost:8080/api/patients/0``` the following respone is sent:
+For example, if the user ```karl``` who is a nurse in the ICCU, accesses the record of Mona Vance under http://localhost:8080/api/patients/0 the following respone is sent:
 
 ```JSON
 {
@@ -115,7 +115,7 @@ For example, if the user ```karl``` who is a nurse in the ICCU, accesses the rec
 }
 ```
 
-Now, if the user ```eleanore``` who is a nurse in the general ward, accesses the same record of  of Mona Vance under ```http://localhost:8080/api/patients/0``` the following respone is sent:
+Now, if the user ```eleanore``` who is a nurse in the general ward, accesses the same record of  of Mona Vance under http://localhost:8080/api/patients/0 the following respone is sent:
 
 ```JSON
 {
@@ -277,7 +277,7 @@ The ```FetchAllPatients``` query is handled by the following query handler:
 	}
 ```
 
-This query is exposed as a REST endpoint under [http://localhost:8080/api/patients](http://localhost:8080/api/patients). While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
+This query is exposed as a REST endpoint under http://localhost:8080/api/patients . While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
 
 ```JSON
 {
@@ -398,7 +398,7 @@ In the case of ```karl``` the REST service will return:
 
 #### The ```MonitorPatient``` Subscription Query
 
-Subscription queries are useful to monitor changes of the application state withour resorting to polling. For example, in the demo the Query ```MonitorPatient``` subscribes to any changes made to the medical data of the patient. The following query handler is exposed as a Server-Sent Events endpoint at: [http://localhost:8080/api/patients/{id}/stream]([http://localhost:8080/api/patients](http://localhost:8080/api/patients/{id}/stream)), where ```{id}``` is the id of the patient.
+Subscription queries are useful to monitor changes of the application state withour resorting to polling. For example, in the demo the Query ```MonitorPatient``` subscribes to any changes made to the medical data of the patient. The following query handler is exposed as a Server-Sent Events endpoint at: http://localhost:8080/api/patients/{id}/stream, where ```{id}``` is the id of the patient.
 
 ```
   @QueryHandler
@@ -408,7 +408,7 @@ Subscription queries are useful to monitor changes of the application state with
   }
 ```
 
-When ```karl``` accesseses [http://localhost:8080/api/patients/0/stream]([http://localhost:8080/api/patients](http://localhost:8080/api/patients/0/stream)), he may see the following data stream when using Chrome (note that the ```â–ˆ``` is equal to a ```█``` Chrome does not apply the correct encoding when visualizing Server-Sent-Events):
+When ```karl``` accesseses http://localhost:8080/api/patients/0/stream, he may see the following data stream when using Chrome (note that the ```â–ˆ``` is equal to a ```█``` Chrome does not apply the correct encoding when visualizing Server-Sent-Events):
 
 ```
 data:{"id":"0","name":"Mona Vance","latestIcd11Code":"1B95","latestDiagnosisText":"Brucellosis","ward":"ICCU","updatedAt":"2022-09-06T23:07:08.048Z"}
@@ -485,8 +485,7 @@ public enum MonitorType {
 }
 ```
 
-For each patient, the different measurements from the different devices are available as Server-Sent Events under (http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream)[http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream]. For example:
-(http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream)[http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream] provides a stream of measurements from a blood pressure monitor connected to patient ```0```.
+For each patient, the different measurements from the different devices are available as Server-Sent Events under http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream. For example: http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream provides a stream of measurements from a blood pressure monitor connected to patient ```0```.
 
 This stream of events is backed by the subscription query ```MonitorVitalSignOfPatient```. The access control policies attached to this query are not realistic, but serve to illustrate how time-series data and synamic authorization decisions changeing over time can interact in an application. The policy set ```src\main\resources\policies\measurements.sapl``` demonstrates how to implement a simple time-based policy set. Instead of time, a SAPL PDP can use arbritary external data streams, such as location tracking, other subscription queries, or IoT data.
 
@@ -599,7 +598,7 @@ The handling of access denied for the controller is realised as follows:
 	}
 ```
 
-Using the ```onErrorContinue``` operator a ```recoverableSubscriptionQuery``` sent via the ```SaplQueryGateway``` can stay subscribed to the updates, even if access is denied. The delivery of updtates resumes on a permission decision by the PDP. For example, if ```karl``` accesses (http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream)[http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream], the result may look like this (e.g., in Chrome):
+Using the ```onErrorContinue``` operator a ```recoverableSubscriptionQuery``` sent via the ```SaplQueryGateway``` can stay subscribed to the updates, even if access is denied. The delivery of updtates resumes on a permission decision by the PDP. For example, if ```karl``` accesses http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream , the result may look like this (e.g., in Chrome):
 
 ```
 data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"106/71","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:46:32.997Z"}
