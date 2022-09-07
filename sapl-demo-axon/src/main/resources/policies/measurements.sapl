@@ -28,12 +28,11 @@ for resource.type == "measurement"
 policy "permit doctors raw data" 
 permit subject.position == "DOCTOR"
 
-
 /*
  * All nurses only get categrorised blood pressure data. For the first 20 seconds of each minute
  */
 policy "nurses get categorised blood pressure first 20s" 
-permit subject.position == "NURSE" & resource.monitorType == "blood pressure"
+permit subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
 where 
 	time.secondOf(<time.now>) < 20; 
 obligation "catrgorise blood pressure"
@@ -42,7 +41,7 @@ obligation "catrgorise blood pressure"
  * All nurses get all raw data for the second 20 seconds of each minute
  */
 policy "nurses get raw blood pressure 2nd 20s" 
-permit subject.position == "NURSE" & resource.monitorType == "blood pressure"
+permit subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
 where 
 	time.secondOf(<time.now>) < 40; 
 
@@ -50,13 +49,13 @@ where
  * All nurses are denied data the last 20 seconds of each minute
  */
 policy "nurses get denied blood pressure 3rd 20s" 
-deny subject.position == "NURSE" & resource.monitorType == "blood pressure"
+deny subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
 
 /*
  * All nurses only get categrorised body temperature data.
  */
 policy "nurses get categorised body temperature"
-permit subject.position == "NURSE" & resource.monitorType == "body temperature"
+permit subject.position == "NURSE" & resource.monitorType == "BODY_TEMPERATURE"
 obligation "categorise body temperature"
 
 
