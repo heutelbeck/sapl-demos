@@ -85,10 +85,60 @@ These documents can be accessed via the following queries which are individually
 * ```record MonitorPatient (String patientId) {};```: Subscription Query [http://localhost:8080/api/patients/{id}/stream](http://localhost:8080/api/patients/{id}/stream).
 
 
-
 ## Use Case Command 1: Simple Authorization
 
+To establish a Policy Enforcement Point (PEP) for commands, any ```@CommandHandler``` method can me annotated with the ```@PreHandleEnforce``` annotation. For example, the ```HospitalisePatient``` command is handled in the ```Patient``` aggregate as follows:
 
+```java
+@CommandHandler
+@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#command.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+void handle(HospitalisePatient cmd) {
+	apply(new PatientHospitalised(cmd.id(), cmd.ward()));
+}
+```
+
+When handling the command, the PEP will formulate an authorization subscription. For example, when ```cheryl``` attempts to hospitalise patient ```3``` into the general ward, the following subscription is generated, based on the SpEL expression in the annotation:
+
+```JSON
+{
+  "subject": {
+    "username": "cheryl",
+    "authorities": [],
+    "accountNonExpired": true,
+    "accountNonLocked": true,
+    "credentialsNonExpired": true,
+    "enabled": true,
+    "assignedWard": "ICCU",
+    "position": "DOCTOR"
+  },
+  "action": {
+    "command": "HospitalisePatient",
+    "ward": "GENERAL"
+  },
+  "resource": {
+    "type": "Patient",
+    "id": "3",
+    "ward": "CCU"
+  }
+}
+```
+
+The following policy in the policy set ```src/main/resources/policies/patientCommandSet.sapl``` is controlling access in this scenario:
+
+```
+policy "only doctors may hospitalize patients but only into their own wards, system may do it as well"
+permit 	action.command == "HospitalisePatient"
+where 
+		subject == "SYSTEM" || (subject.position == "DOCTOR" && action.ward ==  subject.assignedWard);
+```
+
+As the subjects ward is not the same as the target ward indiocated in the command, the PDP will deny execution of the command, returning the following authorization decision:
+
+```JSON
+{
+  "decision": "DENY"
+}
+```
 
 ## Use Case Command 2: Aggregate Constraint Handlers
 
@@ -96,7 +146,7 @@ These documents can be accessed via the following queries which are individually
 
 ## Use Case Query 1: Access Patient Diagnosis, the ```FetchPatient``` Query
 
-First, for the ```FetchPatient``` query the folowing rules are enforced:
+For the ```FetchPatient``` query the folowing rules are enforced:
 - All doctors may see the complete medical record.
 - All nurses working in the ward where the patient is hospitalised may see the complete medical record.
 - All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
