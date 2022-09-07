@@ -477,5 +477,153 @@ obligation
 
 ## Use Case Query 4: Subscription Query for Vital Signs, the ```MonitorVitalSignOfPatient``` SubscriptionQuery
 
+The demo oncludes a set of mock medical sensors attached to different matients. The follwoing types of medical monitors are present in the demo:
+
+```java
+public enum MonitorType {
+	BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE, HEART_RATE
+}
+```
+
+For each patient, the different measurements from the different devices are available as Server-Sent Events under (http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream)[http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream]. For example:
+(http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream)[http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream] provides a stream of measurements from a blood pressure monitor connected to patient ```0```.
+
+This stream of events is backed by the subscription query ```MonitorVitalSignOfPatient```. The access control policies attached to this query are not realistic, but serve to illustrate how time-series data and synamic authorization decisions changeing over time can interact in an application. The policy set ```src\main\resources\policies\measurements.sapl``` demonstrates how to implement a simple time-based policy set. Instead of time, a SAPL PDP can use arbritary external data streams, such as location tracking, other subscription queries, or IoT data.
+
+```
+/*
+ * Import the filter library, so that 'blacken' can be used directly instead of using the absolute name 'filter.blacken'.
+ */
+import filter.*
+import time.*
+
+/*
+ * In each SAPL document, the top level policy or policy set MUST have a unique name.
+ */
+set "fetch vital sign"
+
+/*
+ * The 'first-applicable' combination algorithm is used here in oder to avoid 'transformation uncertainty',
+ * i.e., multiple policies which return PERMIT but do not agree about transformation of the resource.
+ * This algorithm evaluates policies from top to bottom in the document and stops as soon as one policy 
+ * yields an applicable result or errors.
+ */
+first-applicable
+
+/*
+ * scope the policy set to be applicable to all authorization subscriptions "Fetch" actions on "measurements".
+ */
+for resource.type == "measurement"
+
+/*
+ * All doctors and nurses have full access to raw data
+ */
+policy "permit doctors raw data" 
+permit subject.position == "DOCTOR"
+
+/*
+ * All nurses only get categrorised blood pressure data. For the first 20 seconds of each minute
+ */
+policy "nurses get categorised blood pressure first 20s" 
+permit subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
+where 
+	time.secondOf(<time.now>) < 20; 
+obligation "catrgorise blood pressure"
+
+/*
+ * All nurses get all raw data for the second 20 seconds of each minute
+ */
+policy "nurses get raw blood pressure 2nd 20s" 
+permit subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
+where 
+	time.secondOf(<time.now>) < 40; 
+
+/*
+ * All nurses are denied data the last 20 seconds of each minute
+ */
+policy "nurses get denied blood pressure 3rd 20s" 
+deny subject.position == "NURSE" & resource.monitorType == "BLOOD_PRESSURE"
+
+/*
+ * All nurses only get categrorised body temperature data.
+ */
+policy "nurses get categorised body temperature"
+permit subject.position == "NURSE" & resource.monitorType == "BODY_TEMPERATURE"
+obligation "categorise body temperature"
+
+
+/* other data feeds raw for nurses */
+policy "other data feeds raw for nurses" 
+permit subject.position == "NURSE"
+
+policy "deny others data feed access" 
+deny
+```
+
+One of the effects this policy set has, is to change the decision every twenty seconds for nurses. For blood pressure, nurses have a time period where access is denied to the data stream, a period, where the data is not passed to the user without applying a categorisation filter, and finally a phase where the raw data is forwarded to the user.
+
+In this example, the matching ```@QueryHandler``` is secured with the ```@EnforceRecoverableUpdatesIfDenied``` which will drop events while access is denied, but will allow clients to react on access denied events.
+
+```java
+@QueryHandler
+@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", resource = "{ 'type':'measurement', 'id':#query.patientId(), 'monitorType':#query.type() }")
+Optional<VitalSignMeasurement> handle(MonitorVitalSignOfPatient query) {
+  return repository.findById(query.patientId()).map(v -> v.lastKnownMeasurements().get(query.type()));
+}
+```
+
+The handling of access denied for the controller is realised as follows:
+
+```java
+	private final SaplQueryGateway queryGateway;
+	
+	/* ... */
+
+	@GetMapping("/api/patients/{id}/vitals/{type}/stream")
+	Flux<ServerSentEvent<VitalSignMeasurement>> streamSingleVital(@PathVariable String id,
+			@PathVariable MonitorType type) {
+		var result = queryGateway.recoverableSubscriptionQuery(new MonitorVitalSignOfPatient(id, type),
+				ResponseTypes.instanceOf(VitalSignMeasurement.class),
+				ResponseTypes.instanceOf(VitalSignMeasurement.class), () -> log.info("AccessDenied"));
+		return Flux.concat(result.initialResult().onErrorResume(AccessDeniedException.class, error -> {
+			doOnAccessDenied(error, id, type);
+			return Mono.empty();
+		}), result.updates().onErrorContinue(AccessDeniedException.class,
+				(error, reason) -> doOnAccessDenied(error, id, type)))
+				.map(view -> ServerSentEvent.<VitalSignMeasurement>builder().data(view).build());
+	}
+
+	private void doOnAccessDenied(Throwable e, String id, MonitorType type) {
+		log.warn("Access Denied on {} for patient {}. Data will resume when access is granted again. '{}'", type, id,
+				e.getMessage());
+	}
+```
+
+Using the ```onErrorContinue``` operator a ```recoverableSubscriptionQuery``` sent via the ```SaplQueryGateway``` can stay subscribed to the updates, even if access is denied. The delivery of updtates resumes on a permission decision by the PDP. For example, if ```karl``` accesses (http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream)[http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream], the result may look like this (e.g., in Chrome):
+
+```
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"106/71","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:46:32.997Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"Normal","unit":"Blood Pressure Category","timestamp":"2022-09-07T13:47:04.997Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"Normal","unit":"Blood Pressure Category","timestamp":"2022-09-07T13:47:12.996Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"107/67","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:47:20.997Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"108/65","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:47:28.996Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"109/66","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:47:36.996Z"}
+
+data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"Normal","unit":"Blood Pressure Category","timestamp":"2022-09-07T13:48:00.997Z"}
+```
+
+And at the same time, the application log will contain lines like this:
+
+```
+22-09-07 15:46:40 WARN  i.s.d.a.iface.rest.VitalSignsController  | Access Denied on BLOOD_PRESSURE for patient 0. Data will resume when access is granted again. 'Access Denied'
+22-09-07 15:47:40 WARN  i.s.d.a.iface.rest.VitalSignsController  | Access Denied on BLOOD_PRESSURE for patient 0. Data will resume when access is granted again. 'Access Denied'
+```
+
+
 
 
