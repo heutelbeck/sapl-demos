@@ -4,31 +4,31 @@ This project demonstrates how to implement Attribute-based Access Control (ABAC)
 in an event-driven application domain implemented with the Axon Framework and Spring Boot.
 
 In particular, it demonstrates how to secure *commands* and *queries*, including *subscription queries* in a declarative style by
-adding different SAPL Annotations to aggregates, domain services, or projections. These annotations will automatically deploy 
-policy enforcement points in the different command and query handlers.
+adding different SAPL Annotations to aggregates, domain services, or projections. These annotations automatically deploy 
+policy enforcement points in the command and query handlers.
 
 Further, the demo includes examples for customizing authorization subscriptions and enforcing obligations on the handling of 
-commands and queries, such as triggering side-effects (e.g., dispatch events or commands) or modifying and filtering of data 
+commands and queries, such as triggering side-effects (e.g., dispatch events or commands) or modifying and filtering data 
 before delivering it to users.
 
 ## Prerequisites
 
 The only requirement for running the demo is the presence of a working install of JDK 17 and Maven. 
-Also, port 8080 (for the demo application) and port 8888 (used by the embedded MongoDB) have to be available when running the demo.
+Also, port 8080 (for the demo application) and port 8888 (used by the embedded MongoDB) must be available when running the demo.
 
 ## Running the Demo
 
-To run the demo, execute ``mvn spring-boot:run`` in the demos root folder. You can then access the demo by navigating to [http://localhost:8080](http://localhost:8080). Here you will be greeted by a login form. And after logging in you will be forwarded to a Swagger API page [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
+To run the demo, execute ``mvn spring-boot:run`` in the demos root folder. You can access the demo by navigating to [http://localhost:8080](http://localhost:8080). Here you will be greeted by a login form. And after logging in, you will be forwarded to a Swagger API page [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html).
 
 ## The Demo Hospital Domain
 
 The demo implements a simple hospital scenario. The central and only aggregate in the system is the ```Patient``` aggregate. 
 Each patient can be registered, hospitalized, discharged, and diagnosed. Further, the staff can connect monitoring devices to patients to take measurements of vital signs, such as heart rate, blood pressure, body temperature, and respiration rate.
 
-Whenever the application starts up, a number of random patients are generate, diagnosed with a random condition, and different monitors 
+Whenever the application starts up, some patients are generated, diagnosed with conditions, and different monitors 
 are connected to each of the patients.
 
-In order to interact with the demo you have to authenticate as a staff member of the hospital. Staff is not modeled using aggregates. 
+To interact with the demo, you have to authenticate as a hospital staff member. The demo does not use aggregates to model staff members. 
 You can impersonate the following pre-configured staff members by logging in:
 
 | Username   | Password | Position       | Ward                                |
@@ -59,8 +59,8 @@ Further, the following patients are created on startup:
 
 Whenever a monitoring device is connected to a patient, the monitor starts publishing events with measurements taken.
 
-The different commands and queries are secured with different policy enforcement points and policies. 
-The policies are not modeled after real-world hospital requirements, but to demonstrate different features of SAPL and 
+The different commands and queries are secured with policy enforcement points and policies. 
+The policies are not modeled after real-world hospital requirements but to demonstrate various features of SAPL and 
 the Axon Framework integration.
 
 The Patient aggregate is projected into a MongoDB document:
@@ -78,7 +78,7 @@ public record PatientDocument (
 	Instant updatedAt) { };
 ```
 
-These documents can be accessed via the following queries which are individually exposed through a REST controller: 
+These documents can be accessed via the following queries, which are individually exposed through a REST controller: 
 
 * ```record FetchAllPatients () {};```: Standard Query [http://localhost:8080/api/patients](http://localhost:8080/api/patients).
 * ```record FetchPatient (String patientId) {};```: Standard Query [http://localhost:8080/api/patients/{id}](http://localhost:8080/api/patients/{id}).
@@ -87,7 +87,7 @@ These documents can be accessed via the following queries which are individually
 
 ## Use Case Command 1: Simple Command Authorization
 
-To establish a Policy Enforcement Point (PEP) for commands, any ```@CommandHandler``` method can me annotated with the ```@PreHandleEnforce``` annotation. For example, the ```HospitalisePatient``` command is handled in the ```Patient``` aggregate as follows:
+To establish a Policy Enforcement Point (PEP) for commands, any ```@CommandHandler``` method can be annotated with the ```@PreHandleEnforce``` annotation. For example, the ```HospitalisePatient``` command is handled in the ```Patient``` aggregate as follows:
 
 ```java
 @CommandHandler
@@ -97,7 +97,7 @@ void handle(HospitalisePatient cmd) {
 }
 ```
 
-When handling the command, the PEP will formulate an authorization subscription. For example, when ```cheryl``` attempts to hospitalise patient ```3``` into the general ward, the following subscription is generated, based on the SpEL expression in the annotation:
+When handling the command, the PEP will formulate an authorization subscription. For example, when ```cheryl``` attempts to hospitalise patient ```3```in the general ward, the following subscription is generated based on the SpEL expression in the annotation:
 
 ```JSON
 {
@@ -126,13 +126,13 @@ When handling the command, the PEP will formulate an authorization subscription.
 The following policy in the policy set ```src/main/resources/policies/patientCommandSet.sapl``` is controlling access in this scenario:
 
 ```
-policy "only doctors may hospitalize patients but only into their own wards, system may do it as well"
+policy "only doctors may hospitalize patients but only into their own wards, the system may do it as well."
 permit 	action.command == "HospitalisePatient"
 where 
 		subject == "SYSTEM" || (subject.position == "DOCTOR" && action.ward ==  subject.assignedWard);
 ```
 
-As the subjects ward is not the same as the target ward indiocated in the command, the PDP will deny execution of the command, returning the following authorization decision:
+As the subjects ward is not the same as the target ward indicated in the command, the PDP will deny execution of the command, returning the following authorization decision:
 
 ```JSON
 {
@@ -142,12 +142,12 @@ As the subjects ward is not the same as the target ward indiocated in the comman
 
 ## Use Case Command 2: Aggregate Constraint Handlers
 
-With SAPL, an authorizationd decision may contain additional constraints instructing the application to perform additional actions when cranting or denying access. For an Axon application this may imply that this has to be done within the ```UnitOfWork```covering the command, and that the state of the aggregate may change the same way as through the initial command. For an aggregate, a constraitn from an authorization decision may have to be executed just like an additional command that has to be successfully handled before handling the original command. 
+With SAPL, an authorization decision may contain additional constraints instructing the application to perform additional actions when granting or denying access. For an Axon application, the constraint may require that it be enforced within the ```UnitOfWork``` covering the command and that the aggregate state may change the same way as the initial command. For an aggregate, a constraint from an authorization decision may have to be executed just like an additional command that has to be successfully handled before handling the original command. 
 
-In the demo, the command ```ConnectMonitorToPatient``` os secured in such a way. Whenever a user not from the ward where the patient is hospitalised connects a monitor, this must be recorded in the events of the aggregate. This is expressed in the following policies in the policy set ```src/main/resources/policies/patientCommandSet.sapl```:
+In the demo, the command ```ConnectMonitorToPatient``` is secured in such a way. Whenever a user not from the ward where the patient is hospitalised, connects a monitor to the patient, this action must be recorded in the events of the aggregate. This requirement is expressed in the following policies in the policy set ```src/main/resources/policies/patientCommandSet.sapl```:
 
 ```
-policy "all ward staff may connect and disconnect monitors"
+policy "all ward staff may connect and disconnect monitors."
 permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
 where 
 		(subject != "anonymous" && resource.ward == subject.assignedWard) || subject == "SYSTEM";
@@ -164,7 +164,7 @@ obligation
 
 ```
 
-The policy set uses the ```first-applicable``` combining algorithm. Thus, if the ward of the patient and the ward of the user are the same the action is simply permitted without additional constraints (```resource.ward == subject.assignedWard```). For any other authenticated user an obligation is added to the permission, that the suspicious manipulation must be recorded. 
+The policy set uses the ```first-applicable``` combining algorithm. Thus, if the ward of the patient and the ward of the user are the same, the action is simply permitted without additional constraints (```resource.ward == subject.assignedWard```). For any other authenticated user, an obligation is added to the permission that the suspicious manipulation must be recorded. 
 
 The handling of the command and this obligation is implemented in the ```Patient``` aggregate:
 
@@ -186,18 +186,18 @@ public void handleSuspiciousManipulation(JsonNode constraint) {
 }
 ```
 
-Once the PEP receives the decision containing the obligation, it checks if the aggregate possesses a ```@ConstraintHandler``` method where the contained SpEL excpression evaluates to ```true``` for the given constraitn and aggregate state. All of these hadlers are invoked before invoking the command handler. This is also possible for multi-entity aggregates. 
+Once the PEP receives the decision containing the obligation, it checks if the aggregate possesses a ```@ConstraintHandler``` method where the contained SpEL expression evaluates to ```true``` for the given constraint and aggregate state. All of these handlers are invoked before invoking the command handler. This is also possible for multi-entity aggregates. 
 
 
 ## Use Case Query 1: Access Patient Diagnosis, the ```FetchPatient``` Query
 
-For the ```FetchPatient``` query the folowing rules are enforced:
+For the ```FetchPatient``` query, the following rules are enforced:
 - All doctors may see the complete medical record.
 - All nurses working in the ward where the patient is hospitalised may see the complete medical record.
-- All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened and access to the record must be recorded in an event.
+- All other authenticated users may access the medical record, but all except the first two letters of the ICD11 code and the diagnosis must be blackened, and access to the data must be recorded in an event.
 - Unauthenticated users may not access the document.
 
-For example, if the user ```karl``` who is a nurse in the ICCU, accesses the record of Mona Vance under http://localhost:8080/api/patients/0 the following respone is sent:
+For example, if the user ```karl``` who is a nurse in the ICCU, accesses the record of Mona Vance under http://localhost:8080/api/patients/0 the following response is sent:
 
 ```JSON
 {
@@ -210,7 +210,7 @@ For example, if the user ```karl``` who is a nurse in the ICCU, accesses the rec
 }
 ```
 
-Now, if the user ```eleanore``` who is a nurse in the general ward, accesses the same record of  of Mona Vance under http://localhost:8080/api/patients/0 the following respone is sent:
+Now, if the user ```eleanore``` who is a nurse in the general ward, accesses the same record of Mona Vance under http://localhost:8080/api/patients/0 the following response is sent:
 
 ```JSON
 {
@@ -250,7 +250,7 @@ Optional<PatientDocument> handle(FetchPatient query) {
 }
 ```
 
-The ```@PostHandleEnforce``` annotation establishes a Policy Decision Point (PDP) wrapping the ```handle(FetchPatient query)``` method. This annotation first invokes the method, and then constructs an authorizuation decision evaluating the Sprinf Expression Language expressions in the annotation:
+The ```@PostHandleEnforce``` annotation establishes a Policy Decision Point (PDP) wrapping the ```handle(FetchPatient query)``` method. This annotation first invokes the method and then constructs an authorization decision evaluating the Spring Expression Language expressions in the annotation:
 
 ```JSON
 {
@@ -293,7 +293,7 @@ transform
                     }
 ```
 
-The policy states thet access is granted (```permit```) for authenticated users (```subject != "anononymous"```) and that an assess attempt event must be emitted, and if this is not possible, access is denied (```obligation "dispatch access attempt event"```). Further, the ```transform``` expression states, that the queryResult must be replaced with an object, where the ICD11 code and the diagnosis text are blackened. 
+The policy states that access is granted (```permit```) for authenticated users (```subject != "anononymous"```) and that an assess attempt event must be emitted, and if this is not possible, access is denied (```obligation "dispatch access attempt event"```). Further, the ```transform``` expression states that the queryResult must be replaced with an object, where the ICD11 code and the diagnosis text are blackened. 
 
 Thus, the PDP sends an authorization decision:
 
@@ -315,7 +315,7 @@ Thus, the PDP sends an authorization decision:
 }
 ```
 
-The PEP then replaces the query result with the object with the ```resource``` of the decision. Before retuning this, the PEP checks if any handler for the obligation ```"dispatch access attempt event"``` is available. In the case of the demo, the Bean ```LogAccessEventEmitterProvider``` does support this type of obligation:
+The PEP then replaces the query result with the object with the ```resource``` of the decision. Before returning this, the PEP checks if any handler for the obligation ```"dispatch access attempt event"``` is available. In the case of the demo, the Bean ```LogAccessEventEmitterProvider``` does support this type of obligation:
 
 ```java
 @Slf4j
@@ -372,7 +372,7 @@ The ```FetchAllPatients``` query is handled by the following query handler:
 	}
 ```
 
-This query is exposed as a REST endpoint under http://localhost:8080/api/patients . While it is feasible to send an idividual limited size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections, would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching contstraint. The PEP may create an authorization subscription as follows:
+This query is exposed as a REST endpoint under http://localhost:8080/api/patients . While it is feasible to send an individual limited-size resource in the authorization subscription to the PDP for full inspection and transformation, objects of larger size or large collections would introduce significant traffic, latency, and load on the PDP. Here it is more sensible to instruct the PEP to modify the results locally by enforcing a matching constraints. The PEP may create an authorization subscription as follows:
 
 ```JSON
 {
@@ -393,7 +393,7 @@ This query is exposed as a REST endpoint under http://localhost:8080/api/patient
 }
 ```
 
-As ```karl``` is assigned to the ICCU ward, he may see all partients, but for all patients not assigned to the ICCU, the diagnosis has to be blackened. This is expressed by the following SAPL policy in ```src/main/resources/policies/fetchAll.sapl```:
+As ```karl``` is assigned to the ICCU ward, he may see all patients, but for all patients not assigned to the ICCU, the diagnosis has to be blackened. This is expressed by the following SAPL policy in ```src/main/resources/policies/fetchAll.sapl```:
 
 ```
 policy "authenticated users may see filtered" 
@@ -423,7 +423,7 @@ obligation
   }
 ```
 
-Which results in the following authorization decision:
+This results in the following authorization decision:
 
 ```JSON
 {
@@ -455,7 +455,7 @@ Which results in the following authorization decision:
 }
 ```
 
-Which triggers the ```ResponseMessagePayloadFilterProvider``` to handle the obligation with the ```type``` ```filterMessagePayloadContent```. This is a constraint handler provider available by default in the SAPL Axon extension. If the ```conditions``` defined in the constraint are met for the query result, the diffferent ```actions``` modifying the query result are applied. If the result is an array, ```Optiona```, or an ```Iterable```, the conditions and actions are evaluated for each individual element.
+Which triggers the ```ResponseMessagePayloadFilterProvider``` to handle the obligation with the ```type``` ```filterMessagePayloadContent```. This is a constraint handler provider available by default in the SAPL Axon extension. If the ```conditions``` defined in the constraint are met for the query result, the different ```actions``` modifying the query result are applied. If the result is an array, ```Optional```, or an ```Iterable```, the conditions and actions are evaluated for each element.
 
 In the case of ```karl``` the REST service will return:
 
@@ -493,7 +493,7 @@ In the case of ```karl``` the REST service will return:
 
 #### The ```MonitorPatient``` Subscription Query
 
-Subscription queries are useful to monitor changes of the application state withour resorting to polling. For example, in the demo the Query ```MonitorPatient``` subscribes to any changes made to the medical data of the patient. The following query handler is exposed as a Server-Sent Events endpoint at: http://localhost:8080/api/patients/{id}/stream, where ```{id}``` is the id of the patient.
+Subscription queries are useful to monitor changes in the application state without resorting to polling. For example, in the demo, the Query ```MonitorPatient``` subscribes to any changes made to the medical data of the patient. The following query handler is exposed as a Server-Sent Events endpoint at http://localhost:8080/api/patients/{id}/stream, where ```{id}``` is the id of the patient.
 
 ```
   @QueryHandler
@@ -511,17 +511,17 @@ data:{"id":"0","name":"Mona Vance","latestIcd11Code":"1B95","latestDiagnosisText
 data:{"id":"0","name":"Mona Vance","latestIcd11Code":"1Bâ–ˆâ–ˆ","latestDiagnosisText":"Brâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ","ward":"NONE","updatedAt":"2022-09-06T23:08:15.054Z"}
 ```
 
-In this case, first Mona was aggigned to the ICCU and then got discharged by a doctor. Thus Mona was assigned to no ward. And as karl can only see medical data of parients assigned to the ICCU, the updated ```PatientDocument``` was delivered with blackened fields.
+In this case, first Mona was assigned to the ICCU and then got discharged by a doctor. Thus Mona was assigned to no ward. And as karl can only see medical data of patients assigned to the ICCU, the updated ```PatientDocument``` was delivered with blackened fields.
 
-This is implemented with the same policy used for ```FetchAllPatients``` the obligation was applied to each individual subscription update. 
-This is expressed in ```src/main/resources/policies/fetchAll.sapl```. This document is a policy set, which is applicable for both queries. As can bee seen in the ```for``` clause of the policy set:
+This is implemented with the same policy used for ```FetchAllPatients```. The obligation was applied to each individual subscription update. 
+This is expressed in ```src/main/resources/policies/fetchAll.sapl```. This document is a policy set, which is applicable for both queries. As can been seen in the ```for``` clause of the policy set:
 
 ```
 set "fetch patient list policy set"
 
 /*
- * The 'first-applicable' combination algorithm is used here in oder to avoid 'transformation uncertainty',
- * i.e., multiple policies which return PERMIT but do not agree about transformation of the resource.
+ * The 'first-applicable' combination algorithm is used here to avoid 'transformation uncertainty',
+ * i.e., multiple policies which return PERMIT but do not agree on the transformation of the resource.
  * This algorithm evaluates policies from top to bottom in the document and stops as soon as one policy 
  * yields an applicable result or errors.
  */
@@ -572,7 +572,7 @@ obligation
 
 ## Use Case Query 4: Subscription Query for Vital Signs, the ```MonitorVitalSignOfPatient``` SubscriptionQuery
 
-The demo oncludes a set of mock medical sensors attached to different matients. The follwoing types of medical monitors are present in the demo:
+The demo includes a set of mock medical sensors attached to different patients. The following types of medical monitors are present in the demo:
 
 ```java
 public enum MonitorType {
@@ -580,25 +580,25 @@ public enum MonitorType {
 }
 ```
 
-For each patient, the different measurements from the different devices are available as Server-Sent Events under http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream. For example: http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream provides a stream of measurements from a blood pressure monitor connected to patient ```0```.
+For each patient, the different measurements from the different devices are available as Server-Sent Events under http://localhost:8080/api/patients/{id}/vitals/{MonitorType}/stream. For example http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream provides a stream of measurements from a blood pressure monitor connected to patient ```0```.
 
-This stream of events is backed by the subscription query ```MonitorVitalSignOfPatient```. The access control policies attached to this query are not realistic, but serve to illustrate how time-series data and synamic authorization decisions changeing over time can interact in an application. The policy set ```src\main\resources\policies\measurements.sapl``` demonstrates how to implement a simple time-based policy set. Instead of time, a SAPL PDP can use arbritary external data streams, such as location tracking, other subscription queries, or IoT data.
+This stream of events is backed by the subscription query ```MonitorVitalSignOfPatient```. The access control policies attached to this query are not realistic but serve to illustrate how time-series data and dynamic authorization decisions changing over time can interact in an application. The policy set ```src\main\resources\policies\measurements.sapl``` demonstrates how to implement a simple time-based policy set. Instead of time, a SAPL PDP can use arbitrary external data streams, such as location tracking, other subscription queries, or IoT data.
 
 ```
 /*
- * Import the filter library, so that 'blacken' can be used directly instead of using the absolute name 'filter.blacken'.
+ * Import the filter library so that 'blacken' can be used directly instead of using the absolute name 'filter.blacken'.
  */
 import filter.*
 import time.*
 
 /*
- * In each SAPL document, the top level policy or policy set MUST have a unique name.
+ * In each SAPL document, the top-level policy or policy set MUST have a unique name.
  */
 set "fetch vital sign"
 
 /*
- * The 'first-applicable' combination algorithm is used here in oder to avoid 'transformation uncertainty',
- * i.e., multiple policies which return PERMIT but do not agree about transformation of the resource.
+ * The 'first-applicable' combination algorithm is used here to avoid 'transformation uncertainty',
+ * i.e., multiple policies which return PERMIT but do not agree on the transformation of the resource.
  * This algorithm evaluates policies from top to bottom in the document and stops as soon as one policy 
  * yields an applicable result or errors.
  */
@@ -654,9 +654,9 @@ policy "deny others data feed access"
 deny
 ```
 
-One of the effects this policy set has, is to change the decision every twenty seconds for nurses. For blood pressure, nurses have a time period where access is denied to the data stream, a period, where the data is not passed to the user without applying a categorisation filter, and finally a phase where the raw data is forwarded to the user.
+One of the effects of this policy set is changing the decision every twenty seconds for nurses. For blood pressure, nurses have a period where access is denied to the data stream, a period where the data is not passed to the user without applying a categorisation filter, and finally, a phase where the raw data is forwarded to the user.
 
-In this example, the matching ```@QueryHandler``` is secured with the ```@EnforceRecoverableUpdatesIfDenied``` which will drop events while access is denied, but will allow clients to react on access denied events.
+In this example, the matching ```@QueryHandler``` is secured with the ```@EnforceRecoverableUpdatesIfDenied``` which will drop events while access is denied but will allow clients to react on access denied events.
 
 ```java
 @QueryHandler
@@ -666,7 +666,7 @@ Optional<VitalSignMeasurement> handle(MonitorVitalSignOfPatient query) {
 }
 ```
 
-The handling of access denied for the controller is realised as follows:
+The handling of access denied for the controller is realized as follows:
 
 ```java
 	private final SaplQueryGateway queryGateway;
@@ -693,7 +693,7 @@ The handling of access denied for the controller is realised as follows:
 	}
 ```
 
-Using the ```onErrorContinue``` operator a ```recoverableSubscriptionQuery``` sent via the ```SaplQueryGateway``` can stay subscribed to the updates, even if access is denied. The delivery of updtates resumes on a permission decision by the PDP. For example, if ```karl``` accesses http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream , the result may look like this (e.g., in Chrome):
+Using the ```onErrorContinue``` operator, a ```recoverableSubscriptionQuery``` sent via the ```SaplQueryGateway``` can stay subscribed to the updates, even if access is denied. The delivery of updates resumes on a permission decision by the PDP. For example, if ```karl``` accesses http://localhost:8080/api/patients/0/vitals/BLOOD_PRESSURE/stream , the result may look like this (e.g., in Chrome):
 
 ```
 data:{"monitorDeviceId":"mYJO75oPhLN6qhU8i8VEow","type":"BLOOD_PRESSURE","value":"106/71","unit":"systolic/diastolic mmHg","timestamp":"2022-09-07T13:46:32.997Z"}
