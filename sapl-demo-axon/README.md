@@ -172,17 +172,17 @@ The handling of the command and this obligation is implemented in the ```Patient
 @CommandHandler
 @PreHandleEnforce(action = "{'command':'ConnectMonitorToPatient'}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 void handle(ConnectMonitorToPatient cmd) {
-	if (connectedMonitors.contains(cmd.monitorDeviceId()))
-		throw new IllegalStateException(String.format("Monitor %s already connected to patient %s.", id, cmd.monitorDeviceId()));
-	
-	apply(new MonitorConnectedToPatient(cmd.id(), cmd.monitorDeviceId(), cmd.monitorType()));
+    if (connectedMonitors.contains(cmd.monitorDeviceId()))
+       throw new IllegalStateException(String.format("Monitor %s already connected to patient %s.", id, cmd.monitorDeviceId()));
+    
+    apply(new MonitorConnectedToPatient(cmd.id(), cmd.monitorDeviceId(), cmd.monitorType()));
 }
 
 /* ... */
 
 @ConstraintHandler("#constraint.get('type').textValue() == 'documentSuspisiousManipulation'")
 public void handleSuspiciousManipulation(JsonNode constraint) {
-	apply(new SuspiciousManipulation(id, constraint.get("username").textValue()));
+    apply(new SuspiciousManipulation(id, constraint.get("username").textValue()));
 }
 ```
 
