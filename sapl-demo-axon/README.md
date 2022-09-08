@@ -127,10 +127,10 @@ When handling the command, the PEP will formulate an authorization subscription.
 The following policy in the policy set ```src/main/resources/policies/patientCommandSet.sapl``` is controlling access in this scenario:
 
 ```
-policy "only doctors may hospitalize patients but only into their own wards, the system may do it as well."
+policy "only system/doctors may hospitalize patients but only into their own wards."
 permit 	action.command == "HospitalisePatient"
 where 
-		subject == "SYSTEM" || (subject.position == "DOCTOR" && action.ward ==  subject.assignedWard);
+  subject == "SYSTEM" || (subject.position == "DOCTOR" && action.ward ==  subject.assignedWard);
 ```
 
 As the subjects ward is not the same as the target ward indicated in the command, the PDP will deny execution of the command, returning the following authorization decision:
