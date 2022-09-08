@@ -91,7 +91,8 @@ To establish a Policy Enforcement Point (PEP) for commands, any ```@CommandHandl
 
 ```java
 @CommandHandler
-@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#command.ward()}", resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
+@PreHandleEnforce(action = "{'command':'HospitalisePatient', 'ward':#command.ward()}", 
+                  resource = "{ 'type':'Patient', 'id':id, 'ward':ward }")
 void handle(HospitalisePatient cmd) {
 	apply(new PatientHospitalised(cmd.id(), cmd.ward()));
 }
