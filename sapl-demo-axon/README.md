@@ -151,18 +151,17 @@ In the demo, the command ```ConnectMonitorToPatient``` is secured in such a way.
 policy "all ward staff may connect and disconnect monitors."
 permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
 where 
-		(subject != "anonymous" && resource.ward == subject.assignedWard) || subject == "SYSTEM";
+    (subject != "anonymous" && resource.ward == subject.assignedWard) || subject == "SYSTEM";
 
 policy "all staff connect and disconnect monitors but it must be documented if they do not belong to the ward"
 permit 	action.command == "ConnectMonitorToPatient" | action.command == "DisconnectMonitorFromPatient"
 where 
-		subject != "anonymous";
+    subject != "anonymous";
 obligation
-		{
-			"type":"documentSuspisiousManipulation",
-			"username": subject.username
-		}
-
+    {
+      "type":"documentSuspisiousManipulation",
+      "username": subject.username
+    }
 ```
 
 The policy set uses the ```first-applicable``` combining algorithm. Thus, if the ward of the patient and the ward of the user are the same, the action is simply permitted without additional constraints (```resource.ward == subject.assignedWard```). For any other authenticated user, an obligation is added to the permission that the suspicious manipulation must be recorded. 
