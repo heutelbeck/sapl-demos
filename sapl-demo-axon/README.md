@@ -659,7 +659,8 @@ In this example, the matching ```@QueryHandler``` is secured with the ```@Enforc
 
 ```java
 @QueryHandler
-@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", resource = "{ 'type':'measurement', 'id':#query.patientId(), 'monitorType':#query.type() }")
+@EnforceRecoverableUpdatesIfDenied(action = "'Monitor'", 
+             resource = "{ 'type':'measurement', 'id':#query.patientId(), 'monitorType':#query.type() }")
 Optional<VitalSignMeasurement> handle(MonitorVitalSignOfPatient query) {
   return repository.findById(query.patientId()).map(v -> v.lastKnownMeasurements().get(query.type()));
 }
