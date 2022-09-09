@@ -545,7 +545,6 @@ permit subject.position == "DOCTOR"
 policy "authenticated users may see filtered" 
 permit subject != "anononymous"
 obligation
-obligation
   {
     "type" : "filterMessagePayloadContent",
     "conditions" : [ 
