@@ -9,8 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.sapl.spring.constraints.api.FilterPredicateConstraintHandlerProvider;
 
 @Service
-public class FilterClassifiedDocumentsContraintHandlerProvider
-		implements FilterPredicateConstraintHandlerProvider<Document> {
+public class FilterClassifiedDocumentsContraintHandlerProvider implements FilterPredicateConstraintHandlerProvider {
 
 	@Override
 	public boolean isResponsible(JsonNode constraint) {
@@ -19,12 +18,7 @@ public class FilterClassifiedDocumentsContraintHandlerProvider
 	}
 
 	@Override
-	public Class<Document> getSupportedType() {
-		return Document.class;
-	}
-
-	@Override
-	public Predicate<Document> getHandler(JsonNode constraint) {
+	public Predicate<Object> getHandler(JsonNode constraint) {
 		var clearanceAux = NatoSecurityClassification.NATO_UNCLASSIFIED;
 
 		if (constraint.has("clearance")) {
@@ -37,11 +31,12 @@ public class FilterClassifiedDocumentsContraintHandlerProvider
 
 		var clearance = clearanceAux;
 
-		return document -> clearanceMatchesOrIsHigherThanClassification(clearance, document.getClassification());
+		return document -> {
+			return clearanceMatchesOrIsHigherThanClassification(clearance, ((Document) document).getClassification());
+		};
 	}
 
-	private boolean clearanceMatchesOrIsHigherThanClassification(
-			NatoSecurityClassification clearance,
+	private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,
 			NatoSecurityClassification classification) {
 		return classification.compareTo(clearance) <= 0;
 	}
