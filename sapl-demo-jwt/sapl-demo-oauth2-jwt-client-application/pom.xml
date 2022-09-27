@@ -29,7 +29,7 @@
 
 	<artifactId>sapl-demo-oauth2-jwt-client-application</artifactId>
 
-	<name>Sapl Demo OAuth2/JWT Client Application</name>
+	<name>SAPL Demo OAuth2/JWT Client Application</name>
 	<description>Demo of a OAuth2 Cient Application with a JWT/SAPL secured Resource Server.</description>
 
 	<dependencies>

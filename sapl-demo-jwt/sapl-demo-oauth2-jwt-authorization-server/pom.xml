@@ -29,7 +29,7 @@
 
 	<artifactId>sapl-demo-oauth2-jwt-authorization-server</artifactId>
 
-	<name>Sapl Demo OAuth2/JWT Authorization Server</name>
+	<name>SAPL Demo OAuth2/JWT Authorization Server</name>
 	<description>Demo of a OAuth2 Resource Server with JWT using SAPL for additional authorization. This is the demo authorization srver for the demo setup.</description>
 
 	<dependencies>
