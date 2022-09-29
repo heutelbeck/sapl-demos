@@ -10,7 +10,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ImpersonationUtil {
 
-	public static Authentication impersonateSystemUser() {
+	public static Authentication systemUser() {
 		var securityContext = SecurityContextHolder.getContext();
 		var originalAuthn   = securityContext.getAuthentication();
 		var newAuthn        = new UsernamePasswordAuthenticationToken("SYSTEM", null,
@@ -19,7 +19,17 @@ public class ImpersonationUtil {
 		return originalAuthn;
 	}
 
-	public static void setUser(Authentication authn) {
+	public static Authentication setUser(Authentication authn) {
+		var ctx           = SecurityContextHolder.getContext();
+		var originalAuthn = ctx.getAuthentication();
 		SecurityContextHolder.getContext().setAuthentication(authn);
+		return originalAuthn;
 	}
+
+	public static void runAs(Authentication authn, Runnable task) {
+		var originalAuthn = setUser(authn);
+		task.run();
+		setUser(originalAuthn);
+	}
+
 }

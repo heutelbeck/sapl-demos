@@ -3,13 +3,15 @@ package io.sapl.demo.axon.authentication;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import reactor.core.publisher.Mono;
+
 @Service
-public class HospitalStappUserDetailsService implements UserDetailsService {
+public class HospitalStaffUserDetailsService implements ReactiveUserDetailsService {
 
 	Map<String, HospitalStaff> users = new HashMap<>();
 
@@ -18,12 +20,12 @@ public class HospitalStappUserDetailsService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public Mono<UserDetails> findByUsername(String username) {
 		var user = users.get(username);
-		if(user==null) {
-			throw new UsernameNotFoundException("User not found");
+		if (user == null) {
+			return Mono.error(new UsernameNotFoundException("User not found"));
 		}
-		return user;
+		return Mono.just(user);
 	}
 
 }

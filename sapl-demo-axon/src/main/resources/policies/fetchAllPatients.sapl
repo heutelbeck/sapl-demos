@@ -33,7 +33,7 @@ permit subject.position == "DOCTOR"
  * All other authenticated staff members have limited access.
  */
 policy "authenticated users may see filtered" 
-permit subject != "anononymous"
+permit subject != "anonymous"
 obligation
 	{
 		"type" 		 : "filterMessagePayloadContent",

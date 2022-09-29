@@ -3,6 +3,7 @@ package io.sapl.demo.axon.iface.rest;
 import java.util.List;
 
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
+import org.axonframework.extensions.reactor.queryhandling.gateway.DefaultReactorQueryGateway;
 import org.axonframework.extensions.reactor.queryhandling.gateway.ReactorQueryGateway;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.springframework.http.MediaType;
@@ -30,7 +31,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 public class PatientsController {
-
+	DefaultReactorQueryGateway x;
 	private final ReactorQueryGateway   queryGateway;
 	private final ReactorCommandGateway commandGateway;
 

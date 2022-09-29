@@ -18,12 +18,13 @@ import java.util.List;
 import org.axonframework.extensions.reactor.commandhandling.gateway.ReactorCommandGateway;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.heutelbeck.uuid.Base64Id;
 
 import io.sapl.demo.axon.authentication.HospitalStaff;
-import io.sapl.demo.axon.authentication.HospitalStappUserDetailsService;
+import io.sapl.demo.axon.authentication.HospitalStaffUserDetailsService;
 import io.sapl.demo.axon.command.MonitorType;
 import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
 import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
@@ -58,14 +59,12 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 			"Radial hemimelia", "Laceration with foreign body of head", "Puncture wound with foreign body of head",
 			"Assault by exposure to radiation", "Victim of lightning" };
 	private final ReactorCommandGateway           commandGateway;
-	private final HospitalStappUserDetailsService userDetailsService;
+	private final HospitalStaffUserDetailsService userDetailsService;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
-		var authn = ImpersonationUtil.impersonateSystemUser();
 		generateHospitalStaff();
 		generatePatients();
-		ImpersonationUtil.setUser(authn);
 	}
 
 	// @formatter:off
@@ -124,7 +123,8 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 		}
 		creationProcess = creationProcess
 				.then(commandGateway.send(new MakeDiagnosisForPatient(patientId, doctor, icd11, diagnosis)));
-		creationProcess.subscribe();
+		creationProcess.contextWrite(ReactiveSecurityContextHolder.withAuthentication(ImpersonationUtil.systemUser()))
+				.subscribe();
 	}
 
 }
