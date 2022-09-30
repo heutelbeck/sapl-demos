@@ -24,6 +24,7 @@ import io.sapl.demo.axon.query.patients.api.PatientDocument;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchAllPatients;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchPatient;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.MonitorPatient;
+import io.sapl.demo.axon.query.publisher.api.PublisherAPI.StreamAllPatients;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,9 +32,20 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 public class PatientsController {
-	DefaultReactorQueryGateway x;
+	DefaultReactorQueryGateway          x;
 	private final ReactorQueryGateway   queryGateway;
 	private final ReactorCommandGateway commandGateway;
+
+	@GetMapping("/api/publisher/patients")
+	Flux<PatientDocument> fetchAllPatientsViaPublisher() {
+		return queryGateway.streamingQuery(new StreamAllPatients(), PatientDocument.class);
+	}
+
+//	@GetMapping("/api/publisher/patients/{id}")
+//	public Mono<ResponseEntity<PatientDocument>> fetchPatientViaPublisher(@PathVariable String id) {
+//		return queryGateway.query(new FetchPatient(id), ResponseTypes.instanceOf(PatientDocument.class))
+//				.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
+//	}
 
 	@GetMapping("/api/patients")
 	Mono<List<PatientDocument>> fetchAllPatients() {
