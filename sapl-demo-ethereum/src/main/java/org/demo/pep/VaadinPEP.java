@@ -77,7 +77,7 @@ public class VaadinPEP<Component> {
 				ui.access(() -> denyListener.accept(component, decision));
 			}
 		}
-		else if (decision.getDecision() == Decision.DENY) {
+		else if (decision.getDecision() == Decision.NOT_APPLICABLE) {
 			if (notApplicableListener != null) {
 				ui.access(() -> notApplicableListener.accept(component, decision));
 			}
