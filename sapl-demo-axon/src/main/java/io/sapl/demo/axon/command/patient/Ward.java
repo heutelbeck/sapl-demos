@@ -1,4 +1,4 @@
-package io.sapl.demo.axon.command;
+package io.sapl.demo.axon.command.patient;
 
 import lombok.Getter;
 

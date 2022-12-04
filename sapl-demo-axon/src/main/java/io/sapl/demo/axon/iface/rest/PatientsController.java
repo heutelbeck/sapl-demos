@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.sapl.demo.axon.command.MonitorType;
-import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.DischargePatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.DisconnectMonitorFromPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
-import io.sapl.demo.axon.command.Ward;
+import io.sapl.demo.axon.command.patient.Ward;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.ConnectMonitorToPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.DischargePatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.DisconnectMonitorFromPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.HospitalisePatient;
 import io.sapl.demo.axon.query.patients.api.PatientDocument;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchAllPatients;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchPatient;

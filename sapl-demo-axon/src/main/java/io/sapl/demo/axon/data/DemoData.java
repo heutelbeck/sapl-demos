@@ -1,17 +1,17 @@
 package io.sapl.demo.axon.data;
 
+import static io.sapl.demo.axon.authentication.Position.ADMINISTRATOR;
+import static io.sapl.demo.axon.authentication.Position.DOCTOR;
+import static io.sapl.demo.axon.authentication.Position.NURSE;
 import static io.sapl.demo.axon.command.MonitorType.BLOOD_PRESSURE;
 import static io.sapl.demo.axon.command.MonitorType.BODY_TEMPERATURE;
 import static io.sapl.demo.axon.command.MonitorType.HEART_RATE;
 import static io.sapl.demo.axon.command.MonitorType.RESPIRATION_RATE;
-import static io.sapl.demo.axon.command.Position.ADMINISTRATOR;
-import static io.sapl.demo.axon.command.Position.DOCTOR;
-import static io.sapl.demo.axon.command.Position.NURSE;
-import static io.sapl.demo.axon.command.Ward.CCU;
-import static io.sapl.demo.axon.command.Ward.GENERAL;
-import static io.sapl.demo.axon.command.Ward.ICCU;
-import static io.sapl.demo.axon.command.Ward.NONE;
-import static io.sapl.demo.axon.command.Ward.SICU;
+import static io.sapl.demo.axon.command.patient.Ward.CCU;
+import static io.sapl.demo.axon.command.patient.Ward.GENERAL;
+import static io.sapl.demo.axon.command.patient.Ward.ICCU;
+import static io.sapl.demo.axon.command.patient.Ward.NONE;
+import static io.sapl.demo.axon.command.patient.Ward.SICU;
 
 import java.util.List;
 
@@ -25,13 +25,13 @@ import com.heutelbeck.uuid.Base64Id;
 
 import io.sapl.demo.axon.authentication.HospitalStaff;
 import io.sapl.demo.axon.authentication.HospitalStaffUserDetailsService;
+import io.sapl.demo.axon.authentication.Position;
 import io.sapl.demo.axon.command.MonitorType;
-import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.MakeDiagnosisForPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.RegisterPatient;
-import io.sapl.demo.axon.command.Position;
-import io.sapl.demo.axon.command.Ward;
+import io.sapl.demo.axon.command.patient.Ward;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.ConnectMonitorToPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.HospitalisePatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MakeDiagnosisForPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.RegisterPatient;
 import io.sapl.demo.axon.configuration.ImpersonationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

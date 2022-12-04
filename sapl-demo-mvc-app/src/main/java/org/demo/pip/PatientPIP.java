@@ -75,8 +75,8 @@ public class PatientPIP {
 	 *
 	 */
 	@Attribute(name = "relatives")
-	public Flux<Val> getRelations(@Number Val value, Map<String, JsonNode> variables) {
-		final List<Relation> relations = relationRepo.findByPatientId(value.get().asLong());
+	public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, JsonNode> variables) {
+		final List<Relation> relations = relationRepo.findByPatientId(leftHandValue.get().asLong());
 		final List<String> relationNames = relations.stream().map(Relation::getUsername).collect(Collectors.toList());
 		final JsonNode jsonNode = mapper.convertValue(relationNames, JsonNode.class);
 		return Flux.just(Val.of(jsonNode));

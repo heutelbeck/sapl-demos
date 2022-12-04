@@ -5,8 +5,7 @@ import java.util.List;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import io.sapl.demo.axon.command.Position;
-import io.sapl.demo.axon.command.Ward;
+import io.sapl.demo.axon.command.patient.Ward;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;

@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-import io.sapl.demo.axon.command.Ward;
+import io.sapl.demo.axon.command.patient.Ward;
 
 // @formatter:off
 @Document

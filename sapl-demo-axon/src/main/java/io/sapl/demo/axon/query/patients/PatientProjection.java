@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 
 import io.sapl.axon.annotation.PostHandleEnforce;
 import io.sapl.axon.annotation.PreHandleEnforce;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientDiagnosed;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientDischarged;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientHospitalised;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientRegistered;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientDiagnosed;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientDischarged;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientHospitalised;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientRegistered;
 import io.sapl.demo.axon.query.patients.api.PatientDocument;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchAllPatients;
 import io.sapl.demo.axon.query.patients.api.PatientQueryAPI.FetchPatient;

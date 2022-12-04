@@ -1,11 +1,16 @@
-package io.sapl.demo.axon.command;
+package io.sapl.demo.axon.command.patient;
+
+import java.util.Set;
 
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
+import io.sapl.demo.axon.command.MonitorType;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class PatientCommandAPI {
+
+	// Commands
 
 	// @formatter:off
 	public record RegisterPatient    			(@TargetAggregateIdentifier String id, String name) {};
@@ -17,6 +22,8 @@ public class PatientCommandAPI {
 	public record DisconnectMonitorFromPatient	(@TargetAggregateIdentifier String id, String monitorDeviceId) {};
 	// @formatter:on
 
+	// Events
+
 	// @formatter:off
 	public record PatientRegistered    			(String id, String name, Ward ward) {};
 	public record PatientHospitalised			(String id, Ward ward) {};
@@ -25,6 +32,7 @@ public class PatientCommandAPI {
 	public record MonitorConnectedToPatient		(String id, String monitorDeviceId, MonitorType monitorType) {};
 	public record MonitorDisconnectedFromPatient(String id, String monitorDeviceId) {};
 	public record SuspiciousManipulation        (String id, String user) {};
+	// Snapshot
+	public record PatientSnapshot               (String id, Set<String> connectedMonitors, Ward ward) {};
 	// @formatter:on
-
 }

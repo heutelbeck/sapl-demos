@@ -1,4 +1,4 @@
-package io.sapl.demo.axon.command;
+package io.sapl.demo.axon.command.patient;
 
 import static org.axonframework.modelling.command.AggregateLifecycle.apply;
 
@@ -14,24 +14,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.axon.annotation.ConstraintHandler;
 import io.sapl.axon.annotation.PreHandleEnforce;
-import io.sapl.demo.axon.command.PatientCommandAPI.ConnectMonitorToPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.DischargePatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.DisconnectMonitorFromPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.HospitalisePatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.MakeDiagnosisForPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.MonitorConnectedToPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.MonitorDisconnectedFromPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientDiagnosed;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientDischarged;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientHospitalised;
-import io.sapl.demo.axon.command.PatientCommandAPI.PatientRegistered;
-import io.sapl.demo.axon.command.PatientCommandAPI.RegisterPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.SuspiciousManipulation;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.ConnectMonitorToPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.DischargePatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.DisconnectMonitorFromPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.HospitalisePatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MakeDiagnosisForPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MonitorConnectedToPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MonitorDisconnectedFromPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientDiagnosed;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientDischarged;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientHospitalised;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.PatientRegistered;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.RegisterPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.SuspiciousManipulation;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Aggregate
+@Aggregate(snapshotTriggerDefinition = "patientSnapshotTrigger")
 @NoArgsConstructor
 public class Patient {
 

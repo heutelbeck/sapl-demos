@@ -57,8 +57,8 @@ public class DefaultSecurityConfig {
 	// @formatter:on
 
 	@Bean
+	@SuppressWarnings("deprecation") // OK for demo ! 
 	public PasswordEncoder passwordEncoder(){
-		//noinspection deprecation
 		return NoOpPasswordEncoder.getInstance();
 	}
 

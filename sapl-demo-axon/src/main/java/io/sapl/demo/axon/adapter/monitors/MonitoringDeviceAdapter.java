@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.axonframework.eventhandling.EventHandler;
 import org.springframework.stereotype.Service;
 
-import io.sapl.demo.axon.command.PatientCommandAPI.MonitorConnectedToPatient;
-import io.sapl.demo.axon.command.PatientCommandAPI.MonitorDisconnectedFromPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MonitorConnectedToPatient;
+import io.sapl.demo.axon.command.patient.PatientCommandAPI.MonitorDisconnectedFromPatient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
