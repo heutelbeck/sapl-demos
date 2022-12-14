@@ -56,6 +56,7 @@ import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
+import io.sapl.interpreter.DocumentEvaluationResult;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.SAPLInterpreter;
 import io.sapl.interpreter.context.AuthorizationContext;
@@ -489,7 +490,7 @@ public class ContentView extends Div {
 
 			var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
 
-			Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate().contextWrite(
+			Step<AuthorizationDecision> steps = StepVerifier.create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision).contextWrite(
 					ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel,
 							this.currentAuthzSub)));
 
