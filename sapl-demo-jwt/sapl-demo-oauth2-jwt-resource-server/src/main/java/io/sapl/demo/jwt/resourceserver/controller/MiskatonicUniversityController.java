@@ -62,7 +62,7 @@ public class MiskatonicUniversityController {
 		var decisions = pdp.decide(authzSub).map(AuthorizationDecision::getDecision);
 		var ticktock = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
 		var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
-		decisionsWithTicker.log().subscribe();
+		decisionsWithTicker.subscribe();
 	}
 
 	@GetMapping("/faculty")
