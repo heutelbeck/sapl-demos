@@ -2,6 +2,7 @@ package io.sapl.pdp.multitenant;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -34,7 +35,7 @@ public class MultiTenantConfiguration {
 	private final AttributeContext attributeContext;
 
 	@Bean
-	public PolicyDecisionPoint multiTenantPolicyDecisionPoint(TenantIdExtractor tenantIdExtractor) {
+	PolicyDecisionPoint multiTenantPolicyDecisionPoint(TenantIdExtractor tenantIdExtractor) {
 		log.info("Multi Tenant settings: {}", properties);
 		var file        = new File(properties.path);
 		var directories = file.list(new FilenameFilter() {
@@ -59,7 +60,7 @@ public class MultiTenantConfiguration {
 		var policyRetrievalPoint  = new GenericInMemoryIndexedPolicyRetrievalPoint(seedIndex, pdpUpdateEventSource);
 		var combinatorProvider    = new FileSystemVariablesAndCombinatorSource(path);
 		var configurationProvider = new FixedFunctionsAndAttributesPDPConfigurationProvider(attributeContext,
-				functionContext, combinatorProvider);
+				functionContext, combinatorProvider, List.of(), List.of());
 		return new EmbeddedPolicyDecisionPoint(configurationProvider, policyRetrievalPoint);
 	}
 }
