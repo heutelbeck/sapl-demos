@@ -41,7 +41,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	@Option(names = { "-h",
 			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-	private String host = "http://localhost:8443";
+	private String host = "https://localhost:8443";
 
 	// The default option set here are the default credentials of the pdp-server-lt
 
