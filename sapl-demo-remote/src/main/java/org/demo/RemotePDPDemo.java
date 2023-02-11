@@ -95,7 +95,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 		 * authorization decisions when applicable. For alternative patterns of
 		 * invocation, consult the sapl-demo-pdp-embedded
 		 */
-		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockLast();
+		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockFirst();
 		return 0;
 	}
 
