@@ -25,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
@@ -60,12 +58,12 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	public Integer call() throws SSLException, JsonProcessingException
 	{
-		LOG.warn("INSECURE SSL SETTINGS! This demo uses an insecure SslContext for "
-				+ "testing purposes only. It will accept all certificates. "
-				+ "This is only for testing local servers with self-signed certificates easily. "
-				+ "NEVER USE SUCH A CONFIGURATION IN PRODUCTION!");
-		var sslContext = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE).build();
-		var pdp        = new RemotePolicyDecisionPoint(host, clientKey, clientSecret, sslContext);
+		var pdp= RemotePolicyDecisionPoint.builder()
+				.http()
+				.baseUrl(host)
+				.basicAuth(clientKey, clientSecret)
+				.secureNoTrust()
+				.build();
 
 		/*
 		 * To have the client use the default SSL verification use this constructor
@@ -95,7 +93,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 		 * authorization decisions when applicable. For alternative patterns of
 		 * invocation, consult the sapl-demo-pdp-embedded
 		 */
-		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockLast();
+		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockFirst();
 		return 0;
 	}
 

@@ -26,7 +26,7 @@
 
 	<packaging>jar</packaging>
 
-	<name>SAPL Demo Remote PDP</name>
+	<name>SAPL Demo Embedded PDP</name>
 
 	<properties>
 		<!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
