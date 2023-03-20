@@ -27,7 +27,7 @@ import io.sapl.interpreter.InitializationException;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
-public class B_PolicyWithSimpleFunctionTest {
+class B_PolicyWithSimpleFunctionTest {
 
 	private SaplTestFixture fixture;
 

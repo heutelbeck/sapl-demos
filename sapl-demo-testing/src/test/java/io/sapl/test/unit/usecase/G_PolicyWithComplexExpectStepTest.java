@@ -37,7 +37,7 @@ import io.sapl.interpreter.InitializationException;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
-public class G_PolicyWithComplexExpectStepTest {
+class G_PolicyWithComplexExpectStepTest {
 
 	private SaplTestFixture fixture;
 

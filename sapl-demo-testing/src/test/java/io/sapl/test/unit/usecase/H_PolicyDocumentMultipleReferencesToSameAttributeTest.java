@@ -27,7 +27,7 @@ import io.sapl.test.unit.SaplUnitTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
+class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
 
 	private SaplTestFixture fixture;
 

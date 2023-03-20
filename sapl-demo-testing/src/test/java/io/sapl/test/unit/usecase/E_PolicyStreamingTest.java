@@ -31,7 +31,7 @@ import io.sapl.test.SaplTestException;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
-public class E_PolicyStreamingTest {
+class E_PolicyStreamingTest {
 
 	private SaplTestFixture fixture;
 

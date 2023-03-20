@@ -83,8 +83,7 @@
 							<goal>enable-coverage-collection</goal>
 							<goal>report-coverage-information</goal>
 						</goals>
-					</execution>
-					
+					</execution>					
 				</executions>
 			</plugin>
 		</plugins>

@@ -28,7 +28,7 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
-public class F_PolicyWithComplexFunctionTest {
+class F_PolicyWithComplexFunctionTest {
 
 	private SaplTestFixture fixture;
 

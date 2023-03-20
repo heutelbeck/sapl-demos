@@ -23,7 +23,7 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
 
-public class D_PolicyWithMultipleFunctionsOrPIPsTest {
+class D_PolicyWithMultipleFunctionsOrPIPsTest {
 
 	private SaplTestFixture fixture;
 

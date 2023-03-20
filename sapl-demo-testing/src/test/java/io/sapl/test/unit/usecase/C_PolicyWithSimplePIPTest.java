@@ -28,7 +28,7 @@ import io.sapl.test.unit.TestPIP;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class C_PolicyWithSimplePIPTest {
+class C_PolicyWithSimplePIPTest {
 
 	private SaplTestFixture fixture;
 
