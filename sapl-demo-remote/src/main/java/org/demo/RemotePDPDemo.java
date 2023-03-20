@@ -80,7 +80,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 						"file://example/med/record/patient/BartSimpson"))
 				.addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
 						"file://example/med/record/patient/MaggieSimpson"));
-		LOG.info("Multi: {}", multiSubscription.toString());
+		LOG.info("Multi: {}", multiSubscription);
 		var mapper = new ObjectMapper();
 		var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
 		LOG.info("JSON: {}", json);

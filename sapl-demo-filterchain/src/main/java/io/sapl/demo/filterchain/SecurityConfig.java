@@ -23,10 +23,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig  {
+public class SecurityConfig {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// @formatter:off
 		http.authorizeRequests()
 		    .and().formLogin()

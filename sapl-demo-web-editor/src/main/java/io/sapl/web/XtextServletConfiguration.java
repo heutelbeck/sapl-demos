@@ -40,7 +40,7 @@ import io.sapl.pip.TimePolicyInformationPoint;
 public class XtextServletConfiguration {
 
 	@Bean
-	public static ServletRegistrationBean<SAPLServlet> xTextRegistrationBean() {
+	ServletRegistrationBean<SAPLServlet> xTextRegistrationBean() {
 		ServletRegistrationBean<SAPLServlet> registration = new ServletRegistrationBean<>(new SAPLServlet(),
 				"/xtext-service/*");
 		registration.setName("XtextServices");
@@ -49,21 +49,20 @@ public class XtextServletConfiguration {
 	}
 
 	@Bean
-	public static FilterRegistrationBean<OrderedFormContentFilter> registration1(OrderedFormContentFilter filter) {
+	FilterRegistrationBean<OrderedFormContentFilter> registration1(OrderedFormContentFilter filter) {
 		FilterRegistrationBean<OrderedFormContentFilter> registration = new FilterRegistrationBean<>(filter);
 		registration.setEnabled(false);
 		return registration;
 	}
 
 	@Bean
-	public FunctionContext functionContext() throws InitializationException {
-		FunctionContext context = new AnnotationFunctionContext(new FilterFunctionLibrary(),
-				new StandardFunctionLibrary(), new TemporalFunctionLibrary());
-		return context;
+	FunctionContext functionContext() throws InitializationException {
+		return new AnnotationFunctionContext(new FilterFunctionLibrary(), new StandardFunctionLibrary(),
+				new TemporalFunctionLibrary());
 	}
 
 	@Bean
-	public AttributeContext attributeContext() throws InitializationException {
+	AttributeContext attributeContext() throws InitializationException {
 		AnnotationAttributeContext context = new AnnotationAttributeContext();
 		context.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
 		return context;

@@ -25,15 +25,15 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
 			try {
 				clearanceAux = NatoSecurityClassification.valueOf(constraint.findValue("clearance").asText());
 			} catch (IllegalArgumentException e) {
-				; // NOOP
+				// NOOP
 			}
 		}
 
 		var clearance = clearanceAux;
 
-		return document -> {
-			return clearanceMatchesOrIsHigherThanClassification(clearance, ((Document) document).getClassification());
-		};
+		return document -> clearanceMatchesOrIsHigherThanClassification(clearance,
+				((Document) document).getClassification());
+
 	}
 
 	private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,

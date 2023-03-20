@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class PatientConfiguration {
 	@Bean
-	public SnapshotTriggerDefinition patientSnapshotTrigger(Snapshotter snapshotter) {
+	SnapshotTriggerDefinition patientSnapshotTrigger(Snapshotter snapshotter) {
 		return new EventCountSnapshotTriggerDefinition(snapshotter, 2);
 	}
 }

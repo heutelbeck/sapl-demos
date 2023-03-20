@@ -67,7 +67,7 @@ public class AuthorizationServerConfig {
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 		http.authorizeRequests().mvcMatchers("/public-key/**").permitAll();
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		return http.formLogin(Customizer.withDefaults()).build();
@@ -75,7 +75,7 @@ public class AuthorizationServerConfig {
 
 	// @formatter:off
 	@Bean
-	public RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("miskatonic-client")
 				.clientSecret("secret")
@@ -101,19 +101,19 @@ public class AuthorizationServerConfig {
 	// @formatter:on
 
 	@Bean
-	public OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
+	OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
 			RegisteredClientRepository registeredClientRepository) {
 		return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
 	}
 
 	@Bean
-	public OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+	OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
 			RegisteredClientRepository registeredClientRepository) {
 		return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
 	}
 
 	@Bean
-	public JWKSource<SecurityContext> jwkSource() throws JOSEException {
+	JWKSource<SecurityContext> jwkSource() throws JOSEException {
 		JWK jwk = JWK.parseFromPEMEncodedObjects(privateKey);
 		jwk = new RSAKey.Builder(jwk.toRSAKey()).keyID(kid).build();
 		// JWK jwk = Jwks.generateRsa();
@@ -123,12 +123,12 @@ public class AuthorizationServerConfig {
 	}
 
 	@Bean
-	public ProviderSettings providerSettings() {
+	ProviderSettings providerSettings() {
 		return ProviderSettings.builder().issuer("http://auth-server:9000").build();
 	}
 
 	@Bean
-	public EmbeddedDatabase embeddedDatabase() {
+	EmbeddedDatabase embeddedDatabase() {
 		// @formatter:off
 		return new EmbeddedDatabaseBuilder()
 				.generateUniqueName(true)

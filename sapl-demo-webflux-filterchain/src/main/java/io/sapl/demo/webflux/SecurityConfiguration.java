@@ -31,13 +31,13 @@ import io.sapl.spring.subscriptions.AuthorizationSubscriptionBuilderService;
 public class SecurityConfiguration {
 
 	@Bean
-	public AuthorizationManagerPolicyEnforcementPoint<AuthorizationContext> saplAuthorizationManager(
+	AuthorizationManagerPolicyEnforcementPoint<AuthorizationContext> saplAuthorizationManager(
 			PolicyEnforcementPoint pep, AuthorizationSubscriptionBuilderService subBuilder) {
-		return new AuthorizationManagerPolicyEnforcementPoint<AuthorizationContext>(subBuilder, pep);
+		return new AuthorizationManagerPolicyEnforcementPoint<>(subBuilder, pep);
 	}
 
 	@Bean
-	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
+	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http,
 			AuthorizationManagerPolicyEnforcementPoint<AuthorizationContext> authzManager) {
 		// @formatter:off
 		return http.authorizeExchange()

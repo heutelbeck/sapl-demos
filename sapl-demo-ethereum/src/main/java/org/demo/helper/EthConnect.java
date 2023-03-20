@@ -51,7 +51,7 @@ public class EthConnect {
 		String address = user.getEthereumAddress();
 		Credentials credentials = getCredentials(address);
 		BigDecimal amount = new BigDecimal(value);
-		System.out.println(amount);
+		log.info("Amount: {}",amount);
 
 		try {
 			Transfer.sendFunds(web3j, credentials, ACCREDITATION_AUTHORITY, amount, Convert.Unit.ETHER).send();
@@ -67,7 +67,7 @@ public class EthConnect {
 		String address = user.getEthereumAddress();
 		Credentials credentials = getCredentials(address);
 		BigDecimal amount = new BigDecimal(value);
-		System.out.println(amount);
+		log.info("Amount: {}",amount);
 
 		try {
 			TransactionReceipt receipt = Transfer

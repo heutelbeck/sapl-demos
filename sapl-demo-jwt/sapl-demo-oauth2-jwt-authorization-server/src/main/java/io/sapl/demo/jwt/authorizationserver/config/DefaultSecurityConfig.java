@@ -58,7 +58,7 @@ public class DefaultSecurityConfig {
 
 	@Bean
 	@SuppressWarnings("deprecation") // OK for demo ! 
-	public PasswordEncoder passwordEncoder(){
+	PasswordEncoder passwordEncoder(){
 		return NoOpPasswordEncoder.getInstance();
 	}
 
