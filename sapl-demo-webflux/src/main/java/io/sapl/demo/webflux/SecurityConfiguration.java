@@ -16,15 +16,18 @@
 package io.sapl.demo.webflux;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 
 /**
- * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration class to
- * activate the reactive method security for methods returning a Publisher<?>.
+ * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration
+ * class to activate the reactive method security for methods returning a
+ * Publisher<?>.
  */
 @EnableWebFluxSecurity
 @EnableReactiveSaplMethodSecurity
@@ -33,10 +36,13 @@ public class SecurityConfiguration {
 	@Bean
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		// @formatter:off
-		return http.authorizeExchange()
-				   .anyExchange()
-				   .permitAll()
-				   .and().build();
+		http.authorizeExchange(exchanges -> 
+		        exchanges.anyExchange().permitAll()
+			 ).formLogin().disable() 
+		      //.httpBasic().disable(); // This does not turn off basic authn. The following line does. 
+			  .httpBasic().authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED));
+		return http.build();
 		// @formatter:on
 	}
+
 }

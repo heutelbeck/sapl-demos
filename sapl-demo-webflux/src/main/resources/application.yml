@@ -20,10 +20,10 @@ io.sapl.pdp:
 #                               decision-making process. It includes lists of all errors and values
 #                               of policy information point attributes encountered
 #                               during the evaluation of each policy (set).
-    print-json-report: false
+    print-json-report: true
 # print-text-report: true|false This will log a human-readable textual report based on the
 #                               same data as the 'print-json-report' option generates.
-    print-text-report: true
+    print-text-report: false
 # pretty-print-reports: true|false This option can enable formatting of JSON data while
 #                                  printing JSON during reporting and tracing.
 #                                  If it is intended to copy&paste JSON from the console-log

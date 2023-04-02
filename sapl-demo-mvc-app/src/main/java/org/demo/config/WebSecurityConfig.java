@@ -34,19 +34,23 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// @formatter:off
-		http.authorizeRequests()
-			.antMatchers("/css/**").permitAll()
-			.anyRequest().authenticated()
-			.and().formLogin()
-				  .loginPage("/login")
-				  .defaultSuccessUrl("/patients")
-				  .permitAll()
-		    .and().logout()
-		    	  .logoutUrl("/logout")
-		    	  .logoutSuccessUrl("/login")
-		    	  .permitAll()
-		    .and().csrf()
-		    	  .disable();
+		http.authorizeHttpRequests(requests -> requests
+	            .requestMatchers("/css/**").permitAll()
+	            .anyRequest().authenticated()
+	        )
+	        .formLogin(form -> form
+	            .loginPage("/login")
+			    .defaultSuccessUrl("/patients")
+	            .permitAll()
+	        )
+	        .logout(logout -> logout
+	    	    .logoutUrl("/logout")
+			    .logoutSuccessUrl("/login")
+			    .deleteCookies("JSESSIONID")
+			    .invalidateHttpSession(true)
+	            .permitAll()
+	        );
+	        //.csrf().disable();
 		// @formatter:on
 		return http.build();
 	}

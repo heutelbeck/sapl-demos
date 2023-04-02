@@ -17,8 +17,6 @@ package org.demo.controller;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.demo.domain.Patient;
 import org.demo.domain.PatientRepository;
 import org.springframework.http.HttpStatus;
@@ -38,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.spring.method.metadata.PreEnforce;
 import io.sapl.spring.pep.PolicyEnforcementPoint;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +58,16 @@ public class UIController {
 
 	}
 
+	//@PreEnforce
+	@GetMapping("/")
+	public String home(Model model, Authentication authentication) {
+		if(authentication != null) {
+			model.addAttribute("user",authentication.getName());
+		}
+		return "home";
+	}
+
+	
 	@PreEnforce
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {

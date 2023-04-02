@@ -29,8 +29,7 @@
 	<name>SAPL Demo Remote PDP</name>
 
 	<properties>
-		<!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

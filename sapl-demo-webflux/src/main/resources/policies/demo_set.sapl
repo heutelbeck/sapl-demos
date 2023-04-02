@@ -40,9 +40,9 @@ obligation
 		"type" 		: "logAccess",
 		"message"	: "DENY ! Time < 60"
 	}
-/*
-policy "Permit All"
-permit 
+
+policy "Permit Numbers"
+permit action.http.contextPath == "/numbers"
 obligation
 	{
 		"type"		: "sendEmail",
@@ -55,4 +55,3 @@ advice
 		"type" 		: "logAccess",
 		"message"	: ("User " + subject.name + " has accessed: " + action.http.requestedURI)
 	}
-	*/

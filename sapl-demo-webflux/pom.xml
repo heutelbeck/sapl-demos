@@ -32,7 +32,6 @@
 	<name>SAPL Demo Reactive PEPs with Webflux</name>
 	<description>Illustrates how to do true reactive policy enforcement with SAPL in a fully reactive stack with Webflux.</description>
 
-
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -48,6 +47,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>

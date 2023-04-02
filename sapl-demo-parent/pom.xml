@@ -12,7 +12,7 @@
 
 	<name>SAPL Demo Parent</name>
 
-	<inceptionYear>2019-2021</inceptionYear>
+	<inceptionYear>2019-2023</inceptionYear>
 
 	<organization>
 		<name>Dominic Heutelbeck</name>
@@ -21,10 +21,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<sapl.version>2.1.0-SNAPSHOT</sapl.version>
-		<junit.version>4.13.2</junit.version>
-		<springboot.version>2.7.9</springboot.version>
+		<springboot.version>3.0.5</springboot.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -49,14 +48,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			<!-- Testing Scope Dependencies -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>${junit.version}</version>
-				<scope>test</scope>
-			</dependency>
-
+		
 			<!-- Spring-Boot -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>

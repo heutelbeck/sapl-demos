@@ -15,10 +15,10 @@
  */
 package org.demo.security;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 class CustomRequestCache extends HttpSessionRequestCache {
 
