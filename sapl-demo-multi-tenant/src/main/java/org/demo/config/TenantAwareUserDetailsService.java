@@ -17,7 +17,7 @@ public class TenantAwareUserDetailsService implements UserDetailsService {
 
 	@Override
 	public TenantAwareUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		if(!users.containsKey(username))
+		if (!users.containsKey(username))
 			throw new UsernameNotFoundException("no such user");
 		return users.get(username);
 	}

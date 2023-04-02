@@ -28,16 +28,17 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
+@SuppressWarnings("deprecation") // NoOp Encoder OK for demo ! 
 public class DefaultSecurityConfig {
 
 	// @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests().mvcMatchers("/public-key/**").permitAll().and()
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
-			)
-			.formLogin(withDefaults());
+		http.authorizeHttpRequests (requests -> 
+				requests.requestMatchers("/public-key/**").permitAll()
+				        .anyRequest().authenticated()
+		    )
+		    .formLogin(withDefaults());
 		return http.build();
 	}
 	// @formatter:on
@@ -57,8 +58,7 @@ public class DefaultSecurityConfig {
 	// @formatter:on
 
 	@Bean
-	@SuppressWarnings("deprecation") // OK for demo ! 
-	PasswordEncoder passwordEncoder(){
+	PasswordEncoder passwordEncoder() {
 		return NoOpPasswordEncoder.getInstance();
 	}
 

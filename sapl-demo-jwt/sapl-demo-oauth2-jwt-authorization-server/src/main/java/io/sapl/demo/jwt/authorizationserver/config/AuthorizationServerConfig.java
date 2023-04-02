@@ -68,7 +68,7 @@ public class AuthorizationServerConfig {
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.authorizeRequests().mvcMatchers("/public-key/**").permitAll();
+		http.authorizeHttpRequests(requests -> requests.requestMatchers("/public-key/**").permitAll());
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 		return http.formLogin(Customizer.withDefaults()).build();
 	}

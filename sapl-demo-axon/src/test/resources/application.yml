@@ -4,9 +4,9 @@ axon:
     general:  jackson
     events:   jackson
     messages: jackson
+de.flapdoodle.mongodb.embedded.version: 4.4.18 # See: de.flapdoodle.embed.mongo.distribution.Version.Main.PRODUCTION
 spring:
   main.banner-mode: off
-  mongodb.embedded.version: 4.4.13 # Select embedded Mongo Version. See: de.flapdoodle.embed.mongo.distribution.Version.Main.PRODUCTION
   data.mongodb.port: 8888
   task.scheduling.pool.size: 5
 logging:
