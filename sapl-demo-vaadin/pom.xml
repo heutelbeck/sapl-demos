@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.10</version>
+		<version>3.0.5</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -19,8 +19,8 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<java.version>11</java.version>
-		<vaadin.version>23.0.5</vaadin.version>
+		<java.version>17</java.version>
+		<vaadin.version>24.0.2</vaadin.version>
 	</properties>
 
 	<repositories>

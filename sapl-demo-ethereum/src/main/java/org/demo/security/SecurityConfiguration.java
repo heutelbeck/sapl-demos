@@ -45,7 +45,7 @@ public class SecurityConfiguration {
 				     .disable()
 				     .requestCache()
 				     .requestCache(new CustomRequestCache())
-			   .and().authorizeRequests()
+			   .and().authorizeHttpRequests()
 		             .requestMatchers(SecurityUtils::isFrameworkInternalRequest)
 		             .permitAll()
 		             .anyRequest()
@@ -68,20 +68,20 @@ public class SecurityConfiguration {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		// @formatter:off
-		return (web) -> web.ignoring()
-				           .antMatchers("/VAADIN/**", 
-				        		        "/favicon.ico", 
-				        		        "/robots.txt", 
-				        		        "/manifest.webmanifest", 
-				        		        "/sw.js",
-				        		        "/offline-page.html", 
-				        		        "/icons/**", 
-				        		        "/images/**", 
-				        		        "/frontend/**", 
-				        		        "/webjars/**", 
-				        		        "/h2-console/**",
-				        		        "/frontend-es5/**", 
-				        		        "/frontend-es6/**");
+		return web -> web.ignoring()
+				         .requestMatchers("/VAADIN/**", 
+				      	    	          "/favicon.ico", 
+				        	    	      "/robots.txt", 
+				        	    	      "/manifest.webmanifest", 
+				        	    	      "/sw.js",
+				        	    	      "/offline-page.html", 
+				        	    	      "/icons/**", 
+				        	    	      "/images/**", 
+				        	    	      "/frontend/**", 
+				        	    	      "/webjars/**", 
+				        	    	      "/h2-console/**",
+				        	    	      "/frontend-es5/**", 
+				        		          "/frontend-es6/**");
 		// @formatter:on
 	}
 

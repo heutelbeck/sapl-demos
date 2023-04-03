@@ -26,10 +26,10 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
 @SpringBootApplication(exclude = ErrorMvcAutoConfiguration.class)
-public class Application extends SpringBootServletInitializer {
+public class EthereumDemoApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
+		SpringApplication.run(EthereumDemoApplication.class, args);
 	}
 
 	@Bean
