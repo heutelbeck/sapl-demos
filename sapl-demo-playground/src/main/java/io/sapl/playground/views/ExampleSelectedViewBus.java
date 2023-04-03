@@ -19,22 +19,20 @@ import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.spring.annotation.UIScope;
 
-import io.sapl.playground.views.content.ContentView;
+import lombok.NoArgsConstructor;
 
-@Component
 @UIScope
+@Component
+@NoArgsConstructor
 public class ExampleSelectedViewBus {
 
-	private ContentView contentView;
+	private PlaygroundView contentView;
 
-	public ExampleSelectedViewBus() {
-	}
-
-	public ContentView getContentView() {
+	public PlaygroundView getContentView() {
 		return this.contentView;
 	}
 
-	public void setContentView(ContentView contentView) {
+	public void setContentView(PlaygroundView contentView) {
 		this.contentView = contentView;
 	}
 
