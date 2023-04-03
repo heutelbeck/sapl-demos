@@ -24,6 +24,7 @@
 		<java.version>17</java.version>
 		<sapl.version>2.1.0-SNAPSHOT</sapl.version>
 		<springboot.version>3.0.5</springboot.version>
+		<vaadin.version>24.0.2</vaadin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
@@ -65,6 +66,15 @@
 				<version>${version.lombok}</version>
 				<scope>provided</scope>
 			</dependency>
+			
+			<!-- Vaadin -->
+			<dependency>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-bom</artifactId>
+                <version>${vaadin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -93,6 +103,13 @@
 				<enabled>false</enabled>
 			</releases>
 		</repository>
+		<repository>
+            <id>Vaadin Directory</id>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 	</repositories>
 
 	<pluginRepositories>

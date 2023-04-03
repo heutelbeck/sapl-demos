@@ -1,68 +1,46 @@
-/*
- * Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package io.sapl.web.views.javabasedview;
+package io.sapl.demo.views.sapleditor;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.CssImport;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
-import io.sapl.vaadin.DocumentChangedListener;
 import io.sapl.vaadin.Issue;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
-import io.sapl.vaadin.ValidationFinishedListener;
-import io.sapl.web.MainView;
+import lombok.extern.slf4j.Slf4j;
 
-@Route(value = "", layout = MainView.class)
-@PageTitle("Sapl Editor Demo")
-@CssImport("./styles/views/javabasedview/javabased-view-view.css")
-public class SaplEditorView extends Div implements DocumentChangedListener, ValidationFinishedListener {
+@Slf4j
+@PageTitle("SAPL Editor")
+@Route(value = "", layout = MainLayout.class)
+public class SAPLEditorView extends VerticalLayout {
 
-	private final Button addDocumentChangedListenerButton;
+	private static final String DEFAULT_POLICY = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
 
-	private Button removeDocumentChangedListenerButton;
-
-	private final Button addValidationChangedListenerButton;
-
-	private Button removeValidationChangedListenerButton;
-
+	private final Button     addDocumentChangedListenerButton;
+	private final Button     addValidationChangedListenerButton;
 	private final SaplEditor saplEditor;
 
-	public SaplEditorView() {
-		final String DefaultSaplString = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
+	private Button removeDocumentChangedListenerButton;
+	private Button removeValidationChangedListenerButton;
 
-		setId("sapl-editor-view");
-
-		SaplEditorConfiguration saplConfig = new SaplEditorConfiguration();
+	public SAPLEditorView() {
+		var saplConfig = new SaplEditorConfiguration();
 		saplConfig.setHasLineNumbers(true);
 		saplConfig.setTextUpdateDelay(500);
 
 		saplEditor = new SaplEditor(saplConfig);
-		saplEditor.addDocumentChangedListener(this);
-		saplEditor.addValidationFinishedListener(this);
+		saplEditor.addDocumentChangedListener(this::onDocumentChanged);
+		saplEditor.addValidationFinishedListener(this::onValidationFinished);
 		add(saplEditor);
 
 		addDocumentChangedListenerButton = new Button();
 		addDocumentChangedListenerButton.setText("Add Change Listener");
 		addDocumentChangedListenerButton.addClickListener(e -> {
-			saplEditor.addDocumentChangedListener(this);
+			saplEditor.addDocumentChangedListener(this::onDocumentChanged);
 			addDocumentChangedListenerButton.setEnabled(false);
 			removeDocumentChangedListenerButton.setEnabled(true);
 		});
@@ -72,7 +50,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		removeDocumentChangedListenerButton = new Button();
 		removeDocumentChangedListenerButton.setText("Remove Change Listener");
 		removeDocumentChangedListenerButton.addClickListener(e -> {
-			saplEditor.removeDocumentChangedListener(this);
+			saplEditor.removeDocumentChangedListener(this::onDocumentChanged);
 			addDocumentChangedListenerButton.setEnabled(true);
 			removeDocumentChangedListenerButton.setEnabled(false);
 		});
@@ -81,7 +59,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		addValidationChangedListenerButton = new Button();
 		addValidationChangedListenerButton.setText("Add Validation Listener");
 		addValidationChangedListenerButton.addClickListener(e -> {
-			saplEditor.addValidationFinishedListener(this);
+			saplEditor.addValidationFinishedListener(this::onValidationFinished);
 			addValidationChangedListenerButton.setEnabled(false);
 			removeValidationChangedListenerButton.setEnabled(true);
 		});
@@ -91,7 +69,7 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		removeValidationChangedListenerButton = new Button();
 		removeValidationChangedListenerButton.setText("Remove Validation Listener");
 		removeValidationChangedListenerButton.addClickListener(e -> {
-			saplEditor.removeValidationFinishedListener(this);
+			saplEditor.removeValidationFinishedListener(this::onValidationFinished);
 			addValidationChangedListenerButton.setEnabled(true);
 			removeValidationChangedListenerButton.setEnabled(false);
 		});
@@ -99,14 +77,14 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 
 		Button setDocumentToDefaultButton = new Button();
 		setDocumentToDefaultButton.setText("Set Document to Default");
-		setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DefaultSaplString));
+		setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DEFAULT_POLICY));
 		add(setDocumentToDefaultButton);
 
 		Button showSaplDocumentButton = new Button();
 		showSaplDocumentButton.setText("Show Document in Console");
 		showSaplDocumentButton.addClickListener(e -> {
 			String document = saplEditor.getDocument();
-			System.out.println("Current SAPL value: " + document);
+			log.info("Current SAPL value: {}", document);
 		});
 		add(showSaplDocumentButton);
 
@@ -115,19 +93,18 @@ public class SaplEditorView extends Div implements DocumentChangedListener, Vali
 		toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
 		add(toggleReadOnlyButton);
 
-		saplEditor.setDocument(DefaultSaplString);
+		saplEditor.setDocument(DEFAULT_POLICY);
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
-		System.out.println("value changed: " + event.getNewValue());
+		log.info("value changed: {}", event.getNewValue());
 	}
 
 	public void onValidationFinished(ValidationFinishedEvent event) {
-		System.out.println("validation finished");
 		Issue[] issues = event.getIssues();
-		System.out.println("issue count: " + issues.length);
+		log.info("validation finished, number of issues: {}", issues.length);
 		for (Issue issue : issues) {
-			System.out.println(issue.getDescription());
+			log.info(" - {} " + issue.getDescription());
 		}
 	}
 
