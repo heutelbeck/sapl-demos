@@ -62,7 +62,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 				.http()
 				.baseUrl(host)
 				.basicAuth(clientKey, clientSecret)
-				.secureNoTrust()
+				.withUnsecureSSL()
 				.build();
 
 		/*
