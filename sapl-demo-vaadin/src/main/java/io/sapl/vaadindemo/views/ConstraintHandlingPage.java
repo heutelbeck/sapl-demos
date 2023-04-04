@@ -64,7 +64,6 @@ public class ConstraintHandlingPage extends VerticalLayout {
 
         // cheese pizza
         cheese.setValueChangeMode(ValueChangeMode.EAGER);
-        cheese.setHasControls(true);
         var cheeseImage = new Image("images/cheese.jpg", "Cheese Pizza");
         cheeseImage.setHeight(pizzaImageHeight);
         var cheeseLayout = new VerticalLayout(cheeseImage, cheese);
@@ -72,7 +71,6 @@ public class ConstraintHandlingPage extends VerticalLayout {
 
         // veggie pizza
         veggie.setValueChangeMode(ValueChangeMode.EAGER);
-        veggie.setHasControls(true);
         var veggieImage = new Image("images/veggie.jpg", "Veggie Pizza");
         veggieImage.setHeight(pizzaImageHeight);
         var veggieLayout = new VerticalLayout(veggieImage, veggie);
@@ -80,7 +78,6 @@ public class ConstraintHandlingPage extends VerticalLayout {
 
         // pepperoni pizza
         pepperoni.setValueChangeMode(ValueChangeMode.EAGER);
-        pepperoni.setHasControls(true);
         var pepperoniImage = new Image("images/salami.jpg", "Pepperoni Pizza");
         pepperoniImage.setHeight(pizzaImageHeight);
         var pepperoniLayout = new VerticalLayout(pepperoniImage, pepperoni);
@@ -93,7 +90,6 @@ public class ConstraintHandlingPage extends VerticalLayout {
 
         // beer
         beer.setValueChangeMode(ValueChangeMode.EAGER);
-        beer.setHasControls(true);
 
         // current time
         Label lblTime = new Label();
