@@ -32,7 +32,7 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
 		var clearance = clearanceAux;
 
 		return document -> clearanceMatchesOrIsHigherThanClassification(clearance,
-				((Document) document).getClassification());
+				((Document) document).classification());
 
 	}
 

@@ -2,7 +2,7 @@ set "patients"
 first-applicable
 
 policy "Change Resource Example (1/3)"
-permit action.http.contextPath == "/patients"
+permit action.java.name == "getPatients"
 where
   time.secondOf(<time.now>) < 20; 
 obligation
@@ -22,7 +22,7 @@ obligation
 	}
 
 policy "Change Resource Example (2/3)"
-permit action.http.contextPath == "/patients"
+permit action.java.name == "getPatients"
 where
   time.secondOf(<time.now>) < 40; 
 obligation
@@ -43,4 +43,4 @@ obligation
 	}
 
 policy "Change Resource Example (3/3)"
-permit action.http.contextPath == "/patients"
+permit action.java.name == "getPatients"

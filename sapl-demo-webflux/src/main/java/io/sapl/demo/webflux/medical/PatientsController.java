@@ -35,7 +35,7 @@ public class PatientsController {
 	private final PatientsService service;
 
 	@GetMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Patient> documents() {
+	public Flux<Patient> patients() {
 		return service.getPatients();
 	}
 }

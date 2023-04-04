@@ -15,14 +15,18 @@
  */
 package io.sapl.demo.webflux;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootTest
-public class DemoApplicationTest {
+class DemoApplicationTest {
 
 	@Test
-	public void contextLoads() {
+	void contextLoads(ApplicationContext context) {
+	    assertThat(context).isNotNull();
 	}
 
 }

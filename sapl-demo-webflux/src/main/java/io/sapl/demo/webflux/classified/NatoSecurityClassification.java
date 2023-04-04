@@ -15,6 +15,7 @@ public enum NatoSecurityClassification {
 	private String name;
 	private String abbreviation;
 
+	@Override
 	public String toString() {
 		return name + " (" + abbreviation + ')';
 	}
