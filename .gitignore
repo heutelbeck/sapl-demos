@@ -234,3 +234,6 @@ package-lock.json
 webpack.config.js
 webpack.generated.js
 node_modules/
+
+### Vaadin generated JavaScript / TypeScript ###
+**/frontend/generated/**
