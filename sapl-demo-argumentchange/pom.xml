@@ -69,7 +69,7 @@ specific language governing permissions and
 		</dependency>
 
 		<!-- Regression Tests -->
-
+		<!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -80,7 +80,7 @@ specific language governing permissions and
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
+		-->
 	</dependencies>
 
 

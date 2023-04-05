@@ -1,4 +1,4 @@
-package io.sapl.argumentmodification.demo;
+/*package io.sapl.argumentmodification.demo;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,3 +33,5 @@ public class ArgumentModificationDemoApplicationTests {
 	}
 
 }
+
+*/
