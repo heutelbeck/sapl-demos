@@ -1,4 +1,4 @@
-package org.demo.argumentmodification;
+package io.sapl.argumentmodification.demo;
 
 import org.springframework.stereotype.Service;
 

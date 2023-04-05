@@ -1,0 +1,5 @@
+policy "modify string arguments" 
+permit action.http.servletPath == "/string"
+obligation {
+              "suffix" : "HELLO MODIFICATION"
+           }
