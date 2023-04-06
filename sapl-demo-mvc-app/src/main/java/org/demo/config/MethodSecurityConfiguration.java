@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.config.SaplMethodSecurityConfiguration;
 import io.sapl.spring.constraints.ConstraintEnforcementService;
-import io.sapl.spring.subscriptions.AuthorizationSubscriptionBuilderService;
+import io.sapl.spring.subscriptions.WebAuthorizationSubscriptionBuilderService;
 
 @Configuration
 @EnableGlobalMethodSecurity
@@ -33,7 +33,7 @@ public class MethodSecurityConfiguration extends SaplMethodSecurityConfiguration
 	public MethodSecurityConfiguration(ObjectFactory<PolicyDecisionPoint> pdpFactory,
 			ObjectFactory<ConstraintEnforcementService> constraintHandlerFactory,
 			ObjectFactory<ObjectMapper> objectMapperFactory,
-			ObjectFactory<AuthorizationSubscriptionBuilderService> subscriptionBuilderFactory) {
+			ObjectFactory<WebAuthorizationSubscriptionBuilderService> subscriptionBuilderFactory) {
 		super(pdpFactory, constraintHandlerFactory, objectMapperFactory, subscriptionBuilderFactory);
 	}
 

@@ -63,9 +63,9 @@
 		<module>sapl-demo-parent</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-mvc-app</module>
-		<module>sapl-demo-filterchain</module>
+		<module>sapl-demo-web-authorizationmanager</module>
 		<module>sapl-demo-webflux</module>
-		<module>sapl-demo-webflux-filterchain</module>
+		<module>sapl-demo-webflux-authorizationmanager</module>
 		<module>sapl-demo-remote</module>
 		<module>sapl-demo-extension</module>
 		<module>sapl-demo-testing</module>

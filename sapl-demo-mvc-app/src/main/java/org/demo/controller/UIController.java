@@ -34,8 +34,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.Decision;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.method.metadata.PreEnforce;
-import io.sapl.spring.pep.PolicyEnforcementPoint;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,7 @@ public class UIController {
 
 	private final ObjectMapper om;
 
-	private final PolicyEnforcementPoint pep;
+	private final PolicyDecisionPoint pdp;
 
 	private final PatientRepository patientRepository;
 
@@ -58,16 +59,15 @@ public class UIController {
 
 	}
 
-	//@PreEnforce
+	// @PreEnforce
 	@GetMapping("/")
 	public String home(Model model, Authentication authentication) {
-		if(authentication != null) {
-			model.addAttribute("user",authentication.getName());
+		if (authentication != null) {
+			model.addAttribute("user", authentication.getName());
 		}
 		return "home";
 	}
 
-	
 	@PreEnforce
 	@GetMapping("/patients")
 	public String getPatients(HttpServletRequest request, Model model, Authentication authentication) {
@@ -167,7 +167,8 @@ public class UIController {
 	}
 
 	private boolean isPermitted(Object subject, Object action, Object resource) {
-		return pep.isPermitted(AuthorizationSubscription.of(subject, action, resource)).block();
+		return pdp.decide(AuthorizationSubscription.of(subject, action, resource))
+				.map(d -> d.getDecision() == Decision.PERMIT).blockFirst();
 	}
 
 }
