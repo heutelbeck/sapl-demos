@@ -1,37 +1,31 @@
-/*package io.sapl.argumentmodification.demo;
+package io.sapl.argumentmodification.demo;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcConfigurer;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = ArgumentModificationDemoApplication.class)
+@SpringJUnitConfig
+@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = ArgumentModificationDemoApplication.class)
 public class ArgumentModificationDemoApplicationTests {
 
+	private static final String BASIC_AUTH = "Basic dGVzdFVzZXI6dGVzdFBhc3N3b3Jk";
+	private static final String EXPECTED_RESULT = "if all text is lowercase the service was called. right to this message there is a lowercase 'hello modification' then the oblication successfully modified the method arguments->hello modification";
+
 	@Autowired
-	TestRestTemplate restTemplate;
-	
+	MockMvc mvc;
+
 	@Test
-	@WithMockUser(username = "testUser", password = "testPassword")
-	public void testSomeString() {
-		var response = restTemplate.withBasicAuth("testUser", "testPassword").getForObject("/string", String.class);
-		System.out.println(response);
+	public void testSomeStringMvc() throws Exception {
+		mvc.perform(MockMvcRequestBuilders.get("/string").header("Authorization", BASIC_AUTH))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.content().string(EXPECTED_RESULT));
 	}
 
 }
-
-*/
