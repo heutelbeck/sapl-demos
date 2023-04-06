@@ -56,6 +56,8 @@ public class UIController {
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	public static class ResourceNotFoundException extends RuntimeException {
 
+		private static final long serialVersionUID = -7473576823119824705L;
+
 	}
 
 	//@PreEnforce
