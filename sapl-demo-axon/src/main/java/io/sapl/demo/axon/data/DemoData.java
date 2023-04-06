@@ -70,7 +70,7 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 	// @formatter:off
 	private void generateHospitalStaff() {
 		log.info("");
-		log.info("This demo is pre-configured with the follwoing users:");
+		log.info("This demo is pre-configured with the following users:");
 		log.info("");
 		log.info(" Username   | Password | Position       | Ward");
 		log.info("------------+----------+----------------+-------------------------------------");
@@ -93,7 +93,7 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 
 	private void generatePatients() {
 		log.info("");
-		log.info("This demo is pre-configured with the follwoing patients:");
+		log.info("This demo is pre-configured with the following patients:");
 		log.info("");
 		log.info(" Id  | Name                 | Ward");
 		log.info("-----+----------------------+-------------------------------------");

@@ -12,3 +12,5 @@ spring:
 logging:
   level:
     root: OFF
+    io.sapl.pdp: TRACE
+    io.sapl.axon.queryhandling: TRACE

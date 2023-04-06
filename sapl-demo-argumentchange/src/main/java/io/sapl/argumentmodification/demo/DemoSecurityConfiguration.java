@@ -28,15 +28,17 @@ public class DemoSecurityConfiguration {
 	public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
 		var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
 				List.of(new SimpleGrantedAuthority(DEMO_AUTHORITY)));
+		log.info("");
 		log.info("Generating demo user: {}", testUser);
 		log.info("use username : '{}' and password '{}' for login", DEMO_USER, DEMO_PASSWORD);
+		log.info("");
 		return new InMemoryUserDetailsManager(testUser);
 	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable(); // for demo purposes only!
-							   // do not disable csrf in your application unless strictly necessary.
+								// do not disable csrf in your application unless strictly necessary.
 		return http.build();
 	}
 
