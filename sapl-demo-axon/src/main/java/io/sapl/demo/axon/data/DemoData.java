@@ -41,13 +41,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 
-	private static final String                   PASSWORD  = "pwd";
-	private static final String                   NOOP      = "{noop}";
-	private static final String[]                 ICD11     = { "1B21.3", "1B95", "1E31", "2A90.7", "6A25.3", "6C73",
-			"6D51", "6E40.2", "9A82", "9A96.2", "9B02.2", "AB11.1", "BD11.1", "BC02.30", "DA20", "DC10", "LB70.1",
-			"LB79.0", "LB99.2", "NA01.3", "NA01.5", "PF13", "PJ00" };
-	private static final String[]                 DIAGNOSIS = { "Disseminated non-tuberculous mycobacterial infection",
-			"Brucellosis", "Influenza due to identified zoonotic or pandemic influenza virus",
+	private static final String PASSWORD = "pwd";
+	private static final String NOOP = "{noop}";
+	private static final String[] ICD11 = { "1B21.3", "1B95", "1E31", "2A90.7", "6A25.3", "6C73", "6D51", "6E40.2",
+			"9A82", "9A96.2", "9B02.2", "AB11.1", "BD11.1", "BC02.30", "DA20", "DC10", "LB70.1", "LB79.0", "LB99.2",
+			"NA01.3", "NA01.5", "PF13", "PJ00" };
+	private static final String[] DIAGNOSIS = { "Disseminated non-tuberculous mycobacterial infection", "Brucellosis",
+			"Influenza due to identified zoonotic or pandemic influenza virus",
 			"Enteropathy associated T-cell lymphoma", "Manic mood symptoms in primary psychotic disorders",
 			"Intermittent explosive disorder", "Factitious disorder imposed on another",
 			"Personality traits or coping style affecting disorders or diseases classified elsewhere",
@@ -58,8 +58,40 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 			"Acquired anatomical alterations of gallbladder or bile ducts", "Wormian bones", "Fused fingers",
 			"Radial hemimelia", "Laceration with foreign body of head", "Puncture wound with foreign body of head",
 			"Assault by exposure to radiation", "Victim of lightning" };
-	private final ReactorCommandGateway           commandGateway;
+	public static final DemoUser[] DEMO_USERS = new DemoUser[] {
+			// @formatter:off
+			new DemoUser("karl",     PASSWORD, NURSE,         ICCU),
+			new DemoUser("cheryl",   PASSWORD, DOCTOR,        ICCU),
+			new DemoUser("phyllis",  PASSWORD, NURSE,         CCU),
+			new DemoUser("neil",     PASSWORD, DOCTOR,        CCU),
+			new DemoUser("eleanore", PASSWORD, NURSE,         GENERAL),
+			new DemoUser("david",    PASSWORD, DOCTOR,        SICU),
+			new DemoUser("donna",    PASSWORD, ADMINISTRATOR, NONE)
+			// @formatter:on
+	};
+	public static final DemoPatient[] DEMO_PATIENTS = new DemoPatient[] {
+			// @formatter:off
+			new DemoPatient("0","Mona Vance",       List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), ICCU,    "cheryl",ICD11[1], DIAGNOSIS[1]  ),
+			new DemoPatient("1","Martin Pape",      List.of(HEART_RATE, BLOOD_PRESSURE),                                     ICCU,    "cheryl",ICD11[4], DIAGNOSIS[4]  ),
+			new DemoPatient("2","Richard Lewis",    List.of(HEART_RATE,                 BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[6], DIAGNOSIS[6]  ),
+			new DemoPatient("3","Jesse Ramos",      List.of(            BLOOD_PRESSURE,                   RESPIRATION_RATE), CCU,     "neil",  ICD11[8], DIAGNOSIS[8]  ),
+			new DemoPatient("4","Lester Romaniak",  List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[11],DIAGNOSIS[11] ),
+			new DemoPatient("5","Matthew Cortazar", List.of(HEART_RATE,                                   RESPIRATION_RATE), SICU,    "david", ICD11[15],DIAGNOSIS[15] ),
+			new DemoPatient("6","Timothy Favero",   List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), SICU,    "david", ICD11[17],DIAGNOSIS[17] ),
+			new DemoPatient("7","Louise Colley",    List.of(                                              RESPIRATION_RATE), GENERAL, "david", ICD11[22],DIAGNOSIS[22] ),
+			new DemoPatient("8","Bret Gerson",      List.of(                            BODY_TEMPERATURE                  ), ICCU,    "cheryl",ICD11[7], DIAGNOSIS[7]  ),
+			new DemoPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl",ICD11[19],DIAGNOSIS[19] )
+			// @formatter:on
+	};
+	private final ReactorCommandGateway commandGateway;
 	private final HospitalStaffUserDetailsService userDetailsService;
+
+	public static record DemoUser(String userName, String password, Position position, Ward ward) {
+	}
+
+	public static record DemoPatient(String patientId, String name, List<MonitorType> monitors, Ward ward,
+			String doctor, String icd11, String diagnosis) {
+	}
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -67,23 +99,16 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 		generatePatients();
 	}
 
-	// @formatter:off
 	private void generateHospitalStaff() {
 		log.info("");
 		log.info("This demo is pre-configured with the following users:");
 		log.info("");
 		log.info(" Username   | Password | Position       | Ward");
 		log.info("------------+----------+----------------+-------------------------------------");
-		loadUser("karl",        PASSWORD,  NURSE,           ICCU);
-		loadUser("cheryl",      PASSWORD,  DOCTOR,          ICCU);
-		loadUser("phyllis",     PASSWORD,  NURSE,           CCU);
-		loadUser("neil",        PASSWORD,  DOCTOR,          CCU);
-		loadUser("eleanore",    PASSWORD,  NURSE,           GENERAL);
-		loadUser("david",       PASSWORD,  DOCTOR,          SICU);
-		loadUser("donna",       PASSWORD,  ADMINISTRATOR,   NONE);
+		for (var demoUser : DEMO_USERS)
+			loadUser(demoUser.userName(), demoUser.password(), demoUser.position(), demoUser.ward());
 		log.info("");
 	}
-	// @formatter:on
 
 	private void loadUser(String username, String rawPassword, Position position, Ward ward) {
 		log.info(String.format(" %-10.10s | %-8.8s | %-14.14s | %s ", username, rawPassword, position,
@@ -97,18 +122,9 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 		log.info("");
 		log.info(" Id  | Name                 | Ward");
 		log.info("-----+----------------------+-------------------------------------");
-		// @formatter:off
-		loadPatient("0","Mona Vance",       List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), ICCU,    "cheryl",ICD11[1], DIAGNOSIS[1]  );
-		loadPatient("1","Martin Pape",      List.of(HEART_RATE, BLOOD_PRESSURE),                                     ICCU,    "cheryl",ICD11[4], DIAGNOSIS[4]  );
-		loadPatient("2","Richard Lewis",    List.of(HEART_RATE,                 BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[6], DIAGNOSIS[6]  );
-		loadPatient("3","Jesse Ramos",      List.of(            BLOOD_PRESSURE,                   RESPIRATION_RATE), CCU,     "neil",  ICD11[8], DIAGNOSIS[8]  );
-		loadPatient("4","Lester Romaniak",  List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[11],DIAGNOSIS[11] );
-		loadPatient("5","Matthew Cortazar", List.of(HEART_RATE,                                   RESPIRATION_RATE), SICU,    "david", ICD11[15],DIAGNOSIS[15] );
-		loadPatient("6","Timothy Favero",   List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), SICU,    "david", ICD11[17],DIAGNOSIS[17] );
-		loadPatient("7","Louise Colley",    List.of(                                              RESPIRATION_RATE), GENERAL, "david", ICD11[22],DIAGNOSIS[22] );
-		loadPatient("8","Bret Gerson",      List.of(                            BODY_TEMPERATURE                  ), ICCU,    "cheryl",ICD11[7], DIAGNOSIS[7]  );
-		loadPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl",ICD11[19],DIAGNOSIS[19] );
-		// @formatter:on
+		for (var demoPatient : DEMO_PATIENTS)
+			loadPatient(demoPatient.patientId(), demoPatient.name(), demoPatient.monitors(), demoPatient.ward(),
+					demoPatient.doctor(), demoPatient.icd11(), demoPatient.diagnosis());
 		log.info("");
 	}
 
