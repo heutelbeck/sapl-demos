@@ -43,8 +43,8 @@ import reactor.core.publisher.Mono;
 
 @SpringJUnitConfig
 @SpringBootTest(classes = SaplDemoAxonApplication.class)
-@Import(io.sapl.demo.axon.iface.rest.PatientsTests.TestConfiguration.class)
-public class PatientsTests {
+@Import(io.sapl.demo.axon.iface.rest.SaplAxonDemoTests.TestConfiguration.class)
+public class SaplAxonDemoTests {
 
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(100);
 

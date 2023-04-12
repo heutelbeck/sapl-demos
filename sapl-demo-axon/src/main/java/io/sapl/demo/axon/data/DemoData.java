@@ -83,8 +83,6 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 			new DemoPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl",ICD11[19],DIAGNOSIS[19] )
 			// @formatter:on
 	};
-	private final ReactorCommandGateway commandGateway;
-	private final HospitalStaffUserDetailsService userDetailsService;
 
 	public static record DemoUser(String userName, String password, Position position, Ward ward) {
 	}
@@ -92,6 +90,9 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 	public static record DemoPatient(String patientId, String name, List<MonitorType> monitors, Ward ward,
 			String doctor, String icd11, String diagnosis) {
 	}
+
+	private final ReactorCommandGateway commandGateway;
+	private final HospitalStaffUserDetailsService userDetailsService;
 
 	@Override
 	public void onApplicationEvent(ContextRefreshedEvent event) {
