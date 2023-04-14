@@ -13,7 +13,7 @@
 	<name>SAPL Demo Query Rewriting Library Scenario</name>
 	<description>Demo for filtering collections.</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 
 	<dependencyManagement>

@@ -5,9 +5,11 @@ import static reactor.test.StepVerifier.*;
 
 import java.time.Duration;
 import java.util.Collection;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,7 @@ import io.sapl.demo.axon.SaplDemoAxonApplication;
 import io.sapl.demo.axon.authentication.HospitalStaff;
 import io.sapl.demo.axon.authentication.HospitalStaffUserDetailsService;
 import io.sapl.demo.axon.authentication.Position;
+import io.sapl.demo.axon.command.MonitorType;
 import io.sapl.demo.axon.command.patient.Ward;
 import io.sapl.demo.axon.data.DemoData;
 import io.sapl.demo.axon.data.DemoData.DemoPatient;
@@ -126,7 +129,10 @@ public class SaplAxonDemoTests {
 	private HospitalStaffUserDetailsService userDetailService;
 
 	@Autowired
-	private PatientsController controller;
+	private PatientsController patientsController;
+
+	@Autowired
+	private VitalSignsController vitalsController;
 
 	@Autowired
 	private TestAuthenticationSupplier authenticationSupplier;
@@ -140,7 +146,7 @@ public class SaplAxonDemoTests {
 	@MethodSource("userNameSource")
 	public void fetchAllPatientsViaPublisherTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
-		var response = pricipal.thenMany(controller.fetchAllPatientsViaPublisher());
+		var response = pricipal.thenMany(patientsController.fetchAllPatientsViaPublisher());
 		create(Flux.zip(pricipal.repeat(9), response))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
@@ -158,7 +164,7 @@ public class SaplAxonDemoTests {
 	@MethodSource("userNameAndPatientIdSource")
 	public void fetchPatientViaPublisherTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
-		var response = pricipal.then(controller.fetchPatientViaPublisher(unapi.patientId()))
+		var response = pricipal.then(patientsController.fetchPatientViaPublisher(unapi.patientId()))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
 		create(Mono.zip(pricipal, response))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
@@ -168,7 +174,7 @@ public class SaplAxonDemoTests {
 	@MethodSource("userNameSource")
 	public void fetchAllPatientsTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
-		var response = pricipal.then(controller.fetchAllPatients()).flatMapMany(Flux::fromIterable);
+		var response = pricipal.then(patientsController.fetchAllPatients()).flatMapMany(Flux::fromIterable);
 		create(Flux.zip(pricipal.repeat(9), response))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
@@ -186,7 +192,7 @@ public class SaplAxonDemoTests {
 	@MethodSource("userNameAndPatientIdSource")
 	public void fetchPatientTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
-		var response = pricipal.then(controller.fetchPatient(unapi.patientId())).filter(ResponseEntity::hasBody)
+		var response = pricipal.then(patientsController.fetchPatient(unapi.patientId())).filter(ResponseEntity::hasBody)
 				.map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
 		create(Mono.zip(pricipal, response))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
@@ -196,15 +202,23 @@ public class SaplAxonDemoTests {
 	@MethodSource("doctorsAndTheirPatients")
 	public void streamPatientAndHospitalizePatientTest(UserNameAndPatientIdAndWard unapiaw) {
 		var pricipal = login(userDetailService.findByUsername(unapiaw.userName()));
-		var response = pricipal.thenMany(controller.streamPatient(unapiaw.patientId())).map(ServerSentEvent::data)
-				.map(data -> (PatientDocument) data);
+		var response = pricipal.thenMany(patientsController.streamPatient(unapiaw.patientId()))
+				.map(ServerSentEvent::data).map(data -> (PatientDocument) data);
 		create(response)
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward() || patient.ward() == Ward.NONE
 						|| patient.ward() == Ward.GENERAL))
-				.then(() -> controller.hospitalizePatient(unapiaw.patientId(), unapiaw.ward()).subscribe())
+				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId(), unapiaw.ward()).subscribe())
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward()))
-				.then(() -> controller.hospitalizePatient(unapiaw.patientId()).subscribe())
+				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId()).subscribe())
 				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(DEFAULT_TIMEOUT);
+	}
+
+	@Test
+	public void testtest() {
+		var pricipal = login(userDetailService.findByUsername("cheryl"));
+		var response = pricipal.then(vitalsController.fetchVitals("1", MonitorType.BLOOD_PRESSURE));
+		response.doOnEach(System.out::println).block();
+		Mono.fromFuture(new CompletableFuture<>());
 	}
 
 	private Mono<HospitalStaff> login(Mono<UserDetails> userPulisher) {

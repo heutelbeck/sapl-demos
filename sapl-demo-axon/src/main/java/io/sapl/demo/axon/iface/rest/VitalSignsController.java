@@ -28,7 +28,7 @@ public class VitalSignsController {
 	@GetMapping("/api/patients/{id}/vitals/{type}")
 	Mono<ResponseEntity<VitalSignMeasurement>> fetchVitals(@PathVariable String id, @PathVariable MonitorType type) {
 		return Mono
-				.fromFuture(queryGateway.query(new FetchVitalSignOfPatient(id, type),
+				.fromFuture(() -> queryGateway.query(new FetchVitalSignOfPatient(id, type),
 						ResponseTypes.instanceOf(VitalSignMeasurement.class)))
 				.map(ResponseEntity::ok).defaultIfEmpty(ResponseEntity.notFound().build());
 	}
