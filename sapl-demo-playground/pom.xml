@@ -12,6 +12,7 @@
 	
     <artifactId>sapl-demo-playground</artifactId>
     <packaging>jar</packaging>
+	<name>SAPL Demo Playground</name>
 
     <properties>
         <selenium.version>4.8.1</selenium.version>

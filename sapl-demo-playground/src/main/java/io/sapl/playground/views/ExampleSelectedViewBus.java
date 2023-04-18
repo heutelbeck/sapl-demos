@@ -15,6 +15,8 @@
  */
 package io.sapl.playground.views;
 
+import java.io.Serializable;
+
 import org.springframework.stereotype.Component;
 
 import com.vaadin.flow.spring.annotation.UIScope;
@@ -24,7 +26,7 @@ import lombok.NoArgsConstructor;
 @UIScope
 @Component
 @NoArgsConstructor
-public class ExampleSelectedViewBus {
+public class ExampleSelectedViewBus implements Serializable {
 
 	private PlaygroundView contentView;
 
