@@ -37,7 +37,6 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
 
@@ -50,7 +49,6 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * In the main view one can see all features of the demo application.
  */
-@Push
 @Slf4j
 @Route
 @CssImport("./styles/shared-styles.css")

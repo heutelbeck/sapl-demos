@@ -22,3 +22,9 @@ webpack.generated.js
 package.json
 package-lock.json
 webpack.config.js
+
+**/dev-bundle/
+tsconfig.json
+
+*.ts
+*.html
