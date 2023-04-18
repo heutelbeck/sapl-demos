@@ -23,7 +23,7 @@ first-applicable
 for resource.type == "measurement"
 
 /*
- * All doctors and nurses have full access to raw data
+ * All doctors have full access to raw data
  */
 policy "permit doctors raw data" 
 permit subject.position == "DOCTOR"

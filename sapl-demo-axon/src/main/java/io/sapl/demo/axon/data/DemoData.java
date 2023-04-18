@@ -60,27 +60,27 @@ public class DemoData implements ApplicationListener<ContextRefreshedEvent> {
 			"Assault by exposure to radiation", "Victim of lightning" };
 	public static final DemoUser[] DEMO_USERS = new DemoUser[] {
 			// @formatter:off
-			new DemoUser("karl",     PASSWORD, NURSE,         ICCU),
-			new DemoUser("cheryl",   PASSWORD, DOCTOR,        ICCU),
-			new DemoUser("phyllis",  PASSWORD, NURSE,         CCU),
-			new DemoUser("neil",     PASSWORD, DOCTOR,        CCU),
-			new DemoUser("eleanore", PASSWORD, NURSE,         GENERAL),
-			new DemoUser("david",    PASSWORD, DOCTOR,        SICU),
-			new DemoUser("donna",    PASSWORD, ADMINISTRATOR, NONE)
+			new DemoUser("karl",     PASSWORD, NURSE,         ICCU    ),
+			new DemoUser("cheryl",   PASSWORD, DOCTOR,        ICCU    ),
+			new DemoUser("phyllis",  PASSWORD, NURSE,         CCU     ),
+			new DemoUser("neil",     PASSWORD, DOCTOR,        CCU     ),
+			new DemoUser("eleanore", PASSWORD, NURSE,         GENERAL ),
+			new DemoUser("david",    PASSWORD, DOCTOR,        SICU    ),
+			new DemoUser("donna",    PASSWORD, ADMINISTRATOR, NONE    )
 			// @formatter:on
 	};
 	public static final DemoPatient[] DEMO_PATIENTS = new DemoPatient[] {
 			// @formatter:off
-			new DemoPatient("0","Mona Vance",       List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), ICCU,    "cheryl",ICD11[1], DIAGNOSIS[1]  ),
-			new DemoPatient("1","Martin Pape",      List.of(HEART_RATE, BLOOD_PRESSURE),                                     ICCU,    "cheryl",ICD11[4], DIAGNOSIS[4]  ),
-			new DemoPatient("2","Richard Lewis",    List.of(HEART_RATE,                 BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[6], DIAGNOSIS[6]  ),
-			new DemoPatient("3","Jesse Ramos",      List.of(            BLOOD_PRESSURE,                   RESPIRATION_RATE), CCU,     "neil",  ICD11[8], DIAGNOSIS[8]  ),
-			new DemoPatient("4","Lester Romaniak",  List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",  ICD11[11],DIAGNOSIS[11] ),
-			new DemoPatient("5","Matthew Cortazar", List.of(HEART_RATE,                                   RESPIRATION_RATE), SICU,    "david", ICD11[15],DIAGNOSIS[15] ),
-			new DemoPatient("6","Timothy Favero",   List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), SICU,    "david", ICD11[17],DIAGNOSIS[17] ),
-			new DemoPatient("7","Louise Colley",    List.of(                                              RESPIRATION_RATE), GENERAL, "david", ICD11[22],DIAGNOSIS[22] ),
-			new DemoPatient("8","Bret Gerson",      List.of(                            BODY_TEMPERATURE                  ), ICCU,    "cheryl",ICD11[7], DIAGNOSIS[7]  ),
-			new DemoPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl",ICD11[19],DIAGNOSIS[19] )
+			new DemoPatient("0","Mona Vance",       List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), ICCU,    "cheryl", ICD11[ 1], DIAGNOSIS[ 1] ),
+			new DemoPatient("1","Martin Pape",      List.of(HEART_RATE, BLOOD_PRESSURE                                    ), ICCU,    "cheryl", ICD11[ 4], DIAGNOSIS[ 4] ),
+			new DemoPatient("2","Richard Lewis",    List.of(HEART_RATE,                 BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",   ICD11[ 6], DIAGNOSIS[ 6] ),
+			new DemoPatient("3","Jesse Ramos",      List.of(            BLOOD_PRESSURE,                   RESPIRATION_RATE), CCU,     "neil",   ICD11[ 8], DIAGNOSIS[ 8] ),
+			new DemoPatient("4","Lester Romaniak",  List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), CCU,     "neil",   ICD11[11], DIAGNOSIS[11] ),
+			new DemoPatient("5","Matthew Cortazar", List.of(HEART_RATE,                                   RESPIRATION_RATE), SICU,    "david",  ICD11[15], DIAGNOSIS[15] ),
+			new DemoPatient("6","Timothy Favero",   List.of(HEART_RATE, BLOOD_PRESSURE, BODY_TEMPERATURE, RESPIRATION_RATE), SICU,    "david",  ICD11[17], DIAGNOSIS[17] ),
+			new DemoPatient("7","Louise Colley",    List.of(                                              RESPIRATION_RATE), GENERAL, "david",  ICD11[22], DIAGNOSIS[22] ),
+			new DemoPatient("8","Bret Gerson",      List.of(                            BODY_TEMPERATURE                  ), ICCU,    "cheryl", ICD11[ 7], DIAGNOSIS[ 7] ),
+			new DemoPatient("9","Richard Spreer",   List.of(            BLOOD_PRESSURE                                    ), NONE,    "cheryl", ICD11[19], DIAGNOSIS[19] )
 			// @formatter:on
 	};
 

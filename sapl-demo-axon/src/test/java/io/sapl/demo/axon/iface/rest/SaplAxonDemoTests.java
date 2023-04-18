@@ -5,7 +5,7 @@ import static reactor.test.StepVerifier.*;
 
 import java.time.Duration;
 import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -40,6 +40,7 @@ import io.sapl.demo.axon.data.DemoData;
 import io.sapl.demo.axon.data.DemoData.DemoPatient;
 import io.sapl.demo.axon.data.DemoData.DemoUser;
 import io.sapl.demo.axon.query.patients.api.PatientDocument;
+import io.sapl.demo.axon.query.vitals.api.VitalSignMeasurement;
 import lombok.Setter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,7 +50,8 @@ import reactor.core.publisher.Mono;
 @Import(io.sapl.demo.axon.iface.rest.SaplAxonDemoTests.TestConfiguration.class)
 public class SaplAxonDemoTests {
 
-	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(100);
+	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(400);
+	private static final Duration SHORT_TIMEOUT = Duration.ofMillis(100);
 
 	@org.springframework.boot.test.context.TestConfiguration
 	public static class TestConfiguration {
@@ -94,6 +96,10 @@ public class SaplAxonDemoTests {
 	private static record UserNameAndPatientIdAndWard(String userName, String patientId, Ward ward) {
 	}
 
+	private static record UserNameAndPatientIdAndMonitorType(String userName, String patientId,
+			MonitorType monitorType) {
+	}
+
 	private static Collection<String> userNameSource() {
 		return Stream.of(DemoData.DEMO_USERS).map(DemoUser::userName).toList();
 	}
@@ -102,9 +108,20 @@ public class SaplAxonDemoTests {
 		return Stream.of(DemoData.DEMO_USERS).filter(user -> user.position() == Position.DOCTOR).toList();
 	}
 
+	private static Collection<DemoUser> nurseSource() {
+		return Stream.of(DemoData.DEMO_USERS).filter(user -> user.position() == Position.NURSE).toList();
+	}
+
 	private static Collection<UserNameAndPatientId> userNameAndPatientIdSource() {
 		return userNameSource().stream().flatMap(userName -> Stream.of(DemoData.DEMO_PATIENTS)
 				.map(DemoPatient::patientId).map(patientId -> new UserNameAndPatientId(userName, patientId))).toList();
+	}
+
+	private static Collection<UserNameAndPatientId> doctorAndPatientIdSource() {
+		return doctorSource()
+				.stream().map(DemoUser::userName).flatMap(userName -> Stream.of(DemoData.DEMO_PATIENTS)
+						.map(DemoPatient::patientId).map(patientId -> new UserNameAndPatientId(userName, patientId)))
+				.toList();
 	}
 
 	private static Collection<UserNameAndPatientIdAndWard> doctorsAndTheirPatients() {
@@ -112,6 +129,34 @@ public class SaplAxonDemoTests {
 				.flatMap(doctor -> Stream.of(DemoData.DEMO_PATIENTS)
 						.filter(patient -> patient.doctor().equals(doctor.userName())).map(DemoPatient::patientId)
 						.map(patientId -> new UserNameAndPatientIdAndWard(doctor.userName(), patientId, doctor.ward())))
+				.toList();
+	}
+
+	private static Collection<UserNameAndPatientIdAndMonitorType> doctorsAndPatientsAndTheirMonitors() {
+		return doctorAndPatientIdSource().stream()
+				.flatMap(doctorAndPatient -> Stream.of(DemoData.DEMO_PATIENTS)
+						.filter(demoPatient -> demoPatient.patientId().equals(doctorAndPatient.patientId)).findAny()
+						.map(DemoPatient::monitors).map(List::stream).orElse(Stream.of())
+						.map(monitorType -> new UserNameAndPatientIdAndMonitorType(doctorAndPatient.userName,
+								doctorAndPatient.patientId, monitorType)))
+				.toList();
+	}
+
+	private static Collection<UserNameAndPatientId> nursesAndPatientsWithBodyTemperatureMonitor() {
+		return nurseSource().stream().map(DemoUser::userName)
+				.flatMap(userName -> Stream.of(DemoData.DEMO_PATIENTS)
+						.filter(demoPatient -> demoPatient.monitors().contains(MonitorType.BODY_TEMPERATURE))
+						.map(DemoPatient::patientId).map(patientId -> new UserNameAndPatientId(userName, patientId)))
+				.toList();
+	}
+
+	private static Collection<UserNameAndPatientIdAndMonitorType> nursesAndPatientsWithRawMonitor() {
+		return nurseSource().stream().map(DemoUser::userName).flatMap(userName -> Stream.of(MonitorType.values())
+				.filter(monitorType -> !monitorType.equals(MonitorType.BLOOD_PRESSURE))
+				.filter(monitorType -> !monitorType.equals(MonitorType.BODY_TEMPERATURE))
+				.flatMap(monitorType -> Stream.of(DemoData.DEMO_PATIENTS)
+						.filter(demoPatient -> demoPatient.monitors().contains(monitorType)).map(DemoPatient::patientId)
+						.map(patientId -> new UserNameAndPatientIdAndMonitorType(userName, patientId, monitorType))))
 				.toList();
 	}
 
@@ -147,7 +192,7 @@ public class SaplAxonDemoTests {
 	public void fetchAllPatientsViaPublisherTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
 		var response = pricipal.thenMany(patientsController.fetchAllPatientsViaPublisher());
-		create(Flux.zip(pricipal.repeat(9), response))
+		create(Flux.zip(pricipal.repeat(9), response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
@@ -166,7 +211,7 @@ public class SaplAxonDemoTests {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatientViaPublisher(unapi.patientId()))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
-		create(Mono.zip(pricipal, response))
+		create(Mono.zip(pricipal, response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
 	}
 
@@ -175,7 +220,7 @@ public class SaplAxonDemoTests {
 	public void fetchAllPatientsTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
 		var response = pricipal.then(patientsController.fetchAllPatients()).flatMapMany(Flux::fromIterable);
-		create(Flux.zip(pricipal.repeat(9), response))
+		create(Flux.zip(pricipal.repeat(9), response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
@@ -194,7 +239,7 @@ public class SaplAxonDemoTests {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatient(unapi.patientId())).filter(ResponseEntity::hasBody)
 				.map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
-		create(Mono.zip(pricipal, response))
+		create(Mono.zip(pricipal, response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
 	}
 
@@ -204,21 +249,71 @@ public class SaplAxonDemoTests {
 		var pricipal = login(userDetailService.findByUsername(unapiaw.userName()));
 		var response = pricipal.thenMany(patientsController.streamPatient(unapiaw.patientId()))
 				.map(ServerSentEvent::data).map(data -> (PatientDocument) data);
-		create(response)
+		create(response.timeout(DEFAULT_TIMEOUT))
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward() || patient.ward() == Ward.NONE
 						|| patient.ward() == Ward.GENERAL))
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId(), unapiaw.ward()).subscribe())
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward()))
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId()).subscribe())
-				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(DEFAULT_TIMEOUT);
+				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(SHORT_TIMEOUT);
 	}
 
-	@Test
-	public void testtest() {
-		var pricipal = login(userDetailService.findByUsername("cheryl"));
-		var response = pricipal.then(vitalsController.fetchVitals("1", MonitorType.BLOOD_PRESSURE));
-		response.doOnEach(System.out::println).block();
-		Mono.fromFuture(new CompletableFuture<>());
+	@ParameterizedTest
+	@MethodSource("doctorsAndPatientsAndTheirMonitors")
+	public void fetchVitalsTestForDoctors(UserNameAndPatientIdAndMonitorType unapiamt) {
+		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
+		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
+			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
+			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
+			assertNotNull(measurement.timestamp(), "expected timestamp");
+			assertNotNull(measurement.type(), "expected monitor type");
+			assertFalse(measurement.unit().isBlank(), "expected unit");
+			assertFalse(measurement.unit().contains("█"), "expected non blackend unit");
+			assertNotEquals(measurement.unit(), "Body Temperature Category", "expected no body temperature category");
+			assertFalse(measurement.value().isBlank(), "expected value");
+			assertFalse(measurement.value().contains("█"), "expected non blackend value");
+			assertNotEquals(measurement.value(), "Normal", "expected normal");
+		}).verifyComplete();
+	}
+
+	// omit testing time PIP
+
+	@ParameterizedTest
+	@MethodSource("nursesAndPatientsWithBodyTemperatureMonitor")
+	public void fetchVitalsTestForNursesAndBodyTemperature(UserNameAndPatientId unapi) {
+		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
+		var response = pricipal.then(vitalsController.fetchVitals(unapi.patientId(), MonitorType.BODY_TEMPERATURE))
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
+			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
+			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
+			assertNotNull(measurement.timestamp(), "expected timestamp");
+			assertEquals(measurement.type(), MonitorType.BODY_TEMPERATURE, "expected body temerature");
+			assertEquals(measurement.unit(), "Body Temperature Category", "expected body temperature category");
+			assertEquals(measurement.value(), "Normal", "expected normal");
+		}).verifyComplete();
+	}
+
+	@ParameterizedTest
+	@MethodSource("nursesAndPatientsWithRawMonitor")
+	public void fetchVitalsTestForNursesAndRawMonitor(UserNameAndPatientIdAndMonitorType unapiamt) {
+		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
+		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
+			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
+			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
+			assertNotNull(measurement.timestamp(), "expected timestamp");
+			assertNotNull(measurement.type(), "expected monitor type");
+			assertFalse(measurement.unit().isBlank(), "expected unit");
+			assertFalse(measurement.unit().contains("█"), "expected non blackend unit");
+			assertNotEquals(measurement.unit(), "Body Temperature Category", "expected no body temperature category");
+			assertFalse(measurement.value().isBlank(), "expected value");
+			assertFalse(measurement.value().contains("█"), "expected non blackend value");
+			assertNotEquals(measurement.value(), "Normal", "expected normal");
+		}).verifyComplete();
 	}
 
 	private Mono<HospitalStaff> login(Mono<UserDetails> userPulisher) {
