@@ -20,17 +20,23 @@ public class DemoData implements CommandLineRunner {
 
 	public static final String DEFAULT_PASSWORD = "password";
 
-	private static final String NAME_ADMIN = "admin";
-	private static final String NAME_TOM = "Tom";
-	private static final String NAME_SIM = "Sim";
-	private static final String NAME_KAT = "Kat";
-
 	public static final LibraryUser[] DEMO_USERS = new LibraryUser[] {
 			// @formatter:off
-			new LibraryUser(NAME_ADMIN, 1, List.of(),      DEFAULT_PASSWORD),
-			new LibraryUser(NAME_TOM,   1, List.of(1,2,3), DEFAULT_PASSWORD),
-			new LibraryUser(NAME_SIM,   2, List.of(1,2),   DEFAULT_PASSWORD),
-			new LibraryUser(NAME_KAT,   3, null,           DEFAULT_PASSWORD)
+			new LibraryUser("admin", 1, List.of(),      DEFAULT_PASSWORD),
+			new LibraryUser("Tom",   1, List.of(1,2,3), DEFAULT_PASSWORD),
+			new LibraryUser("Sim",   2, List.of(1,2),   DEFAULT_PASSWORD),
+			new LibraryUser("Kat",   3, null,           DEFAULT_PASSWORD)
+			// @formatter:on
+	};
+
+	public static final Book[] DEMO_BOOKS = new Book[] {
+			// @formatter:off
+			new Book(1L, "book1", 1),
+			new Book(2L, "book2", 1),
+			new Book(3L, "book3", 2),
+			new Book(4L, "book4", 3),
+			new Book(5L, "book5", 4),
+			new Book(6L, "book6", 5)
 			// @formatter:on
 	};
 
@@ -41,12 +47,8 @@ public class DemoData implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		log.info("Loading demo book collection...");
-		bookRepository.save(new Book(1L, "book1", 1));
-		bookRepository.save(new Book(2L, "book2", 1));
-		bookRepository.save(new Book(3L, "book3", 2));
-		bookRepository.save(new Book(4L, "book4", 3));
-		bookRepository.save(new Book(5L, "book5", 4));
-		bookRepository.save(new Book(6L, "book6", 5));
+		for (var demoBook : DEMO_BOOKS)
+			bookRepository.save(demoBook);
 
 		log.info("Loading demo users...");
 		for (var demoUser : DEMO_USERS)

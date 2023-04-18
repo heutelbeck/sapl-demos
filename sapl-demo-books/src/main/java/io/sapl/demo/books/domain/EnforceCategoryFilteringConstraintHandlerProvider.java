@@ -27,17 +27,17 @@ public class EnforceCategoryFilteringConstraintHandlerProvider implements Method
 
 			var constraintCategories = constraint.get(LIMIT_CATEGORIES);
 			var categories = new ArrayList<Integer>();
+
 			if (constraintCategories.size() == 0) {
-				var newArguments = new Object[] { Optional.empty() };
-				methodInvocation.setArguments(newArguments);
+				methodInvocation.setArguments(Optional.empty());
 				return;
 			}
 
 			for (var category : constraintCategories)
 				categories.add(category.asInt());
 
-			var newArguments = new Object[] { Optional.of(categories) };
-			methodInvocation.setArguments(newArguments);
+			methodInvocation.setArguments(Optional.of(categories));
 		};
 	}
+
 }

@@ -9,6 +9,8 @@ spring:
   main.banner-mode: off
   data.mongodb.port: 8888
   task.scheduling.pool.size: 5
+
+# No logging during test
 logging:
   level:
     root: OFF
