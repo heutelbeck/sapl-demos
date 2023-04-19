@@ -1,7 +1,6 @@
 package io.sapl.playground.views;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Unit;
@@ -29,7 +28,7 @@ import io.sapl.playground.examples.SpringSecurityExample;
 public class MainLayout extends AppLayout {
 
 	private final ExampleSelectedViewBus exampleSelectedViewBus;
-	private Map<String, Example>         examples;
+	private HashMap<String, Example>     examples;
 
 	public MainLayout(ExampleSelectedViewBus exampleSelectedViewBus) {
 		this.exampleSelectedViewBus = exampleSelectedViewBus;

@@ -15,7 +15,9 @@
  */
 package io.sapl.playground.examples;
 
-public abstract class Example {
+import java.io.Serializable;
+
+public abstract class Example implements Serializable {
 
 	protected String mockDefinition;
 

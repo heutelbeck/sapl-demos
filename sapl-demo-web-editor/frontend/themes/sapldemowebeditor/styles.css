@@ -1,1 +1,9 @@
-@import url('./main-layout.css');
+vaadin-vertical-layout {
+  height: 100%;
+}
+
+sapl-editor,
+json-editor {
+  width: 100%;
+  flex: 1;
+}

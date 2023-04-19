@@ -69,6 +69,7 @@ import java.util.function.Consumer;
 @PageTitle("SAPL Playground")
 @Route(value = "", layout = MainLayout.class)
 public class PlaygroundView extends VerticalLayout {
+    private static final long serialVersionUID = 6521235098267757690L;
 
 	// UI element references
 	private SaplEditor saplEditor;
