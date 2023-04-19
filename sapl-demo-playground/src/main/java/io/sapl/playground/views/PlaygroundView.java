@@ -15,15 +15,6 @@
  */
 package io.sapl.playground.views;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +29,7 @@ import com.vaadin.flow.component.splitlayout.SplitLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -62,18 +53,17 @@ import io.sapl.playground.models.MockingModel;
 import io.sapl.test.mocking.attribute.MockingAttributeContext;
 import io.sapl.test.mocking.function.MockingFunctionContext;
 import io.sapl.test.steps.AttributeMockReturnValues;
-import io.sapl.vaadin.DocumentChangedEvent;
-import io.sapl.vaadin.Issue;
-import io.sapl.vaadin.JsonEditor;
-import io.sapl.vaadin.JsonEditorConfiguration;
-import io.sapl.vaadin.SaplEditor;
-import io.sapl.vaadin.SaplEditorConfiguration;
-import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.*;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
 import reactor.util.context.Context;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.util.*;
+import java.util.function.Consumer;
 
 @Slf4j
 @PageTitle("SAPL Playground")
@@ -134,6 +124,7 @@ public class PlaygroundView extends VerticalLayout {
 		var horizontalSplitLayout = new SplitLayout(policyEditor(), createRightSide());
 		horizontalSplitLayout.setOrientation(SplitLayout.Orientation.HORIZONTAL);
 		horizontalSplitLayout.setSizeFull();
+		horizontalSplitLayout.setSplitterPosition(50);
 
 		add(horizontalSplitLayout);
 	}
@@ -150,6 +141,7 @@ public class PlaygroundView extends VerticalLayout {
 		var saplConfig = new SaplEditorConfiguration();
 		saplConfig.setHasLineNumbers(true);
 		saplConfig.setTextUpdateDelay(500);
+		saplConfig.setDarkTheme(true);
 		this.saplEditor = new SaplEditor(saplConfig);
 		this.saplEditor.addDocumentChangedListener(this::onSaplPolicyChanged);
 		this.saplEditor.addValidationFinishedListener(this::onValidationFinished);
@@ -160,6 +152,7 @@ public class PlaygroundView extends VerticalLayout {
 		var rightSideSplit = new SplitLayout(createRightUpperSide(), resultsDisplay());
 		rightSideSplit.setOrientation(SplitLayout.Orientation.VERTICAL);
 		rightSideSplit.setSizeFull();
+		rightSideSplit.setSplitterPosition(50);
 		return rightSideSplit;
 	}
 
@@ -201,23 +194,29 @@ public class PlaygroundView extends VerticalLayout {
 
 	private Component mocksEditorAndError() {
 		var mockInput            = new VerticalLayout();
+		mockInput.setClassName(LumoUtility.Padding.NONE);
+
 		var mockJsonEditorConfig = new JsonEditorConfiguration();
 		mockJsonEditorConfig.setTextUpdateDelay(500);
+		mockJsonEditorConfig.setDarkTheme(true);
 		this.mockDefinitionEditor = new JsonEditor(mockJsonEditorConfig);
 		this.mockDefinitionEditor.addDocumentChangedListener(this::onMockingJsonEditorInputChanged);
 		mockInput.add(this.mockDefinitionEditor);
 
 		this.mockDefinitionJsonInputError = new Paragraph("Input JSON is not valid");
 		this.mockDefinitionJsonInputError.setVisible(false);
-		this.mockDefinitionJsonInputError.setClassName("errorText");
+		this.mockDefinitionJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
 		mockInput.add(this.mockDefinitionJsonInputError);
-		return this.mockDefinitionEditor;
+		return mockInput;
 	}
 
 	private Component createAuthorizationSubscriptionEditor() {
 		var authzSubscriptionEditor = new VerticalLayout();
+		authzSubscriptionEditor.setClassName(LumoUtility.Padding.NONE);
+
 		var authzSubEditorConfig    = new JsonEditorConfiguration();
 		authzSubEditorConfig.setTextUpdateDelay(500);
+		authzSubEditorConfig.setDarkTheme(true);
 		this.authzSubEditor = new JsonEditor(authzSubEditorConfig);
 		this.authzSubEditor.addDocumentChangedListener(this::onAuthzSubJsonInputChanged);
 
@@ -225,17 +224,21 @@ public class PlaygroundView extends VerticalLayout {
 
 		this.authzSubJsonInputError = new Paragraph("Input JSON is not valid");
 		this.authzSubJsonInputError.setVisible(false);
-		this.authzSubJsonInputError.setClassName("errorText");
+		this.authzSubJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
 		authzSubscriptionEditor.add(this.authzSubJsonInputError);
 		return authzSubscriptionEditor;
 	}
 
 	private Component resultsDisplay() {
-		this.jsonOutput      = new JsonEditor(new JsonEditorConfiguration());
+		JsonEditorConfiguration jsonOutputEditorConfiguration = new JsonEditorConfiguration();
+		jsonOutputEditorConfiguration.setDarkTheme(true);
+		this.jsonOutput      = new JsonEditor(jsonOutputEditorConfiguration);
 		this.evaluationError = new Paragraph();
 		this.evaluationError.setVisible(false);
-		this.evaluationError.setClassName("errorText");
-		return new VerticalLayout(jsonOutput, evaluationError);
+		this.evaluationError.setClassName(LumoUtility.TextColor.ERROR);
+		VerticalLayout resultsDisplayLayout = new VerticalLayout(jsonOutput, evaluationError);
+		resultsDisplayLayout.addClassNames(LumoUtility.Padding.Bottom.NONE);
+		return resultsDisplayLayout;
 	}
 
 	private void onValidationFinished(ValidationFinishedEvent event) {
