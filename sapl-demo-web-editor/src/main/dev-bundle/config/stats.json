@@ -247,10 +247,10 @@
   "virtualListConnector.js": "e89f6bc6f5cd4765c863ae12721371ebff9079d163679e3989368fb7f74e5e61"
  },
  "themeJsonContents": {
-  "saplplayground": "{\n  \"lumoImports\" : [ \"typography\", \"color\", \"spacing\", \"badge\", \"utility\" ]\n}"
+  "sapldemowebeditor": "{\n  \"lumoImports\" : [ \"typography\", \"color\", \"spacing\", \"badge\", \"utility\" ]\n}"
  },
  "entryScripts": [
-  "VAADIN/build/indexhtml-9a225186.js"
+  "VAADIN/build/indexhtml-96cdefc8.js"
  ],
  "webComponents": [],
  "packageJsonHash": "220bffcd495719486f6856723ac5de8ab9fe2c0abc7bcc45fd8ccdc782ea3553"
