@@ -67,16 +67,28 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	private static final AuthorizationSubscription WRITE_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
 			ACTION_WRITE, RESOURCE);
 
-	private static final int RUNS = 20_000;
+	private static final int DEMO_RUNS = 20_000;
+	
+	private static final int TEST_RUNS = 20;
 
 	private static final double BILLION = 1_000_000_000.0D;
 
 	private static final double MILLION = 1_000_000.0D;
 
 	private static final DecimalFormat decFormat = new DecimalFormat("#.####");
+	
+	private static boolean useTestRuns = false;
 
 	public static void main(String... args) {
 		System.exit(new CommandLine(new EmbeddedPDPDemo()).execute(args));
+	}
+	
+	static void setUseTestRuns(boolean useTestRuns) {
+		EmbeddedPDPDemo.useTestRuns = useTestRuns;
+	}
+	
+	private static int getRuns() {
+		return useTestRuns ? TEST_RUNS : DEMO_RUNS;
 	}
 
 	@Override
@@ -171,42 +183,44 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 	}
 
 	private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
+		var runs = getRuns();
 		LOGGER.info("");
 		LOGGER.info("Demo Part 3: Perform a small benchmark for blocking decisions.");
 
-		LOGGER.info("Warming up for {} runs...", RUNS);
-		for (int i = 0; i < RUNS; i++) {
+		LOGGER.info("Warming up for {} runs...", runs);
+		for (int i = 0; i < runs; i++) {
 			pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		}
-		LOGGER.info("Measure time for {} runs...", RUNS);
+		LOGGER.info("Measure time for {} runs...", runs);
 		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
+		for (int i = 0; i < runs; i++) {
 			pdp.decide(READ_SUBSCRIPTION).blockFirst();
 		}
 		long end = System.nanoTime();
 		LOGGER.info("");
-		logResults("Benchmark results for blocking PDP access:", RUNS, start, end);
+		logResults("Benchmark results for blocking PDP access:", runs, start, end);
 		LOGGER.info("");
 		LOGGER.info("------------------------------------------------------------------------");
 	}
 
 	private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
+		var runs = getRuns();
 		LOGGER.info("");
 		LOGGER.info("Demo Part 4: Perform a small benchmark for sequential .take(1) decisions.");
 
-		LOGGER.info("Warming up for {} runs...", RUNS);
-		for (int i = 0; i < RUNS; i++) {
+		LOGGER.info("Warming up for {} runs...", runs);
+		for (int i = 0; i < runs; i++) {
 			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
 		}
-		LOGGER.info("Measure time for {} runs...", RUNS);
+		LOGGER.info("Measure time for {} runs...", runs);
 
 		long start = System.nanoTime();
-		for (int i = 0; i < RUNS; i++) {
+		for (int i = 0; i < runs; i++) {
 			pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
 		}
 		long end = System.nanoTime();
 		LOGGER.info("");
-		logResults("Benchmark results for .take(1) access:", RUNS, start, end);
+		logResults("Benchmark results for .take(1) access:", runs, start, end);
 		LOGGER.info("");
 		LOGGER.info("------------------------------------------------------------------------");
 	}
@@ -223,7 +237,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 		LOGGER.info(title);
 		LOGGER.info("Runs  : {}", runs);
 		LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
-		LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / RUNS)));
+		LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / runs)));
 	}
 
 }
