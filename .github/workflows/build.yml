@@ -49,6 +49,9 @@ jobs:
     - name: Run tests
       run: mvn -B test
 
+    - name: Package
+      run: mvn -B package -Pproduction
+
     - name: Clean up local repository before caching (Linux/Mac)
       if: ${{ matrix.os != 'windows-latest'}}
       run: rm -rf ~/.m2/repository/io/sapl
