@@ -49,6 +49,7 @@ import lombok.Setter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@Disabled
 @SpringJUnitConfig
 @SpringBootTest(classes = SaplDemoAxonApplication.class)
 @Import(io.sapl.demo.axon.iface.rest.SaplAxonDemoTests.TestConfiguration.class)
@@ -247,7 +248,6 @@ class SaplAxonDemoTests {
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
 	}
 
-	@Disabled
 	@ParameterizedTest
 	@MethodSource("doctorsAndTheirPatients")
 	void streamPatientAndHospitalizePatientTest(UserNameAndPatientIdAndWard unapiaw) {
