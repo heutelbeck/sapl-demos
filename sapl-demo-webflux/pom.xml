@@ -110,13 +110,6 @@
 					</excludes>
 				</configuration>
 			</plugin>
-			 <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                   <configuration>
-        <reuseForks>false</reuseForks>
-        <forkCount>1</forkCount>
-    </configuration>
-            </plugin>
 		</plugins>
 	</build>
 
