@@ -45,7 +45,10 @@ public class JSONEditorView extends VerticalLayout {
 	private Button removeDocumentChangedListenerButton;
 
 	public JSONEditorView() {
-		jsonEditor = new JsonEditor(new JsonEditorConfiguration());
+		var jsonConfig = new JsonEditorConfiguration();
+		jsonConfig.setDarkTheme(true);
+
+		jsonEditor = new JsonEditor(jsonConfig);
 		jsonEditor.addDocumentChangedListener(this::onDocumentChanged);
 		add(jsonEditor);
 
@@ -83,6 +86,7 @@ public class JSONEditorView extends VerticalLayout {
 		add(toggleReadOnlyButton);
 
 		jsonEditor.setDocument(DEFAULT_JSON);
+		setSizeFull();
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {
