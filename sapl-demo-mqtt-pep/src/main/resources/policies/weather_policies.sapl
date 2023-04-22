@@ -1,0 +1,34 @@
+set "weather_policy_set"
+first-applicable
+
+policy "weather_clients_connection_policy"
+permit
+  subject.clientId in ["weather_station", "outdoor_thermometer"]
+where
+  action.type == "mqtt.connect";
+
+policy "weather_station_temperature_policy"
+permit
+  subject.clientId == "weather_station"
+where
+  action.type == "mqtt.subscribe";
+  resource.topic == "temperature";
+
+policy "outdoor_thermometer_policy"
+permit
+  subject.clientId == "outdoor_thermometer"
+where
+  action.type == "mqtt.publish";
+  resource.topic == "temperature";
+obligation
+    {
+        "type" : "replaceContentType",
+            "replacement" : "temperature_celsius"
+    }
+
+policy "weather_station_humidity_policy"
+deny
+  subject.clientId == "weather_station"
+where
+  action.type == "mqtt.subscribe";
+  resource.topic == "humidity";

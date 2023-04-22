@@ -1,0 +1,19 @@
+set "mqttPipPolicySet"
+first-applicable
+
+policy "mqttBroker1"
+permit
+    action == "actionBroker1"
+where
+    subject == "subjectName";
+    var message = "message";
+    resource.topics.<mqtt.messages(0, "broker1")> == message;
+
+policy "mqttToggle"
+permit
+    action == "actionToggle"
+where
+    subject == "subjectName";
+    var message = "message";
+    var config = {"brokerAddress": "localhost", "brokerPort": 1883, "clientId": <mqttToggle.toggleId>};
+    resource.topic.<mqtt.messages(0, config)> == message;
