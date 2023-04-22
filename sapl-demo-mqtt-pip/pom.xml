@@ -69,7 +69,6 @@
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-mqtt-pip</artifactId>
-            <version>2.1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <!-- A logging library for printing messages to the console -->
