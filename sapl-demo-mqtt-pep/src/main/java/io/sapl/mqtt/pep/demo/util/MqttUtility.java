@@ -70,9 +70,9 @@ public class MqttUtility {
 
     private static EmbeddedHiveMQBuilder buildEmbeddedHivemqBroker(EmbeddedExtension embeddedExtensionBuild) {
         return EmbeddedHiveMQ.builder()
-                .withConfigurationFolder(Path.of("sapl-mqtt-pep-demo/src/main/resources/embedded-config-folder"))
-                .withDataFolder(Path.of("sapl-mqtt-pep-demo/src/main/resources/embedded-data-folder"))
-                .withExtensionsFolder(Path.of("sapl-mqtt-pep-demo/src/main/resources/embedded-extensions-folder"))
+                .withConfigurationFolder(Path.of("sapl-demo-mqtt-pep/src/main/resources/embedded-config-folder"))
+                .withDataFolder(Path.of("sapl-demo-mqtt-pep/src/main/resources/embedded-data-folder"))
+                .withExtensionsFolder(Path.of("sapl-demo-mqtt-pep/src/main/resources/embedded-extensions-folder"))
                 .withEmbeddedExtension(embeddedExtensionBuild);
     }
 

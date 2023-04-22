@@ -70,7 +70,7 @@ public class SaplMqttFunctionsDemo {
 
     private static EmbeddedPolicyDecisionPoint buildPdp() throws InitializationException {
         return PolicyDecisionPointFactory
-                .filesystemPolicyDecisionPoint("sapl-mqtt-functions-demo/src/main/resources/policies",
+                .filesystemPolicyDecisionPoint("sapl-demo-mqtt-functions/src/main/resources/policies",
                         List.of(), List.of(new MqttFunctions()));
     }
 }

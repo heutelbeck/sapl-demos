@@ -71,16 +71,16 @@ public class MqttPipDemo {
 
 	private static void startMqttServerCe() {
 		final var embeddedHiveMQBuilder = EmbeddedHiveMQ.builder()
-				.withConfigurationFolder(Path.of("sapl-mqtt-pip-demo/src/main/resources/embedded-config-folder"))
-				.withDataFolder(Path.of("sapl-mqtt-pip-demo/src/main/resources/embedded-data-folder"))
-				.withExtensionsFolder(Path.of("sapl-mqtt-pip-demo/src/main/resources/embedded-extensions-folder"));
+				.withConfigurationFolder(Path.of("sapl-demo-mqtt-pip/src/main/resources/embedded-config-folder"))
+				.withDataFolder(Path.of("sapl-demo-mqtt-pip/src/main/resources/embedded-data-folder"))
+				.withExtensionsFolder(Path.of("sapl-demo-mqtt-pip/src/main/resources/embedded-extensions-folder"));
 
 		embeddedHiveMQBuilder.build().start().join();
 	}
 
 	private static EmbeddedPolicyDecisionPoint buildPdp() throws InitializationException {
 		return PolicyDecisionPointFactory
-				.filesystemPolicyDecisionPoint("sapl-mqtt-pip-demo/src/main/resources/policies",
+				.filesystemPolicyDecisionPoint("sapl-demo-mqtt-pip/src/main/resources/policies",
 						List.of(new MqttPolicyInformationPoint(), new MqttTogglePip()), List.of());
 	}
 

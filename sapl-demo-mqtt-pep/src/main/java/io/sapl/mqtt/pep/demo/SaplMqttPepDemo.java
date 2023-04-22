@@ -32,8 +32,8 @@ import static io.sapl.mqtt.pep.demo.util.MqttUtility.*;
  */
 @Slf4j
 public class SaplMqttPepDemo {
-    private static final String SAPL_EXTENSION_CONFIG_PATH = "sapl-mqtt-pep-demo/src/main/resources";
-    private static final String SAPL_PDP_POLICIES_PATH = "sapl-mqtt-pep-demo/src/main/resources/policies";
+    private static final String SAPL_EXTENSION_CONFIG_PATH = "sapl-demo-mqtt-pep/src/main/resources";
+    private static final String SAPL_PDP_POLICIES_PATH = "sapl-demo-mqtt-pep/src/main/resources/policies";
     private static final String WEATHER_STATION_CLIENT_ID = "weather_station";
     private static final String THERMOMETER_CLIENT_ID = "outdoor_thermometer";
     private static final String TEMPERATURE_TOPIC = "temperature";
