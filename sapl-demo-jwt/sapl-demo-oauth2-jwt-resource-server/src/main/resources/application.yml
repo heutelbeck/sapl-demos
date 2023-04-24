@@ -12,7 +12,7 @@ logging:
     org:
       springframework:
         web: INFO
-        security: INFO
+        security: TRACE
 
 spring:
   security:

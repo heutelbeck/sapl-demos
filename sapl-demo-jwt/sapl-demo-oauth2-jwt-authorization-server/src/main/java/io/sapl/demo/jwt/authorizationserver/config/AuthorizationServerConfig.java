@@ -122,14 +122,9 @@ public class AuthorizationServerConfig {
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
 
-	/*@Bean
-	ProviderSettings providerSettings() {
-		return ProviderSettings.builder().issuer("http://auth-server:9000").build();
-	}*/
-	
 	@Bean
 	AuthorizationServerSettings authorizationServerSettings() {
-		return AuthorizationServerSettings.builder().build();
+		return AuthorizationServerSettings.builder().issuer("http://auth-server:9000").build();
 	}
 
 	@Bean
