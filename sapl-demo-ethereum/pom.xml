@@ -16,7 +16,20 @@
 
     <properties>
         <selenium.version>4.8.3</selenium.version>
+        <version.testcontainers>1.18.0</version.testcontainers>
     </properties>
+    
+    <dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${version.testcontainers}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
     <dependencies>
 		<!-- Vaadin -->
@@ -78,10 +91,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-		    <groupId>org.testcontainers</groupId>
-		    <artifactId>junit-jupiter</artifactId>
-		    <version>1.18.0</version>
-		    <scope>test</scope>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>testcontainers</artifactId>
+			<scope>test</scope>
 		</dependency>
 
     </dependencies>
