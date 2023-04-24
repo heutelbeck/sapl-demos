@@ -1,7 +1,11 @@
 package io.sapl.demo.axon.iface.rest;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static reactor.test.StepVerifier.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static reactor.test.StepVerifier.create;
 
 import java.time.Duration;
 import java.util.Collection;
@@ -47,7 +51,7 @@ import reactor.core.publisher.Mono;
 @SpringJUnitConfig
 @SpringBootTest(classes = SaplDemoAxonApplication.class)
 @Import(io.sapl.demo.axon.iface.rest.SaplAxonDemoTests.TestConfiguration.class)
-public class SaplAxonDemoTests {
+class SaplAxonDemoTests {
 
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
 	private static final Duration SHORT_TIMEOUT = Duration.ofMillis(100);
@@ -72,7 +76,7 @@ public class SaplAxonDemoTests {
 	}
 
 	private static class TestAuthenticationSupplier extends ServletAuthenticationSupplier {
-		private ObjectMapper mapper;
+		private ObjectMapper   mapper;
 		@Setter
 		private Authentication testAuthentication = null;
 
@@ -188,7 +192,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("userNameSource")
-	public void fetchAllPatientsViaPublisherTest(String userName) {
+	void fetchAllPatientsViaPublisherTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
 		var response = pricipal.thenMany(patientsController.fetchAllPatientsViaPublisher());
 		create(Flux.zip(pricipal.repeat(9), response).timeout(DEFAULT_TIMEOUT))
@@ -206,7 +210,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("userNameAndPatientIdSource")
-	public void fetchPatientViaPublisherTest(UserNameAndPatientId unapi) {
+	void fetchPatientViaPublisherTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatientViaPublisher(unapi.patientId()))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
@@ -216,7 +220,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("userNameSource")
-	public void fetchAllPatientsTest(String userName) {
+	void fetchAllPatientsTest(String userName) {
 		var pricipal = login(userDetailService.findByUsername(userName));
 		var response = pricipal.then(patientsController.fetchAllPatients()).flatMapMany(Flux::fromIterable);
 		create(Flux.zip(pricipal.repeat(9), response).timeout(DEFAULT_TIMEOUT))
@@ -234,7 +238,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("userNameAndPatientIdSource")
-	public void fetchPatientTest(UserNameAndPatientId unapi) {
+	void fetchPatientTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatient(unapi.patientId())).filter(ResponseEntity::hasBody)
 				.map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
@@ -244,7 +248,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("doctorsAndTheirPatients")
-	public void streamPatientAndHospitalizePatientTest(UserNameAndPatientIdAndWard unapiaw) {
+	void streamPatientAndHospitalizePatientTest(UserNameAndPatientIdAndWard unapiaw) {
 		var pricipal = login(userDetailService.findByUsername(unapiaw.userName()));
 		var response = pricipal.thenMany(patientsController.streamPatient(unapiaw.patientId()))
 				.map(ServerSentEvent::data).map(data -> (PatientDocument) data);
@@ -259,7 +263,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("doctorsAndPatientsAndTheirMonitors")
-	public void fetchVitalsTestForDoctors(UserNameAndPatientIdAndMonitorType unapiamt) {
+	void fetchVitalsTestForDoctors(UserNameAndPatientIdAndMonitorType unapiamt) {
 		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
@@ -281,7 +285,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("nursesAndPatientsWithBodyTemperatureMonitor")
-	public void fetchVitalsTestForNursesAndBodyTemperature(UserNameAndPatientId unapi) {
+	void fetchVitalsTestForNursesAndBodyTemperature(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapi.patientId(), MonitorType.BODY_TEMPERATURE))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
@@ -297,7 +301,7 @@ public class SaplAxonDemoTests {
 
 	@ParameterizedTest
 	@MethodSource("nursesAndPatientsWithRawMonitor")
-	public void fetchVitalsTestForNursesAndRawMonitor(UserNameAndPatientIdAndMonitorType unapiamt) {
+	void fetchVitalsTestForNursesAndRawMonitor(UserNameAndPatientIdAndMonitorType unapiamt) {
 		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
 				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);

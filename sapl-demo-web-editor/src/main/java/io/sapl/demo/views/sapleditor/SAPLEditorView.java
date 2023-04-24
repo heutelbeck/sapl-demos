@@ -31,6 +31,7 @@ public class SAPLEditorView extends VerticalLayout {
 		var saplConfig = new SaplEditorConfiguration();
 		saplConfig.setHasLineNumbers(true);
 		saplConfig.setTextUpdateDelay(500);
+		saplConfig.setDarkTheme(true);
 
 		saplEditor = new SaplEditor(saplConfig);
 		saplEditor.addDocumentChangedListener(this::onDocumentChanged);
@@ -94,6 +95,7 @@ public class SAPLEditorView extends VerticalLayout {
 		add(toggleReadOnlyButton);
 
 		saplEditor.setDocument(DEFAULT_POLICY);
+		setSizeFull();
 	}
 
 	public void onDocumentChanged(DocumentChangedEvent event) {

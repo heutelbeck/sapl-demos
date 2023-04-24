@@ -128,6 +128,7 @@ public class PlaygroundView extends VerticalLayout {
 		horizontalSplitLayout.setSplitterPosition(50);
 
 		add(horizontalSplitLayout);
+		setSizeFull();
 	}
 
 	/**
@@ -202,12 +203,14 @@ public class PlaygroundView extends VerticalLayout {
 		mockJsonEditorConfig.setDarkTheme(true);
 		this.mockDefinitionEditor = new JsonEditor(mockJsonEditorConfig);
 		this.mockDefinitionEditor.addDocumentChangedListener(this::onMockingJsonEditorInputChanged);
+
 		mockInput.add(this.mockDefinitionEditor);
 
 		this.mockDefinitionJsonInputError = new Paragraph("Input JSON is not valid");
 		this.mockDefinitionJsonInputError.setVisible(false);
 		this.mockDefinitionJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
 		mockInput.add(this.mockDefinitionJsonInputError);
+		mockInput.setSizeFull();
 		return mockInput;
 	}
 
@@ -227,6 +230,7 @@ public class PlaygroundView extends VerticalLayout {
 		this.authzSubJsonInputError.setVisible(false);
 		this.authzSubJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
 		authzSubscriptionEditor.add(this.authzSubJsonInputError);
+		authzSubscriptionEditor.setSizeFull();
 		return authzSubscriptionEditor;
 	}
 
@@ -239,6 +243,7 @@ public class PlaygroundView extends VerticalLayout {
 		this.evaluationError.setClassName(LumoUtility.TextColor.ERROR);
 		VerticalLayout resultsDisplayLayout = new VerticalLayout(jsonOutput, evaluationError);
 		resultsDisplayLayout.addClassNames(LumoUtility.Padding.Bottom.NONE);
+		resultsDisplayLayout.setSizeFull();
 		return resultsDisplayLayout;
 	}
 
