@@ -10,7 +10,7 @@
   "@vaadin/checkbox": "24.0.2",
   "@vaadin/checkbox-group": "24.0.2",
   "@vaadin/combo-box": "24.0.2",
-  "@vaadin/common-frontend": "0.0.17",
+  "@vaadin/common-frontend": "0.0.18",
   "@vaadin/component-base": "24.0.2",
   "@vaadin/confirm-dialog": "24.0.2",
   "@vaadin/context-menu": "24.0.2",
@@ -77,7 +77,7 @@
   "@vaadin/checkbox": "24.0.2",
   "@vaadin/checkbox-group": "24.0.2",
   "@vaadin/combo-box": "24.0.2",
-  "@vaadin/common-frontend": "0.0.17",
+  "@vaadin/common-frontend": "0.0.18",
   "@vaadin/component-base": "24.0.2",
   "@vaadin/confirm-dialog": "24.0.2",
   "@vaadin/context-menu": "24.0.2",
@@ -127,15 +127,13 @@
   "@vaadin/vaadin-usage-statistics": "2.1.2",
   "@vaadin/vertical-layout": "24.0.2",
   "@vaadin/virtual-list": "24.0.2",
+  "construct-style-sheets-polyfill": "3.1.0",
   "date-fns": "2.29.3",
   "lit-element": "3.3.1",
   "lit-html": "2.7.2",
   "tslib": "2.5.0"
  },
  "bundleImports": [
-  "@vaadin/vaadin-themable-mixin",
-  "Frontend/styles/shared-styles.css",
-  "Frontend/styles/vaadin-text-field-styles.css",
   "@vaadin/grid/theme/lumo/vaadin-grid.js",
   "@vaadin/tooltip/theme/lumo/vaadin-tooltip.js",
   "@vaadin/grid/theme/lumo/vaadin-grid-column.js",
@@ -220,14 +218,12 @@
   "Frontend/generated/jar-resources/virtualListConnector.js"
  ],
  "frontendHashes": {
-  "styles/shared-styles.css": "0b4c088655db08447f7d71bd12701ef58d73a985db8934dc68e2747bf9be3c5b",
-  "styles/vaadin-text-field-styles.css": "6076b3217ca993c8a77e212d9786b90a5305d5f7fd57d45c5021ef8c9094420a",
   "comboBoxConnector.js": "1d004c3dae9c76f8bcc68678abe1b8f7bdc8b456f5c9c4c7f190df8ed25d66cd",
   "contextMenuConnector.js": "25a200f8086461635ddd92316ebeb5a868294c8650a190efbae120edb1088f4f",
   "contextMenuTargetConnector.js": "870f67643988dd5618c247bd3c28d843f70aa026ee89f44c3c7556b5e70856af",
   "datepickerConnector.js": "84d25236e1e478c2e181a7881464ad75228a30ccd99d60f78186f0804b6a4a37",
   "dndConnector-es6.js": "d1923b7ec5655346bc130c7ce477d69eb3776417ddc942dd7f69fee1188e0ddf",
-  "flow-component-renderer.js": "69175eaf0e9c85e3e6574203778bdaeb2de62735c2b7279d1925d780797c2018",
+  "flow-component-renderer.js": "f45de3d78e4719c2eb7aa09b48ec758e1e44e171cd4ad545ac9e33c3623dcfb1",
   "gridConnector.js": "844651edd2d8980c5f9d344cc2b8fb0f0f34c0127ce6f0fe04e873930cc1d13f",
   "lit-renderer.ts": "afefa9f5fcb38260a0ff08bc044a5f591f242689ca3c7905130ad32df0476e7c",
   "lumo-includes.ts": "be2372586a5d7de41ae33e60d9b882eba8b7f751d314cfae1672c32ee8fd09ea",
@@ -240,10 +236,12 @@
   "vaadin-time-picker/timepickerConnector.js": "68889ce9748478f71bf1620d488abbbd588f8047618ac558315d9b0b689e75e8",
   "virtualListConnector.js": "e89f6bc6f5cd4765c863ae12721371ebff9079d163679e3989368fb7f74e5e61"
  },
- "themeJsonContents": {},
+ "themeJsonContents": {
+  "sapldemoethereum": "{\n  \"lumoImports\" : [ \"typography\", \"color\", \"spacing\", \"badge\", \"utility\" ]\n}"
+ },
  "entryScripts": [
-  "VAADIN/build/indexhtml-27cae624.js"
+  "VAADIN/build/indexhtml-c7519fab.js"
  ],
  "webComponents": [],
- "packageJsonHash": "d61bb38034c1ede6973a0f4a0c9cadce6c8d142cb581a8e68d2c8ec4837164e7"
+ "packageJsonHash": "91b9078d7f233b0da51d74dc4ed341f7ab4c00275214b4039d946e617a06632f"
 }
