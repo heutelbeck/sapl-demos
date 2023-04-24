@@ -49,4 +49,13 @@ After that pick a demo that matches your interest.
 * [sapl-demo-testing](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-testing): Demonstrates how to test SAPL policies with unit tests, including test code coverage reports.
 
 
+* [sapl-demo-mqtt-pep](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pep): Demonstrates how to authorize MQTT subscriptions and publish messages with a Policy Enforcement Point.
+
+
+* [sapl-demo-mqtt-pip](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pip): Demonstrates how to evaluate MQTT messages with a Policy Information Point.
+
+
+* [sapl-demo-mqtt-functions](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-functions): Demonstrates authorization of MQTT publish messages in respect to single- and multi-level wildcard topics.
+
+
 

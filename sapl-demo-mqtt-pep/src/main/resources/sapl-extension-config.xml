@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+    Copyright © 2019-2022 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<sapl-extension-config>
+    <connection-enforcement-timeout-millis>5000</connection-enforcement-timeout-millis>
+    <subscription-enforcement-timeout-millis>5000</subscription-enforcement-timeout-millis>
+    <publish-enforcement-timeout-millis>5000</publish-enforcement-timeout-millis>
+    <pdp-implementation>embedded</pdp-implementation>
+    <embedded-pdp-policies-path>/policies</embedded-pdp-policies-path>
+    <embedded-pdp-policies-path-is-relative-to-extension-home>
+        true
+    </embedded-pdp-policies-path-is-relative-to-extension-home>
+    <remote-pdp-base-url>https://localhost:8080</remote-pdp-base-url>
+    <remote-pdp-client-key>YJi7gyT5mfdKbmL</remote-pdp-client-key>
+    <remote-pdp-client-secret>$2a$10$Ph9bF71xYb0MK8KubWLB7e0Dpl2AfMiEUi9jrKTbFR4kkWABRb9yO</remote-pdp-client-secret>
+    <remote-pdp-first-back-off-millis>500</remote-pdp-first-back-off-millis>
+    <remote-pdp-max-back-off-millis>5000</remote-pdp-max-back-off-millis>
+    <remote-pdp-back-off-factor>2</remote-pdp-back-off-factor>
+</sapl-extension-config>
