@@ -81,8 +81,10 @@
 		<module>sapl-demo-vaadin</module>
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-mqtt-functions</module>
+		<!--
 		<module>sapl-demo-mqtt-pep</module>
 		<module>sapl-demo-mqtt-pip</module>
+		-->
 	</modules>
 
 </project>
