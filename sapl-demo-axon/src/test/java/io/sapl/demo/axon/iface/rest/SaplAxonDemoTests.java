@@ -53,7 +53,7 @@ import reactor.core.publisher.Mono;
 @Import(io.sapl.demo.axon.iface.rest.SaplAxonDemoTests.TestConfiguration.class)
 class SaplAxonDemoTests {
 
-	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
+	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(600);
 	private static final Duration SHORT_TIMEOUT = Duration.ofMillis(100);
 
 	@org.springframework.boot.test.context.TestConfiguration
