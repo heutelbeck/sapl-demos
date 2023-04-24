@@ -54,7 +54,6 @@ import reactor.core.publisher.Mono;
 class SaplAxonDemoTests {
 
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
-	private static final Duration SHORT_TIMEOUT = Duration.ofMillis(100);
 
 	@org.springframework.boot.test.context.TestConfiguration
 	public static class TestConfiguration {
@@ -258,7 +257,7 @@ class SaplAxonDemoTests {
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId(), unapiaw.ward()).subscribe())
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward()))
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId()).subscribe())
-				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(SHORT_TIMEOUT);
+				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(DEFAULT_TIMEOUT);
 	}
 
 	@ParameterizedTest
