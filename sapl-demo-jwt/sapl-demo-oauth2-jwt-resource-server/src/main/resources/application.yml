@@ -8,11 +8,11 @@ logging:
   level:
     root: INFO
     io:
-      sapl: TRACE
+      sapl: DEBUG
     org:
       springframework:
         web: INFO
-        security: TRACE
+        security: INFO
 
 spring:
   security:

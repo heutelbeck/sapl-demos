@@ -49,11 +49,18 @@
 			<scope>runtime</scope>
 		</dependency>
 		
+		<!-- Auth server -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-cas</artifactId>
+		    <version>5.8.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-oauth2-authorization-server</artifactId>
 			<version>1.0.1</version>
 		</dependency>
+		<!-- /Auth server -->
 
 		<dependency>
 			<groupId>com.heutelbeck</groupId>
