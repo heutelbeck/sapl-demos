@@ -1,0 +1,14 @@
+set "mqttFunctionsDemoPolicySet"
+deny-overrides
+
+policy "allowAllTopics"
+permit
+    resource != null
+
+policy "denyWhenMatchingAllTopics"
+deny
+  mqtt.functions.isMatchingAllTopics(resource, ["first/second/third", "first/second/fourth"])
+
+policy "denyWhenMatchingSingleTopic"
+deny
+  mqtt.functions.isMatchingAtLeastOneTopic(resource, ["munich/weather/temperature", "munich/population"])
