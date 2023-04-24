@@ -18,65 +18,38 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <artifactId>sapl-demos</artifactId>
-        <groupId>io.sapl</groupId>
-        <version>2.1.0-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>io.sapl</groupId>
+		<artifactId>sapl-demo-parent</artifactId>
+		<version>2.1.0-SNAPSHOT</version>
+		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
+	</parent>
 
     <artifactId>sapl-demo-mqtt-pip</artifactId>
     <name>SAPL Demo MQTT PIP</name>
-
-    <properties>
-        <!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
-        <java.version>11</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- The Version of the SAPL Dependencies -->
-        <sapl.version>2.1.0-SNAPSHOT</sapl.version>
-    </properties>
-
-    <repositories>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
+    
     <dependencies>
         <!-- The embedded Streaming Attribute Engine PDP -->
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-pdp-embedded</artifactId>
-            <version>${sapl.version}</version>
-        </dependency>
-        <!-- An embedded mqtt broker for integration testing -->
-        <dependency>
-            <groupId>com.hivemq</groupId>
-            <artifactId>hivemq-community-edition-embedded</artifactId>
-            <version>2021.3</version>
-            <scope>compile</scope>
         </dependency>
         <!-- The sapl mqtt pip used for demonstration purposes.-->
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-mqtt-pip</artifactId>
-            <version>2.1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.hivemq</groupId>
+            <artifactId>hivemq-community-edition-embedded</artifactId>
+            <version>2021.3</version>
         </dependency>
         <!-- A logging library for printing messages to the console -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.3</version>
         </dependency>
     </dependencies>
 
