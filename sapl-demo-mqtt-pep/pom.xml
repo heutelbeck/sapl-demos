@@ -28,11 +28,13 @@
 
     <properties>
         <!-- The Version of the SAPL Dependencies -->
-        <sapl.version>2.0.1</sapl.version>
+        <sapl.version>2.1.0-SNAPSHOT</sapl.version>
         <!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <repositories>
