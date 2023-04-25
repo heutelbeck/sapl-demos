@@ -30,6 +30,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     name: JDK ${{ matrix.java }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
 
     steps:
     - name: Check out
@@ -70,6 +71,8 @@ jobs:
     needs: [tests]
     name: Code Analysis, Test Coverage, Integration Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
     steps:
     - name: Check out
       uses: actions/checkout@v3
@@ -114,6 +117,8 @@ jobs:
     needs: [analyze]
     name: Deliver server images
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
     steps:
     - name: Check out
       uses: actions/checkout@v3
