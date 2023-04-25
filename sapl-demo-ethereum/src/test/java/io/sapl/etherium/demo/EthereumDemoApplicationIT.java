@@ -18,7 +18,7 @@ import io.sapl.ethereum.demo.EthereumDemoApplication;
 @Testcontainers
 @SpringJUnitConfig
 @SpringBootTest(classes = EthereumDemoApplication.class)
-public class EthereumDemoApplicationTests {
+public class EthereumDemoApplicationIT {
 
 	private static final Duration TIMEOUT_FOR_GANACHE_CLI_SPINUP = Duration.ofSeconds(10);
 	private static final int GANACHE_SERVER_PORT = 8545;
