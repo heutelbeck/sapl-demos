@@ -1,0 +1,16 @@
+{
+  "algorithm": "DENY_OVERRIDES",
+  "variables": {
+    "mqttPipConfig": {
+      "defaultBrokerConfigName": "demo",
+      "brokerConfig": [
+        {
+          "name": "demo",
+          "brokerAddress": "localhost",
+          "brokerPort": 1883,
+          "clientId": "demo-pip"
+        }
+      ]
+    }
+  }
+}
