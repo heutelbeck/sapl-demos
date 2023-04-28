@@ -32,7 +32,7 @@ public class MqttClientService implements DisposableBean {
 				.serverPort(1883)
 				.buildAsync();
 		log.debug("Connect MQTT client... ");
-		var connAckMessage = mqttClient.connect().get();
+		var connAckMessage = mqttClient.connect().get(); // Block for Demo
 		if (connAckMessage.getReasonCode() != Mqtt5ConnAckReasonCode.SUCCESS) {
 			throw new IllegalStateException("Connection to the mqtt broker couldn't be established:" +
 					connAckMessage.getReasonCode());
@@ -57,7 +57,7 @@ public class MqttClientService implements DisposableBean {
 	@Override
 	public void destroy() throws InterruptedException, ExecutionException {
 		log.debug("Disconnect MQTT client");
-		mqttClient.disconnect().get();
+		mqttClient.disconnect().get();// Block for Demo
 	}
 
 }

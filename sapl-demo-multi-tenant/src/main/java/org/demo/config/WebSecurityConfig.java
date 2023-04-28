@@ -30,19 +30,19 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
 	@Bean
-	public UserDetailsService userDetailsService() {
+	UserDetailsService userDetailsService() {
 		var service = new TenantAwareUserDetailsService();
 		DemoData.loadUsers(service, passwordEncoder());
 		return service;
 	}
 
 	@Bean
-	public static PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// @formatter:off
 		return http  .authorizeRequests()
 				     .anyRequest()

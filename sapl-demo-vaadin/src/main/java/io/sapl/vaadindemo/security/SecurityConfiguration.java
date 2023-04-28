@@ -24,7 +24,7 @@ import io.sapl.vaadindemo.views.LoginView;
 public class SecurityConfiguration extends VaadinWebSecurity {
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
@@ -44,7 +44,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 	 * their roles. NOTE: This should not be used in real world applications.
 	 */
 	@Bean
-	public UserDetailsService userDetailsService() {
+	UserDetailsService userDetailsService() {
 		UserDetails admin = User.withUsername("admin").password("{noop}admin").roles("Admin").build();
 		UserDetails user  = User.withUsername("user").password("{noop}user").roles("USER").build();
 		return new InMemoryUserDetailsManager(admin, user);

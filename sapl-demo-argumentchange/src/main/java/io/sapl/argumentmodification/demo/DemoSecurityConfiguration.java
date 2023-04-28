@@ -19,13 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 public class DemoSecurityConfiguration {
 
-	static final String DEMO_USER = "demoUser";
-	static final String DEMO_PASSWORD = "demoPassword";
+	static final String         DEMO_USER      = "demoUser";
+	static final String         DEMO_PASSWORD  = "demoPassword";
 	private static final String DEMO_AUTHORITY = "demoAuthority";
 
 	@Bean
 	@Primary
-	public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+	UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
 		var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
 				List.of(new SimpleGrantedAuthority(DEMO_AUTHORITY)));
 		log.info("");
@@ -36,14 +36,14 @@ public class DemoSecurityConfiguration {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.csrf().disable(); // for demo purposes only!
-								// do not disable csrf in your application unless strictly necessary.
+							   // do not disable csrf in your application unless strictly necessary.
 		return http.build();
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new PasswordEncoder() {
 
 			@Override

@@ -17,7 +17,7 @@ import io.sapl.ethereum.demo.views.login.LoginView;
 public class SecurityConfiguration extends VaadinWebSecurity {
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
+	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 

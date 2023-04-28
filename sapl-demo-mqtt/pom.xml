@@ -54,7 +54,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-mqtt</artifactId>
+			<artifactId>sapl-mqtt-pip</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>

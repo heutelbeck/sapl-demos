@@ -34,7 +34,7 @@ import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 public class SecurityConfiguration {
 
 	@Bean
-	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		// @formatter:off
 		http.authorizeExchange(exchanges -> 
 		        exchanges.anyExchange().permitAll()

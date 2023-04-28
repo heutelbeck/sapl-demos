@@ -81,7 +81,7 @@
 		<module>sapl-demo-vaadin</module>
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-mqtt</module>
-		<!-- <module>sapl-demo-mqtt-pep</module> -->
+		<module>sapl-demo-mqtt-pep</module>
 	</modules>
 
 	<profiles>

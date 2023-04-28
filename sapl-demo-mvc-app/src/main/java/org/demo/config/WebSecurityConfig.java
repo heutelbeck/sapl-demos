@@ -32,7 +32,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// @formatter:off
 		http.authorizeHttpRequests(requests -> requests
 	            .requestMatchers("/css/**").permitAll()
@@ -50,7 +50,6 @@ public class WebSecurityConfig {
 			    .invalidateHttpSession(true)
 	            .permitAll()
 	        );
-	        //.csrf().disable();
 		// @formatter:on
 		return http.build();
 	}
@@ -63,7 +62,7 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public static PasswordEncoder passwordEncoder() {
+	static PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 

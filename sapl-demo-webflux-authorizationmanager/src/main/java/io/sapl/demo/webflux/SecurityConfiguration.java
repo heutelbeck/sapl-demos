@@ -37,7 +37,7 @@ public class SecurityConfiguration {
 	private final ReactiveSaplAuthorizationManager saplAuthzManager;
 
 	@Bean
-	public MapReactiveUserDetailsService userDetailsService() {
+	MapReactiveUserDetailsService userDetailsService() {
 		@SuppressWarnings("deprecation") // Demo Code!
 		UserDetails user = User.withDefaultPasswordEncoder()
 				.username("user")

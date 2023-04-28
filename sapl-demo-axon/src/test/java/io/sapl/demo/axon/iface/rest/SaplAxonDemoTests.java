@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static reactor.test.StepVerifier.create;
 
@@ -59,13 +60,13 @@ class SaplAxonDemoTests {
 	public static class TestConfiguration {
 		@Bean
 		@Primary
-		public AuthenticationSupplier authenticationSupplier(ObjectMapper mapper) {
+		AuthenticationSupplier authenticationSupplier(ObjectMapper mapper) {
 			return new TestAuthenticationSupplier(mapper);
 		}
 
 		@Bean
 		@Primary
-		public ReactiveAuthenticationSupplier reactiveAuthenticationSupplier(
+		ReactiveAuthenticationSupplier reactiveAuthenticationSupplier(
 				AuthenticationSupplier authenticationSupplier) {
 			return () -> {
 				return Mono.just(authenticationSupplier.get()).onErrorResume(e -> Mono.empty())
@@ -255,9 +256,9 @@ class SaplAxonDemoTests {
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward() || patient.ward() == Ward.NONE
 						|| patient.ward() == Ward.GENERAL))
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId(), unapiaw.ward()).subscribe())
-				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward()))
+				.assertNext(patient -> assertSame(unapiaw.ward(), patient.ward()))
 				.then(() -> patientsController.hospitalizePatient(unapiaw.patientId()).subscribe())
-				.assertNext(patient -> assertTrue(patient.ward() == Ward.NONE)).verifyTimeout(DEFAULT_TIMEOUT);
+				.assertNext(patient -> assertSame(Ward.NONE, patient.ward())).verifyTimeout(DEFAULT_TIMEOUT);
 	}
 
 	@ParameterizedTest
@@ -273,10 +274,10 @@ class SaplAxonDemoTests {
 			assertNotNull(measurement.type(), "expected monitor type");
 			assertFalse(measurement.unit().isBlank(), "expected unit");
 			assertFalse(measurement.unit().contains("█"), "expected non blackend unit");
-			assertNotEquals(measurement.unit(), "Body Temperature Category", "expected no body temperature category");
+			assertNotEquals("Body Temperature Category", measurement.unit(), "expected no body temperature category");
 			assertFalse(measurement.value().isBlank(), "expected value");
 			assertFalse(measurement.value().contains("█"), "expected non blackend value");
-			assertNotEquals(measurement.value(), "Normal", "expected normal");
+			assertNotEquals("Normal", measurement.value(), "expected normal");
 		}).verifyComplete();
 	}
 
@@ -292,9 +293,9 @@ class SaplAxonDemoTests {
 			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
 			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
 			assertNotNull(measurement.timestamp(), "expected timestamp");
-			assertEquals(measurement.type(), MonitorType.BODY_TEMPERATURE, "expected body temerature");
-			assertEquals(measurement.unit(), "Body Temperature Category", "expected body temperature category");
-			assertEquals(measurement.value(), "Normal", "expected normal");
+			assertEquals(MonitorType.BODY_TEMPERATURE, measurement.type(), "expected body temerature");
+			assertEquals("Body Temperature Category", measurement.unit(), "expected body temperature category");
+			assertEquals("Normal", measurement.value(), "expected normal");
 		}).verifyComplete();
 	}
 
@@ -311,10 +312,10 @@ class SaplAxonDemoTests {
 			assertNotNull(measurement.type(), "expected monitor type");
 			assertFalse(measurement.unit().isBlank(), "expected unit");
 			assertFalse(measurement.unit().contains("█"), "expected non blackend unit");
-			assertNotEquals(measurement.unit(), "Body Temperature Category", "expected no body temperature category");
+			assertNotEquals("Body Temperature Category", measurement.unit(), "expected no body temperature category");
 			assertFalse(measurement.value().isBlank(), "expected value");
 			assertFalse(measurement.value().contains("█"), "expected non blackend value");
-			assertNotEquals(measurement.value(), "Normal", "expected normal");
+			assertNotEquals("Normal", measurement.value(), "expected normal");
 		}).verifyComplete();
 	}
 

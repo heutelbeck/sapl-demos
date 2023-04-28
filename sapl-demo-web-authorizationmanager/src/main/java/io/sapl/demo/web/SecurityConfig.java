@@ -37,7 +37,7 @@ public class SecurityConfig {
 	private final SaplAuthorizationManager saplAuthzManager;
 
 	@Bean
-	public UserDetailsService  userDetailsService() {
+	UserDetailsService  userDetailsService() {
 		@SuppressWarnings("deprecation") // Demo Code!
 		UserDetails user = User.withDefaultPasswordEncoder()
 				.username("user")
