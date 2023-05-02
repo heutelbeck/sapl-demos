@@ -68,7 +68,9 @@ public class DemoPolicyInformationPoint {
 	 */
 	@Attribute(name = "toggle", docs = "Periodically turns from true to false.")
 	public Flux<Val> toggle() {
-		return Flux.concat(Flux.just(true), Flux.just(true, false).repeat().delayElements(Duration.ofMillis(500)))
+		return Flux
+				.concat(Flux.just(Boolean.TRUE),
+						Flux.just(Boolean.TRUE, Boolean.FALSE).repeat().delayElements(Duration.ofMillis(500)))
 				.map(Val::of);
 	}
 
@@ -116,8 +118,8 @@ public class DemoPolicyInformationPoint {
 	@Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable(5000,6000)> checks if the address returns a package within 5000ms and repeats this pinging action every 6000ms. The timeout must be smaller than the repetition interval.")
 	public Flux<Val> reachable(@Text Val leftHandHostnameParameter, Val pollingIntervalParameter,
 			Val timeoutMsParameter) {
-		var hostname          = leftHandHostnameParameter.getText();
-		var timeoutMs         = timeoutMsParameter.get().asInt();
+		var hostname = leftHandHostnameParameter.getText();
+		var timeoutMs = timeoutMsParameter.get().asInt();
 		var pollingIntervalMs = pollingIntervalParameter.get().asLong();
 		if (pollingIntervalMs < timeoutMs)
 			return Flux.error(new PolicyEvaluationException(
@@ -188,7 +190,7 @@ public class DemoPolicyInformationPoint {
 			try {
 				return inetAddress.isReachable(timeout);
 			} catch (IOException e) {
-				return false;
+				return Boolean.FALSE;
 			}
 		});
 	}
