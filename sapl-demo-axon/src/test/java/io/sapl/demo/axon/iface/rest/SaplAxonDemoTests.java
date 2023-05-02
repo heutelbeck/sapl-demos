@@ -11,6 +11,7 @@ import static reactor.test.StepVerifier.create;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -66,8 +67,7 @@ class SaplAxonDemoTests {
 
 		@Bean
 		@Primary
-		ReactiveAuthenticationSupplier reactiveAuthenticationSupplier(
-				AuthenticationSupplier authenticationSupplier) {
+		ReactiveAuthenticationSupplier reactiveAuthenticationSupplier(AuthenticationSupplier authenticationSupplier) {
 			return () -> {
 				return Mono.just(authenticationSupplier.get()).onErrorResume(e -> Mono.empty())
 						.defaultIfEmpty("\"anonymous\"");
@@ -76,7 +76,7 @@ class SaplAxonDemoTests {
 	}
 
 	private static class TestAuthenticationSupplier extends ServletAuthenticationSupplier {
-		private ObjectMapper   mapper;
+		private ObjectMapper mapper;
 		@Setter
 		private Authentication testAuthentication = null;
 
@@ -101,6 +101,10 @@ class SaplAxonDemoTests {
 
 	private static record UserNameAndPatientIdAndMonitorType(String userName, String patientId,
 			MonitorType monitorType) {
+	}
+
+	private static <T> Function<T, T> cast(Class<T> clazz) {
+		return Function.identity();
 	}
 
 	private static Collection<String> userNameSource() {
@@ -155,8 +159,8 @@ class SaplAxonDemoTests {
 
 	private static Collection<UserNameAndPatientIdAndMonitorType> nursesAndPatientsWithRawMonitor() {
 		return nurseSource().stream().map(DemoUser::userName).flatMap(userName -> Stream.of(MonitorType.values())
-				.filter(monitorType -> !monitorType.equals(MonitorType.BLOOD_PRESSURE))
-				.filter(monitorType -> !monitorType.equals(MonitorType.BODY_TEMPERATURE))
+				.filter(monitorType -> monitorType != MonitorType.BLOOD_PRESSURE)
+				.filter(monitorType -> monitorType != MonitorType.BODY_TEMPERATURE)
 				.flatMap(monitorType -> Stream.of(DemoData.DEMO_PATIENTS)
 						.filter(demoPatient -> demoPatient.monitors().contains(monitorType)).map(DemoPatient::patientId)
 						.map(patientId -> new UserNameAndPatientIdAndMonitorType(userName, patientId, monitorType))))
@@ -213,7 +217,7 @@ class SaplAxonDemoTests {
 	void fetchPatientViaPublisherTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatientViaPublisher(unapi.patientId()))
-				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(cast(PatientDocument.class));
 		create(Mono.zip(pricipal, response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
 	}
@@ -241,7 +245,7 @@ class SaplAxonDemoTests {
 	void fetchPatientTest(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(patientsController.fetchPatient(unapi.patientId())).filter(ResponseEntity::hasBody)
-				.map(ResponseEntity::getBody).map(body -> (PatientDocument) body);
+				.map(ResponseEntity::getBody).map(cast(PatientDocument.class));
 		create(Mono.zip(pricipal, response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), true)).verifyComplete();
 	}
@@ -251,7 +255,7 @@ class SaplAxonDemoTests {
 	void streamPatientAndHospitalizePatientTest(UserNameAndPatientIdAndWard unapiaw) {
 		var pricipal = login(userDetailService.findByUsername(unapiaw.userName()));
 		var response = pricipal.thenMany(patientsController.streamPatient(unapiaw.patientId()))
-				.map(ServerSentEvent::data).map(data -> (PatientDocument) data);
+				.map(ServerSentEvent::data).map(cast(PatientDocument.class));
 		create(response.timeout(DEFAULT_TIMEOUT))
 				.assertNext(patient -> assertTrue(patient.ward() == unapiaw.ward() || patient.ward() == Ward.NONE
 						|| patient.ward() == Ward.GENERAL))
@@ -266,7 +270,7 @@ class SaplAxonDemoTests {
 	void fetchVitalsTestForDoctors(UserNameAndPatientIdAndMonitorType unapiamt) {
 		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
-				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(cast(VitalSignMeasurement.class));
 		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
 			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
 			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
@@ -288,7 +292,7 @@ class SaplAxonDemoTests {
 	void fetchVitalsTestForNursesAndBodyTemperature(UserNameAndPatientId unapi) {
 		var pricipal = login(userDetailService.findByUsername(unapi.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapi.patientId(), MonitorType.BODY_TEMPERATURE))
-				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(cast(VitalSignMeasurement.class));
 		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
 			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
 			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");
@@ -304,7 +308,7 @@ class SaplAxonDemoTests {
 	void fetchVitalsTestForNursesAndRawMonitor(UserNameAndPatientIdAndMonitorType unapiamt) {
 		var pricipal = login(userDetailService.findByUsername(unapiamt.userName()));
 		var response = pricipal.then(vitalsController.fetchVitals(unapiamt.patientId(), unapiamt.monitorType()))
-				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(body -> (VitalSignMeasurement) body);
+				.filter(ResponseEntity::hasBody).map(ResponseEntity::getBody).map(cast(VitalSignMeasurement.class));
 		create(response.timeout(DEFAULT_TIMEOUT)).assertNext(measurement -> {
 			assertFalse(measurement.monitorDeviceId().isBlank(), "expected id");
 			assertFalse(measurement.monitorDeviceId().contains("█"), "expected non blackend id");

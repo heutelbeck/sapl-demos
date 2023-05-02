@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 public class VitalSignsProjection {
 
 	private final VitalSignsRepository repository;
-	private final QueryUpdateEmitter   updateEmitter;
+	private final QueryUpdateEmitter updateEmitter;
 
 	@EventHandler
 	void on(PatientRegistered evt, @Timestamp Instant timestamp) {
@@ -62,8 +62,7 @@ public class VitalSignsProjection {
 				.ifPresentOrElse(v -> {
 					saveAndUpdate(v);
 					updateEmitter.emit(MonitorVitalSignOfPatient.class,
-							q -> q.patientId().equals(v.patientId()) && q.type().equals(evt.monitorType()),
-							measurement);
+							q -> q.patientId().equals(v.patientId()) && q.type() == evt.monitorType(), measurement);
 				}, () -> log.trace("No patient has monitor {} connected", evt.monitorId()));
 	}
 
