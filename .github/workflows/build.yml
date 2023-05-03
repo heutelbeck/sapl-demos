@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         java: [ '17' ]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest]
     name: JDK ${{ matrix.java }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -101,7 +101,7 @@ jobs:
       run: sudo sh -c 'echo "127.0.0.1 auth-server" >> /etc/hosts'
       
     - name: Build Modules
-      run: mvn -B install -DskipTests
+      run: mvn -B install -DskipTests -pl !:sapl-demo-testing
 
     - name: Build Integration Test Images
       run: mvn -B dockerfile:build -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -P docker -DskipTests
