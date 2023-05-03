@@ -26,6 +26,8 @@
 	</parent>
 
 	<artifactId>sapl-demo-oauth2-jwt-authorization-server</artifactId>
+	
+	<packaging>jar</packaging>
 
 	<name>SAPL Demo OAuth2/JWT Authorization Server</name>
 	<description>Demo of a OAuth2 Resource Server with JWT using SAPL for additional authorization. This is the demo authorization srver for the demo setup.</description>
@@ -130,8 +132,70 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<!-- create fat JAR, required as boot starter is not parent -->
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<image>
+						<name>${docker-registry-url}/${project.artifactId}:${project.version}</name>
+					</image>
+					<layout>ZIP</layout>
+					<excludes>
+						<exclude>
+							<groupId>org.springframework.boot</groupId>
+							<artifactId>spring-boot-configuration-processor</artifactId>
+						</exclude>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+	
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+		            <plugin>
+        		        <groupId>org.springframework.boot</groupId>
+                		<artifactId>spring-boot-maven-plugin</artifactId>
+		                <configuration>
+        		            <image>
+                		        <publish>true</publish>
+                    		</image>
+                		</configuration>
+            		</plugin>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<repository>${docker-registry-url}/${project.artifactId}</repository>
+							<tag>${project.version}</tag>
+							<buildArgs>
+								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

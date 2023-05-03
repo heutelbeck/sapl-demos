@@ -97,6 +97,15 @@ jobs:
         mkdir ~/.web3j/solc
         cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
 
+    - name: Add auth-server to /etc/hosts for OAuth Integration Tests
+      run: sudo sh -c 'echo "127.0.0.1 auth-server" >> /etc/hosts'
+      
+    - name: Build Modules
+      run: mvn -B install -DskipTests
+
+    - name: Build Integration Test Images
+      run: mvn -B dockerfile:build -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -P docker -DskipTests
+
     - name: Run analysis (JaCoCo, Sonar)
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
