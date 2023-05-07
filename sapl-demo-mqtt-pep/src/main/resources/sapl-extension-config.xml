@@ -18,15 +18,4 @@
     <connection-enforcement-timeout-millis>5000</connection-enforcement-timeout-millis>
     <subscription-enforcement-timeout-millis>5000</subscription-enforcement-timeout-millis>
     <publish-enforcement-timeout-millis>5000</publish-enforcement-timeout-millis>
-    <pdp-implementation>embedded</pdp-implementation>
-    <embedded-pdp-policies-path>/policies</embedded-pdp-policies-path>
-    <embedded-pdp-policies-path-is-relative-to-extension-home>
-        true
-    </embedded-pdp-policies-path-is-relative-to-extension-home>
-    <remote-pdp-base-url>https://localhost:8080</remote-pdp-base-url>
-    <remote-pdp-client-key>YJi7gyT5mfdKbmL</remote-pdp-client-key>
-    <remote-pdp-client-secret>$2a$10$Ph9bF71xYb0MK8KubWLB7e0Dpl2AfMiEUi9jrKTbFR4kkWABRb9yO</remote-pdp-client-secret>
-    <remote-pdp-first-back-off-millis>500</remote-pdp-first-back-off-millis>
-    <remote-pdp-max-back-off-millis>5000</remote-pdp-max-back-off-millis>
-    <remote-pdp-back-off-factor>2</remote-pdp-back-off-factor>
 </sapl-extension-config>

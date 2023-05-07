@@ -1,4 +1,4 @@
 {
-	"algorithm": "DENY_UNLESS_PERMIT",
+	"algorithm": "PERMIT_UNLESS_DENY",
 	"variables": {}
 }

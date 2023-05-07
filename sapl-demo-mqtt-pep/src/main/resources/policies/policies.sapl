@@ -1,0 +1,25 @@
+import mqtt.*
+
+set "policy_set"
+first-applicable
+
+policy "allow_connections"
+permit
+    action.type == "mqtt.connect"
+
+policy "blacken_security_cam_status"
+permit
+  action.type == "mqtt.publish"
+where
+  resource.topic == "security_cam_status";
+obligation
+    {
+        "type" : "blackenPayload",
+            "replacement" : "*"
+    }
+
+policy "deny_door_lock_security_status_subscriptions"
+deny
+  action.type == "mqtt.subscribe"
+where
+  isMatchingAtLeastOneTopic(resource.topic, "door_lock_status");
