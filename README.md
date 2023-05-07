@@ -55,7 +55,4 @@ After that pick a demo that matches your interest.
 * [sapl-demo-mqtt-pip](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pip): Demonstrates how to evaluate MQTT messages with a Policy Information Point.
 
 
-* [sapl-demo-mqtt-functions](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-functions): Demonstrates authorization of MQTT publish messages in respect to single- and multi-level wildcard topics.
-
-
 

@@ -40,8 +40,8 @@ public class MqttBrokerLifecycleService implements DisposableBean {
 	Path           		extensionsDir;
 	EmbeddedHiveMQ 		mqttBroker;
 
-	static final String EXTENSIONS_PATH = "sapl-demo-mqtt-pep/src/main/resources";
-	static final String POLICIES_PATH 	= "sapl-demo-mqtt-pep/src/main/resources/policies";
+	static final String EXTENSIONS_PATH = "src/main/resources";
+	static final String POLICIES_PATH 	= "src/main/resources/policies";
 
 	public MqttBrokerLifecycleService() throws IOException, InterruptedException, ExecutionException {
 		configDir     = newTemporaryDirectory();
