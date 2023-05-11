@@ -10,6 +10,7 @@ spring:
   main.banner-mode: OFF
   thymeleaf:
     cache: false
+    mode: LEGACYHTML5
   security:
     oauth2:
       client:
