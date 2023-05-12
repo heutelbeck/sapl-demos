@@ -1,6 +1,8 @@
 package io.sapl.demo.jwt.clientapplication.web;
 
 import static org.xmlunit.assertj3.XmlAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -12,18 +14,16 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
@@ -32,6 +32,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -39,7 +40,6 @@ import org.testcontainers.images.PullPolicy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.builder.Input;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
@@ -69,11 +69,14 @@ public class OAuth2DemoIT {
 	private static final Network IT_NETWORK = Network.newNetwork();
 	private static final String AUTH_SERVER = "auth-server";
 
+	private static final String INDEX_URL = "http://localhost:8080/index";
+	private static final String INDEX_RESULT_PATH = "target/test-classes/xml/index_result.html";
+
 	private static final String AUTH_CODE_GRANT_TYPE_URL = "http://localhost:8080/authorize?grant_type=authorization_code";
 	private static final String AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN = "^" + Pattern.quote(
 			"http://auth-server:9000/oauth2/authorize?response_type=code&client_id=miskatonic-client&scope=books.read%20faculty.read%20bestiary.read&state=")
 			+ ".*" + Pattern.quote("%3D&redirect_uri=http://127.0.0.1:8080/authorized") + "$";
-
+	
 	private static final String AUTH_CREDENTIALS_GRANT_TYPE_URL = "http://localhost:8080/authorize?grant_type=client_credentials";
 	private static final String AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH = "target/test-classes/xml/credentials_grant_type_result.html";
 
@@ -100,8 +103,6 @@ public class OAuth2DemoIT {
 
 	}
 
-	static DocumentBuilderFactory xmlBuilderFactory;
-
 	@Container
 	static GenericContainer<?> authServer = new GenericContainer<>(
 			DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
@@ -118,12 +119,6 @@ public class OAuth2DemoIT {
 			.waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
 			.withStartupTimeout(TIMEOUT_SPINUP)
 			.withCreateContainerCmdModifier(configureContainerStartup(RESOURCE_SERVER_PORT));
-
-	@BeforeAll
-	static void beforeAll() throws ParserConfigurationException {
-		xmlBuilderFactory = DocumentBuilderFactory.newDefaultInstance();
-		xmlBuilderFactory.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
-	}
 
 	private static String containsPattern(String pattern) {
 		return "^.*" + pattern.replaceAll("[\\^\\$]", "") + ".*$";
@@ -142,8 +137,18 @@ public class OAuth2DemoIT {
 		System.out.println(response.getContentAsString());
 	}
 
+	private static <T> void printResponse(ResponseEntity<T> response) {
+		System.out.println(response.getStatusCode());
+		for (var header : response.getHeaders().keySet())
+			System.out.println(header + "\t:\t" + response.getHeaders().get(header));
+		System.out.println(response.getBody());
+	}
+
 	@Autowired
 	WebApplicationContext webApplicationContext;
+
+	@Autowired
+	WebClient webClient;
 
 	MockMvc mockMvc;
 
@@ -154,29 +159,40 @@ public class OAuth2DemoIT {
 
 	@Test
 	@WithMockUser(username = "user1", password = "password")
+	void test_index() throws Exception {
+		var request = request(HttpMethod.GET, INDEX_URL);
+		var response = mockMvc.perform(request).andExpect(status().isOk())
+				.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
+		assertThat(Input.fromString(response.getContentAsString())).and(Input.fromFile(INDEX_RESULT_PATH))
+				.areIdentical();
+	}
+
+	@Test
+	@WithMockUser(username = "user1", password = "password")
 	void test_codeGrantType_clientRedirect() throws Exception {
 		var request = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
-		mockMvc.perform(request).andExpect(status().is3xxRedirection()).andExpect(content().string(""))
+		var response = mockMvc.perform(request).andExpect(status().is3xxRedirection()).andExpect(content().string(""))
 				.andExpect(header().exists("Location"))
-				.andExpect(
-						header().string("Location",
-								new PredicateMatcher<String>(
-										str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
-				.andReturn();
+				.andExpect(header().string("Location",
+						new PredicateMatcher<String>(
+								str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
+				.andReturn().getResponse();
+		//printResponse(response);
+		var redirectURI = response.getHeader("Location");
+		var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
+		assertTrue(authResponse.getStatusCode().is3xxRedirection());
+		assertTrue(authResponse.getHeaders().containsKey("Location"));
+		//printResponse(authResponse);
 	}
 
 	@Test
 	@WithMockUser(username = "user1", password = "password")
 	void test_credectialsGrantType_accessToRessources() throws Exception {
 		var request = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
-		var response = mockMvc.perform(request).andExpect(status().is2xxSuccessful())
+		var response = mockMvc.perform(request).andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-		printResponse(response);
-		DiffBuilder.compare(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH));
 		assertThat(Input.fromString(response.getContentAsString()))
-				.and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH))
-				.withDocumentBuilderFactory(xmlBuilderFactory).areIdentical();
-
+				.and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();
 	}
 
 }
