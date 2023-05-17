@@ -1,13 +1,12 @@
 package io.sapl.demo.jwt.clientapplication.web;
 
-import static org.xmlunit.assertj3.XmlAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.xmlunit.assertj3.XmlAssert.assertThat;
 
 import java.time.Duration;
 import java.util.function.Consumer;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -41,6 +39,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import org.xmlunit.builder.Input;
+
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
@@ -58,11 +57,11 @@ import lombok.experimental.FieldDefaults;
 @WebAppConfiguration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest(classes = OAuth2ClientApplication.class)
-public class OAuth2DemoIT {
+class OAuth2DemoIT {
 
 	private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
 	private static final String REGISTRY = "ghcr.io/heutelbeck/";
-	private static final String TAG = ":2.1.0-SNAPSHOT";
+	private static final String TAG = ":3.0.0-SNAPSHOT";
 
 	private static final int AUTH_SERVER_PORT = 9000;
 	private static final int RESOURCE_SERVER_PORT = 8090;
@@ -130,14 +129,14 @@ public class OAuth2DemoIT {
 	}
 
 	@SneakyThrows
-	private static void printResponse(MockHttpServletResponse response) {
+	static void printResponse(MockHttpServletResponse response) {
 		System.out.println(response.getStatus());
 		for (var header : response.getHeaderNames())
 			System.out.println(header + "\t:\t" + response.getHeaderValues(header));
 		System.out.println(response.getContentAsString());
 	}
 
-	private static <T> void printResponse(ResponseEntity<T> response) {
+	static <T> void printResponse(ResponseEntity<T> response) {
 		System.out.println(response.getStatusCode());
 		for (var header : response.getHeaders().keySet())
 			System.out.println(header + "\t:\t" + response.getHeaders().get(header));

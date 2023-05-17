@@ -23,7 +23,7 @@ import io.sapl.demo.books.domain.LibraryUser;
 @SpringBootTest(classes = SaplDemoBooksApplication.class)
 class SaplDemoBooksApplicationTests {
 
-	private static record UserAndAccessibleBooks(LibraryUser user, List<Book> books) {
+	private record UserAndAccessibleBooks(LibraryUser user, List<Book> books) {
 	}
 
 	private static final Book[] ALL_CATEGORIES = DemoData.DEMO_BOOKS;
@@ -51,7 +51,7 @@ class SaplDemoBooksApplicationTests {
 
 	@ParameterizedTest
 	@MethodSource("userSourcePermit")
-	public void findAllPermitTest(UserAndAccessibleBooks userAndAccessibleBooks) {
+	void findAllPermitTest(UserAndAccessibleBooks userAndAccessibleBooks) {
 		var user = userAndAccessibleBooks.user;
 		var expectedBooks = userAndAccessibleBooks.books;
 		var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
@@ -62,7 +62,7 @@ class SaplDemoBooksApplicationTests {
 
 	@ParameterizedTest
 	@MethodSource("userSourceDeny")
-	public void findAllDenyTest(LibraryUser user) {
+	void findAllDenyTest(LibraryUser user) {
 		var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		assertThrows(AccessDeniedException.class, () -> controller.findAll());

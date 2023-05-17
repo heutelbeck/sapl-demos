@@ -21,13 +21,16 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import io.sapl.spring.config.EnableSaplMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableSaplMethodSecurity
 public class WebSecurityConfiguration {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.oauth2ResourceServer().jwt();
+        http.oauth2ResourceServer(server -> server.jwt());
 		return http.build();
 	}
 

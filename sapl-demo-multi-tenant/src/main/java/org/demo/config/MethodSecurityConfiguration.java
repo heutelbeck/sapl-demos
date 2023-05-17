@@ -15,29 +15,15 @@
  */
 package org.demo.config;
 
-import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.pdp.multitenant.MultiTenantConfiguration;
-import io.sapl.spring.config.SaplMethodSecurityConfiguration;
-import io.sapl.spring.constraints.ConstraintEnforcementService;
-import io.sapl.spring.subscriptions.WebAuthorizationSubscriptionBuilderService;
+import io.sapl.spring.config.EnableSaplMethodSecurity;
 
 @Configuration
-@EnableGlobalMethodSecurity
+@EnableSaplMethodSecurity
 @Import(MultiTenantConfiguration.class)
-public class MethodSecurityConfiguration extends SaplMethodSecurityConfiguration {
-
-	public MethodSecurityConfiguration(ObjectFactory<PolicyDecisionPoint> pdpFactory,
-			ObjectFactory<ConstraintEnforcementService> constraintHandlerFactory,
-			ObjectFactory<ObjectMapper> objectMapperFactory,
-			ObjectFactory<WebAuthorizationSubscriptionBuilderService> subscriptionBuilderFactory) {
-		super(pdpFactory, constraintHandlerFactory, objectMapperFactory, subscriptionBuilderFactory);
-	}
+public class MethodSecurityConfiguration {
 
 }

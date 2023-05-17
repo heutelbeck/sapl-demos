@@ -36,7 +36,7 @@ import picocli.CommandLine.Option;
  * Custom Policy Information Point and Function Library are bound to the PDP. The demo
  * runs a few performance tests and illustrates different ways of invoking the PDP.
  */
-@Command(name = "sapl-demo-embedded", version = "2.1.0-SNAPSHOT", mixinStandardHelpOptions = true,
+@Command(name = "sapl-demo-embedded", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true,
 		description = "This demo shows how to manually construct a PDP without infrastructure support. "
 				+ "A Custom Policy Information Point and Function Library are bound to the PDP. "
 				+ "The demo runs a few performance tests and illustrates different ways of invoking the PDP. "

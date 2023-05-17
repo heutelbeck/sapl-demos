@@ -12,8 +12,8 @@ import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
 import io.sapl.ethereum.demo.views.login.LoginView;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfiguration extends VaadinWebSecurity {
 
 	@Bean

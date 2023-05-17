@@ -75,7 +75,7 @@ public class MqttBrokerLifecycleService implements DisposableBean {
 		return EmbeddedExtension.builder()
 				.withId("SAPL-HIVEMQ-EXTENSION")
 				.withName("SAPL-HIVEMQ-EXTENSION")
-				.withVersion("2.1.0-SNAPSHOT")
+				.withVersion("3.0.0-SNAPSHOT")
 				.withPriority(0)
 				.withStartPriority(1000)
 				.withAuthor("Nils Mahnken")

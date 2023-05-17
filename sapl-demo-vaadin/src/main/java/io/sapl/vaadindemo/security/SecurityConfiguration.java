@@ -16,11 +16,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
 
+import io.sapl.spring.config.EnableSaplMethodSecurity;
 import io.sapl.vaadin.base.VaadinAuthorizationSubscriptionBuilderService;
 import io.sapl.vaadindemo.views.LoginView;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
+@EnableSaplMethodSecurity
 public class SecurityConfiguration extends VaadinWebSecurity {
 
 	@Bean

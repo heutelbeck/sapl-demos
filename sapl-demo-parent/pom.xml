@@ -7,7 +7,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-parent</artifactId>
-	<version>2.1.0-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>SAPL Demo Parent</name>
@@ -22,9 +22,9 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<sapl.version>2.1.0-SNAPSHOT</sapl.version>
+		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
 		<springboot.version>3.0.6</springboot.version>
-		<vaadin.version>24.0.4</vaadin.version>
+		<vaadin.version>24.0.5</vaadin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>

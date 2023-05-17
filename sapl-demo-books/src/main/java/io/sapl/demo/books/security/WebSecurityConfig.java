@@ -21,8 +21,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import io.sapl.spring.config.EnableSaplMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
+@EnableSaplMethodSecurity
 public class WebSecurityConfig {
 
 	@Bean
