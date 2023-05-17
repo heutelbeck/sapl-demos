@@ -142,7 +142,7 @@ jobs:
         cache: 'maven'
 
     - name: Configure servers
-      uses: s4u/maven-settings-action@v2.3.0
+      uses: s4u/maven-settings-action@v2.8.0
       with:
         githubServer: false
         servers: |
