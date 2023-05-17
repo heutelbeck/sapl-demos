@@ -93,7 +93,7 @@
 				Java application directly runnable via 'java -jar'. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.5.0</version>
+				<version>3.6.0</version>
 				<configuration>
 					<archive>
 						<manifest>

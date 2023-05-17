@@ -55,7 +55,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<failsafe.version>3.0.0</failsafe.version>
+		<failsafe.version>3.1.0</failsafe.version>
 		<jacoco.version>0.8.9</jacoco.version>
 	</properties>
 
