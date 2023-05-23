@@ -230,6 +230,7 @@ hs_err_pid*
 
 *.db
 package.json
+package-lock.json
 webpack.config.js
 webpack.generated.js
 node_modules/
