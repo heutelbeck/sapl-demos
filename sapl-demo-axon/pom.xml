@@ -87,8 +87,8 @@
 				a Policy Decision Point, or if you want to use a PDP Server remotely. 
 			 -->
 			<groupId>io.sapl</groupId>
+			<!-- Use: sapl-spring-pdp-remote for a remote PDP -->
 			<artifactId>sapl-spring-pdp-embedded</artifactId>
-			<!-- <artifactId>sapl-spring-pdp-remote</artifactId> -->
 		</dependency>
 
 		<!-- Utilities -->
