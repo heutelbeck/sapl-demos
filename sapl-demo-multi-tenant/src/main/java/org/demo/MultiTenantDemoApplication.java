@@ -13,33 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.demo.domain;
+package org.demo;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Data
-@Entity
-@NoArgsConstructor
-@AllArgsConstructor
-public class Relation {
+@SpringBootApplication
+public class MultiTenantDemoApplication {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	Long id;
-
-	String username;
-
-	Long patientId;
-
-	public Relation(String username, Long patientId) {
-		this.username = username;
-		this.patientId = patientId;
+	public static void main(String[] args) {
+		SpringApplication.run(MultiTenantDemoApplication.class, args);
 	}
 
 }

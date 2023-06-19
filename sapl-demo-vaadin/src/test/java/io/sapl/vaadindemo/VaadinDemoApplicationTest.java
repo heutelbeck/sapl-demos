@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.demo.domain;
+package io.sapl.vaadindemo;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.springframework.data.repository.CrudRepository;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 
-public interface RelationRepository extends CrudRepository<Relation, Long> {
+@SpringBootTest
+class VaadinDemoApplicationTest {
 
-	List<Relation> findByPatientId(Long id);
+	@Test
+	void contextLoads(ApplicationContext context) {
+	    assertThat(context).isNotNull();
+	}
 
 }

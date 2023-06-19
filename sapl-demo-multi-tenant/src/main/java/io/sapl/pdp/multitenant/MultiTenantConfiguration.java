@@ -1,12 +1,12 @@
 package io.sapl.pdp.multitenant;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.interpreter.SAPLInterpreter;
@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @ComponentScan
 @Configuration
 @RequiredArgsConstructor
+@Import(MultiTenantPolicyDecisionPointProperties.class)
 public class MultiTenantConfiguration {
 
 	private final MultiTenantPolicyDecisionPointProperties properties;
@@ -38,12 +39,7 @@ public class MultiTenantConfiguration {
 	PolicyDecisionPoint multiTenantPolicyDecisionPoint(TenantIdExtractor tenantIdExtractor) {
 		log.info("Multi Tenant settings: {}", properties);
 		var file        = new File(properties.path);
-		var directories = file.list(new FilenameFilter() {
-							@Override
-							public boolean accept(File current, String name) {
-								return new File(current, name).isDirectory();
-							}
-						});
+		var directories = file.list((current, name) -> new File(current, name).isDirectory());
 		var pdp         = new MultiTenantAwarePolicyDecisionPoint(tenantIdExtractor);
 		for (var tenantId : directories) {
 			log.info("Setting up PDP for tenant '{}'", tenantId);

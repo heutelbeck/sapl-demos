@@ -28,16 +28,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import io.sapl.spring.manager.SaplAuthorizationManager;
-import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
-public class SecurityConfig {
-	private final SaplAuthorizationManager saplAuthzManager;
+public class SecurityConfiguration {
 
 	@Bean
-	UserDetailsService  userDetailsService() {
+	UserDetailsService userDetailsService() {
 		@SuppressWarnings("deprecation") // Demo Code!
 		UserDetails user = User.withDefaultPasswordEncoder()
 				.username("user")
@@ -48,7 +45,7 @@ public class SecurityConfig {
 	}
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) throws Exception {
 		// @formatter:off
 		return http.authorizeHttpRequests(requests -> 
 						requests.anyRequest()

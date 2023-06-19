@@ -1,9 +1,12 @@
 package io.sapl.etherium.demo;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.containers.GenericContainer;
@@ -18,7 +21,7 @@ import io.sapl.ethereum.demo.EthereumDemoApplication;
 @Testcontainers
 @SpringJUnitConfig
 @SpringBootTest(classes = EthereumDemoApplication.class)
-public class EthereumDemoApplicationIT {
+class EthereumDemoApplicationIT {
 
 	private static final Duration TIMEOUT_FOR_GANACHE_CLI_SPINUP = Duration.ofSeconds(10);
 	private static final int GANACHE_SERVER_PORT = 8545;
@@ -36,8 +39,7 @@ public class EthereumDemoApplicationIT {
 			.withStartupTimeout(TIMEOUT_FOR_GANACHE_CLI_SPINUP);
 
 	@Test
-	void testContainerStartup() {
-		
+	void contextLoads(ApplicationContext context) {
+	    assertThat(context).isNotNull();
 	}
-
 }

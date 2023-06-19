@@ -18,16 +18,23 @@ package org.demo.config;
 import org.demo.domain.DemoData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
+import io.sapl.pdp.multitenant.MultiTenantConfiguration;
+import io.sapl.spring.config.EnableSaplMethodSecurity;
+
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig {
+@EnableSaplMethodSecurity
+@Import(MultiTenantConfiguration.class)
+public class SecurityConfiguration {
 
 	@Bean
 	UserDetailsService userDetailsService() {
@@ -44,17 +51,11 @@ public class WebSecurityConfig {
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		// @formatter:off
-		return http  .authorizeRequests()
-				     .anyRequest()
-				     .authenticated()
-			   .and().formLogin()
-				   	 .defaultSuccessUrl("/patients/1", true)
-			   .and().logout()
-				     .permitAll()
-				     .logoutSuccessUrl("/login")
-			   .and().csrf()
-			         .disable()
-			   .build();
+		return http.authorizeHttpRequests(requests -> requests.anyRequest().authenticated())
+				   .formLogin(login -> login.defaultSuccessUrl("/patients/1", true))
+				   .logout(logout -> logout.permitAll().logoutSuccessUrl("/login"))
+				   .csrf(CsrfConfigurer::disable)
+                   .build();
 		// @formatter:on
 	}
 

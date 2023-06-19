@@ -39,8 +39,8 @@ public class DemoSecurityConfiguration {
 
 	@Bean
 	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable(); // for demo purposes only!
-							   // do not disable csrf in your application unless strictly necessary.
+        // for demo purposes only! do not disable csrf in your application unless strictly necessary.
+        http.csrf(csrf -> csrf.disable()); 
 		return http.build();
 	}
 

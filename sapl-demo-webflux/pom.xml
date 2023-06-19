@@ -101,14 +101,23 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
+				<executions>
+        			<execution>
+            			<goals>
+ 			            	<goal>repackage</goal>
+            			</goals>
+         			</execution>
+    			</executions>
+				<configuration>    
+                	<mainClass>io.sapl.demo.webflux.DemoApplication</mainClass>
+		            <layout>JAR</layout>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-					</excludes>
-				</configuration>
+					</excludes>                	
+            	</configuration>
 			</plugin>
 		</plugins>
 	</build>

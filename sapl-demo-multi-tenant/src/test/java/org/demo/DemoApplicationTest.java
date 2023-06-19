@@ -1,3 +1,4 @@
+package org.demo;
 /*
  * Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
  *
@@ -13,17 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.demo.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
-import io.sapl.pdp.multitenant.MultiTenantConfiguration;
-import io.sapl.spring.config.EnableSaplMethodSecurity;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Configuration
-@EnableSaplMethodSecurity
-@Import(MultiTenantConfiguration.class)
-public class MethodSecurityConfiguration {
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+
+@SpringBootTest
+class DemoApplicationTest {
+
+	@Test
+	void contextLoads(ApplicationContext context) {
+	    assertThat(context).isNotNull();
+	}
 
 }

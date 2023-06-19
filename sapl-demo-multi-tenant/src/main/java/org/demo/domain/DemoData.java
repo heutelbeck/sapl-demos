@@ -15,8 +15,6 @@
  */
 package org.demo.domain;
 
-import java.util.stream.StreamSupport;
-
 import org.demo.config.TenantAwareUserDetailsService;
 import org.demo.tenants.TenantAwareUserDetails;
 import org.springframework.boot.CommandLineRunner;
@@ -46,7 +44,7 @@ public class DemoData implements CommandLineRunner {
 	private static final String ROLE_VISITOR = "ROLE_VISITOR";
 
 	private static final String ROLE_ADMIN = "ROLE_ADMIN";
-	
+
 	private static final String NAME_DOMINIC = "Dominic";
 
 	private static final String NAME_JULIA = "Julia";
@@ -68,9 +66,9 @@ public class DemoData implements CommandLineRunner {
 	private static final String NAME_KARL = "Karl";
 
 	private static final String NAME_HORST_A = "horsta";
-	
+
 	private static final String NAME_HORST_B = "horstb";
-	
+
 	private static final String NAME_SYSTEM = "system";
 
 	private static final String DEFAULT_RAW_PASSWORD = "password";
@@ -78,12 +76,10 @@ public class DemoData implements CommandLineRunner {
 	private static final String TENANT_A = "tenant_a";
 
 	private static final String TENANT_B = "tenant_b";
-	
+
 	private static final String TENANT_SYSTEM = "system";
 
 	private final PatientRepository patientRepository;
-
-	private final RelationRepository relationRepository;
 
 	/**
 	 * This method is executed upon startup, when the application context is loaded.
@@ -100,25 +96,17 @@ public class DemoData implements CommandLineRunner {
 		 * authority 'ROLE_SYSTEM'.
 		 */
 
-		var authorities = AuthorityUtils.createAuthorityList("ROLE_SYSTEM");
-		var systemUser = new TenantAwareUserDetails(TENANT_SYSTEM,NAME_SYSTEM,"", authorities);								
-		Authentication auth = new UsernamePasswordAuthenticationToken(systemUser, null, authorities);
+		var            authorities = AuthorityUtils.createAuthorityList("ROLE_SYSTEM");
+		var            systemUser  = new TenantAwareUserDetails(TENANT_SYSTEM, NAME_SYSTEM, "", authorities);
+		Authentication auth        = new UsernamePasswordAuthenticationToken(systemUser, null, authorities);
 		SecurityContextHolder.getContext().setAuthentication(auth);
 		// Create patients, if none are present
 		// (else assume they are in persistent storage and do nothing)
-		if (patientRepository.findAll().size() == 0) {
+		if (patientRepository.findAll().isEmpty()) {
 			patientRepository.save(new Patient(null, "123456", NAME_LENNY, "DA63.Z/ME24.90",
 					"Duodenal ulcer with acute haemorrhage.", NAME_JULIA, NAME_THOMAS, "+78(0)456-789", "A.3.47"));
 			patientRepository.save(new Patient(null, "987654", NAME_KARL, "9B71.0Z/5A11", "Type 2 diabetes mellitus",
 					NAME_ALINA, NAME_JANINA, "+78(0)456-567", "C.2.23"));
-		}
-		// Establish relations between users and patients, if none are present
-		// (else assume they are in persistent storage and do nothing)
-		if (StreamSupport.stream(relationRepository.findAll().spliterator(), false).findAny().isEmpty()) {
-			relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
-			relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).get().getId()));
-			relationRepository.save(new Relation(NAME_ALINA, patientRepository.findByName(NAME_KARL).get().getId()));
-			relationRepository.save(new Relation(NAME_JANOSCH, patientRepository.findByName(NAME_KARL).get().getId()));
 		}
 	}
 
@@ -133,16 +121,26 @@ public class DemoData implements CommandLineRunner {
 			TenantAwareUserDetailsService inMem,
 			PasswordEncoder encoder) {
 
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_DOMINIC,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_VISITOR)));
-		inMem.load(new TenantAwareUserDetails(TENANT_B,NAME_JULIA,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_PETER,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_ALINA,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_THOMAS,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_NURSE)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_BRIGITTE,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_NURSE)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_JANOSCH,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_NURSE)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_JANINA,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
-		inMem.load(new TenantAwareUserDetails(TENANT_A,NAME_HORST_A,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_ADMIN)));
-		inMem.load(new TenantAwareUserDetails(TENANT_B,NAME_HORST_B,encoder.encode(DEFAULT_RAW_PASSWORD), AuthorityUtils.createAuthorityList(ROLE_ADMIN)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_DOMINIC, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_VISITOR)));
+		inMem.load(new TenantAwareUserDetails(TENANT_B, NAME_JULIA, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_PETER, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_ALINA, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_THOMAS, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_NURSE)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_BRIGITTE, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_NURSE)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_JANOSCH, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_NURSE)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_JANINA, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_DOCTOR)));
+		inMem.load(new TenantAwareUserDetails(TENANT_A, NAME_HORST_A, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_ADMIN)));
+		inMem.load(new TenantAwareUserDetails(TENANT_B, NAME_HORST_B, encoder.encode(DEFAULT_RAW_PASSWORD),
+				AuthorityUtils.createAuthorityList(ROLE_ADMIN)));
 
 	}
 

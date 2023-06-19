@@ -17,7 +17,6 @@ import com.vaadin.flow.theme.Theme;
 @Theme(value = "collaborationengine")
 @NpmPackage(value = "lumo-css-framework", version = "^4.0.10")
 @NpmPackage(value = "line-awesome", version = "1.3.0")
-// TODO: bean initialization in framework
 @ComponentScan({ "io.sapl.vaadindemo", "io.sapl.vaadin" })
 public class VaadinDemoApplication extends SpringBootServletInitializer implements AppShellConfigurator {
 

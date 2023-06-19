@@ -36,11 +36,9 @@ public class SecurityConfiguration {
 	@Bean
 	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 		// @formatter:off
-		http.authorizeExchange(exchanges -> 
-		        exchanges.anyExchange().permitAll()
-			 ).formLogin().disable() 
-		      //.httpBasic().disable(); // This does not turn off basic authn. The following line does. 
-			  .httpBasic().authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED));
+		http.authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+            .formLogin(form-> form.disable())
+            .httpBasic(basic -> basic.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
 		return http.build();
 		// @formatter:on
 	}
