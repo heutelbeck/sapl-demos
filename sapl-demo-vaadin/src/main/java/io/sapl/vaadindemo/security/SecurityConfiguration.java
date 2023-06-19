@@ -47,8 +47,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 	 */
 	@Bean
 	UserDetailsService userDetailsService() {
-		UserDetails admin = User.withUsername("admin").password("{noop}admin").roles("Admin").build();
-		UserDetails user  = User.withUsername("user").password("{noop}user").roles("USER").build();
+		UserDetails admin = User.withUsername("admin").password("$2a$12$wuM1Cmdn4e0eTZfWrqSk0.Q82N3S6ehvj7/jzdxUH5xuthcvvlKCW").roles("Admin").build();
+		UserDetails user  = User.withUsername("user").password("$2a$12$itBzi/0MWsalfjnrftIO9eQ6lifIn61K77A3/UbNMAC9IVEtVmnvW").roles("USER").build();
 		return new InMemoryUserDetailsManager(admin, user);
 	}
 

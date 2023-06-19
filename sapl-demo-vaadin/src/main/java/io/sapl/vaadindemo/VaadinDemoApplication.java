@@ -6,17 +6,12 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import com.vaadin.flow.component.dependency.NpmPackage;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
-import com.vaadin.flow.theme.Theme;
 
 @Push
 @EnableAsync
 @SpringBootApplication
-@Theme(value = "collaborationengine")
-@NpmPackage(value = "lumo-css-framework", version = "^4.0.10")
-@NpmPackage(value = "line-awesome", version = "1.3.0")
 @ComponentScan({ "io.sapl.vaadindemo", "io.sapl.vaadin" })
 public class VaadinDemoApplication extends SpringBootServletInitializer implements AppShellConfigurator {
 

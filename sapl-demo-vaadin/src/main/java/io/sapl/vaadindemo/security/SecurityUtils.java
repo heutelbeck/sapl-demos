@@ -3,6 +3,9 @@ package io.sapl.vaadindemo.security;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class SecurityUtils {
 
     private static final String LOGOUT_SUCCESS_URL = "/";
