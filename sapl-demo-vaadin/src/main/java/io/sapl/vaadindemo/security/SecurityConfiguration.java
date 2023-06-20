@@ -33,10 +33,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll();
+		http.authorizeHttpRequests(
+				requests -> requests.requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll());
 
 		// Icons from the line-awesome addon
-		http.authorizeHttpRequests().requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll();
+		http.authorizeHttpRequests(
+				requests -> requests.requestMatchers(new AntPathRequestMatcher("/line-awesome/**/*.svg")).permitAll());
 		super.configure(http);
 		setLoginView(http, LoginView.class);
 	}
@@ -47,8 +49,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 	 */
 	@Bean
 	UserDetailsService userDetailsService() {
-		UserDetails admin = User.withUsername("admin").password("$2a$12$wuM1Cmdn4e0eTZfWrqSk0.Q82N3S6ehvj7/jzdxUH5xuthcvvlKCW").roles("Admin").build();
-		UserDetails user  = User.withUsername("user").password("$2a$12$itBzi/0MWsalfjnrftIO9eQ6lifIn61K77A3/UbNMAC9IVEtVmnvW").roles("USER").build();
+		UserDetails admin = User.withUsername("admin")
+				.password("$2a$12$wuM1Cmdn4e0eTZfWrqSk0.Q82N3S6ehvj7/jzdxUH5xuthcvvlKCW").roles("Admin").build();
+		UserDetails user  = User.withUsername("user")
+				.password("$2a$12$itBzi/0MWsalfjnrftIO9eQ6lifIn61K77A3/UbNMAC9IVEtVmnvW").roles("USER").build();
 		return new InMemoryUserDetailsManager(admin, user);
 	}
 
