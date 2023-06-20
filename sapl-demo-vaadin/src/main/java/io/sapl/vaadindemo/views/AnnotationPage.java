@@ -6,10 +6,12 @@ import com.vaadin.flow.router.Route;
 
 import io.sapl.vaadin.annotation.annotations.OnDenyNavigate;
 import io.sapl.vaadindemo.shared.Utilities;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * This page demonstrates the rerouting with the @OnDenyNavigate annotation for all users except admins.
  */
+@PermitAll
 @OnDenyNavigate(value = "/", subject = "{roles: getAuthorities().![getAuthority()]}", environment="'environment information'")
 @PageTitle("Annotation Page")
 @Route(value = "annotation-page", layout = MainLayout.class)

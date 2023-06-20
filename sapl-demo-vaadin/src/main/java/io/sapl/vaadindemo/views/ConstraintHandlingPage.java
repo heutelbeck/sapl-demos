@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -29,10 +29,12 @@ import io.sapl.vaadin.PepBuilderService;
 import io.sapl.vaadin.constraint.providers.FieldValidationConstraintHandlerProvider;
 import io.sapl.vaadindemo.pizzaform.PizzaOrder;
 import io.sapl.vaadindemo.shared.Utilities;
+import jakarta.annotation.security.PermitAll;
 
 /**
  *  This page demonstrates the Vaadin-Sapl constraint handling.
  */
+@PermitAll
 @PageTitle("Constraint Handling Page")
 @Route(value = "constraint-handling-page", layout = MainLayout.class)
 public class ConstraintHandlingPage extends VerticalLayout {
@@ -86,13 +88,13 @@ public class ConstraintHandlingPage extends VerticalLayout {
         add(Utilities.getInfoText("The number of allowed pizza(s) is controlled by a time-based sapl policy and a local constraint handler provider."));
 
         // minPizza message
-        Label lblMinPizza = new Label();
+        NativeLabel lblMinPizza = new NativeLabel();
 
         // beer
         beer.setValueChangeMode(ValueChangeMode.EAGER);
 
         // current time
-        Label lblTime = new Label();
+        NativeLabel lblTime = new NativeLabel();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss");
         Timer t = new Timer();
         t.schedule(new TimerTask() {

@@ -19,7 +19,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Input;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -39,7 +39,7 @@ public class CrowdfundingForm extends VerticalLayout {
 						+ "new template for the community.");
 
 		Input donationField = new Input();
-		Label unit          = new Label("ETH");
+		NativeLabel unit          = new NativeLabel("ETH");
 		unit.getStyle().set("margin-top", "10px");
 
 		Button donate = new Button("Donate");

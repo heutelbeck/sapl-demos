@@ -236,5 +236,5 @@ webpack.generated.js
 node_modules/
 
 ### Vaadin generated JavaScript / TypeScript ###
-**/frontend/generated/**
-
+sapl-demo-vaadin/frontend/generated/
+sapl-demo-vaadin/src/main/dev-bundle/

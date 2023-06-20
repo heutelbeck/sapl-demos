@@ -11,20 +11,22 @@ import com.vaadin.flow.router.Route;
 
 import io.sapl.vaadin.PepBuilderService;
 import io.sapl.vaadindemo.shared.Utilities;
+import jakarta.annotation.security.PermitAll;
 
 /**
- * The SingleAndMultisubscriptionPage got four buttons. The left one is for singlesubscription using
- * {@link VaadinSingleButtonPepBuilder} and the right three are for multisubscriptions with
- * {@link MultiBuilder}
+ * The SingleAndMultisubscriptionPage got four buttons. The left one is for
+ * singlesubscription using {@link VaadinSingleButtonPepBuilder} and the right
+ * three are for multisubscriptions with {@link MultiBuilder}
  *
  */
+@PermitAll
 @PageTitle("Single- and Multisubscription Page")
 @Route(value = "single-and-multisubscription-page", layout = MainLayout.class)
 public class SingleAndMultisubscriptionPage extends VerticalLayout {
-	private static final String INFOTEXT = "This site demonstrates the usage of Single- and "
+	private static final String INFOTEXT         = "This site demonstrates the usage of Single- and "
 			+ "MultiSubscription component based builders.\n"
 			+ "The related policies are defined in the file: singleAndMultisubscriptionPage.sapl";
-	private static final long serialVersionUID = 627128122009470259L;
+	private static final long   serialVersionUID = 627128122009470259L;
 
 	public SingleAndMultisubscriptionPage(PepBuilderService pepBuilderService) {
 
@@ -52,10 +54,8 @@ public class SingleAndMultisubscriptionPage extends VerticalLayout {
 		singleSubscriptionLayout.add(
 				Utilities.getInfoText(
 						"access to buttons is granted/revoked in a 5 seconds interval " +
-						"by the policy \"grant_access_to_buttons_on_singleAndMultisubscription_page\"\n" +
-						"- decision is enforced on the Button by disabling/enabling the button"
-				)
-		);
+								"by the policy \"grant_access_to_buttons_on_singleAndMultisubscription_page\"\n" +
+								"- decision is enforced on the Button by disabling/enabling the button"));
 
 		// add and format component
 		singleSubscriptionLayout.add(singleSubscriptionButton);
@@ -77,8 +77,8 @@ public class SingleAndMultisubscriptionPage extends VerticalLayout {
 	}
 
 	private VerticalLayout crateMultisubscriptionLayout(PepBuilderService pepBuilderService) {
-		H3 multiSubscriptionH3 = new H3("Multisubscription");
-		var buttonResource = JsonNodeFactory.instance.objectNode()
+		H3  multiSubscriptionH3 = new H3("Multisubscription");
+		var buttonResource      = JsonNodeFactory.instance.objectNode()
 				.put("object", "button")
 				.put("page", "SingleAndMultisubscription");
 
@@ -86,8 +86,8 @@ public class SingleAndMultisubscriptionPage extends VerticalLayout {
 				.put("object", "textfield")
 				.put("page", "SingleAndMultisubscription");
 
-		Button button1 = new Button("access enforced by multisubscription");
-		Button button2 = new Button("visibility enforced by multisubscription");
+		Button    button1    = new Button("access enforced by multisubscription");
+		Button    button2    = new Button("visibility enforced by multisubscription");
 		TextField textField1 = new TextField("access enforced by multisubscription");
 
 		// @formatter:off
@@ -112,16 +112,13 @@ public class SingleAndMultisubscriptionPage extends VerticalLayout {
 		multisubscriptionLayout.add(
 				Utilities.getInfoText(
 						"access to buttons is granted/revoked in a 5 seconds interval " +
-						"by the policy \"grant_access_to_buttons_on_singleAndMultisubscription_page\"\n" +
-						"- decision is enforced on the 1. Button by disabling/enabling the button\n"+
-						"- decision is enforced on the 2. Button by hiding/showing the button"
-				),
+								"by the policy \"grant_access_to_buttons_on_singleAndMultisubscription_page\"\n" +
+								"- decision is enforced on the 1. Button by disabling/enabling the button\n" +
+								"- decision is enforced on the 2. Button by hiding/showing the button"),
 				Utilities.getInfoText(
 						"access to textbox is granted/revoked in a 6 seconds interval " +
-						"by the policy \"grant_access_to_textfields_on_singleAndMultisubscription_page\".\n" +
-						"- decision is enforced on the TextField by disabling/enabling the TextField"
-				)
-		);
+								"by the policy \"grant_access_to_textfields_on_singleAndMultisubscription_page\".\n" +
+								"- decision is enforced on the TextField by disabling/enabling the TextField"));
 
 		// add and format components
 		multisubscriptionLayout.add(button1);

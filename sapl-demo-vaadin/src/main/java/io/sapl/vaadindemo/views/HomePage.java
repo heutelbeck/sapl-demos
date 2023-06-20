@@ -7,10 +7,12 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import io.sapl.vaadindemo.shared.Utilities;
+import jakarta.annotation.security.PermitAll;
 
 /**
  * This page is used as a landing page for demonstration of routing functionality.
  */
+@PermitAll
 @PageTitle("Home Page")
 @Route(value = "", layout = MainLayout.class)
 public class HomePage extends VerticalLayout {
