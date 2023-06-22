@@ -15,6 +15,15 @@
  */
 package io.sapl.playground.views;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +39,7 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
@@ -53,17 +63,18 @@ import io.sapl.playground.models.MockingModel;
 import io.sapl.test.mocking.attribute.MockingAttributeContext;
 import io.sapl.test.mocking.function.MockingFunctionContext;
 import io.sapl.test.steps.AttributeMockReturnValues;
-import io.sapl.vaadin.*;
+import io.sapl.vaadin.DocumentChangedEvent;
+import io.sapl.vaadin.Issue;
+import io.sapl.vaadin.JsonEditor;
+import io.sapl.vaadin.JsonEditorConfiguration;
+import io.sapl.vaadin.SaplEditor;
+import io.sapl.vaadin.SaplEditorConfiguration;
+import io.sapl.vaadin.ValidationFinishedEvent;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import reactor.test.StepVerifier.Step;
 import reactor.util.context.Context;
-
-import java.time.Clock;
-import java.time.Duration;
-import java.util.*;
-import java.util.function.Consumer;
 
 @Slf4j
 @PageTitle("SAPL Playground")
@@ -194,7 +205,7 @@ public class PlaygroundView extends VerticalLayout {
 	}
 
 	private Component mocksEditorAndError() {
-		var mockInput            = new VerticalLayout();
+		var mockInput = new VerticalLayout();
 		mockInput.setClassName(LumoUtility.Padding.NONE);
 
 		var mockJsonEditorConfig = new JsonEditorConfiguration();
@@ -217,7 +228,7 @@ public class PlaygroundView extends VerticalLayout {
 		var authzSubscriptionEditor = new VerticalLayout();
 		authzSubscriptionEditor.setClassName(LumoUtility.Padding.NONE);
 
-		var authzSubEditorConfig    = new JsonEditorConfiguration();
+		var authzSubEditorConfig = new JsonEditorConfiguration();
 		authzSubEditorConfig.setTextUpdateDelay(500);
 		authzSubEditorConfig.setDarkTheme(true);
 		this.authzSubEditor = new JsonEditor(authzSubEditorConfig);
@@ -273,23 +284,6 @@ public class PlaygroundView extends VerticalLayout {
 	 */
 	private void updateComponentsWithNewExample(Example example, boolean ignoreNextChangedEvents) {
 		this.getUI().ifPresent(ui -> ui.access(() -> {
-
-			// TODO: still needed ? Should there not be a flag in the value changed event to
-			// indicate user or system input ?
-//			if (ignoreNextChangedEvents) {
-//
-//				this.ignoreNextPolicyEditorChangedEvent = true;
-//
-//				Component selectedTab = tabs.getSelectedTab();
-//				if (selectedTab.equals(tab2MockInput)) {
-//					this.ignoreNextMockJsonEditorChangedEvent = true;
-//				}
-//				if (selectedTab.equals(tab1AuthzSubInput)) {
-//					this.ignoreNextAuthzSubJsonEditorChangedEvent = true;
-//				}
-//
-//			}
-
 			this.saplEditor.setDocument(example.getPolicy());
 			this.authzSubEditor.setDocument(example.getAuthzSub());
 			this.mockDefinitionEditor.setDocument(example.getMockDefinition());
@@ -444,7 +438,7 @@ public class PlaygroundView extends VerticalLayout {
 
 	private void checkEvaluationDataNotNull() {
 		if (this.currentAuthzSub == null || this.currentMockingModel == null || this.currentPolicy == null) {
-			throw new RuntimeException("Invalid internal state: Some evaluation data is null");
+			throw new IllegalStateException("Invalid internal state: Some evaluation data is null");
 		}
 	}
 

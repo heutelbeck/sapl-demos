@@ -5,10 +5,12 @@ import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
 @ToString(callSuper = true)
+@EqualsAndHashCode(callSuper = true)
 public class TenantAwareUserDetails extends User {
 
 	@Getter
@@ -21,8 +23,7 @@ public class TenantAwareUserDetails extends User {
 	}
 
 	public TenantAwareUserDetails(String tenantId, String username, String password, boolean enabled,
-			boolean accountNonExpired,
-			boolean credentialsNonExpired, boolean accountNonLocked,
+			boolean accountNonExpired, boolean credentialsNonExpired, boolean accountNonLocked,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired, accountNonLocked, authorities);
 		this.tenantId = tenantId;

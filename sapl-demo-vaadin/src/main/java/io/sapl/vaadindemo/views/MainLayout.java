@@ -76,7 +76,7 @@ public class MainLayout extends AppLayout {
         Button logoutBtn = new Button();
         logoutBtn.addClassName("nav-logout-btn");
         logoutBtn.setText("Logout");
-        logoutBtn.addClickListener((x) -> SecurityUtils.logout());
+        logoutBtn.addClickListener(x -> SecurityUtils.logout());
 
         H4 userRole = new H4(SecurityContextHolder.getContext().getAuthentication().getAuthorities().toString());
         userRole.addClassName("nav-logout-btn");

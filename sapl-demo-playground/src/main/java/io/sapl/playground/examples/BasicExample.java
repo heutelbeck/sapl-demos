@@ -19,17 +19,34 @@ public class BasicExample extends Example {
 
 	public BasicExample() {
 
-		this.mockDefinition = "[\n" + "  {\n" + "    \"type\"	   : \"ATTRIBUTE\",\n"
-				+ "    \"importName\": \"time.now\",\n" + "    \"sequence\": [1, 2, 3]\n" + "  }, \n" + "  {\n"
-				+ "    \"type\": \"FUNCTION\",\n" + "    \"importName\": \"time.dayOfWeekFrom\",\n"
-				+ "    \"sequence\": [\"MONDAY\", \"TUESDAY\", \"WEDNESDAY\"]\n" + "  }\n" + "]";
+		this.mockDefinition = """
+				[
+				  {
+				    "type"      : "ATTRIBUTE",
+				    "importName": "time.now",
+				    "sequence"  : [1, 2, 3]
+				  },
+				  {
+				    "type"      : "FUNCTION",
+				    "importName": "time.dayOfWeekFrom",
+				    "sequence"  : ["MONDAY", "TUESDAY", "WEDNESDAY"]
+				  }
+				]""";
 
-		this.policy = "policy \"policy 1\"\n" + "permit\n" + "    action == \"read\"\n" + "where\n"
-				+ "    subject == \"WILLI\";\n"
-				+ "    time.dayOfWeekFrom(<time.now>) =~ \"MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY\";";
+		this.policy = """
+				policy "policy 1"
+				permit
+				    action == "read"
+				where
+				    subject == "WILLI";
+				    time.dayOfWeekFrom(<time.now>) =~ "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY";""";
 
-		this.authzSub = "{\n" + " \"subject\"     : \"WILLI\",\n" + " \"action\"      : \"read\",\n"
-				+ " \"resource\"    : \"something\"\n" + "}";
+		this.authzSub = """
+				{
+				 "subject"     : "WILLI",
+				 "action"      : "read",
+				 "resource"    : "something"
+				}""";
 
 		this.displayName = "Basic";
 	}

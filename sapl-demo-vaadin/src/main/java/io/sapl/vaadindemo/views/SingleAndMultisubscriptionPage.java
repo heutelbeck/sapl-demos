@@ -109,15 +109,13 @@ public class SingleAndMultisubscriptionPage extends VerticalLayout {
 
 		// add info
 		multisubscriptionLayout.add(
-				Utilities.getInfoText(
-						"access to buttons is granted/revoked in a 5 seconds interval " +
-								"by the policy \"grant_access_to_buttons_on_singleAndMultisubscription_page\"\n" +
-								"- decision is enforced on the 1. Button by disabling/enabling the button\n" +
-								"- decision is enforced on the 2. Button by hiding/showing the button"),
-				Utilities.getInfoText(
-						"access to textbox is granted/revoked in a 6 seconds interval " +
-								"by the policy \"grant_access_to_textfields_on_singleAndMultisubscription_page\".\n" +
-								"- decision is enforced on the TextField by disabling/enabling the TextField"));
+				Utilities.getInfoText("""
+						access to buttons is granted/revoked in a 5 seconds interval by the policy "grant_access_to_buttons_on_singleAndMultisubscription_page".
+						  - decision is enforced on the 1. Button by disabling/enabling the button
+						  - decision is enforced on the 2. Button by hiding/showing the button"""),
+				Utilities.getInfoText("""
+						access to TextBox is granted/revoked in a 6 seconds interval by the policy "grant_access_to_textfields_on_singleAndMultisubscription_page".
+						  - decision is enforced on the TextField by disabling/enabling the TextField"""));
 
 		// add and format components
 		multisubscriptionLayout.add(button1);

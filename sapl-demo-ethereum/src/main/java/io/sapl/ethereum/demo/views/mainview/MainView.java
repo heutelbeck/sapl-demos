@@ -96,7 +96,7 @@ public class MainView extends VerticalLayout {
 
 		addClassName("main-view");
 
-		user = authnUser.get().get();
+		user = authnUser.get().orElse(null);
 
 		addHeader();
 		setupPrinterImage();
@@ -299,9 +299,9 @@ public class MainView extends VerticalLayout {
 	}
 
 	private Button createLogoutButton() {
-		Button logout = new Button("Logout");
-		logout.setWidth("10%");
-		return logout;
+		Button logoutButton = new Button("Logout");
+		logoutButton.setWidth("10%");
+		return logoutButton;
 	}
 
 	private AuthorizationSubscription buildSubscription(String action, String resource) {
