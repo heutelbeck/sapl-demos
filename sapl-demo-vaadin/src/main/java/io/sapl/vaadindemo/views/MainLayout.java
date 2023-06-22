@@ -30,8 +30,6 @@ import io.sapl.vaadindemo.security.SecurityUtils;
  */
 public class MainLayout extends AppLayout {
 
-	private static final long serialVersionUID = -7692529717658773127L;
-
 	public static class MenuItemInfo {
 
         private final String text;

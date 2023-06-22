@@ -20,7 +20,6 @@ import jakarta.annotation.security.PermitAll;
 @Route(value = "admin-page", layout = MainLayout.class)
 public class AdminPage extends VerticalLayout implements BeforeEnterObserver {
 
-	private static final long         serialVersionUID = -1287131079283060903L;
 	private static final String       INFOTEXT         = "The \"Admin Page\" and the notification is only shown if you are an admin. "
 			+
 			"Otherwise you will be navigated to the home page. The routing protection of this site is " +

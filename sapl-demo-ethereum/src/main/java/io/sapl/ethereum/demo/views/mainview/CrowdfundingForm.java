@@ -29,8 +29,6 @@ import io.sapl.ethereum.demo.security.PrinterUser;
 
 public class CrowdfundingForm extends VerticalLayout {
 
-	private static final long serialVersionUID = 8878184008835129794L;
-
 	public CrowdfundingForm(PrinterUser user, EthConnect ethConnect) {
 
 		H2        crowdfunding = new H2("Crowdfunding");

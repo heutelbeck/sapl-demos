@@ -26,7 +26,7 @@ import io.sapl.playground.examples.SpringDataExample;
 import io.sapl.playground.examples.SpringSecurityExample;
 
 public class MainLayout extends AppLayout {
-
+	
 	private final ExampleSelectedViewBus exampleSelectedViewBus;
 	private HashMap<String, Example>     examples;
 

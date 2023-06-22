@@ -28,8 +28,6 @@ import io.sapl.ethereum.demo.security.PrinterUser;
 
 public class PrinterUserForm extends VerticalLayout {
 
-	private static final long serialVersionUID = 1949849828168713357L;
-
 	public PrinterUserForm(PrinterUser user, Select<String> printerSelect, AccessCertificate accessCertificate) {
 		String username = user.getUsername();
 		String address  = user.getEthereumAddress();

@@ -42,8 +42,6 @@ public class MainView extends VerticalLayout {
 
 	public static final String ZMORPH = "Zmorph VX";
 
-	private static final long serialVersionUID = -5506530757803376574L;
-
 	private static final String BALL = "Ball";
 
 	private static final String ROCKET = "Rocket";

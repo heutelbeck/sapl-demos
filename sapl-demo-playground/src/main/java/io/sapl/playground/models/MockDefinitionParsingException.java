@@ -15,15 +15,8 @@
  */
 package io.sapl.playground.models;
 
+import lombok.experimental.StandardException;
+
+@StandardException
 public class MockDefinitionParsingException extends Exception {
-
-	/**
-	 *
-	 */
-	private static final long serialVersionUID = -3577173450460254740L;
-
-	public MockDefinitionParsingException(String message) {
-		super(message);
-	}
-
 }

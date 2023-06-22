@@ -16,7 +16,7 @@
 package io.sapl.playground.examples;
 
 public class SpringDataExample extends Example {
-
+	
 	public SpringDataExample() {
 
 		this.mockDefinition = "[\r\n" + "  {\r\n" + "    \"type\" : \"ATTRIBUTE\",\r\n"

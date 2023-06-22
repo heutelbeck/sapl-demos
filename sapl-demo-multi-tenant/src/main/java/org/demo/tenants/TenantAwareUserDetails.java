@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.User;
 import lombok.Getter;
 import lombok.ToString;
 
-@ToString(callSuper=true)
+@ToString(callSuper = true)
 public class TenantAwareUserDetails extends User {
 
 	@Getter
@@ -19,7 +19,7 @@ public class TenantAwareUserDetails extends User {
 		super(username, password, authorities);
 		this.tenantId = tenantId;
 	}
-	
+
 	public TenantAwareUserDetails(String tenantId, String username, String password, boolean enabled,
 			boolean accountNonExpired,
 			boolean credentialsNonExpired, boolean accountNonLocked,

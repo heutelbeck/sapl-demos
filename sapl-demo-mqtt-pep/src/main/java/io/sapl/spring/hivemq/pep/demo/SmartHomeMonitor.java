@@ -38,8 +38,8 @@ import java.util.Optional;
 @Route(value = "")
 @PageTitle("SmartHomeMonitor")
 public class SmartHomeMonitor extends VerticalLayout {
-
-    static final String BADGE_DESIGN_BLUE       = "badge";
+	
+	static final String BADGE_DESIGN_BLUE       = "badge";
     static final String BADGE_DESIGN_ERROR      = "badge error";
     static final String BADGE_DESIGN_SUCCESS    = "badge success";
     static final String BADGE_DESIGN_UNKNOWN    = "badge contrast";

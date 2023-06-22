@@ -32,7 +32,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Theme(value = "sapl-demo-mqtt-pep")
 public class SaplMqttHivemqPepDemo implements AppShellConfigurator {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         SpringApplication.run(SaplMqttHivemqPepDemo.class, args);
     }
 

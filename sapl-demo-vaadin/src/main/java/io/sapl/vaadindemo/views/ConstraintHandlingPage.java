@@ -39,7 +39,6 @@ import jakarta.annotation.security.PermitAll;
 @Route(value = "constraint-handling-page", layout = MainLayout.class)
 public class ConstraintHandlingPage extends VerticalLayout {
 
-    private static final long serialVersionUID = -5299651088738347223L;
     private final IntegerField cheese = new IntegerField("Cheese Pizza");
     private final IntegerField veggie = new IntegerField("Veggie Pizza");
     private final IntegerField pepperoni = new IntegerField("Pepperoni Pizza");

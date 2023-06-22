@@ -10,8 +10,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Theme(value = "saplplayground", variant = Lumo.DARK)
 public class SAPLPlaygroundApplication implements AppShellConfigurator {
 
-    public static void main(String[] args) {
-        SpringApplication.run(SAPLPlaygroundApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(SAPLPlaygroundApplication.class, args);
+	}
 
 }

@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Theme(value = "sapldemowebeditor", variant = Lumo.DARK)
 public class SAPLWebEditorDemoApplication implements AppShellConfigurator {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         SpringApplication.run(SAPLWebEditorDemoApplication.class, args);
     }
 

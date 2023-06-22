@@ -23,10 +23,9 @@ import jakarta.annotation.security.PermitAll;
 @PageTitle("Single- and Multisubscription Page")
 @Route(value = "single-and-multisubscription-page", layout = MainLayout.class)
 public class SingleAndMultisubscriptionPage extends VerticalLayout {
-	private static final String INFOTEXT         = "This site demonstrates the usage of Single- and "
+	private static final String INFOTEXT = "This site demonstrates the usage of Single- and "
 			+ "MultiSubscription component based builders.\n"
 			+ "The related policies are defined in the file: singleAndMultisubscriptionPage.sapl";
-	private static final long   serialVersionUID = 627128122009470259L;
 
 	public SingleAndMultisubscriptionPage(PepBuilderService pepBuilderService) {
 

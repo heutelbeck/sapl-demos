@@ -13,7 +13,6 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @SpringBootApplication
 @Theme(value = "sapldemoethereum", variant = Lumo.DARK)
 public class EthereumDemoApplication implements AppShellConfigurator {
-	private static final long serialVersionUID = -6789027976268546698L;
 
 	public static void main(String[] args) {
 		SpringApplication.run(EthereumDemoApplication.class, args);

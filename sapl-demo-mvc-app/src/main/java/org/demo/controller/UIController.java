@@ -39,6 +39,7 @@ import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.method.metadata.PreEnforce;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.StandardException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -54,11 +55,9 @@ public class UIController {
 
 	private final PatientRepository patientRepository;
 
+	@StandardException
 	@ResponseStatus(value = HttpStatus.NOT_FOUND)
 	public static class ResourceNotFoundException extends RuntimeException {
-
-		private static final long serialVersionUID = -7473576823119824705L;
-
 	}
 
 	// @PreEnforce
