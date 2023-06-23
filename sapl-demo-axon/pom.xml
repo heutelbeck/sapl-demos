@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.0</version>
+		<version>3.1.1</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.sapl</groupId>
@@ -15,7 +15,8 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<axon.version>4.7.2</axon.version>
+		<axon.version>4.8.0</axon.version>
+		<axon.mongo.version>4.8.0</axon.mongo.version>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
 	</properties>
 	<dependencyManagement>
@@ -25,13 +26,6 @@
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-bom</artifactId>
 				<version>${sapl.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.axonframework</groupId>
-				<artifactId>axon-bom</artifactId>
-				<version>${axon.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -63,14 +57,17 @@
 		<dependency>
 			<groupId>org.axonframework</groupId>
 			<artifactId>axon-spring-boot-starter</artifactId>
+			<version>${axon.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.axonframework.extensions.reactor</groupId>
 			<artifactId>axon-reactor-spring-boot-starter</artifactId>
+			<version>${axon.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.axonframework.extensions.mongo</groupId>
 			<artifactId>axon-mongo</artifactId>
+			<version>${axon.mongo.version}</version>
 		</dependency>
 
 		<!-- SAPL Engine -->
