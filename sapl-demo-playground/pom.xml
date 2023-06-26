@@ -17,23 +17,36 @@
     <properties>
         <selenium.version>4.8.3</selenium.version>
     </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+           	<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
 		<!-- SAPL -->
    		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>io.sapl</groupId>
 			<artifactId>sapl-editor-vaadin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-   		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-test</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-vaadin-theme</artifactId>
+		</dependency>
+   		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp-embedded</artifactId>
-			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		
