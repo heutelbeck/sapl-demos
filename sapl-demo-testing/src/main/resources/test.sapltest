@@ -1,0 +1,155 @@
+policySimple tests {
+    when willi attempts read on something
+    expect permit;
+}
+
+policyWithSimpleFunction tests {
+    register functionLibrary TemporalFunctionLibrary
+    when willi attempts read on something
+    expect permit;
+
+    given function time.dayOfWeek returns "SATURDAY"
+    when willi attempts read on something
+    expect permit;
+
+    given
+    function time.dayOfWeek returns "SATURDAY" called 1 times
+    when willi attempts read on something
+    expect permit;
+}
+
+policyWithSimplePIP tests {
+    given attribute test.upper returns "WILLI"
+    when willi attempts read on something
+    expect permit;
+
+    register PIP abc
+    when willi attempts read on something
+    expect permit;
+}
+
+policyWithMultipleFunctionsOrPIPs tests {
+    given
+    attribute test.upper returns "WILLI"
+    function time.dayOfWeekFrom returns "SATURDAY"
+    when willi attempts read on something
+    expect permit;
+}
+
+policyStreaming tests {
+    given
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z"
+    "2021-02-08T16:16:02.000Z"
+    "2021-02-08T16:16:03.000Z"
+    "2021-02-08T16:16:04.000Z"
+    "2021-02-08T16:16:05.000Z"
+    "2021-02-08T16:16:06.000Z"
+    register functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData expect
+    next notApplicable 4 times
+    next permit 2 times;
+
+    given
+    virtualTime
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z"
+    "2021-02-08T16:16:02.000Z"
+    "2021-02-08T16:16:03.000Z"
+    "2021-02-08T16:16:04.000Z"
+    "2021-02-08T16:16:05.000Z"
+    "2021-02-08T16:16:06.000Z"
+    for 1
+    register functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData expect
+    await 1
+    next notApplicable await 1
+    next notApplicable await 1
+    next notApplicable await 1
+    next notApplicable await 1
+    next permit await 1
+    next permit await 1;
+
+    given virtualTime
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z"
+    "2021-02-08T16:16:02.000Z"
+    function time.secondOf returns 4 once
+    function time.secondOf returns 5 once
+    register functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData expect
+    next notApplicable
+    next permit;
+
+    given attribute time.now returns
+    "value"
+    "doesn't"
+    "matter"
+    function time.secondOf returns 3 4 5 once
+    register functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData expect
+    next notApplicable 2 times
+    next permit;
+
+    given attribute time.now returns
+    "value"
+    "doesn't"
+    "matter"
+    function time.secondOf returns 5 called 3 times
+    register functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData expect
+    next permit 3 times;
+}
+
+policyWithComplexFunction tests {
+    given
+    attribute company.pip1
+    attribute company.pip2
+    function company.complexFunction parameters matching is 1 is "foo" returns true
+    function company.complexFunction parameters matching is 2 any returns true
+    function company.complexFunction parameters matching any any returns false
+    when User1 attempts read on heartBeatData
+    expect
+    then company.pip1 returns 1
+    then company.pip2 returns "foo"
+    next permit
+    then company.pip2 returns "bar"
+    next notApplicable
+    then company.pip1 returns 2
+    next permit
+    then company.pip2 returns "xxx"
+    next permit
+    then company.pip1 returns 3
+    next notApplicable;
+}
+
+policyDocumentWithMultipleCallsToSameAttribute tests {
+    given
+    attribute time.now returns 1 2 3 4 5 6
+    function time.secondOf returns 1 15 25 25 35 35 45 45 45 55 55 55 once
+    when WILLI attempts read on something
+    expect
+    matching permit obligation "A"
+    matching permit obligation "A"
+    matching permit obligation "B"
+    matching permit obligation "B"
+    matching permit obligation "C"
+    matching permit obligation "C";
+
+    given
+    attribute time.now returns 1 2 3 4 5 6
+    function time.secondOf parameters matching val 1 returns 1
+    function time.secondOf parameters matching val 2 returns 15
+    function time.secondOf parameters matching val 3 returns 25
+    function time.secondOf parameters matching val 4 returns 35
+    function time.secondOf parameters matching val 5 returns 45
+    function time.secondOf parameters matching val 6 returns 55
+    when WILLI attempts read on something
+    expect
+    matching permit obligation "A"
+    matching permit obligation "A"
+    matching permit obligation "B"
+    matching permit obligation "B"
+    matching permit obligation "C"
+    matching permit obligation "C";
+}
