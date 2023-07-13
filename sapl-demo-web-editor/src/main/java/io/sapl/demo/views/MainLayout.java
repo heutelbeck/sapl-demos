@@ -28,6 +28,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 import io.sapl.demo.views.jsoneditor.JSONEditorView;
 import io.sapl.demo.views.sapleditor.SAPLEditorView;
+import io.sapl.demo.views.sapltesteditor.SAPLTestEditorView;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
@@ -101,8 +102,8 @@ public class MainLayout extends AppLayout {
 
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
-                new MenuItemInfo("SAPL Editor", LineAwesomeIcon.EDIT.create(), SAPLEditorView.class), //
-
+                new MenuItemInfo("SAPL Editor", LineAwesomeIcon.EDIT.create(), SAPLEditorView.class),
+                new MenuItemInfo("SAPL Test Editor", LineAwesomeIcon.EDIT.create(), SAPLTestEditorView.class),//
                 new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class), //
 
         };
