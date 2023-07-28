@@ -19,8 +19,8 @@ public class SAPLTestEditorView extends VerticalLayout {
 
 	private static final String DEFAULT_TEST = """
 			policySimple tests {
-			    when willi attempts read on something
-			    expect permit;
+				when willi attempts read on something
+				then expect single permit;
 			}""";
 
 	private final Button     addDocumentChangedListenerButton;
