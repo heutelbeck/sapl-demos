@@ -1,108 +1,118 @@
 policySimple tests {
+	scenario "test_simplePolicy"
     when willi attempts read on something
     then expect single permit;
 }
 
 policyWithSimpleFunction tests {
+	scenario "test_policyWithSimpleFunction"
     given functionLibrary TemporalFunctionLibrary
     when willi attempts read on something
     then expect single permit;
 
+	scenario "test_policyWithSimpleMockedFunction"
     given function time.dayOfWeek returns "SATURDAY"
     when willi attempts read on something
     then expect single permit;
 
-    given function time.dayOfWeek returns "SATURDAY" called 1 times
+	scenario "test_policyWithSimpleMockedFunction_VerifyTimesCalled"
+    given function time.dayOfWeek returns "SATURDAY" and is invoked once
     when willi attempts read on something
     then expect single permit;
 }
 
 policyWithSimplePIP tests {
+	scenario "test_policyWithSimpleMockedPIP"
     given attribute test.upper returns "WILLI"
     when willi attempts read on something
     then expect single permit;
 
+	scenario "test_policyWithSimplePIP"
     given PIP abc
     when willi attempts read on something
     then expect single permit;
 }
 
 policyWithMultipleFunctionsOrPIPs tests {
-    given
-    attribute test.upper returns "WILLI" and
+	scenario "test_policyWithMultipleMocks"
+    given attribute test.upper returns "WILLI" and
     function time.dayOfWeekFrom returns "SATURDAY"
     when willi attempts read on something
     then expect single permit;
 }
 
 policyStreaming tests {
-    given
-    attribute time.now returns
-    "2021-02-08T16:16:01.000Z"
-    "2021-02-08T16:16:02.000Z"
-    "2021-02-08T16:16:03.000Z"
-    "2021-02-08T16:16:04.000Z"
-    "2021-02-08T16:16:05.000Z"
+	scenario "test_streamingPolicy"
+    given attribute time.now returns
+    "2021-02-08T16:16:01.000Z",
+    "2021-02-08T16:16:02.000Z",
+    "2021-02-08T16:16:03.000Z",
+    "2021-02-08T16:16:04.000Z",
+    "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     and functionLibrary TemporalFunctionLibrary
     when ROLE_DOCTOR attempts read on heartBeatData
     then expect notApplicable 4 times
     then expect permit 2 times;
 
-    given
-    virtualTime and
-    attribute time.now returns
-    "2021-02-08T16:16:01.000Z"
-    "2021-02-08T16:16:02.000Z"
-    "2021-02-08T16:16:03.000Z"
-    "2021-02-08T16:16:04.000Z"
-    "2021-02-08T16:16:05.000Z"
-    "2021-02-08T16:16:06.000Z"
-    for 1
-    and functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
-    then wait for 1 seconds
-    then expect notApplicable 1 times
-    then wait for 1 seconds
-    then expect notApplicable 1 times
-    then wait for 1 seconds
-    then expect notApplicable 1 times
-    then wait for 1 seconds
-    then expect notApplicable 1 times
-    then wait for 1 seconds
-    then expect permit 1 times
-    then wait for 1 seconds
-    then expect permit 1 times
-    then wait for 1 seconds;
-
+	scenario "test_streamingPolicy_TimingAttributeMock"
     given virtualTime and
     attribute time.now returns
-    "2021-02-08T16:16:01.000Z"
-    "2021-02-08T16:16:02.000Z" and
+    "2021-02-08T16:16:01.000Z",
+    "2021-02-08T16:16:02.000Z",
+    "2021-02-08T16:16:03.000Z",
+    "2021-02-08T16:16:04.000Z",
+    "2021-02-08T16:16:05.000Z",
+    "2021-02-08T16:16:06.000Z"
+    for 1s
+    and functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData
+    then wait 1s
+    then expect notApplicable once
+    then wait 1s
+    then expect notApplicable once
+    then wait 1s
+    then expect notApplicable once
+    then wait 1s
+    then expect notApplicable once
+    then wait 1s
+    then expect permit once
+    then wait 1s
+    then expect permit once
+    then wait 1s;
+
+	scenario "test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls"
+    given virtualTime and
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z",
+    "2021-02-08T16:16:02.000Z"
+    and
     function time.secondOf returns 4 once and
     function time.secondOf returns 5 once and
     functionLibrary TemporalFunctionLibrary
     when ROLE_DOCTOR attempts read on heartBeatData
-    then expect notApplicable 1 times
-    then expect permit 1 times;
+    then expect notApplicable once
+    then expect permit once;
 
+	scenario "test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues"
     given attribute time.now returns
-    "value"
-    "doesn't"
+    "value",
+    "doesn't",
     "matter"
     and
     function time.secondOf returns 3 4 5 once and
     functionLibrary TemporalFunctionLibrary
     when ROLE_DOCTOR attempts read on heartBeatData
     then expect notApplicable 2 times
-    then expect permit 1 times;
+    then expect permit once;
 
+	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
     given attribute time.now returns
-    "value"
-    "doesn't"
+    "value",
+    "doesn't",
     "matter"
     and
-    function time.secondOf returns 5 called 3 times
+    function time.secondOf returns 5 and is invoked 3 times
     and
     functionLibrary TemporalFunctionLibrary
     when ROLE_DOCTOR attempts read on heartBeatData
@@ -110,8 +120,8 @@ policyStreaming tests {
 }
 
 policyWithComplexFunction tests {
-    given
-    attribute company.pip1 and
+	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
+    given attribute company.pip1 and
     attribute company.pip2 and
     function company.complexFunction parameters matching is 1 is "foo" returns true and
     function company.complexFunction parameters matching is 2 any returns true and
@@ -119,20 +129,20 @@ policyWithComplexFunction tests {
     when User1 attempts read on heartBeatData
     then let company.pip1 return 1
     then let company.pip2 return "foo"
-    then expect permit 1 times
+    then expect permit once
     then let company.pip2 return "bar"
-    then expect notApplicable 1 times
+    then expect notApplicable once
     then let company.pip1 return 2
-    then expect permit 1 times
+    then expect permit once
     then let company.pip2 return "xxx"
-    then expect permit 1 times
+    then expect permit once
     then let company.pip1 return 3
-    then expect notApplicable 1 times;
+    then expect notApplicable once;
 }
 
 policyDocumentWithMultipleCallsToSameAttribute tests {
-    given
-    attribute time.now returns 1 2 3 4 5 6 and
+	scenario "test_withFunctionSequenceMock"
+    given attribute time.now returns 1,2,3,4,5,6 and
     function time.secondOf returns 1 15 25 25 35 35 45 45 45 55 55 55 once
     when WILLI attempts read on something
     then matching permit obligation "A"
@@ -142,8 +152,8 @@ policyDocumentWithMultipleCallsToSameAttribute tests {
     then matching permit obligation "C"
     then matching permit obligation "C";
 
-    given
-    attribute time.now returns 1 2 3 4 5 6 and
+	scenario "test_withFunctionForParametersMock"
+    given attribute time.now returns 1,2,3,4,5,6 and
     function time.secondOf parameters matching val 1 returns 1 and
     function time.secondOf parameters matching val 2 returns 15 and
     function time.secondOf parameters matching val 3 returns 25 and
