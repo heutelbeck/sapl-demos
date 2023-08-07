@@ -57,7 +57,7 @@ public class EthConnect {
 			Transfer.sendFunds(web3j, credentials, ACCREDITATION_AUTHORITY, amount, Convert.Unit.ETHER).send();
 
 		} catch (Exception e) {
-			log.info("Donation failed", e);
+			log.warn("Donation failed", e);
 		}
 
 	}
@@ -73,7 +73,7 @@ public class EthConnect {
 					.sendFunds(web3j, credentials, ACCREDITATION_AUTHORITY, amount, Convert.Unit.ETHER).send();
 			user.setTransactionHash(receipt.getTransactionHash());
 		} catch (Exception e) {
-			log.info("Payment failed", e);
+			log.warn("Payment failed", e);
 		}
 
 	}

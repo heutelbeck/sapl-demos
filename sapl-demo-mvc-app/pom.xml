@@ -102,6 +102,14 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+        <dependency>
+		    <groupId>net.sourceforge.htmlunit</groupId>
+		    <artifactId>htmlunit</artifactId>
+		    <scope>test</scope>
+		</dependency>
+
+		
 
 		<!-- Devtools for convenience -->
 

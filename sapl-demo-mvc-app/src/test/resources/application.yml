@@ -1,5 +1,5 @@
 spring.main.banner-mode: OFF
 logging.level:
-  root: OFF
-  io.sapl: OFF
-  org.springframework.security: OFF
+  root: ERROR
+  io.sapl: WARN
+  org.springframework.security: WARN

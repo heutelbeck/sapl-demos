@@ -28,6 +28,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class PrinterUserService implements UserDetailsService {
 
+	public static final PrinterUser[] DEMO_USERS = new PrinterUser[] {
+			new PrinterUser("Alice", "Greenfield", "0xE5a72C7Fa4991920619edCf25eD8828793045A53", null,
+					Collections.singletonList(new SimpleGrantedAuthority("USER"))),
+			new PrinterUser("Bob", "Springsteen", "0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8", null,
+					Collections.singletonList(new SimpleGrantedAuthority("USER"))) };
+
 	private final HashMap<String, PrinterUser> allPrinterUsers = new HashMap<>();
 
 	private final PasswordEncoder passwordEncoder;
@@ -43,15 +49,10 @@ public class PrinterUserService implements UserDetailsService {
 	}
 
 	private void createDemoData() {
-		allPrinterUsers.put("Alice",
-				new PrinterUser("Alice", passwordEncoder.encode("Greenfield"),
-						"0xE5a72C7Fa4991920619edCf25eD8828793045A53", null,
-						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
-		allPrinterUsers.put("Bob",
-				new PrinterUser("Bob", passwordEncoder.encode("Springsteen"),
-						"0xC4991aAE3621aadE30b9f577c6DA66698bFB7cD8", null,
-						Collections.singletonList(new SimpleGrantedAuthority("USER"))));
-
+		for (var demoUser : DEMO_USERS)
+			allPrinterUsers.put(demoUser.getUsername(),
+					new PrinterUser(demoUser.getUsername(), passwordEncoder.encode(demoUser.getPassword()),
+							demoUser.getEthereumAddress(), null, demoUser.getAuthorities()));
 	}
 
 	public PrinterUser loadUser(String username) {

@@ -9,7 +9,7 @@
 <body>
 	<h3>Update Patient</h3>
 	<form id="updatePatientForm"
-		th:action="@{'/patients/'+ ${patient.id}}" th:method="put" th:object="${patient}">
+		th:action="@{'/patients/'+ ${patient.id}}" th:method="post" th:object="${patient}">
 		<div>
 			Medical Record Number: <span
 				th:text="${patient.medicalRecordNumber}"></span>

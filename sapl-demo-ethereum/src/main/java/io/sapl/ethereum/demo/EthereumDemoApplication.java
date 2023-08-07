@@ -20,7 +20,7 @@ public class EthereumDemoApplication implements AppShellConfigurator {
 
 	@Bean
 	Web3j web3j() {
-		return Web3j.build(new HttpService("http://localhost:7545"));
+		return Web3j.build(new HttpService("http://localhost:8545")); //7545
 	}
 
 }
