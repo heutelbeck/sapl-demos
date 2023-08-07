@@ -57,7 +57,7 @@ class EthereumDemoApplicationIT {
 			.waitingFor(Wait.forLogMessage(STARTUP_LOG_MESSAGE, 1)).withStartupTimeout(TIMEOUT_FOR_GANACHE_CLI_SPINUP)
 			.withNetwork(network);
 
-	static Collection<PrinterUser> demoUserSoure() {
+	static Collection<PrinterUser> demoUserSource() {
 		return List.of(PrinterUserService.DEMO_USERS);
 	}
 
