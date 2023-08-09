@@ -31,6 +31,11 @@ policyWithSimplePIP tests {
     given PIP abc
     when willi attempts read on something
     then expect single permit;
+
+    scenario "test_policyWithSimplePIP_mockedWhenParameters"
+    given attribute test.upper with parent value "willi" returns "WILLI"
+    when willi attempts read on something
+    then expect single permit;
 }
 
 policyWithMultipleFunctionsOrPIPs tests {
@@ -81,6 +86,20 @@ policyStreaming tests {
     then expect permit once
     then wait 1s;
 
+	scenario "test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime"
+    given
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z",
+    "2021-02-08T16:16:02.000Z",
+    "2021-02-08T16:16:03.000Z",
+    "2021-02-08T16:16:04.000Z",
+    "2021-02-08T16:16:05.000Z",
+    "2021-02-08T16:16:06.000Z"
+    for 10s
+    and functionLibrary TemporalFunctionLibrary
+    when ROLE_DOCTOR attempts read on heartBeatData
+    then expect exception;
+
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls"
     given virtualTime and
     attribute time.now returns
@@ -100,7 +119,7 @@ policyStreaming tests {
     "doesn't",
     "matter"
     and
-    function time.secondOf returns 3 4 5 once and
+    function time.secondOf returns 3,4,5 once and
     functionLibrary TemporalFunctionLibrary
     when ROLE_DOCTOR attempts read on heartBeatData
     then expect notApplicable 2 times
@@ -120,12 +139,12 @@ policyStreaming tests {
 }
 
 policyWithComplexFunction tests {
-	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
+	scenario "test_streamingPolicyWithMockedFunction_ReturnValueDependingOnSimpleParameters_AndDynamicMockedAttribute"
     given attribute company.pip1 and
     attribute company.pip2 and
-    function company.complexFunction parameters matching is 1 is "foo" returns true and
-    function company.complexFunction parameters matching is 2 any returns true and
-    function company.complexFunction parameters matching any any returns false
+    function company.complexFunction called with 1, "foo" returns true and
+    function company.complexFunction called with 2, any returns true and
+    function company.complexFunction called with any, any returns false
     when User1 attempts read on heartBeatData
     then let company.pip1 return 1
     then let company.pip2 return "foo"
@@ -143,28 +162,46 @@ policyWithComplexFunction tests {
 policyDocumentWithMultipleCallsToSameAttribute tests {
 	scenario "test_withFunctionSequenceMock"
     given attribute time.now returns 1,2,3,4,5,6 and
-    function time.secondOf returns 1 15 25 25 35 35 45 45 45 55 55 55 once
+    function time.secondOf returns 1,15,25,25,35,35,45,45,45,55,55,55 once
     when WILLI attempts read on something
-    then matching permit obligation "A"
-    then matching permit obligation "A"
-    then matching permit obligation "B"
-    then matching permit obligation "B"
-    then matching permit obligation "C"
-    then matching permit obligation "C";
+    then expect decision matching permit, obligation "A"
+    then expect decision matching permit, obligation "A"
+    then expect decision matching permit, obligation "B"
+    then expect decision matching permit, obligation "B"
+    then expect decision matching permit, obligation "C"
+    then expect decision matching permit, obligation "C";
 
 	scenario "test_withFunctionForParametersMock"
     given attribute time.now returns 1,2,3,4,5,6 and
-    function time.secondOf parameters matching val 1 returns 1 and
-    function time.secondOf parameters matching val 2 returns 15 and
-    function time.secondOf parameters matching val 3 returns 25 and
-    function time.secondOf parameters matching val 4 returns 35 and
-    function time.secondOf parameters matching val 5 returns 45 and
-    function time.secondOf parameters matching val 6 returns 55
+    function time.secondOf called with 1 returns 1 and
+    function time.secondOf called with 2 returns 15 and
+    function time.secondOf called with 3 returns 25 and
+    function time.secondOf called with 4 returns 35 and
+    function time.secondOf called with 5 returns 45 and
+    function time.secondOf called with 6 returns 55
     when WILLI attempts read on something
-    then matching permit obligation "A"
-    then matching permit obligation "A"
-    then matching permit obligation "B"
-    then matching permit obligation "B"
-    then matching permit obligation "C"
-    then matching permit obligation "C";
+    then expect decision matching permit, obligation "A"
+    then expect decision matching permit, obligation "A"
+    then expect decision matching permit, obligation "B"
+    then expect decision matching permit, obligation "B"
+    then expect decision matching permit, obligation "C"
+    then expect decision matching permit, obligation "C";
+}
+
+policyWithComplexPIP tests {
+	scenario "test_policyWithSimpleMockedPIP"
+    given
+    attribute pip.attribute1 and
+    attribute pip.attribute2 and
+    attribute pip.attributeWithParams with parent value true and parameters 2,2 returns true and
+    attribute pip.attributeWithParams with parent value true and parameters 2,1 returns false and
+    attribute pip.attributeWithParams with parent value true and parameters 1,2 returns false
+    when WILLI attempts read on something
+    then let pip.attribute1 return 1
+    then let pip.attribute2 return 2
+    then expect notApplicable once
+    then let pip.attribute1 return 2
+    then expect permit once
+    then let pip.attribute2 return 1
+	then expect notApplicable once;
 }
