@@ -205,3 +205,26 @@ policyWithComplexPIP tests {
     then let pip.attribute2 return 1
 	then expect notApplicable once;
 }
+
+
+policyWithObligationAndResource tests {
+	scenario "test_equals"
+	given functionLibrary FilterFunctionLibrary
+    when
+    key "name" value "Willi",
+    key "authority" value "ROLE_ADMIN"
+    attempts
+    key "name" value "findById"
+    on
+    key "id" value "56",
+    key "diagnosisText" value "█████████████",
+    key "icd11Code" value "ic███████"
+    then expect single permit
+    and obligation containing
+    key "type" value "logAccess",
+    key "message" value "Willi has accessed patient data (id=56) as an administrator."
+    and resource containing
+    key "id" value "56",
+    key "diagnosisText" value "█████████████",
+    key "icd11Code" value "ic███████";
+}

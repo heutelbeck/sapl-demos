@@ -2,7 +2,7 @@ import filter.*
 
 policy "policyWithObligationAndResource"
 permit 
-    action.java.name == "findById"
+    action.name == "findById"
 where 
     "ROLE_ADMIN" in subject..authority;
 obligation  
