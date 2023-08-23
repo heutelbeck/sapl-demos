@@ -220,10 +220,10 @@ policyWithObligationAndResource tests {
     key "diagnosisText" value "█████████████",
     key "icd11Code" value "ic███████"
     then expect single permit
-    and obligation containing
+    with obligation
     key "type" value "logAccess",
     key "message" value "Willi has accessed patient data (id=56) as an administrator."
-    and resource containing
+    with resource
     key "id" value "56",
     key "diagnosisText" value "█████████████",
     key "icd11Code" value "ic███████";
