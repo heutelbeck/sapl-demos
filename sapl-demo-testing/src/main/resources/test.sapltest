@@ -1,48 +1,48 @@
 policySimple tests {
 	scenario "test_simplePolicy"
-    when willi attempts read on something
+    when "willi" attempts "read" on "something"
     then expect single permit;
 }
 
 policyWithSimpleFunction tests {
 	scenario "test_policyWithSimpleFunction"
     given functionLibrary TemporalFunctionLibrary
-    when willi attempts read on something
+    when "willi" attempts "read" on "something"
     then expect single permit;
 
 	scenario "test_policyWithSimpleMockedFunction"
-    given function time.dayOfWeek returns "SATURDAY"
-    when willi attempts read on something
+    given function time.dayOfWeek returning "SATURDAY"
+    when "willi" attempts "read" on "something"
     then expect single permit;
 
 	scenario "test_policyWithSimpleMockedFunction_VerifyTimesCalled"
-    given function time.dayOfWeek returns "SATURDAY" and is invoked once
-    when willi attempts read on something
+    given function time.dayOfWeek returning "SATURDAY" and is invoked once
+    when "willi" attempts "read" on "something"
     then expect single permit;
 }
 
 policyWithSimplePIP tests {
 	scenario "test_policyWithSimpleMockedPIP"
     given attribute test.upper returns "WILLI"
-    when willi attempts read on something
+    when "willi" attempts "read" on "something"
     then expect single permit;
 
 	scenario "test_policyWithSimplePIP"
     given PIP abc
-    when willi attempts read on something
+    when "willi" attempts "read" on "something"
     then expect single permit;
 
     scenario "test_policyWithSimplePIP_mockedWhenParameters"
     given attribute test.upper with parent value "willi" returns "WILLI"
-    when willi attempts read on something
+    when "willi" attempts "read" on "something"
     then expect single permit;
 }
 
 policyWithMultipleFunctionsOrPIPs tests {
 	scenario "test_policyWithMultipleMocks"
     given attribute test.upper returns "WILLI" and
-    function time.dayOfWeekFrom returns "SATURDAY"
-    when willi attempts read on something
+    function time.dayOfWeekFrom returning "SATURDAY"
+    when "willi" attempts "read" on "something"
     then expect single permit;
 }
 
@@ -56,7 +56,7 @@ policyStreaming tests {
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     and functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then expect notApplicable 4 times
     then expect permit 2 times;
 
@@ -71,7 +71,7 @@ policyStreaming tests {
     "2021-02-08T16:16:06.000Z"
     for 1s
     and functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then wait 1s
     then expect notApplicable once
     then wait 1s
@@ -97,7 +97,7 @@ policyStreaming tests {
     "2021-02-08T16:16:06.000Z"
     for 10s
     and functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then expect exception;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls"
@@ -109,7 +109,7 @@ policyStreaming tests {
     function time.secondOf returns 4 once and
     function time.secondOf returns 5 once and
     functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then expect notApplicable once
     then expect permit once;
 
@@ -121,7 +121,7 @@ policyStreaming tests {
     and
     function time.secondOf returns 3,4,5 once and
     functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then expect notApplicable 2 times
     then expect permit once;
 
@@ -131,10 +131,10 @@ policyStreaming tests {
     "doesn't",
     "matter"
     and
-    function time.secondOf returns 5 and is invoked 3 times
+    function time.secondOf returning 5 and is invoked 3 times
     and
     functionLibrary TemporalFunctionLibrary
-    when ROLE_DOCTOR attempts read on heartBeatData
+    when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
     then expect permit 3 times;
 }
 
@@ -142,10 +142,10 @@ policyWithComplexFunction tests {
 	scenario "test_streamingPolicyWithMockedFunction_ReturnValueDependingOnSimpleParameters_AndDynamicMockedAttribute"
     given attribute company.pip1 and
     attribute company.pip2 and
-    function company.complexFunction called with 1, "foo" returns true and
-    function company.complexFunction called with 2, any returns true and
-    function company.complexFunction called with any, any returns false
-    when User1 attempts read on heartBeatData
+    function company.complexFunction called with 1, "foo" returning true and
+    function company.complexFunction called with 2, any returning true and
+    function company.complexFunction called with any, any returning false
+    when "User1" attempts "read" on "heartBeatData"
     then let company.pip1 return 1
     then let company.pip2 return "foo"
     then expect permit once
@@ -163,7 +163,7 @@ policyDocumentWithMultipleCallsToSameAttribute tests {
 	scenario "test_withFunctionSequenceMock"
     given attribute time.now returns 1,2,3,4,5,6 and
     function time.secondOf returns 1,15,25,25,35,35,45,45,45,55,55,55 once
-    when WILLI attempts read on something
+    when "WILLI" attempts "read" on "something"
     then expect decision matching permit, obligation "A"
     then expect decision matching permit, obligation "A"
     then expect decision matching permit, obligation "B"
@@ -173,13 +173,13 @@ policyDocumentWithMultipleCallsToSameAttribute tests {
 
 	scenario "test_withFunctionForParametersMock"
     given attribute time.now returns 1,2,3,4,5,6 and
-    function time.secondOf called with 1 returns 1 and
-    function time.secondOf called with 2 returns 15 and
-    function time.secondOf called with 3 returns 25 and
-    function time.secondOf called with 4 returns 35 and
-    function time.secondOf called with 5 returns 45 and
-    function time.secondOf called with 6 returns 55
-    when WILLI attempts read on something
+    function time.secondOf called with 1 returning 1 and
+    function time.secondOf called with 2 returning 15 and
+    function time.secondOf called with 3 returning 25 and
+    function time.secondOf called with 4 returning 35 and
+    function time.secondOf called with 5 returning 45 and
+    function time.secondOf called with 6 returning 55
+    when "WILLI" attempts "read" on "something"
     then expect decision matching permit, obligation "A"
     then expect decision matching permit, obligation "A"
     then expect decision matching permit, obligation "B"
@@ -196,7 +196,7 @@ policyWithComplexPIP tests {
     attribute pip.attributeWithParams with parent value true and parameters 2,2 returns true and
     attribute pip.attributeWithParams with parent value true and parameters 2,1 returns false and
     attribute pip.attributeWithParams with parent value true and parameters 1,2 returns false
-    when WILLI attempts read on something
+    when "WILLI" attempts "read" on "something"
     then let pip.attribute1 return 1
     then let pip.attribute2 return 2
     then expect notApplicable once
@@ -206,25 +206,18 @@ policyWithComplexPIP tests {
 	then expect notApplicable once;
 }
 
-
 policyWithObligationAndResource tests {
 	scenario "test_equals"
 	given functionLibrary FilterFunctionLibrary
     when
-    key "name" value "Willi",
-    key "authority" value "ROLE_ADMIN"
+    {"name": "Willi", "authority": "ROLE_ADMIN"}
     attempts
-    key "name" value "findById"
+    {"java": {"name": "findById"}}
     on
-    key "id" value "56",
-    key "diagnosisText" value "█████████████",
-    key "icd11Code" value "ic███████"
+    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"}
     then expect single permit
     with obligation
-    key "type" value "logAccess",
-    key "message" value "Willi has accessed patient data (id=56) as an administrator."
+    {"type": "logAccess", "message": "Willi has accessed patient data (id=56) as an administrator."}
     with resource
-    key "id" value "56",
-    key "diagnosisText" value "█████████████",
-    key "icd11Code" value "ic███████";
+    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"};
 }

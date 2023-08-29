@@ -41,7 +41,7 @@ class I_PolicyWithComplexPIPTest {
 	@Test
 	void test_policyWithSimpleMockedPIP() {
 
-		fixture.constructTestCaseWithMocks().givenAttribute("pip.attribute1").givenAttribute(" ")
+		fixture.constructTestCaseWithMocks().givenAttribute("pip.attribute1").givenAttribute("pip.attribute2")
 				.givenAttribute("pip.attributeWithParams",
 						whenAttributeParams(parentValue(val(true)), arguments(val(2), val(2))),
 						thenReturn(Val.of(true)))
