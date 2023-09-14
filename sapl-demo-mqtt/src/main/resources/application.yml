@@ -53,7 +53,7 @@ spring:
   main.banner-mode: off
 # Set the log level to DEBUG or TRACE to get detailed information about the
 # policy engine decision process.
-logging.level:
-  io.sapl: DEBUG
+#logging.level:
+#  io.sapl: DEBUG
 #logging.level.org.springframework.security.access.vote=TRACE
-  org.springframework.security: WARN
+#  org.springframework.security: WARN
