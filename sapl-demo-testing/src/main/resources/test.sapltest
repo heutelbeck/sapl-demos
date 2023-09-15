@@ -216,8 +216,12 @@ policyWithObligationAndResource tests {
     on
     resource {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"}
     then expect single permit
-    with obligation
-    {"type": "logAccess", "message": "Willi has accessed patient data (id=56) as an administrator."}
+    with obligations
+    {"type": "logAccess", "message": "Willi has accessed patient data (id=56) as an administrator."},
+    {"type": "test", "message": "Willi has accessed test as an administrator."}
     with resource
-    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"};
+    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"}
+    with advice
+    "logging:inform_admin",
+    "inform_admin2";
 }
