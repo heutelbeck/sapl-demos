@@ -1,5 +1,6 @@
 policySimple tests {
 	scenario "test_simplePolicy"
+	with environment { "key": "value", "key": "value"}
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
@@ -224,4 +225,37 @@ policyWithObligationAndResource tests {
     with advice
     "logging:inform_admin",
     "inform_admin2";
+}
+
+policiesIT integration tests {
+	scenario "test_simpleIT_verifyCombined"
+    when subject "WILLI" attempts action "read" on resource "foo"
+    then expect single permit;
+
+    scenario "test"
+    given functionLibrary TemporalFunctionLibrary
+    and
+    virtualTime
+    and
+    attribute time.now returns
+    "2021-02-08T16:16:01.000Z",
+    "2021-02-08T16:16:02.000Z",
+    "2021-02-08T16:16:03.000Z",
+    "2021-02-08T16:16:04.000Z",
+    "2021-02-08T16:16:05.000Z",
+    "2021-02-08T16:16:06.000Z"
+    for 1s
+    when subject "WILLI" attempts action "read" on resource "bar"
+    then wait 10s
+    then expect deny once
+    then expect permit once
+    then no event for 2s;
+
+    scenario "test_mockedFunctionAndAttribute_ArrayOfReturnValues"
+    given attribute time.now returns "value", "doesn't", "matter"
+    and
+    function time.secondOf returns 3, 4 once
+    when subject "WILLI" attempts action "read" on resource "bar"
+    then expect deny once
+    then expect permit once;
 }
