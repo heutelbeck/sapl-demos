@@ -10,13 +10,6 @@ obligation
         "type" : "logAccess",
 		"message" : subject.name + " has accessed patient data (id="+resource.id+") as an administrator."
     }
-obligation
-    {
-        "type" : "test",
-		"message" : subject.name + " has accessed test as an administrator."
-    }
-    advice "logging:inform_admin"
-    advice "inform_admin2"
 transform 
 	// filtering with text blackening
 	resource |- {

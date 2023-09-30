@@ -218,16 +218,14 @@ policyWithObligationAndResource tests {
     resource {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"}
     then expect single permit
     with obligations
-    {"type": "logAccess", "message": "Willi has accessed patient data (id=56) as an administrator."},
-    {"type": "test", "message": "Willi has accessed test as an administrator."}
+    {"type": "logAccess", "message": "Willi has accessed patient data (id=56) as an administrator."}
     with resource
-    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"}
-    with advice
-    "logging:inform_admin",
-    "inform_admin2";
+    {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"};
 }
 
-policiesIT integration tests {
+using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C" integration tests
+    using combiningAlgorithm deny-unless-permit
+    {
 	scenario "test_simpleIT_verifyCombined"
     when subject "WILLI" attempts action "read" on resource "foo"
     then expect single permit;
