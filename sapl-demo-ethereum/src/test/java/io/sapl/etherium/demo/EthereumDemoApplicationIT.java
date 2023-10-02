@@ -85,7 +85,7 @@ class EthereumDemoApplicationIT {
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		ethConnect.makePayment(user, "1");
 		var subscription = buildSubscription(user, "access", "paidTemplate");
-		var decision = pdp.decide(subscription);
+		pdp.decide(subscription);
 	}
 
 	private AuthorizationSubscription buildSubscription(Object user, String action, String resource) {

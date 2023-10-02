@@ -139,7 +139,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 		runPerformanceDemoSingleSequentialReactive(pdp);
 
 		LOGGER.info("End of demo.");
-		pdp.dispose();
+		pdp.destroy();
 		return 0;
 	}
 
