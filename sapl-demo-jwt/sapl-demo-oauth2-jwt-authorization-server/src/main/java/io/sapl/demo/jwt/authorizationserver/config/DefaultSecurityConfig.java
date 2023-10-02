@@ -27,6 +27,8 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
@@ -35,9 +37,10 @@ public class DefaultSecurityConfig {
 
 	// @formatter:off
 	@Bean
-	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+		MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
 		http.authorizeHttpRequests (requests -> 
-				requests.requestMatchers("/public-key/**").permitAll()
+				requests.requestMatchers(mvcMatcherBuilder.pattern("/public-key/**")).permitAll()
 				        .anyRequest().authenticated()
 		    )
 		    .formLogin(withDefaults());

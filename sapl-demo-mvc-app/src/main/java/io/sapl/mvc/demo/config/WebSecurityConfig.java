@@ -25,6 +25,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import io.sapl.mvc.demo.domain.DemoData;
 import io.sapl.spring.config.EnableSaplMethodSecurity;
@@ -35,10 +37,11 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 public class WebSecurityConfig {
 
 	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+		MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
 		// @formatter:off
 		http.authorizeHttpRequests(requests -> requests
-	            .requestMatchers("/css/**").permitAll()
+	            .requestMatchers(mvcMatcherBuilder.pattern("/css/**")).permitAll()
 	            .anyRequest().authenticated()
 	        )
 	        .formLogin(form -> form
