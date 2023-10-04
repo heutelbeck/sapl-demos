@@ -24,7 +24,7 @@ import io.sapl.vaadindemo.views.LoginView;
 @EnableWebSecurity
 @EnableSaplMethodSecurity
 public class SecurityConfiguration extends VaadinWebSecurity {
-
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -32,7 +32,6 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-
 		http.authorizeHttpRequests(
 				requests -> requests.requestMatchers(new AntPathRequestMatcher("/images/*.png")).permitAll());
 
