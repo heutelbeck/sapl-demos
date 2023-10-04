@@ -41,7 +41,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <vaadin.version>24.1.5</vaadin.version>
+        <vaadin.version>24.1.11</vaadin.version>
         <selenium.version>4.8.3</selenium.version>
     </properties>
 
