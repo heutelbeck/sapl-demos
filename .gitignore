@@ -238,3 +238,4 @@ node_modules/
 ### Vaadin generated JavaScript / TypeScript ###
 sapl-demo-vaadin/frontend/generated/
 sapl-demo-vaadin/src/main/dev-bundle/
+sapl-demo-embedded/dependency-reduced-pom.xml

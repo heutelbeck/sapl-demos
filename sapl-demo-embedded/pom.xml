@@ -15,7 +15,9 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>io.sapl</groupId>
@@ -38,10 +40,13 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
-			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
+			<!-- This is a 'Bill of Materials' dependency. It does not directly
+			introduce 
 				additional dependencies. This is a utility dependency, making it easier to 
-				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
-				section of the POM all SAPL dependencies can be used without explicitly declaring 
+				use SAPL dependencies. Once this BOM has been imported in the
+			<dependencyManagement> 
+				section of the POM all SAPL dependencies can be used without explicitly
+			declaring 
 				a version. This ensures that when multiple SAPL dependencies are used, the 
 				versions of them are consistent. -->
 			<dependency>
@@ -60,7 +65,6 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp-embedded</artifactId>
 		</dependency>
-
 		<!-- A logging library for printing messages to the console -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -87,7 +91,8 @@
 
 	<build>
 		<plugins>
-			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which 
+			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file
+			which 
 				contains the code from this module and in addition, all dependencies are 
 				packed into the JAR as well. This results in a self-contained executable 
 				Java application directly runnable via 'java -jar'. -->
@@ -100,20 +105,23 @@
 							<mainClass>io.sapl.embedded.demo.EmbeddedPDPDemo</mainClass>
 						</manifest>
 					</archive>
-					<descriptorRefs>
-						<descriptorRef>jar-with-dependencies</descriptorRef>
-					</descriptorRefs>
+					<descriptors>
+						<!-- See: https://stackoverflow.com/questions/65172081/maven-xtext-the-string-resource-ui-diagnosticroot-diagnostic-could-not-be-l -->
+						<!-- See: https://stackoverflow.com/questions/8085996/maven-overwrite-resource-file-in-dependency/24578209#24578209 -->
+						<descriptor>src/main/assembly/fatjar.xml</descriptor>
+					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
+						<id>create-archive</id>
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
+
 		</plugins>
 	</build>
 
