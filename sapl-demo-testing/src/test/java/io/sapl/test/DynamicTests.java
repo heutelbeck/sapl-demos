@@ -1,6 +1,6 @@
 package io.sapl.test;
 
-import io.sapl.test.setup.TestBuilder;
+import io.sapl.test.dsl.setup.TestBuilder;
 import java.util.Collection;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
