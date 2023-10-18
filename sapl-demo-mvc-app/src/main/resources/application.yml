@@ -55,5 +55,4 @@ spring:
 # policy engine decision process.
 logging.level:
   io.sapl: INFO
-#logging.level.org.springframework.security.access.vote=TRACE
-  org.springframework.security: WARN
+  org.springframework: WARN
