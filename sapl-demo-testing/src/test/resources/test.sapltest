@@ -7,7 +7,7 @@ policySimple tests {
 
 policyWithSimpleFunction tests {
 	scenario "test_policyWithSimpleFunction"
-    given functionLibrary TemporalFunctionLibrary
+    register library TemporalFunctionLibrary
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
@@ -25,12 +25,12 @@ policyWithSimpleFunction tests {
 policyWithSimplePIP tests {
 	scenario "test_policyWithSimpleMockedPIP"
     given attribute test.upper returns "WILLI"
-   when subject "willi" attempts action "read" on resource "something"
+    when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
 	scenario "test_policyWithSimplePIP"
-    given PIP abc
-   when subject "willi" attempts action "read" on resource "something"
+    register PIP "io.sapl.test.TestPIP"
+    when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
     scenario "test_policyWithSimplePIP_mockedWhenParameters"
@@ -49,6 +49,7 @@ policyWithMultipleFunctionsOrPIPs tests {
 
 policyStreaming tests {
 	scenario "test_streamingPolicy"
+    register library TemporalFunctionLibrary
     given attribute time.now returns
     "2021-02-08T16:16:01.000Z",
     "2021-02-08T16:16:02.000Z",
@@ -56,12 +57,12 @@ policyStreaming tests {
     "2021-02-08T16:16:04.000Z",
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
-    and functionLibrary TemporalFunctionLibrary
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect notApplicable 4 times
     then expect permit 2 times;
 
 	scenario "test_streamingPolicy_TimingAttributeMock"
+    register library TemporalFunctionLibrary
     given virtualTime and
     attribute time.now returns
     "2021-02-08T16:16:01.000Z",
@@ -71,7 +72,6 @@ policyStreaming tests {
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     for 1s
-    and functionLibrary TemporalFunctionLibrary
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then wait 1s
     then expect notApplicable once
@@ -88,6 +88,7 @@ policyStreaming tests {
     then wait 1s;
 
 	scenario "test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime"
+    register library TemporalFunctionLibrary
     given
     attribute time.now returns
     "2021-02-08T16:16:01.000Z",
@@ -97,44 +98,40 @@ policyStreaming tests {
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     for 10s
-    and functionLibrary TemporalFunctionLibrary
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect exception;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls"
+    register library TemporalFunctionLibrary
     given virtualTime and
     attribute time.now returns
     "2021-02-08T16:16:01.000Z",
     "2021-02-08T16:16:02.000Z"
-    and
-    function time.secondOf returns 4 once and
-    function time.secondOf returns 5 once and
-    functionLibrary TemporalFunctionLibrary
+    and function time.secondOf returns 4 once
+    and function time.secondOf returns 5 once
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect notApplicable once
     then expect permit once;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues"
+    register library TemporalFunctionLibrary
     given attribute time.now returns
     "value",
     "doesn't",
     "matter"
     and
-    function time.secondOf returns 3,4,5 once and
-    functionLibrary TemporalFunctionLibrary
+    function time.secondOf returns 3,4,5 once
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect notApplicable 2 times
     then expect permit once;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
+    register library TemporalFunctionLibrary
     given attribute time.now returns
     "value",
     "doesn't",
     "matter"
-    and
-    function time.secondOf returning 5 and is invoked 3 times
-    and
-    functionLibrary TemporalFunctionLibrary
+    and function time.secondOf returning 5 and is invoked 3 times
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect permit 3 times;
 }
@@ -209,7 +206,7 @@ policyWithComplexPIP tests {
 
 policyWithObligationAndResource tests {
 	scenario "test_equals"
-	given functionLibrary FilterFunctionLibrary
+	register library FilterFunctionLibrary
     when
     subject {"name": "Willi", "authority": "ROLE_ADMIN"}
     attempts
@@ -231,9 +228,8 @@ using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C"
     then expect single permit;
 
     scenario "test"
-    given functionLibrary TemporalFunctionLibrary
-    and
-    virtualTime
+    register library TemporalFunctionLibrary
+    given virtualTime
     and
     attribute time.now returns
     "2021-02-08T16:16:01.000Z",

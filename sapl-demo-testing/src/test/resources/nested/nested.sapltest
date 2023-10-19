@@ -1,0 +1,6 @@
+policySimple tests {
+	scenario "nested"
+	with environment { "key": "value", "key": "value"}
+    when subject "willi" attempts action "read" on resource "something"
+    then expect single permit;
+}
