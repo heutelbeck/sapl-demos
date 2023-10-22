@@ -71,21 +71,21 @@ policyStreaming tests {
     "2021-02-08T16:16:04.000Z",
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
-    for 1s
+    for "PT1S"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then wait 1s
+    then wait "PT1S"
     then expect notApplicable once
-    then wait 1s
+    then wait "PT1S"
     then expect notApplicable once
-    then wait 1s
+    then wait "PT1S"
     then expect notApplicable once
-    then wait 1s
+    then wait "PT1S"
     then expect notApplicable once
-    then wait 1s
+    then wait "PT1S"
     then expect permit once
-    then wait 1s
+    then wait "PT1S"
     then expect permit once
-    then wait 1s;
+    then wait "PT1S";
 
 	scenario "test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime"
     register library TemporalFunctionLibrary
@@ -97,7 +97,7 @@ policyStreaming tests {
     "2021-02-08T16:16:04.000Z",
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
-    for 10s
+    for "PT10S"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect exception;
 
@@ -238,12 +238,12 @@ using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C"
     "2021-02-08T16:16:04.000Z",
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
-    for 1s
+    for "PT1S"
     when subject "WILLI" attempts action "read" on resource "bar"
-    then wait 10s
+    then wait "PT10S"
     then expect deny once
     then expect permit once
-    then no event for 2s;
+    then no event for "PT2S";
 
     scenario "test_mockedFunctionAndAttribute_ArrayOfReturnValues"
     given attribute time.now returns "value", "doesn't", "matter"
