@@ -49,12 +49,13 @@
 
 	<build>
 		<!-- If the <directory> is changed via the following property, 
-			you have to configure the sapl-test module via a system property "io.sapl.test.outputDir" too. 
-			See below maven-surefire-plugin for example configuration. And configure the outputDir parameter in the configuration of the sapl-maven-plugin -->
-    	<!-- <directory>test/</directory> -->
+			you have to configure the sapl-test module via a system property
+		"io.sapl.test.outputDir" too. 
+			See below maven-surefire-plugin for example configuration. And configure the
+		outputDir parameter in the configuration of the sapl-maven-plugin -->
+		<!-- <directory>test/</directory> -->
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<!--
 				<configuration>
@@ -63,6 +64,11 @@
 					</systemPropertyVariables>
 				</configuration>
 				-->
+				<executions>
+					<execution>
+						<phase>test</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>${project.groupId}</groupId>
@@ -75,6 +81,7 @@
 					<!--<policySetHitRatio>100</policySetHitRatio> -->
 					<policyHitRatio>100</policyHitRatio>
 					<policyConditionHitRatio>50</policyConditionHitRatio>
+					<failOnDisabledTests>false</failOnDisabledTests>
 				</configuration>
 				<executions>
 					<execution>
@@ -83,7 +90,7 @@
 							<goal>enable-coverage-collection</goal>
 							<goal>report-coverage-information</goal>
 						</goals>
-					</execution>					
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
