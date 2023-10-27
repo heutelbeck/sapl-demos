@@ -57,7 +57,8 @@ jobs:
         cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
 
     - name: Run tests
-      run: mvn -B package
+      # make sure to activate Vaadin priduction to catch potential errors during vite JS processing
+      run: mvn -B package -Pproduction
 
     - name: Clean up local repository before caching (Linux/Mac)
       if: ${{ matrix.os != 'windows-latest'}}
