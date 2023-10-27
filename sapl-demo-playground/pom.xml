@@ -34,7 +34,7 @@
 		<!-- SAPL -->
    		<dependency>
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-editor-vaadin</artifactId>
+			<artifactId>sapl-vaadin-editor</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
