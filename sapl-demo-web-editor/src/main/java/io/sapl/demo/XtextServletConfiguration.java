@@ -51,6 +51,15 @@ public class XtextServletConfiguration {
     }
 
     @Bean
+    ServletRegistrationBean<SAPLTestServlet> xTextTestRegistrationBean() {
+        ServletRegistrationBean<SAPLTestServlet> registration = new ServletRegistrationBean<>(new SAPLTestServlet(),
+                "/sapl-test/xtext-service/*");
+        registration.setName("SaplTestXtextServices");
+        registration.setAsyncSupported(true);
+        return registration;
+    }
+
+    @Bean
     FilterRegistrationBean<OrderedFormContentFilter> registration1(OrderedFormContentFilter filter) {
         FilterRegistrationBean<OrderedFormContentFilter> registration = new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
