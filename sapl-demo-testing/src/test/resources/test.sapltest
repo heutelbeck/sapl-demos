@@ -58,8 +58,8 @@ policyStreaming tests {
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect notApplicable 4 times
-    then expect permit 2 times;
+    then expect notApplicable 4x
+    then expect permit 2x;
 
 	scenario "test_streamingPolicy_TimingAttributeMock"
     register library TemporalFunctionLibrary
@@ -122,7 +122,7 @@ policyStreaming tests {
     and
     function time.secondOf returns 3,4,5 once
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect notApplicable 2 times
+    then expect notApplicable 2x
     then expect permit once;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
@@ -131,9 +131,9 @@ policyStreaming tests {
     "value",
     "doesn't",
     "matter"
-    and function time.secondOf returning 5 and is invoked 3 times
+    and function time.secondOf returning 5 and is invoked 3x
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect permit 3 times;
+    then expect permit 3x;
 }
 
 policyWithComplexFunction tests {
