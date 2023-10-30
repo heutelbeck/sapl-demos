@@ -1,56 +1,65 @@
-policySimple tests {
+"policySimple" tests {
 	scenario "test_simplePolicy"
 	with environment { "key": "value", "key": "value"}
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
 
-policyWithSimpleFunction tests {
+"policyWithSimpleFunction" tests {
 	scenario "test_policyWithSimpleFunction"
-    register library TemporalFunctionLibrary
+    register
+    	- library TemporalFunctionLibrary
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
 	scenario "test_policyWithSimpleMockedFunction"
-    given function time.dayOfWeek returning "SATURDAY"
+    given
+    	- function "time.dayOfWeek" returning "SATURDAY"
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
 	scenario "test_policyWithSimpleMockedFunction_VerifyTimesCalled"
-    given function time.dayOfWeek returning "SATURDAY" and is invoked once
+    given
+    	- function "time.dayOfWeek" returning "SATURDAY" and is invoked once
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
 
-policyWithSimplePIP tests {
+"policyWithSimplePIP" tests {
 	scenario "test_policyWithSimpleMockedPIP"
-    given attribute test.upper returns "WILLI"
+    given
+    	- attribute "test.upper" returns "WILLI"
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
 	scenario "test_policyWithSimplePIP"
-    register PIP "io.sapl.test.TestPIP"
+    register
+    	- PIP "io.sapl.test.TestPIP"
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 
     scenario "test_policyWithSimplePIP_mockedWhenParameters"
-    given attribute test.upper with parent value "willi" returns "WILLI"
+    given
+    	- attribute "test.upper" with parent value "willi" returns "WILLI"
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
 
-policyWithMultipleFunctionsOrPIPs tests {
+"policyWithMultipleFunctionsOrPIPs" tests {
 	scenario "test_policyWithMultipleMocks"
-    given attribute test.upper returns "WILLI" and
-    function time.dayOfWeekFrom returning "SATURDAY"
+    given
+    	- attribute "test.upper" returns "WILLI"
+    	- function "time.dayOfWeekFrom" returning "SATURDAY"
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
 
-policyStreaming tests {
+"policyStreaming" tests {
 	scenario "test_streamingPolicy"
-    register library TemporalFunctionLibrary
-    given attribute time.now returns
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- attribute "time.now" returns
     "2021-02-08T16:16:01.000Z",
     "2021-02-08T16:16:02.000Z",
     "2021-02-08T16:16:03.000Z",
@@ -58,13 +67,16 @@ policyStreaming tests {
     "2021-02-08T16:16:05.000Z",
     "2021-02-08T16:16:06.000Z"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect notApplicable 4x
-    then expect permit 2x;
+    then
+    	- expect notApplicable 4x
+        - expect permit 2x;
 
 	scenario "test_streamingPolicy_TimingAttributeMock"
-    register library TemporalFunctionLibrary
-    given virtualTime and
-    attribute time.now returns
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- virtual-time
+        - attribute "time.now" returns
     "2021-02-08T16:16:01.000Z",
     "2021-02-08T16:16:02.000Z",
     "2021-02-08T16:16:03.000Z",
@@ -73,140 +85,156 @@ policyStreaming tests {
     "2021-02-08T16:16:06.000Z"
     for "PT1S"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then wait "PT1S"
-    then expect notApplicable once
-    then wait "PT1S"
-    then expect notApplicable once
-    then wait "PT1S"
-    then expect notApplicable once
-    then wait "PT1S"
-    then expect notApplicable once
-    then wait "PT1S"
-    then expect permit once
-    then wait "PT1S"
-    then expect permit once
-    then wait "PT1S";
+    then
+    	- wait for "PT1S"
+        - expect notApplicable once
+     	- wait for "PT1S"
+    	- expect notApplicable once
+        - wait for "PT1S"
+    	- expect notApplicable once
+      	- wait for "PT1S"
+        - expect notApplicable once
+        - wait for "PT1S"
+      	- expect permit once
+      	- wait for "PT1S"
+     	- expect permit once
+        - wait for "PT1S";
 
 	scenario "test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime"
-    register library TemporalFunctionLibrary
+    register
+    	- library TemporalFunctionLibrary
     given
-    attribute time.now returns
-    "2021-02-08T16:16:01.000Z",
-    "2021-02-08T16:16:02.000Z",
-    "2021-02-08T16:16:03.000Z",
-    "2021-02-08T16:16:04.000Z",
-    "2021-02-08T16:16:05.000Z",
-    "2021-02-08T16:16:06.000Z"
-    for "PT10S"
+    	- attribute "time.now" returns
+          "2021-02-08T16:16:01.000Z",
+          "2021-02-08T16:16:02.000Z",
+          "2021-02-08T16:16:03.000Z",
+          "2021-02-08T16:16:04.000Z",
+          "2021-02-08T16:16:05.000Z",
+          "2021-02-08T16:16:06.000Z"
+          for "PT10S"
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then expect exception;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls"
-    register library TemporalFunctionLibrary
-    given virtualTime and
-    attribute time.now returns
-    "2021-02-08T16:16:01.000Z",
-    "2021-02-08T16:16:02.000Z"
-    and function time.secondOf returns 4 once
-    and function time.secondOf returns 5 once
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- virtual-time
+    	- attribute "time.now" returns "2021-02-08T16:16:01.000Z", "2021-02-08T16:16:02.000Z"
+  		- function "time.secondOf" returns 4 once
+        - function "time.secondOf" returns 5 once
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect notApplicable once
-    then expect permit once;
+    then
+    	- expect notApplicable once
+        - expect permit once;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues"
-    register library TemporalFunctionLibrary
-    given attribute time.now returns
-    "value",
-    "doesn't",
-    "matter"
-    and
-    function time.secondOf returns 3,4,5 once
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- attribute "time.now" returns
+          "value",
+          "doesn't",
+          "matter"
+    	- function "time.secondOf" returns 3, 4, 5 once
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect notApplicable 2x
-    then expect permit once;
+    then
+    	- expect notApplicable 2x
+        - expect permit once;
 
 	scenario "test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled"
-    register library TemporalFunctionLibrary
-    given attribute time.now returns
-    "value",
-    "doesn't",
-    "matter"
-    and function time.secondOf returning 5 and is invoked 3x
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- attribute "time.now" returns
+          "value",
+          "doesn't",
+          "matter"
+    	- function "time.secondOf" returning 5 and is invoked 3x
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
-    then expect permit 3x;
+    then
+    	- expect permit 3x;
 }
 
-policyWithComplexFunction tests {
+"policyWithComplexFunction" tests {
 	scenario "test_streamingPolicyWithMockedFunction_ReturnValueDependingOnSimpleParameters_AndDynamicMockedAttribute"
-    given attribute company.pip1 and
-    attribute company.pip2 and
-    function company.complexFunction called with 1, "foo" returning true and
-    function company.complexFunction called with 2, any returning true and
-    function company.complexFunction called with any, any returning false
+    given
+    	- attribute "company.pip1"
+    	- attribute "company.pip2"
+    	- function "company.complexFunction" called with 1, "foo" returning true
+    	- function "company.complexFunction" called with 2, any returning true
+    	- function "company.complexFunction" called with any, any returning false
     when subject "User1" attempts action "read" on resource "heartBeatData"
-    then let company.pip1 return 1
-    then let company.pip2 return "foo"
-    then expect permit once
-    then let company.pip2 return "bar"
-    then expect notApplicable once
-    then let company.pip1 return 2
-    then expect permit once
-    then let company.pip2 return "xxx"
-    then expect permit once
-    then let company.pip1 return 3
-    then expect notApplicable once;
+    then
+    	- let "company.pip1" return 1
+      	- let "company.pip2" return "foo"
+     	- expect permit once
+      	- let "company.pip2" return "bar"
+      	- expect notApplicable once
+      	- let "company.pip1" return 2
+    	- expect permit once
+      	- let "company.pip2" return "xxx"
+      	- expect permit once
+    	- let "company.pip1" return 3
+      	- expect notApplicable once;
 }
 
-policyDocumentWithMultipleCallsToSameAttribute tests {
+"policyDocumentWithMultipleCallsToSameAttribute" tests {
 	scenario "test_withFunctionSequenceMock"
-    given attribute time.now returns 1,2,3,4,5,6 and
-    function time.secondOf returns 1,15,25,25,35,35,45,45,45,55,55,55 once
+    given
+    	- attribute "time.now" returns 1, 2, 3, 4, 5, 6
+    	- function "time.secondOf" returns 1, 15, 25, 25, 35, 35, 45, 45, 45, 55, 55, 55 once
     when subject "WILLI" attempts action "read" on resource "something"
-    then expect decision is permit, with obligation equals "A"
-    then expect decision is permit, with obligation equals "A"
-    then expect decision is permit, with obligation equals "B"
-    then expect decision is permit, with obligation equals "B"
-    then expect decision is permit, with obligation equals "C"
-    then expect decision is permit, with obligation equals "C";
+    then
+    	- expect decision is permit, with obligation equals "A"
+    	- expect decision is permit, with obligation equals "A"
+      	- expect decision is permit, with obligation equals "B"
+      	- expect decision is permit, with obligation equals "B"
+      	- expect decision is permit, with obligation equals "C"
+    	- expect decision is permit, with obligation equals "C";
 
 	scenario "test_withFunctionForParametersMock"
-    given attribute time.now returns 1,2,3,4,5,6 and
-    function time.secondOf called with 1 returning 1 and
-    function time.secondOf called with 2 returning 15 and
-    function time.secondOf called with 3 returning 25 and
-    function time.secondOf called with 4 returning 35 and
-    function time.secondOf called with 5 returning 45 and
-    function time.secondOf called with 6 returning 55
+    given
+    	- attribute "time.now" returns 1, 2, 3, 4, 5, 6
+    	- function "time.secondOf" called with 1 returning 1
+    	- function "time.secondOf" called with 2 returning 15
+    	- function "time.secondOf" called with 3 returning 25
+    	- function "time.secondOf" called with 4 returning 35
+    	- function "time.secondOf" called with 5 returning 45
+    	- function "time.secondOf" called with 6 returning 55
     when subject "WILLI" attempts action "read" on resource "something"
-    then expect decision is permit, with obligation equals "A"
-    then expect decision is permit, with obligation equals "A"
-    then expect decision is permit, with obligation equals "B"
-    then expect decision is permit, with obligation equals "B"
-    then expect decision is permit, with obligation equals "C"
-    then expect decision is permit, with obligation equals "C";
+    then
+    	- expect decision is permit, with obligation equals "A"
+    	- expect decision is permit, with obligation equals "A"
+    	- expect decision is permit, with obligation equals "B"
+    	- expect decision is permit, with obligation equals "B"
+    	- expect decision is permit, with obligation equals "C"
+      	- expect decision is permit, with obligation equals "C";
 }
 
-policyWithComplexPIP tests {
+"policyWithComplexPIP" tests {
 	scenario "test_policyWithSimpleMockedPIP"
     given
-    attribute pip.attribute1 and
-    attribute pip.attribute2 and
-    attribute pip.attributeWithParams with parent value true and parameters 2,2 returns true and
-    attribute pip.attributeWithParams with parent value true and parameters 2,1 returns false and
-    attribute pip.attributeWithParams with parent value true and parameters 1,2 returns false
+    	- attribute "pip.attribute1"
+    	- attribute "pip.attribute2"
+    	- attribute "pip.attributeWithParams" with parent value true and parameters 2, 2 returns true
+    	- attribute "pip.attributeWithParams" with parent value true and parameters 2, 1 returns false
+    	- attribute "pip.attributeWithParams" with parent value true and parameters 1, 2 returns false
     when subject "WILLI" attempts action "read" on resource "something"
-    then let pip.attribute1 return 1
-    then let pip.attribute2 return 2
-    then expect notApplicable once
-    then let pip.attribute1 return 2
-    then expect permit once
-    then let pip.attribute2 return 1
-	then expect notApplicable once;
+    then
+    	- let "pip.attribute1" return 1
+    	- let "pip.attribute2" return 2
+    	- expect notApplicable once
+    	- let "pip.attribute1" return 2
+    	- expect permit once
+    	- let "pip.attribute2" return 1
+		- expect notApplicable once;
 }
 
-policyWithObligationAndResource tests {
+"policyWithObligationAndResource" tests {
 	scenario "test_equals"
-	register library FilterFunctionLibrary
+	register
+    	 - library FilterFunctionLibrary
     when
     subject {"name": "Willi", "authority": "ROLE_ADMIN"}
     attempts
@@ -221,35 +249,38 @@ policyWithObligationAndResource tests {
 }
 
 using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C" integration tests
-    using combiningAlgorithm deny-unless-permit
+    using combining-algorithm deny-unless-permit
     {
 	scenario "test_simpleIT_verifyCombined"
     when subject "WILLI" attempts action "read" on resource "foo"
     then expect single permit;
 
     scenario "test"
-    register library TemporalFunctionLibrary
-    given virtualTime
-    and
-    attribute time.now returns
-    "2021-02-08T16:16:01.000Z",
-    "2021-02-08T16:16:02.000Z",
-    "2021-02-08T16:16:03.000Z",
-    "2021-02-08T16:16:04.000Z",
-    "2021-02-08T16:16:05.000Z",
-    "2021-02-08T16:16:06.000Z"
+    register
+    	- library TemporalFunctionLibrary
+    given
+    	- virtual-time
+    	- attribute "time.now" returns
+          "2021-02-08T16:16:01.000Z",
+          "2021-02-08T16:16:02.000Z",
+          "2021-02-08T16:16:03.000Z",
+          "2021-02-08T16:16:04.000Z",
+          "2021-02-08T16:16:05.000Z",
+          "2021-02-08T16:16:06.000Z"
     for "PT1S"
     when subject "WILLI" attempts action "read" on resource "bar"
-    then wait "PT10S"
-    then expect deny once
-    then expect permit once
-    then no event for "PT2S";
+    then
+    	- wait for "PT10S"
+        - expect deny once
+     	- expect permit once
+    	- expect no-event for "PT2S";
 
     scenario "test_mockedFunctionAndAttribute_ArrayOfReturnValues"
-    given attribute time.now returns "value", "doesn't", "matter"
-    and
-    function time.secondOf returns 3, 4 once
+    given
+    	- attribute "time.now" returns "value", "doesn't", "matter"
+    	- function "time.secondOf" returns 3, 4 once
     when subject "WILLI" attempts action "read" on resource "bar"
-    then expect deny once
-    then expect permit once;
+    then
+    	- expect deny once
+      	- expect permit once;
 }
