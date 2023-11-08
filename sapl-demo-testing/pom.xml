@@ -34,7 +34,7 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-test</artifactId>
 			<version>3.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
@@ -58,13 +58,6 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<!--
-				<configuration>
-					<systemPropertyVariables>
-						<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir> 
-					</systemPropertyVariables>
-				</configuration>
-				-->
 				<executions>
 					<execution>
 						<phase>test</phase>
@@ -72,6 +65,14 @@
 				</executions>
 				<configuration>
 					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<dependenciesToScan>
+						<dependency>io.sapl:sapl-test</dependency>
+					</dependenciesToScan>
+					<!--
+					<systemPropertyVariables>
+        				<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir>
+    				</systemPropertyVariables>
+					-->
 				</configuration>
 			</plugin>
 			<plugin>
