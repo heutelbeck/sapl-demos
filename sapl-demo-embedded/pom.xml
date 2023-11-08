@@ -65,6 +65,7 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp-embedded</artifactId>
 		</dependency>
+		
 		<!-- A logging library for printing messages to the console -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -76,14 +77,14 @@
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.7.4</version>
+			<version>4.7.5</version>
 		</dependency>
 
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.9.2</version>
+			<version>5.10.0</version>
 			<scope>test</scope>
 		</dependency>
 
