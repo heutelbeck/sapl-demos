@@ -107,8 +107,8 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
              * The PDP will monitor the path at runtime for any changes made to the policies
              * an update any subscribed PEPs accordingly.
              */
-            pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, () -> List.of(),
-                    () -> List.of(EchoPIP.class), () -> List.of(), () -> List.of(SimpleFunctionLibrary.class));
+            pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List::of, () -> List.of(EchoPIP.class),
+                    List::of, () -> List.of(SimpleFunctionLibrary.class));
         } else {
             /*
              * The factory method PolicyDecisionPointFactory.resourcesPolicyDecisionPoint
@@ -124,8 +124,8 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
              * The PDP will monitor the path at runtime for any changes made to the policies
              * an update any subscribed PEPs accordingly.
              */
-            pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(() -> List.of(), () -> List.of(EchoPIP.class),
-                    () -> List.of(), () -> List.of(SimpleFunctionLibrary.class));
+            pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class),
+                    List::of, () -> List.of(SimpleFunctionLibrary.class));
         }
 
         blockingUsageDemo(pdp);
