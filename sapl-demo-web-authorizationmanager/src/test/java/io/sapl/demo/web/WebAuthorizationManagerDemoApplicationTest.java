@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.webflux;
+package io.sapl.demo.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,11 +22,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootTest
-class DemoApplicationTest {
+class WebAuthorizationManagerDemoApplicationTest {
 
 	@Test
 	void contextLoads(ApplicationContext context) {
-	    assertThat(context).isNotNull();
+		assertThat(context).isNotNull();
 	}
 
 }

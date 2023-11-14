@@ -47,7 +47,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
@@ -103,7 +102,7 @@
          			</execution>
     			</executions>
 				<configuration>    
-                	<mainClass>io.sapl.demo.webflux.DemoApplication</mainClass>
+                	<mainClass>io.sapl.demo.webflux.WebfluxDemoApplication</mainClass>
 		            <layout>JAR</layout>
 					<excludes>
 						<exclude>

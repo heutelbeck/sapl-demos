@@ -81,7 +81,7 @@
          			</execution>
     			</executions>
 				<configuration>    
-                	<mainClass>io.sapl.demo.web.DemoApplication</mainClass>
+                	<mainClass>io.sapl.demo.web.WebAuthorizationManagerDemoApplication</mainClass>
 		            <layout>JAR</layout>
 					<excludes>
 						<exclude>

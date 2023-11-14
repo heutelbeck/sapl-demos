@@ -109,8 +109,6 @@
 		    <scope>test</scope>
 		</dependency>
 
-		
-
 		<!-- Devtools for convenience -->
 
 		<dependency>
@@ -133,7 +131,7 @@
          			</execution>
     			</executions>
 				<configuration>    
-                	<mainClass>io.sapl.mvc.demo.DemoApplication</mainClass>
+                	<mainClass>io.sapl.mvc.demo.MvcDemoApplication</mainClass>
 		            <layout>JAR</layout>
 					<excludes>
 						<exclude>

@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootTest
-class DemoApplicationTest {
+class WebfluxAuthorizationManagerDemoApplicationTest {
 
 	@Test
 	void contextLoads(ApplicationContext context) {

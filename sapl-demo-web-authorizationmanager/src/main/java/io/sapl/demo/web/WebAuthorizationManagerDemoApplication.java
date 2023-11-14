@@ -13,24 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.webflux;
+package io.sapl.demo.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/**
- * Demo application
- */
 @SpringBootApplication
-public class DemoApplication {
+public class WebAuthorizationManagerDemoApplication {
 
-	/**
-	 * Starts the application.
-	 * 
-	 * @param args command line parameters
-	 */
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(WebAuthorizationManagerDemoApplication.class, args);
 	}
 
 }

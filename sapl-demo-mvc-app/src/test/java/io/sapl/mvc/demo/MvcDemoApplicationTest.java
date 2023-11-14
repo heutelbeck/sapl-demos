@@ -49,8 +49,8 @@ import lombok.SneakyThrows;
 
 @DirtiesContext
 @AutoConfigureMockMvc
-@SpringBootTest(classes = DemoApplication.class)
-class DemoApplicationTest {
+@SpringBootTest(classes = MvcDemoApplication.class)
+class MvcDemoApplicationTest {
 
 	static record IntegerAndString(int integer, String string) {
 	}

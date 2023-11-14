@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.web;
+package io.sapl.mvc.demo;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
+@SpringBootApplication
+public class MvcDemoApplication {
 
-@SpringBootTest
-class DemoApplicationTest {
-
-	@Test
-	void contextLoads(ApplicationContext context) {
-		assertThat(context).isNotNull();
+	public static void main(String[] args) {
+		SpringApplication.run(MvcDemoApplication.class, args);
 	}
 
 }
