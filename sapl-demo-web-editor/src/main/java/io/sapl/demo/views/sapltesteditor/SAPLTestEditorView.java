@@ -18,9 +18,11 @@ import lombok.extern.slf4j.Slf4j;
 public class SAPLTestEditorView extends VerticalLayout {
 
 	private static final String DEFAULT_TEST = """
-			policySimple tests {
-				when willi attempts read on something
-				then expect single permit;
+			"policySimple" tests {
+				scenario "test_simplePolicy"
+				with environment { "key": "value", "key": "value"}
+			    when subject "willi" attempts action "read" on resource "something"
+			    then expect single permit;
 			}""";
 
 	private final Button     addDocumentChangedListenerButton;

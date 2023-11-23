@@ -248,9 +248,7 @@
     {"id": "56", "diagnosisText": "█████████████", "icd11Code": "ic███████"};
 }
 
-using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C" integration tests
-    using combining-algorithm deny-unless-permit
-    {
+test set of policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C" using combining-algorithm deny-unless-permit {
 	scenario "test_simpleIT_verifyCombined"
     when subject "WILLI" attempts action "read" on resource "foo"
     then expect single permit;
@@ -283,4 +281,10 @@ using policies "policiesIT/policy_A","policiesIT/policy_B","policiesIT/policy_C"
     then
     	- expect deny once
       	- expect permit once;
+}
+
+test set of policies with identifier "policiesIT" {
+    scenario "test_simpleIT_verifyCombined"
+    when subject "WILLI" attempts action "read" on resource "foo"
+    then expect single permit;
 }
