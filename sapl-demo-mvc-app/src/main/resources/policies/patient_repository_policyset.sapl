@@ -112,7 +112,7 @@ permit
        action.java.name == "deleteById"
 where
 	("ROLE_DOCTOR" in subject..authority);
-	subject.name == action.arguments[0].<patient.patientRecord>.attendingDoctor;
+	subject.name == action.java.arguments[0].<patient.patientRecord>.attendingDoctor;
 
 /*
  * Doctors may create new patients. 
@@ -148,7 +148,7 @@ permit
 	|	action.java.name == "updateAttendingDoctorById" 
 where
 	("ROLE_DOCTOR" in subject..authority);
-	subject.name == action.arguments[1].<patient.patientRecord>.attendingDoctor;
+	subject.name == action.java.arguments[1].<patient.patientRecord>.attendingDoctor;
 
 /*
  * All doctors may change diagnosis information or the attending doctor.
@@ -163,7 +163,7 @@ permit
 	|	action.java.name == "updateAttendingDoctorById" 
 where
 	("ROLE_DOCTOR" in subject..authority);
-	var patient = action.arguments[1].<patient.patientRecord>;
+	var patient = action.java.arguments[1].<patient.patientRecord>;
 obligation
 	{
 		"type"		: "sendEmail",
