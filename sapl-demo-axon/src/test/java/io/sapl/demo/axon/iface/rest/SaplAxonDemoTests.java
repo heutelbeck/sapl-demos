@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -57,6 +58,11 @@ class SaplAxonDemoTests {
 
 	private static final Duration DEFAULT_TIMEOUT = Duration.ofMillis(500);
 
+	@BeforeAll
+	static void beforeAll() {
+        System.setProperty("os.arch", "x86_64");
+	}
+	
 	@org.springframework.boot.test.context.TestConfiguration
 	public static class TestConfiguration {
 		@Bean

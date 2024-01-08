@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class SaplDemoAxonApplication {
 
 	public static void main(String[] args) {
+        System.setProperty("os.arch", "x86_64"); // fixes misdetection of 32/64 bit by flapdoodle
 		SpringApplication.run(SaplDemoAxonApplication.class, args);
 	}
 

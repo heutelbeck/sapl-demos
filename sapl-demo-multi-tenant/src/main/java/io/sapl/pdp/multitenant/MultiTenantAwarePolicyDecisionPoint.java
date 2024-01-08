@@ -21,7 +21,7 @@ public class MultiTenantAwarePolicyDecisionPoint implements PolicyDecisionPoint 
 
 	private final TenantIdExtractor tenantIdExtractor;
 
-	private final static PolicyDecisionPoint ALWAYS_INDETERMINATE_PDP_DELEGATE = new AlwaysIndeterminatePolicyDecisionPoint();
+	private static final PolicyDecisionPoint ALWAYS_INDETERMINATE_PDP_DELEGATE = new AlwaysIndeterminatePolicyDecisionPoint();
 
 	private Map<String, PolicyDecisionPoint> tenantToPdpDelegate = new HashMap<>();
 
