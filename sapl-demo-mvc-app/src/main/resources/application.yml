@@ -30,18 +30,6 @@ io.sapl.pdp:
 #                                  it is recommended to keep this turned off.
     pretty-print-reports: false
     
-
-# The following lines of configuration are for connecting the application to a remote PDP.
-# To do so, replace the dependency to sapl-spring-pdp-embedded with sapl-spring-pdp-remote
-# The following settings are select that it will connect to a sapl-server-lt you started locally with mvn spring-boot:run
-  remote:
-    host: https://localhost:8443
-    # These are the default credentials configured for the sapl-server-lt when running with the 'local' profile
-    key: YJidgyT2mfdkbmL
-    secret: Fa4zvYQdiwHZVXh
-    # Do not add this parameter in production! This is only for testing with self-signed localhost certificates during development
-    ignoreCertificates: true
-
 # The context path and port to use for this demo application
 # (http://localhost:8080)
 server:
@@ -54,5 +42,5 @@ spring:
 # Set the log level to DEBUG or TRACE to get detailed information about the
 # policy engine decision process.
 logging.level:
-  io.sapl: INFO
-  org.springframework: WARN
+  "[io.sapl]": INFO
+  "[org.springframework]": WARN

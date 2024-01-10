@@ -205,7 +205,6 @@ class MvcDemoApplicationTest {
 		final String url = "http://localhost:8080/patients/new";
 		setAuthentication(username);
 		HtmlPage page = mockClient.getPage(url);
-		System.out.println(page);
 
 		var header = page.<HtmlHeading3>getByXPath("//h3");
 		assertThat(header.size()).isEqualTo(1);

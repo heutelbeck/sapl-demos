@@ -28,18 +28,23 @@
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<version.lombok>1.18.30</version.lombok>
 		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker-registry-url>ghcr.io/heutelbeck</docker-registry-url>
+		<argLine />
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
-			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
+			<!-- This is a 'Bill of Materials' dependency. It does not directly
+			introduce 
 				additional dependencies. This is a utility dependency, making it easier to 
-				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
-				section of the POM all SAPL dependencies can be used without explicitly declaring 
+				use SAPL dependencies. Once this BOM has been imported in the
+			<dependencyManagement> 
+				section of the POM all SAPL dependencies can be used without explicitly
+			declaring 
 				a version. This ensures that when multiple SAPL dependencies are used, the 
 				versions of them are consistent. -->
 			<dependency>
@@ -49,7 +54,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-		
+
 			<!-- Spring-Boot -->
 			<dependency>
 				<groupId>org.springframework.boot</groupId>
@@ -66,28 +71,28 @@
 				<version>${version.lombok}</version>
 				<scope>provided</scope>
 			</dependency>
-			
+
 			<!-- Vaadin -->
 			<dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-bom</artifactId>
-                <version>${vaadin.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<repositories>
 		<repository>
-    		<id>central</id>
-    		<name>Maven Central</name>
-    		<layout>default</layout>
-    		<url>https://repo1.maven.org/maven2</url>
-    		<snapshots>
-    			<enabled>false</enabled>
-    		</snapshots>
-  		</repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<layout>default</layout>
+			<url>https://repo1.maven.org/maven2</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 		<repository>
 			<id>ossrh</id>
 			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
@@ -113,12 +118,12 @@
 			</releases>
 		</repository>
 		<repository>
-            <id>Vaadin Directory</id>
-            <url>https://maven.vaadin.com/vaadin-addons</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+			<id>Vaadin Directory</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<pluginRepositories>
@@ -151,21 +156,9 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.1</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<compilerArgument>-Xlint:-serial</compilerArgument>
-					<failOnError>true</failOnError>
-					<failOnWarning>true</failOnWarning>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.8</version>
+				<version>1.6.13</version>
 				<extensions>true</extensions>
 				<configuration>
 					<skipRemoteStaging>true</skipRemoteStaging>
@@ -175,14 +168,15 @@
 			<plugin>
 				<groupId>io.spring.javaformat</groupId>
 				<artifactId>spring-javaformat-maven-plugin</artifactId>
-				<version>0.0.29</version>
+				<version>0.0.41</version>
 			</plugin>
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>4.1</version>
+				<version>4.3</version>
 				<configuration>
-					<header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+					<header>
+						com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
 						<owner>Dominic Heutelbeck</owner>
 						<email>dominic@heutelbeck.com</email>
@@ -203,7 +197,7 @@
 						<config>SCRIPT_STYLE</config>
 					</mapping>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -215,7 +209,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -225,7 +219,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.3.2</version>
+					<version>3.4.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -235,7 +229,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.2.5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.springframework.boot</groupId>
@@ -250,5 +244,36 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	<profiles>
+		<profile>
+			<activation>
+				<jdk>[21,)</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<version>3.2.5</version>
+							<configuration>
+								<argLine>@{argLine} -Xshare:off
+									-XX:+EnableDynamicAgentLoading</argLine>
+							</configuration>
+						</plugin>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-compiler-plugin</artifactId>
+							<version>3.12.1</version>
+							<configuration>
+								<compilerArgs>
+									<arg>-proc:full</arg>
+								</compilerArgs>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 </project>

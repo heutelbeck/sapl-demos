@@ -206,9 +206,6 @@ class SaplAxonDemoTests {
 		var pricipal = login(userDetailService.findByUsername(userName));
 		var response = pricipal.thenMany(patientsController.fetchAllPatientsViaPublisher());
     
-		response.doOnNext(x->System.out.println("->"+x)).blockLast();
-		
-		
 		create(Flux.zip(pricipal.repeat(9), response).timeout(DEFAULT_TIMEOUT))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
 				.assertNext(tuple -> assertPatientBlackening(tuple.getT1(), tuple.getT2(), false))
