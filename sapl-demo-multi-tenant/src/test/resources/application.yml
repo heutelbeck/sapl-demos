@@ -57,7 +57,7 @@ spring:
 # policy engine decision process.
 logging.level:
   root: OFF
-  io.sapl: OFF
-#logging.level.org.springframework.security.access.vote=TRACE
-  org.springframework.security: OFF
+  "[io.sapl]": OFF
+#"[org.springframework.security.access.vote]":TRACE
+  "[org.springframework.security]": OFF
     

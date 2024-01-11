@@ -15,15 +15,14 @@
  */
 package io.sapl.mvc.demo.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
@@ -36,10 +35,10 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 @EnableSaplMethodSecurity
 public class WebSecurityConfig {
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
-		MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
-		// @formatter:off
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+        MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+        // @formatter:off
 		http.authorizeHttpRequests(requests -> requests
 	            .requestMatchers(mvcMatcherBuilder.pattern("/css/**")).permitAll()
 	            .anyRequest().authenticated()
@@ -57,19 +56,17 @@ public class WebSecurityConfig {
 	            .permitAll()
 	        );
 		// @formatter:on
-		return http.build();
-	}
+        return http.build();
+    }
 
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMemoryManager = auth
-				.inMemoryAuthentication();
-		DemoData.loadUsers(inMemoryManager, passwordEncoder());
-	}
+    @Bean
+    UserDetailsService users(PasswordEncoder passwordEncoder) {
+        return new InMemoryUserDetailsManager(DemoData.users(passwordEncoder));
+    }
 
-	@Bean
-	static PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    static PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 }

@@ -39,6 +39,7 @@ server:
 spring:
   # do not show the default spring banner
   main.banner-mode: off
+  jpa.open-in-view: false
 # Set the log level to DEBUG or TRACE to get detailed information about the
 # policy engine decision process.
 logging.level:

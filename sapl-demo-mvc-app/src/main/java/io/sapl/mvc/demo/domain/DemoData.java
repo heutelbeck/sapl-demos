@@ -16,17 +16,19 @@
 package io.sapl.mvc.demo.domain;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.InMemoryUserDetailsManagerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -122,24 +124,24 @@ public class DemoData implements CommandLineRunner {
 		}
 	}
 
-	/**
-	 * This method is used by the demo applications to load user credentials into an
-	 * in-memory UserDetailsManager.
-	 * 
-	 * @param inMem   an InMemoryUserDetailsManagerConfigurer
-	 * @param encoder the selected password encoder
-	 */
-	public static void loadUsers(InMemoryUserDetailsManagerConfigurer<AuthenticationManagerBuilder> inMem,
-			PasswordEncoder encoder) {
-		inMem.withUser(NAME_DOMINIC).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_VISITOR);
-		inMem.withUser(NAME_JULIA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR);
-		inMem.withUser(NAME_PETER).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR);
-		inMem.withUser(NAME_ALINA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR);
-		inMem.withUser(NAME_THOMAS).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE);
-		inMem.withUser(NAME_BRIGITTE).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE);
-		inMem.withUser(NAME_JANOSCH).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE);
-		inMem.withUser(NAME_JANINA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE);
-		inMem.withUser(NAME_HORST).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_ADMIN);
-	}
+    /**
+     * This method is used by the demo applications to create user credentials.
+     * 
+     * @param encoder the selected password encoder
+     * @return collection of demo users.
+     */
+    public static Collection<UserDetails> users(PasswordEncoder encoder) {
+        var users = new LinkedList<UserDetails>();
+        users.add(User.builder().username(NAME_DOMINIC).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_VISITOR).build());
+        users.add(User.builder().username(NAME_JULIA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR).build());
+        users.add(User.builder().username(NAME_PETER).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR).build());
+        users.add(User.builder().username(NAME_ALINA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR).build());
+        users.add(User.builder().username(NAME_THOMAS).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE).build());
+        users.add(User.builder().username(NAME_BRIGITTE).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE).build());
+        users.add(User.builder().username(NAME_JANOSCH).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE).build());
+        users.add(User.builder().username(NAME_JANINA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_NURSE).build());
+        users.add(User.builder().username(NAME_HORST).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_ADMIN).build());
+        return users;
+    }
 
 }

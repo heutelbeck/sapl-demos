@@ -104,7 +104,6 @@ public class UIController {
 				isPermitted(authentication, "use", "ui:view:patient:updatePatientButton"));
 		model.addAttribute("permittedToUseDeletePatientButton", isPermitted(authentication, "use",
 				om.readTree("{ \"id\": " + id + ", \"uiElement\": \"ui:view:patient:deletePatientButton\"}")));
-
 		return "patient";
 	}
 
