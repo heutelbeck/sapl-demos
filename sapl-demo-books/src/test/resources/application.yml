@@ -4,4 +4,4 @@ logging:
     root: OFF
 
 # do not show the default spring banner
-spring.main.banner-mode=off
+spring.main.banner-mode: off

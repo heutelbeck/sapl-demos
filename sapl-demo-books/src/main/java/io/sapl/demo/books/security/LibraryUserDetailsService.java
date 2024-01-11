@@ -1,5 +1,6 @@
 package io.sapl.demo.books.security;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,7 +22,11 @@ public class LibraryUserDetailsService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return users.get(username);
+	    var user = users.get(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+       return new LibraryUser(user.getUsername(), user.getDepartment(), new ArrayList<>(user.getDataScope()), user.getPassword());
 	}
 
 }

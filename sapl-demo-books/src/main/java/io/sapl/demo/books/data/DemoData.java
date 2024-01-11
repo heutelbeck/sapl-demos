@@ -18,19 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DemoData implements CommandLineRunner {
 
-	public static final String DEFAULT_PASSWORD = "password";
+    public static final String DEFAULT_PASSWORD = "password";
 
-	public static final LibraryUser[] DEMO_USERS = new LibraryUser[] {
-			// @formatter:off
-			new LibraryUser("admin", 1, List.of(),      DEFAULT_PASSWORD),
-			new LibraryUser("Tom",   1, List.of(1,2,3), DEFAULT_PASSWORD),
-			new LibraryUser("Sim",   2, List.of(1,2),   DEFAULT_PASSWORD),
-			new LibraryUser("Kat",   3, null,           DEFAULT_PASSWORD)
-			// @formatter:on
-	};
-
-	public static final Book[] DEMO_BOOKS = new Book[] {
-			// @formatter:off
+    public static final Book[] DEMO_BOOKS = new Book[] {
+            // @formatter:off
 			new Book(1L, "book1", 1),
 			new Book(2L, "book2", 1),
 			new Book(3L, "book3", 2),
@@ -38,22 +29,33 @@ public class DemoData implements CommandLineRunner {
 			new Book(5L, "book5", 4),
 			new Book(6L, "book6", 5)
 			// @formatter:on
-	};
+    };
 
-	private final BookRepository bookRepository;
-	private final LibraryUserDetailsService userDetailsService;
-	private final PasswordEncoder encoder;
+    private final BookRepository            bookRepository;
+    private final LibraryUserDetailsService userDetailsService;
+    private final PasswordEncoder           encoder;
 
-	@Override
-	public void run(String... args) {
-		log.info("Loading demo book collection...");
-		for (var demoBook : DEMO_BOOKS)
-			bookRepository.save(demoBook);
+    public static LibraryUser[] users(PasswordEncoder           encoder) {
+        // @formatter:off
+        return new LibraryUser[] {
+            new LibraryUser("admin", 1, List.of(),      encoder.encode(DEFAULT_PASSWORD)),
+            new LibraryUser("tom",   1, List.of(1,2,3), encoder.encode(DEFAULT_PASSWORD)),
+            new LibraryUser("sim",   2, List.of(1,2),   encoder.encode(DEFAULT_PASSWORD)),
+            new LibraryUser("kat",   3, null,           encoder.encode(DEFAULT_PASSWORD)),
+        };
+        // @formatter:on
+    }
 
-		log.info("Loading demo users...");
-		for (var demoUser : DEMO_USERS)
-			userDetailsService.load(new LibraryUser(demoUser.getUsername(), demoUser.getDepartment(),
-					demoUser.getDataScope(), encoder.encode(DEFAULT_PASSWORD)));
-	}
+    @Override
+    public void run(String... args) {
+        log.info("Loading demo book collection...");
+        for (var demoBook : DEMO_BOOKS)
+            bookRepository.save(demoBook);
+
+        log.info("Loading demo users...");
+        for (var user : users(encoder)) {
+            userDetailsService.load(user);
+        }
+    }
 
 }
