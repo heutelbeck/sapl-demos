@@ -35,7 +35,7 @@ public class DemoData implements CommandLineRunner {
     private final LibraryUserDetailsService userDetailsService;
     private final PasswordEncoder           encoder;
 
-    public static LibraryUser[] users(PasswordEncoder           encoder) {
+    public static LibraryUser[] users(PasswordEncoder encoder) {
         // @formatter:off
         return new LibraryUser[] {
             new LibraryUser("admin", 1, List.of(),      encoder.encode(DEFAULT_PASSWORD)),
