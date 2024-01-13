@@ -20,7 +20,7 @@
 
 	scenario "test_policyWithSimpleMockedFunction_VerifyTimesCalled"
     given
-    	- function "time.dayOfWeek" returning "SATURDAY" and is invoked once
+    	- function "time.dayOfWeek" returning "SATURDAY" called once
     when subject "willi" attempts action "read" on resource "something"
     then expect single permit;
 }
@@ -150,7 +150,7 @@
           "value",
           "doesn't",
           "matter"
-    	- function "time.secondOf" returning 5 and is invoked 3x
+    	- function "time.secondOf" returning 5 called 3x
     when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
     then
     	- expect permit 3x;
@@ -161,9 +161,9 @@
     given
     	- attribute "company.pip1"
     	- attribute "company.pip2"
-    	- function "company.complexFunction" called with 1, "foo" returning true
-    	- function "company.complexFunction" called with 2, any returning true
-    	- function "company.complexFunction" called with any, any returning false
+    	- function "company.complexFunction" parameters matching 1, "foo" returning true
+    	- function "company.complexFunction" parameters matching 2, any returning true
+    	- function "company.complexFunction" parameters matching any, any returning false
     when subject "User1" attempts action "read" on resource "heartBeatData"
     then
     	- let "company.pip1" return 1
@@ -196,12 +196,12 @@
 	scenario "test_withFunctionForParametersMock"
     given
     	- attribute "time.now" returns 1, 2, 3, 4, 5, 6
-    	- function "time.secondOf" called with 1 returning 1
-    	- function "time.secondOf" called with 2 returning 15
-    	- function "time.secondOf" called with 3 returning 25
-    	- function "time.secondOf" called with 4 returning 35
-    	- function "time.secondOf" called with 5 returning 45
-    	- function "time.secondOf" called with 6 returning 55
+    	- function "time.secondOf" parameters matching 1 returning 1
+    	- function "time.secondOf" parameters matching 2 returning 15
+    	- function "time.secondOf" parameters matching 3 returning 25
+    	- function "time.secondOf" parameters matching 4 returning 35
+    	- function "time.secondOf" parameters matching 5 returning 45
+    	- function "time.secondOf" parameters matching 6 returning 55
     when subject "WILLI" attempts action "read" on resource "something"
     then
     	- expect decision is permit, with obligation equals "A"
