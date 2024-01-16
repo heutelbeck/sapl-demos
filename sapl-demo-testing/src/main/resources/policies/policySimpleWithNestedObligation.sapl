@@ -1,0 +1,16 @@
+set "testSet"
+deny-unless-permit
+
+policy "policySimple"
+permit
+    action == "read"
+where
+    subject == "willi";
+obligation
+{
+    "key1":
+    {
+        "nested1": "ABC",
+        "nested2": "foobar"
+    }
+}
