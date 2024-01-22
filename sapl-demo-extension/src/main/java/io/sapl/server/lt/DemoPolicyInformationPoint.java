@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import io.sapl.api.interpreter.PolicyEvaluationException;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pip.Attribute;
+import io.sapl.api.pip.EnvironmentAttribute;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.api.validation.Text;
 import reactor.core.publisher.Flux;
@@ -66,7 +67,7 @@ public class DemoPolicyInformationPoint {
     /**
      * @return A Flux of Boolean values inverting every 500ms, starting with true.
      */
-    @Attribute(name = "toggle", docs = "Periodically turns from true to false.")
+    @EnvironmentAttribute(name = "toggle", docs = "Periodically turns from true to false.")
     public Flux<Val> toggle() {
         return Flux
                 .concat(Flux.just(Boolean.TRUE),
