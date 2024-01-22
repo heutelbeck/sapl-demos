@@ -23,7 +23,7 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.test.SaplTestFixture;
 import io.sapl.test.unit.SaplUnitTestFixture;
-import io.sapl.test.TestPIP;
+import io.sapl.test.unit.TestPIP;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

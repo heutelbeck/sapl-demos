@@ -52,14 +52,9 @@ class I_PolicyWithComplexPIPTest {
 						whenAttributeParams(parentValue(val(true)), arguments(val(1), val(2))),
 						thenReturn(Val.of(false)))
 				.when(AuthorizationSubscription.of("willi", "read", "something"))
-				.thenAttribute("pip.attribute1", Val.of(1))
-				.thenAttribute("pip.attribute2", Val.of(2))
-				.expectNextNotApplicable()
-				.thenAttribute("pip.attribute1", Val.of(2))
-				.expectNextPermit()
-				.thenAttribute("pip.attribute2", Val.of(1))
-				.expectNextNotApplicable()
-				.verify();
+				.thenAttribute("pip.attribute1", Val.of(1)).thenAttribute("pip.attribute2", Val.of(2))
+				.expectNextNotApplicable().thenAttribute("pip.attribute1", Val.of(2)).expectNextPermit()
+				.thenAttribute("pip.attribute2", Val.of(1)).expectNextNotApplicable().verify();
 	}
 
 }

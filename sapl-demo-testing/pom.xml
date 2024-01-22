@@ -50,25 +50,25 @@
 	<build>
 		<!-- If the <directory> is changed via the following property, 
 			you have to configure the sapl-test module via a system property
-		"io.sapl.test.outputDir" too.
+		"io.sapl.test.outputDir" too. 
 			See below maven-surefire-plugin for example configuration. And configure the
 		outputDir parameter in the configuration of the sapl-maven-plugin -->
 		<!-- <directory>test/</directory> -->
 		<plugins>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<!--
+				<configuration>
+					<systemPropertyVariables>
+						<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir> 
+					</systemPropertyVariables>
+				</configuration>
+				-->
 				<executions>
 					<execution>
 						<phase>test</phase>
 					</execution>
 				</executions>
-				<!--
-				<configuration>
-					<systemPropertyVariables>
-						<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir>
-					</systemPropertyVariables>
-				</configuration>
-				-->
 			</plugin>
 			<plugin>
 				<groupId>${project.groupId}</groupId>

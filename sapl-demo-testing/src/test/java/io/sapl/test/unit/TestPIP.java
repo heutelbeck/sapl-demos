@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.test;
+package io.sapl.test.unit;
 
 import java.util.Map;
 
