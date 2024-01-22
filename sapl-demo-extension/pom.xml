@@ -22,7 +22,7 @@
 		
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-extension</artifactId>
-	<version>3.0.1-SNAPSHOT</version>
+	<version>3.0.0-SNAPSHOT</version>
 
 	<name>SAPL Demo Custom Extensions (PIPs and functions)</name>
 	<properties>
@@ -31,7 +31,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- The Version of the SAPL Dependencies -->
-		<sapl.version>3.0.1-SNAPSHOT</sapl.version>
+		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
 	</properties>
 
 

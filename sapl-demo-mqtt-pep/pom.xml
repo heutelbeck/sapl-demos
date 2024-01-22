@@ -22,7 +22,7 @@
     <parent>
         <groupId>io.sapl</groupId>
         <artifactId>sapl-demo-parent</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
         <relativePath>../sapl-demo-parent/pom.xml</relativePath>
     </parent>
 
@@ -34,7 +34,7 @@
 
     <properties>
         <!-- The Version of the SAPL Dependencies -->
-        <sapl.version>3.0.1-SNAPSHOT</sapl.version>
+        <sapl.version>3.0.0-SNAPSHOT</sapl.version>
         <!-- SAPL Depends on XText, which requires JDK11 from 2.24 upwards -->
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
