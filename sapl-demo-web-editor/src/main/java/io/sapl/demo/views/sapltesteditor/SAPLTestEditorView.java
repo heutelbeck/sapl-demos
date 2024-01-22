@@ -17,102 +17,102 @@ import lombok.extern.slf4j.Slf4j;
 @Route(value = "sapltesteditor", layout = MainLayout.class)
 public class SAPLTestEditorView extends VerticalLayout {
 
-	private static final String DEFAULT_TEST = """
-			"policySimple" tests {
-				scenario "test_simplePolicy"
-				with environment { "key": "value", "key": "value"}
-			    when subject "willi" attempts action "read" on resource "something"
-			    then expect single permit;
-			}""";
+    private static final String DEFAULT_TEST = """
+            test "policyWithSimpleFunction" {
+               scenario "test_policyWithSimpleFunction"
+               register
+            	   - library TemporalFunctionLibrary
+               when subject "willi" attempts action "read" on resource "something"
+               then expect permit;
+           }""";
 
-	private final Button     addDocumentChangedListenerButton;
-	private final Button     addValidationChangedListenerButton;
-	private final SaplTestEditor saplEditor;
+    private final Button addDocumentChangedListenerButton;
+    private final Button addValidationChangedListenerButton;
+    private final SaplTestEditor saplEditor;
 
-	private Button removeDocumentChangedListenerButton;
-	private Button removeValidationChangedListenerButton;
+    private Button removeDocumentChangedListenerButton;
+    private Button removeValidationChangedListenerButton;
 
-	public SAPLTestEditorView() {
-		var saplConfig = new SaplTestEditorConfiguration();
-		saplConfig.setHasLineNumbers(true);
-		saplConfig.setTextUpdateDelay(500);
-		saplConfig.setDarkTheme(true);
+    public SAPLTestEditorView() {
+        var saplConfig = new SaplTestEditorConfiguration();
+        saplConfig.setHasLineNumbers(true);
+        saplConfig.setTextUpdateDelay(500);
+        saplConfig.setDarkTheme(true);
 
-		saplEditor = new SaplTestEditor(saplConfig);
-		saplEditor.addDocumentChangedListener(this::onDocumentChanged);
-		saplEditor.addValidationFinishedListener(this::onValidationFinished);
-		add(saplEditor);
+        saplEditor = new SaplTestEditor(saplConfig);
+        saplEditor.addDocumentChangedListener(this::onDocumentChanged);
+        saplEditor.addValidationFinishedListener(this::onValidationFinished);
+        add(saplEditor);
 
-		addDocumentChangedListenerButton = new Button();
-		addDocumentChangedListenerButton.setText("Add Change Listener");
-		addDocumentChangedListenerButton.addClickListener(e -> {
-			saplEditor.addDocumentChangedListener(this::onDocumentChanged);
-			addDocumentChangedListenerButton.setEnabled(false);
-			removeDocumentChangedListenerButton.setEnabled(true);
-		});
-		addDocumentChangedListenerButton.setEnabled(false);
-		add(addDocumentChangedListenerButton);
+        addDocumentChangedListenerButton = new Button();
+        addDocumentChangedListenerButton.setText("Add Change Listener");
+        addDocumentChangedListenerButton.addClickListener(e -> {
+            saplEditor.addDocumentChangedListener(this::onDocumentChanged);
+            addDocumentChangedListenerButton.setEnabled(false);
+            removeDocumentChangedListenerButton.setEnabled(true);
+        });
+        addDocumentChangedListenerButton.setEnabled(false);
+        add(addDocumentChangedListenerButton);
 
-		removeDocumentChangedListenerButton = new Button();
-		removeDocumentChangedListenerButton.setText("Remove Change Listener");
-		removeDocumentChangedListenerButton.addClickListener(e -> {
-			saplEditor.removeDocumentChangedListener(this::onDocumentChanged);
-			addDocumentChangedListenerButton.setEnabled(true);
-			removeDocumentChangedListenerButton.setEnabled(false);
-		});
-		add(removeDocumentChangedListenerButton);
+        removeDocumentChangedListenerButton = new Button();
+        removeDocumentChangedListenerButton.setText("Remove Change Listener");
+        removeDocumentChangedListenerButton.addClickListener(e -> {
+            saplEditor.removeDocumentChangedListener(this::onDocumentChanged);
+            addDocumentChangedListenerButton.setEnabled(true);
+            removeDocumentChangedListenerButton.setEnabled(false);
+        });
+        add(removeDocumentChangedListenerButton);
 
-		addValidationChangedListenerButton = new Button();
-		addValidationChangedListenerButton.setText("Add Validation Listener");
-		addValidationChangedListenerButton.addClickListener(e -> {
-			saplEditor.addValidationFinishedListener(this::onValidationFinished);
-			addValidationChangedListenerButton.setEnabled(false);
-			removeValidationChangedListenerButton.setEnabled(true);
-		});
-		addValidationChangedListenerButton.setEnabled(false);
-		add(addValidationChangedListenerButton);
+        addValidationChangedListenerButton = new Button();
+        addValidationChangedListenerButton.setText("Add Validation Listener");
+        addValidationChangedListenerButton.addClickListener(e -> {
+            saplEditor.addValidationFinishedListener(this::onValidationFinished);
+            addValidationChangedListenerButton.setEnabled(false);
+            removeValidationChangedListenerButton.setEnabled(true);
+        });
+        addValidationChangedListenerButton.setEnabled(false);
+        add(addValidationChangedListenerButton);
 
-		removeValidationChangedListenerButton = new Button();
-		removeValidationChangedListenerButton.setText("Remove Validation Listener");
-		removeValidationChangedListenerButton.addClickListener(e -> {
-			saplEditor.removeValidationFinishedListener(this::onValidationFinished);
-			addValidationChangedListenerButton.setEnabled(true);
-			removeValidationChangedListenerButton.setEnabled(false);
-		});
-		add(removeValidationChangedListenerButton);
+        removeValidationChangedListenerButton = new Button();
+        removeValidationChangedListenerButton.setText("Remove Validation Listener");
+        removeValidationChangedListenerButton.addClickListener(e -> {
+            saplEditor.removeValidationFinishedListener(this::onValidationFinished);
+            addValidationChangedListenerButton.setEnabled(true);
+            removeValidationChangedListenerButton.setEnabled(false);
+        });
+        add(removeValidationChangedListenerButton);
 
-		Button setDocumentToDefaultButton = new Button();
-		setDocumentToDefaultButton.setText("Set Document to Default");
-		setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DEFAULT_TEST));
-		add(setDocumentToDefaultButton);
+        Button setDocumentToDefaultButton = new Button();
+        setDocumentToDefaultButton.setText("Set Document to Default");
+        setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DEFAULT_TEST));
+        add(setDocumentToDefaultButton);
 
-		Button showSaplDocumentButton = new Button();
-		showSaplDocumentButton.setText("Show Document in Console");
-		showSaplDocumentButton.addClickListener(e -> {
-			String document = saplEditor.getDocument();
-			log.info("Current SAPL value: {}", document);
-		});
-		add(showSaplDocumentButton);
+        Button showSaplDocumentButton = new Button();
+        showSaplDocumentButton.setText("Show Document in Console");
+        showSaplDocumentButton.addClickListener(e -> {
+            String document = saplEditor.getDocument();
+            log.info("Current SAPL value: {}", document);
+        });
+        add(showSaplDocumentButton);
 
-		Button toggleReadOnlyButton = new Button();
-		toggleReadOnlyButton.setText("Toggle ReadOnly");
-		toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
-		add(toggleReadOnlyButton);
+        Button toggleReadOnlyButton = new Button();
+        toggleReadOnlyButton.setText("Toggle ReadOnly");
+        toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
+        add(toggleReadOnlyButton);
 
-		saplEditor.setDocument(DEFAULT_TEST);
-		setSizeFull();
-	}
+        saplEditor.setDocument(DEFAULT_TEST);
+        setSizeFull();
+    }
 
-	public void onDocumentChanged(DocumentChangedEvent event) {
-		log.info("value changed: {}", event.getNewValue());
-	}
+    public void onDocumentChanged(DocumentChangedEvent event) {
+        log.info("value changed: {}", event.getNewValue());
+    }
 
-	public void onValidationFinished(ValidationFinishedEvent event) {
-		Issue[] issues = event.getIssues();
-		log.info("validation finished, number of issues: {}", issues.length);
-		for (Issue issue : issues) {
-			log.info(" - {} " + issue.getDescription());
-		}
-	}
-
+    public void onValidationFinished(ValidationFinishedEvent event) {
+        Issue[] issues = event.getIssues();
+        log.info("validation finished, number of issues: {}", issues.length);
+        for (Issue issue : issues) {
+            log.info(" - {} " + issue.getDescription());
+        }
+    }
 }

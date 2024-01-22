@@ -103,9 +103,8 @@ public class MainLayout extends AppLayout {
     private MenuItemInfo[] createMenuItems() {
         return new MenuItemInfo[]{ //
                 new MenuItemInfo("SAPL Editor", LineAwesomeIcon.EDIT.create(), SAPLEditorView.class),
-                new MenuItemInfo("SAPL Test Editor", LineAwesomeIcon.EDIT.create(), SAPLTestEditorView.class),//
-                new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class), //
-
+                new MenuItemInfo("SAPL Test Editor", LineAwesomeIcon.EDIT.create(), SAPLTestEditorView.class),
+                new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class),
         };
     }
 
