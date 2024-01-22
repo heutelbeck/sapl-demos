@@ -15,6 +15,7 @@
  */
 package io.sapl.demo;
 
+import io.sapl.test.grammar.web.SAPLTestServlet;
 import java.time.Clock;
 import java.util.List;
 
@@ -45,6 +46,15 @@ public class XtextServletConfiguration {
         ServletRegistrationBean<SAPLServlet> registration = new ServletRegistrationBean<>(new SAPLServlet(),
                 "/xtext-service/*");
         registration.setName("XtextServices");
+        registration.setAsyncSupported(true);
+        return registration;
+    }
+
+    @Bean
+    ServletRegistrationBean<SAPLTestServlet> xTextTestRegistrationBean() {
+        ServletRegistrationBean<SAPLTestServlet> registration = new ServletRegistrationBean<>(new SAPLTestServlet(),
+                "/sapl-test/xtext-service/*");
+        registration.setName("SaplTestXtextServices");
         registration.setAsyncSupported(true);
         return registration;
     }
