@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.sapl</groupId>
+        <artifactId>sapl-demo-testing-dsl</artifactId>
+        <version>3.0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>sapl-demo-testing-dsl-junit</artifactId>
+    <name>SAPL Demo Policy Testing DSL JUnit</name>
+    <description>Example for testing your SAPL policies using the SAPLTest DSL with JUnit</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>base</artifactId>
+            <version>${sapl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-test-junit</artifactId>
+            <version>${sapl.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                    <dependenciesToScan>
+                        <dependency>io.sapl:sapl-test-junit</dependency>
+                    </dependenciesToScan>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sapl-maven-plugin</artifactId>
+                <version>${project.version}</version>
+                <configuration>
+                    <policyHitRatio>100</policyHitRatio>
+                    <policyConditionHitRatio>50</policyConditionHitRatio>
+                    <failOnDisabledTests>false</failOnDisabledTests>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>coverage</id>
+                        <goals>
+                            <goal>enable-coverage-collection</goal>
+                            <goal>report-coverage-information</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

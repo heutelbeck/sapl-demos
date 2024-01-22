@@ -32,8 +32,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-test-junit</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
+			<artifactId>sapl-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -63,17 +62,13 @@
 						<phase>test</phase>
 					</execution>
 				</executions>
+				<!--
 				<configuration>
-					<argLine>-Dfile.encoding=UTF-8</argLine>
-					<dependenciesToScan>
-						<dependency>io.sapl:sapl-test-junit</dependency>
-					</dependenciesToScan>
-					<!--
 					<systemPropertyVariables>
-        				<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir>
-    				</systemPropertyVariables>
-					-->
+						<io.sapl.test.outputDir>${project.build.directory}</io.sapl.test.outputDir>
+					</systemPropertyVariables>
 				</configuration>
+				-->
 			</plugin>
 			<plugin>
 				<groupId>${project.groupId}</groupId>
