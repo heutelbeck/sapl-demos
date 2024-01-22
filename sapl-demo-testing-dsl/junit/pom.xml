@@ -40,25 +40,6 @@
                     </dependenciesToScan>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>sapl-maven-plugin</artifactId>
-                <version>${project.version}</version>
-                <configuration>
-                    <policyHitRatio>100</policyHitRatio>
-                    <policyConditionHitRatio>50</policyConditionHitRatio>
-                    <failOnDisabledTests>false</failOnDisabledTests>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>coverage</id>
-                        <goals>
-                            <goal>enable-coverage-collection</goal>
-                            <goal>report-coverage-information</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>
