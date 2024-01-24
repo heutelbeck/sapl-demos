@@ -44,6 +44,7 @@ import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.FilterFunctionLibrary;
+import io.sapl.functions.SchemaValidationLibrary;
 import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.grammar.sapl.SAPL;
@@ -131,6 +132,7 @@ public class PlaygroundView extends VerticalLayout {
         this.defaultFunctionContext.loadLibrary(FilterFunctionLibrary.class);
         this.defaultFunctionContext.loadLibrary(StandardFunctionLibrary.class);
         this.defaultFunctionContext.loadLibrary(TemporalFunctionLibrary.class);
+        this.defaultFunctionContext.loadLibrary(SchemaValidationLibrary.class);
 
         var horizontalSplitLayout = new SplitLayout(policyEditor(), createRightSide());
         horizontalSplitLayout.setOrientation(SplitLayout.Orientation.HORIZONTAL);

@@ -22,6 +22,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
 import io.sapl.playground.examples.BasicExample;
 import io.sapl.playground.examples.Example;
+import io.sapl.playground.examples.SchemaExample;
 import io.sapl.playground.examples.SpringDataExample;
 import io.sapl.playground.examples.SpringSecurityExample;
 
@@ -86,6 +87,9 @@ public class MainLayout extends AppLayout {
 
 		example = new SpringDataExample();
 		this.examples.put(example.getDisplayName(), example);
+		
+		example = new SchemaExample();
+        this.examples.put(example.getDisplayName(), example);
 	}
 
 }

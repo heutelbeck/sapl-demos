@@ -17,7 +17,7 @@ package io.sapl.playground.examples;
 
 public enum ExamplesEnum {
 
-	Basic("Basic"), SpringSecurity("Spring Security"), SpringData("Spring Data");
+	Basic("Basic"), SpringSecurity("Spring Security"), SpringData("Spring Data"), Schema("JSON Schema");
 
 	private final String displayValue;
 
