@@ -15,7 +15,6 @@
  */
 package io.sapl.playground.views;
 
-import java.time.Clock;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,20 +42,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.functions.FilterFunctionLibrary;
-import io.sapl.functions.SchemaValidationLibrary;
-import io.sapl.functions.StandardFunctionLibrary;
-import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
 import io.sapl.interpreter.DocumentEvaluationResult;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.SAPLInterpreter;
 import io.sapl.interpreter.context.AuthorizationContext;
-import io.sapl.interpreter.functions.AnnotationFunctionContext;
-import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.interpreter.pip.AttributeContext;
-import io.sapl.pip.TimePolicyInformationPoint;
+import io.sapl.pdp.config.PDPConfigurationProvider;
 import io.sapl.playground.examples.BasicExample;
 import io.sapl.playground.examples.Example;
 import io.sapl.playground.models.MockDefinitionParsingException;
@@ -108,31 +101,22 @@ public class PlaygroundView extends VerticalLayout {
 
     private List<AttributeMockReturnValues> attrReturnValues;
 
-    private final ObjectMapper objectMapper;
-
-    private final AnnotationAttributeContext defaultAttrContext;
-
-    private final AnnotationFunctionContext defaultFunctionContext;
-
-    private boolean ignoreNextPolicyEditorChangedEvent = false;
+    private final ObjectMapper             objectMapper;
+    private final PDPConfigurationProvider pdpConfigurationProvider;
+    private boolean                        ignoreNextPolicyEditorChangedEvent = false;
 
     private boolean ignoreNextAuthzSubJsonEditorChangedEvent = false;
 
     private boolean ignoreNextMockJsonEditorChangedEvent = false;
 
-    public PlaygroundView(ExampleSelectedViewBus exampleSelectedViewBus) throws InitializationException {
+    public PlaygroundView(ExampleSelectedViewBus exampleSelectedViewBus,
+            PDPConfigurationProvider pdpConfigurationProvider) throws InitializationException {
 
         exampleSelectedViewBus.setContentView(this);
 
-        this.saplInterpreter    = new DefaultSAPLInterpreter();
-        this.objectMapper       = new ObjectMapper();
-        this.defaultAttrContext = new AnnotationAttributeContext();
-        this.defaultAttrContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        this.defaultFunctionContext = new AnnotationFunctionContext();
-        this.defaultFunctionContext.loadLibrary(FilterFunctionLibrary.class);
-        this.defaultFunctionContext.loadLibrary(StandardFunctionLibrary.class);
-        this.defaultFunctionContext.loadLibrary(TemporalFunctionLibrary.class);
-        this.defaultFunctionContext.loadLibrary(SchemaValidationLibrary.class);
+        this.saplInterpreter          = new DefaultSAPLInterpreter();
+        this.objectMapper             = new ObjectMapper();
+        this.pdpConfigurationProvider = pdpConfigurationProvider;
 
         var horizontalSplitLayout = new SplitLayout(policyEditor(), createRightSide());
         horizontalSplitLayout.setOrientation(SplitLayout.Orientation.HORIZONTAL);
@@ -347,7 +331,8 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private boolean isPolicyMatchingAuthzSub() {
-        var attributeCtx  = new MockingAttributeContext(this.defaultAttrContext);
+        var attributeCtx  = new MockingAttributeContext(
+                this.pdpConfigurationProvider.pdpConfiguration().blockFirst().attributeContext());
         var matchesResult = this.currentPolicy.matches().contextWrite(
                 ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel, this.currentAuthzSub))
                 .block();
@@ -375,7 +360,8 @@ public class PlaygroundView extends VerticalLayout {
 
         } else {
 
-            var attributeCtx = new MockingAttributeContext(this.defaultAttrContext);
+            var attributeCtx = new MockingAttributeContext(
+                    this.pdpConfigurationProvider.pdpConfiguration().blockFirst().attributeContext());
 
             Step<AuthorizationDecision> steps = StepVerifier
                     .create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision)
@@ -469,7 +455,8 @@ public class PlaygroundView extends VerticalLayout {
 
     private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
-        var functionCtx = new MockingFunctionContext(this.defaultFunctionContext);
+        var functionCtx = new MockingFunctionContext(
+                this.pdpConfigurationProvider.pdpConfiguration().blockFirst().functionContext());
         var variables   = new HashMap<String, JsonNode>(1);
         this.attrReturnValues = new LinkedList<>();
 
