@@ -22,8 +22,8 @@ public class SchemaExample extends Example {
 		this.mockDefinition = "[]";
 
 		this.policy = """
-		        subject enforced schema 
-		               {
+                subject enforced schema 
+                       {
                             "$id": "https://example.com/person.schema.json",
                             "$schema": "https://json-schema.org/draft/2020-12/schema",
                             "title": "Person",
@@ -44,6 +44,28 @@ public class SchemaExample extends Example {
                                 }
                             }
                         }
+                subject enforced schema 
+                       {
+                            "$id": "https://example.com/person.schema.json",
+                            "$schema": "https://json-schema.org/draft/2020-12/schema",
+                            "title": "Person2",
+                            "type": "object",
+                            "properties": {
+                                "description": {
+                                    "type": "string",
+                                    "description": "The person's first name."
+                                },
+                                "something": {
+                                    "type": "string",
+                                    "description": "The person's last name."
+                                },
+                                "wage": {
+                                    "description": "Age in years which must be equal to or greater than zero.",
+                                    "type": "integer",
+                                    "minimum": 0
+                                }
+                            }
+                        }
 
 				policy "policy 1"
 				permit
@@ -55,8 +77,8 @@ public class SchemaExample extends Example {
 				{
 				  "subject"  : {
                                  "firstName" : "Ophelia",
-                                 "lastName" : "Olling",
-                                 "age" : 34
+                                 "lastName"  : "Olling",
+                                 "age"       : 34
                                },
 				  "action"   : "read",
 				  "resource" : "something"
