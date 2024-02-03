@@ -3,11 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>io.sapl</groupId>
-        <artifactId>sapl-demo-testing-dsl</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
-    </parent>
+
+	<parent>
+		<groupId>io.sapl</groupId>
+		<artifactId>sapl-demo-parent</artifactId>
+		<version>3.0.0-SNAPSHOT</version>
+		<relativePath>../../sapl-demo-parent/pom.xml</relativePath>
+	</parent>
 
     <artifactId>sapl-demo-testing-dsl-testng</artifactId>
     <name>SAPL Demo Policy Testing DSL TestNG</name>
@@ -17,7 +19,6 @@
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-test</artifactId>
-            <version>${sapl.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -26,13 +27,17 @@
             <version>7.7.0</version>
             <scope>test</scope>
         </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<scope>test</scope>
+		</dependency>        
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.apache.maven.surefire</groupId>
