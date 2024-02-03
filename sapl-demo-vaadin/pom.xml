@@ -194,12 +194,6 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-vaadin</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>com.networknt</groupId>
-			<artifactId>json-schema-validator</artifactId>
-			<version>1.0.65</version>
-		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>flow-data</artifactId>
@@ -208,7 +202,6 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>flow-html-components</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>
