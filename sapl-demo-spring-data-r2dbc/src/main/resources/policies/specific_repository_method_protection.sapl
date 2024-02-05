@@ -1,0 +1,61 @@
+set "specific_reactive_user_repository"
+first-applicable
+
+policy "permit_find_all_by_age_r2dbc_person_repository"
+permit
+where
+    action == "find_all_by_age";
+    subject == true;
+    resource == true;
+obligation {
+               "type": "r2dbcQueryManipulation",
+               "conditions": [ "lastname LIKE '%ie%'" ]
+             }
+obligation {
+               "type": "filterJsonContent",
+               "actions": [
+                 {
+                   "type": "blacken",
+                   "path": "$.lastname",
+                   "discloseLeft": 2
+                 },
+                 {
+                   "type": "delete",
+                   "path": "$.id"
+                 }
+               ]
+             }
+
+policy "permit_custom_repository_method_r2dbc_person_repository"
+permit
+where
+    action == "custom_repository_method";
+obligation {
+               "type": "filterJsonContent",
+               "actions": [
+                             {
+                               "type": "blacken",
+                               "path": "$.lastname",
+                               "discloseLeft": 2
+                             },
+                             {
+                               "type": "delete",
+                               "path": "$.id"
+                             }
+               ]
+             }
+obligation {
+               "type": "jsonContentFilterPredicate",
+               "conditions":[
+                                {
+                                    "type":">=",
+                                    "path":"$.age",
+                                    "value": 30
+                                },
+                                {
+                                    "type":"=~",
+                                    "path":"$.firstname",
+                                    "value": "^.*er.*$"
+                                }
+                            ]
+           }

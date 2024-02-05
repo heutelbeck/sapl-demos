@@ -85,6 +85,7 @@
 		<module>sapl-demo-ethereum</module>
 		<module>sapl-demo-mqtt</module>
 		<module>sapl-demo-mqtt-pep</module>
+		<module>sapl-demo-spring-data-r2dbc</module>
 	</modules>
 
 	<profiles>
