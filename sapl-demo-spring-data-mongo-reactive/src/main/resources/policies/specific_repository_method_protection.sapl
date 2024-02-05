@@ -1,0 +1,65 @@
+set "specific_reactive_user_repository"
+first-applicable
+
+policy "permit_find_all_by_age_reactive_user_repository"
+permit
+where
+    action == "find_all_by_age";
+    subject == "USER";
+    resource == true;
+obligation {
+               "type": "mongoQueryManipulation",
+               "conditions": [
+                                "{'active': {'$eq': true}}"
+               ]
+             }
+obligation {
+               "type": "filterJsonContent",
+               "actions": [
+                 {
+                   "type": "blacken",
+                   "path": "$.lastname",
+                   "discloseLeft": 2
+                 },
+                 {
+                   "type": "delete",
+                   "path": "$._id"
+                 }
+               ]
+             }
+
+policy "permit_custom_repository_method_reactive_user_repository"
+permit
+where
+    action == "custom_repository_method";
+obligation {
+               "type": "mongoQueryManipulation",
+               "conditions": [
+                                "{'active': {'$eq': true}}",
+                                "{'role': {'$in': ['USER']}}"
+               ]
+             }
+obligation {
+               "type": "filterJsonContent",
+               "actions": [
+                 {
+                   "type": "blacken",
+                   "path": "$.lastname",
+                   "discloseLeft": 2
+                 },
+                 {
+                   "type": "delete",
+                   "path": "$._id"
+                 }
+               ]
+             }
+obligation {
+               "type": "jsonContentFilterPredicate",
+               "conditions":[
+                                {
+                                    "type":">=",
+                                    "path":"$.age",
+                                    "value": 90
+                                }
+                            ]
+           }

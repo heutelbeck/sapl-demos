@@ -86,6 +86,7 @@
 		<module>sapl-demo-mqtt</module>
 		<module>sapl-demo-mqtt-pep</module>
 		<module>sapl-demo-spring-data-r2dbc</module>
+		<module>sapl-demo-spring-data-mongo-reactive</module>
 	</modules>
 
 	<profiles>
