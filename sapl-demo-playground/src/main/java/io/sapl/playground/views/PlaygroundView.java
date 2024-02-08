@@ -457,7 +457,7 @@ public class PlaygroundView extends VerticalLayout {
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
         var functionCtx = new MockingFunctionContext(
                 this.pdpConfigurationProvider.pdpConfiguration().blockFirst().functionContext());
-        var variables   = new HashMap<String, JsonNode>(1);
+        var variables   = new HashMap<String, Val>(1);
         this.attrReturnValues = new LinkedList<>();
 
         for (var mock : mocks) {

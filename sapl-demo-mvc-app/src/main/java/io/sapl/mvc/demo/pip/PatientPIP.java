@@ -74,7 +74,7 @@ public class PatientPIP {
 	 *
 	 */
 	@Attribute(name = "relatives")
-	public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, JsonNode> variables) {
+	public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, Val> variables) {
 		final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.get().asLong());
 		final List<String>   relationNames = relations.stream().map(Relation::getUsername).toList();
 		final JsonNode       jsonNode      = mapper.convertValue(relationNames, JsonNode.class);
@@ -102,7 +102,7 @@ public class PatientPIP {
 	 *
 	 */
 	@Attribute(name = "patientRecord")
-	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, JsonNode> variables) {
+	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, Val> variables) {
 		try {
 			final Patient  patient  = patientRepo.findById(patientId.get().asLong())
 					.orElseThrow(PolicyEvaluationException::new);

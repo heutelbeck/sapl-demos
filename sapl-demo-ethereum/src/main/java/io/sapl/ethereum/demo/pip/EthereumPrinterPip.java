@@ -59,7 +59,7 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 	}
 
 	@Attribute(name = "certified", docs = "Checks, if the given address has a valid printer certificate.")
-	public Flux<Val> certified(@JsonObject Val saplObject, Map<String, JsonNode> variables) {
+	public Flux<Val> certified(@JsonObject Val saplObject, Map<String, Val> variables) {
 		String address         = saplObject.get().get("address").textValue();
 		String printer         = saplObject.get().get("printer").textValue();
 		String contractAddress = getContractAddress(printer, variables);
@@ -80,29 +80,29 @@ public class EthereumPrinterPip extends EthereumPolicyInformationPoint {
 				.map(Val::of);
 	}
 
-	private String getContractAddress(String printer, Map<String, JsonNode> variables) {
+	private String getContractAddress(String printer, Map<String, Val> variables) {
 		if (MainView.ULTIMAKER.equals(printer)) {
-			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			Val ethPipConfig = variables.get(ETH_PIP_CONFIG);
 			if (ethPipConfig != null) {
-				JsonNode address = ethPipConfig.get(MainView.ULTIMAKER);
+				JsonNode address = ethPipConfig.get().get(MainView.ULTIMAKER);
 				if (address != null)
 					return address.textValue();
 			}
 			return addressProvider.getUltimakerAddress();
 		}
 		if (MainView.GRAFTEN.equals(printer)) {
-			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			Val ethPipConfig = variables.get(ETH_PIP_CONFIG);
 			if (ethPipConfig != null) {
-				JsonNode address = ethPipConfig.get(MainView.GRAFTEN);
+				JsonNode address = ethPipConfig.get().get(MainView.GRAFTEN);
 				if (address != null)
 					return address.textValue();
 			}
 			return addressProvider.getGraftenAddress();
 		}
 		if (MainView.ZMORPH.equals(printer)) {
-			JsonNode ethPipConfig = variables.get(ETH_PIP_CONFIG);
+			Val ethPipConfig = variables.get(ETH_PIP_CONFIG);
 			if (ethPipConfig != null) {
-				JsonNode address = ethPipConfig.get(MainView.ZMORPH);
+				JsonNode address = ethPipConfig.get().get(MainView.ZMORPH);
 				if (address != null)
 					return address.textValue();
 			}
