@@ -70,7 +70,14 @@
 			<artifactId>lombok</artifactId>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		<!-- Argon2 -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.70</version>
+		</dependency>v
+		
 		<!-- Development Tools -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
