@@ -76,7 +76,7 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.70</version>
-		</dependency>v
+		</dependency>
 		
 		<!-- Development Tools -->
 		<dependency>
