@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: mariadb
+    image: mariadb:latest
+    cap_add:
+      - SYS_NICE
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sapl4db
+      MYSQL_USER: test
+      MYSQL_PASSWORD: password
+    restart: always
+    ports:
+      - "3306:3306"
+
+volumes:
+  db:
+    driver: local

@@ -1,0 +1,27 @@
+set "general_reactive_user_repository"
+first-applicable
+
+policy "permit_general_protection_reactive_user_repository"
+permit
+where
+    action == "general_protection";
+obligation {
+               "type": "mongoQueryManipulation",
+               "conditions": [
+                                "{'role': {'$eq': 'USER'}}"
+               ]
+             }
+obligation {
+               "type": "filterJsonContent",
+               "actions": [
+                 {
+                   "type": "blacken",
+                   "path": "$.lastname",
+                   "discloseLeft": 2
+                 },
+                 {
+                   "type": "delete",
+                   "path": "$._id"
+                 }
+               ]
+           }
