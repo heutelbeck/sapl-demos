@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import io.sapl.demo.books.SaplDemoBooksApplication;
@@ -42,7 +42,7 @@ class SaplDemoBooksApplicationTests {
     BookController controller;
 
     private static Collection<UserAndAccessibleBooks> userSourcePermit() {
-        var users          = DemoData.users(new BCryptPasswordEncoder());
+        var users          = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
         var permittedUsers = new UserAndAccessibleBooks[] {
                 new UserAndAccessibleBooks(users[0], List.of(ALL_CATEGORIES)),
                 new UserAndAccessibleBooks(users[1], List.of(CATEGORIES_1_TO_3)),
@@ -51,7 +51,7 @@ class SaplDemoBooksApplicationTests {
     }
 
     private static Collection<LibraryUser> userSourceDeny() {
-        var users = DemoData.users(new BCryptPasswordEncoder());
+        var users = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
         return List.of(users[3]);
     }
 
