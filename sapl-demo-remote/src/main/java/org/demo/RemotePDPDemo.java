@@ -45,11 +45,11 @@ public class RemotePDPDemo implements Callable<Integer> {
 
 	@Option(names = { "-k",
 			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
-	private String clientKey = "YJidgyT2mfdkbmL";
+	private String clientKey = "xwuUaRD65G";
 
 	@Option(names = { "-s",
 			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-	private String clientSecret = "Fa4zvYQdiwHZVXh";
+	private String clientSecret = "3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_";
 
 	public static void main(String... args)
 	{
