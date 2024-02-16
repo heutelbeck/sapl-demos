@@ -13,7 +13,7 @@ import java.util.concurrent.Callable;
 @Slf4j
 @ToString
 @SuppressWarnings("ALL")
-@Command(name = "benchmark", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
+@Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
 public class BenchmarkCommand implements Callable<Integer> {
 
     private final LocalDateTime dateTime = LocalDateTime.now();
@@ -22,8 +22,8 @@ public class BenchmarkCommand implements Callable<Integer> {
     @Option(names = {"-o", "--output"}, description = "Path to the output directory for benchmark results.")
     private String outputPath = "results/" + formatter.format(dateTime);
 
-    @Option(names = {"-c", "--cfg"}, description = "YAML file to read json from")
-    private String cfgFilePath = "examples/small_docker_benchmark.yaml";
+    @Option(names = {"-c", "--cfg"},  required = true, description = "YAML file to read json from")
+    private String cfgFilePath;
 
     @Option(names = {"--skipBenchmark"})
     private Boolean skipBenchmark = Boolean.FALSE;
