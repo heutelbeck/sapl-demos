@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAPL Performance Report</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.6.4.min.js"></script>
+    <link rel="stylesheet" href="custom.css">
+    <link rel="icon" href="favicon.png">
+</head>
+<body>
+    <div class="container-fluid p-1 text-white text-center title-bar">
+        <a href="https://sapl.io/" target="_blank">
+            <img src="https://playground.sapl.io/images/logo-header.png" width="300">
+        </a>
+        <h1>SAPL Performance Benchmark</h1>
+    </div>
+
+
+    <!-- Summary -->
+    <div class="container">
+        <div class="row my-5">
+            <h1 style="text-align: center">Summary</h1>
+
+            {%- for decisionMethod, l1 in SummaryTableData.row_data|dictsort %}
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col" colspan="2">{{decisionMethod}}</th>
+                    {%- for hf in SummaryTableData.header_facts %}
+                    <th scope="col" class="right">{{hf}}</th>
+                    {% endfor -%}
+                </tr>
+                </thead>
+                <tbody>
+                {%- for authMethod, l2 in l1|dictsort %}
+                    {%- for pdp, l3 in l2|dictsort %}
+                    <tr>
+                        {%- if loop.first %}
+                        <th rowspan="{{l2|length}}" class="firstrow">{{authMethod}}</th>
+                        {% endif -%}
+                        <th>{{pdp}}</th>
+                        {%- for fact in l3 %}
+                        <td class="right">{{fact | round(2)}}</td>
+                        {% endfor -%}
+                    </tr>
+                    {% endfor -%}
+                {% endfor -%}
+                </tbody>
+            </table>
+            {% endfor -%}
+            This report has been generated based on the following JMH result files:
+            <a href="average_response.json" target="_blank">average_response.json</a>
+            {% for f in throughputJsonFiles %}
+            <a href="{{f}}" target="_blank">{{f}}</a>
+            {% endfor %}
+        </div>
+        <div class="border-top my-3"></div>
+    </div>
+
+
+    <!-- Average Response time -->
+    {%- for section, entry in responseTimeData|dictsort %}
+    <div class="container" >
+        <div class="row">
+            <img src="{{entry.chart}}" class="img-fluid" >
+        </div>
+        <div class="row my-5">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Benchmark</th>
+                    <th scope="col" class="right">avg ms/op</th>
+                    <th scope="col" class="right">variance ms/op</th>
+                    <th scope="col" class="right">90% ms/op</th>
+                    <th scope="col" class="right">95% ms/op</th>
+                    <th scope="col" class="right">99% ms/op</th>
+                    <th scope="col">details</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in entry.tableData|sort %}
+                <tr>
+                    <th scope="row">{{row.benchmark}}</th>
+                    <td class="right">{{row.score | round(3)}}</td>
+                    <td class="right">
+                        {%- if row.error != 'NaN' %}
+                            {{row.error | round(2)}} ({{((row.error/row.score)*100) | round(2)}}%)
+                        {% else %}
+                            {{row.error}}
+                        {% endif -%}
+                    </td>
+                    <td class="right">{{row.pct_90 | round(3)}}</td>
+                    <td class="right">{{row.pct_95 | round(3)}}</td>
+                    <td class="right">{{row.pct_99 | round(3)}}</td>
+                    <td>
+                        <a href="{{row.chart}}" target="_blank">{{row.chart}}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {%if not loop.last %}
+        <div class="border-top my-3"></div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+
+    <!-- throughput -->
+    <div class="container" >
+        {%- for section, entry in throughputData|dictsort %}
+        <div class="row my-5">
+            <img src="{{entry.chart}}" class="img-fluid" >
+        </div>
+        <div class="row my-5">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">Benchmark</th>
+                    <th scope="col" class="right">threads</th>
+                    <th scope="col" class="right">throughput ops/s</th>
+                    <th scope="col" class="right">variance ops/s</th>
+                    <th scope="col">details</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in entry.tableData|sort %}
+                <tr>
+                    <th scope="row">{{row.benchmark}}</th>
+                    <td class="right">{{row.threads}}</td>
+                    <td class="right">{{row.score | round(2)}}</td>
+                    <td class="right">
+                        {%- if row.error != 'NaN' %}
+                            {{row.error | round(2)}} ({{((row.error/row.score)*100) | round(2)}}%)
+                        {% else %}
+                            {{row.error}}
+                        {% endif -%}
+                    </td>
+                    <td>
+                        <a href="{{row.chart}}" target="_blank">{{row.chart}}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {%if not loop.last %}
+        <div class="border-top my-3"></div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+
+</body>
+</html>

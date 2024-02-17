@@ -61,6 +61,7 @@
 
 	<modules>
 		<module>sapl-demo-parent</module>
+		<module>sapl-demo-benchmark</module>
 		<module>sapl-demo-embedded</module>
 		<module>sapl-demo-mvc-app</module>
 		<module>sapl-demo-web-authorizationmanager</module>

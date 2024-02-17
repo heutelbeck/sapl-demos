@@ -238,10 +238,12 @@ node_modules/
 ### Vaadin generated JavaScript / TypeScript ###
 sapl-demo-vaadin/frontend/generated/
 sapl-demo-vaadin/src/main/dev-bundle/
-sapl-demo-vaadin/src/main/dev-bundle/
 sapl-demo-vaadin/src/main/bundls/
 sapl-demo-playground/src/main/dev-bundle/
 sapl-demo-playground/src/main/bundles/
 sapl-demo-web-editor/src/main/dev-bundle/
 sapl-demo-web-editor/src/main/bundles
 sapl-demo-embedded/dependency-reduced-pom.xml
+
+### Benchmark result ###
+sapl-demo-benchmark/results/
