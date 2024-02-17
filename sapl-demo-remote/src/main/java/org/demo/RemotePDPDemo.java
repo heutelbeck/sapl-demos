@@ -19,6 +19,7 @@ import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLException;
 
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,66 +36,80 @@ import picocli.CommandLine.Option;
 @Command
 public class RemotePDPDemo implements Callable<Integer> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
+    private static final int RSOCKETPORT = 7000;
+    private static final String RSOCKETHOST = "localhost";
 
-	@Option(names = { "-h",
-			"-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-	private String host = "https://localhost:8443";
+    @Option(names = {"-h",
+            "-host"}, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
+    private String host = "https://localhost:8443";
 
-	// The default option set here are the default credentials of the pdp-server-lt
+    // The default option set here are the default credentials of the pdp-server-lt
 
-	@Option(names = { "-k",
-			"-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
-	private String clientKey = "xwuUaRD65G";
+    @Option(names = {"-k",
+            "-key"}, description = "Client key for the demo application, to be obtained from the PDP administrator.")
+    private String clientKey = "xwuUaRD65G";
 
-	@Option(names = { "-s",
-			"-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-	private String clientSecret = "3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_";
+    @Option(names = {"-s",
+            "-secret"}, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
+    private String clientSecret = "3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_";
 
-	public static void main(String... args)
-	{
-		System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
-	}
 
-	public Integer call() throws SSLException, JsonProcessingException
-	{
-		var pdp= RemotePolicyDecisionPoint.builder()
-				.http()
-				.baseUrl(host)
-				.basicAuth(clientKey, clientSecret)
-				.withUnsecureSSL()
-				.build();
+    public static void main(String... args) {
+        System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
+    }
 
-		/*
-		 * To have the client use the default SSL verification use this constructor
-		 * instead, or provide your own TrustManager/SslContext accordingly.
-		 *
-		 * var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret);
-		 */
+    public Integer call() throws SSLException, JsonProcessingException {
 
-		var authzSubscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
-		LOG.info("Subscription: {}", authzSubscription);
+        PolicyDecisionPoint pdp;
 
-		var multiSubscription = new MultiAuthorizationSubscription()
-				.addAuthorizationSubscription("id-1", AuthorizationSubscription.of("bs@simpsons.com", "read",
-						"file://example/med/record/patient/BartSimpson"))
-				.addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
-						"file://example/med/record/patient/MaggieSimpson"));
-		LOG.info("Multi: {}", multiSubscription);
-		var mapper = new ObjectMapper();
-		var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
-		LOG.info("JSON: {}", json);
-		
-		
-		/*
-		 * This just consumes the first decision in a blocking fashion to quickly
-		 * terminate the demo application. If not using blockFirst() or take(1), the
-		 * Flux will continue to listen to the PDP server and receive updated
-		 * authorization decisions when applicable. For alternative patterns of
-		 * invocation, consult the sapl-demo-pdp-embedded
-		 */
-		pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockFirst();
-		return 0;
-	}
+        if (host.startsWith("rsocket")) {
+            pdp = RemotePolicyDecisionPoint.builder()
+                    .rsocket()
+                    .host(RSOCKETHOST)
+                    .port(RSOCKETPORT)
+                    .basicAuth(clientKey, clientSecret)
+                    .withUnsecureSSL()
+                    .build();
+        } else {
+            pdp = RemotePolicyDecisionPoint.builder()
+                    .http()
+                    .baseUrl(host)
+                    .basicAuth(clientKey, clientSecret)
+                    .withUnsecureSSL()
+                    .build();
+        }
+
+        /*
+         * To have the client use the default SSL verification use this constructor
+         * instead, or provide your own TrustManager/SslContext accordingly.
+         *
+         * var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret);
+         */
+
+        var authzSubscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
+        LOG.info("Subscription: {}", authzSubscription);
+
+        var multiSubscription = new MultiAuthorizationSubscription()
+                .addAuthorizationSubscription("id-1", AuthorizationSubscription.of("bs@simpsons.com", "read",
+                        "file://example/med/record/patient/BartSimpson"))
+                .addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
+                        "file://example/med/record/patient/MaggieSimpson"));
+        LOG.info("Multi: {}", multiSubscription);
+        var mapper = new ObjectMapper();
+        var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
+        LOG.info("JSON: {}", json);
+
+
+        /*
+         * This just consumes the first decision in a blocking fashion to quickly
+         * terminate the demo application. If not using blockFirst() or take(1), the
+         * Flux will continue to listen to the PDP server and receive updated
+         * authorization decisions when applicable. For alternative patterns of
+         * invocation, consult the sapl-demo-pdp-embedded
+         */
+        pdp.decide(multiSubscription).doOnNext(decision -> LOG.info("Decision: {}", decision)).blockFirst();
+        return 0;
+    }
 
 }

@@ -49,6 +49,7 @@ The demo will send the following authorization subscription to the server:
 	"resource": "icecream"
 }
 ```
+If you want to use the RSocket endpoint, you must transfer a value to the Host variable that begins with "rsocket". The default host is the localhost. The default port is the number 7000.
 
 The demo will now output some messages on the console showing the incoming decisions or log the errors to connect to the server.
 
