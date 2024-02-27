@@ -82,6 +82,7 @@
 					<policyHitRatio>100</policyHitRatio>
 					<policyConditionHitRatio>50</policyConditionHitRatio>
 					<failOnDisabledTests>false</failOnDisabledTests>
+					<enableSonarReport>true</enableSonarReport>
 				</configuration>
 				<executions>
 					<execution>

@@ -55,8 +55,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<failsafe.version>3.1.0</failsafe.version>
-		<jacoco.version>0.8.9</jacoco.version>
+		<spotbugs.version>4.7.3.6</spotbugs.version>
+		<sbcontrib.version>7.6.0</sbcontrib.version>
 	</properties>
 
 	<modules>
@@ -92,53 +92,26 @@
 		-->
 	</modules>
 
-	<profiles>
-		<profile>
-			<id>it</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>${failsafe.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>coverage</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<version>${jacoco.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>prepare-agent</goal>
-								</goals>
-							</execution>
-							<execution>
-								<id>report</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>report</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs.version}</version>
+				<configuration>
+					<excludeFilterFile>spotbugsExcludeFilter.xml</excludeFilterFile>
+					<includeTests>true</includeTests>
+					<addSourceDirs>true</addSourceDirs>
+					<plugins>
+						<plugin>
+							<groupId>com.mebigfatguy.sb-contrib</groupId>
+							<artifactId>sb-contrib</artifactId>
+							<version>${sbcontrib.version}</version>
+						</plugin>
+					</plugins>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

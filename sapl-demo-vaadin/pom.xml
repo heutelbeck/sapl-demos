@@ -21,6 +21,8 @@
 	<properties>
 		<java.version>17</java.version>
 		<vaadin.version>24.1.12</vaadin.version>
+		<spotbugs.version>4.7.3.6</spotbugs.version>
+		<sbcontrib.version>7.6.0</sbcontrib.version>
 		<argLine />
 	</properties>
 
@@ -258,6 +260,23 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>${spotbugs.version}</version>
+				<configuration>
+					<excludeFilterFile>spotbugsExcludeFilter.xml</excludeFilterFile>
+					<includeTests>true</includeTests>
+					<addSourceDirs>true</addSourceDirs>
+					<plugins>
+						<plugin>
+							<groupId>com.mebigfatguy.sb-contrib</groupId>
+							<artifactId>sb-contrib</artifactId>
+							<version>${sbcontrib.version}</version>
+						</plugin>
+					</plugins>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
