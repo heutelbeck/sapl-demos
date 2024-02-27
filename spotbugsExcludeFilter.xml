@@ -29,6 +29,7 @@
 			<Source name="~.*xtend-gen.*"/>
 			<Source name="~.*emf-gen.*"/>
 			<Source name="~.*xtext-gen.*"/>
+			<Source name="~.*jmh_generated.*"/>
 		</Or>
 	</Match>
 	<!-- The following rules are excluded from the spotbugs analysis. -->
