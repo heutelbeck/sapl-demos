@@ -94,21 +94,21 @@ public class SaplBenchmark {
         container.withEnv("io_sapl_server-lt_allowNoAuth", String.valueOf(config.useNoAuth));
         container.withEnv("io_sapl_server-lt_allowBasicAuth", String.valueOf(config.useBasicAuth));
         if ( config.useBasicAuth ) {
-            container.withEnv("io_sapl_server-lt_key", config.basic_client_key)
-                    .withEnv("io_sapl_server-lt_secret", encoder.encode(config.basic_client_secret));
+            container.withEnv("io_sapl_server-lt_key", config.basicClientKey)
+                    .withEnv("io_sapl_server-lt_secret", encoder.encode(config.basicClientSecret));
         }
         container.withEnv("io_sapl_server-lt_allowApiKeyAuth", String.valueOf(config.useAuthApiKey));
         if ( config.useAuthApiKey ) {
-            container.withEnv("io_sapl_server-lt_apiKeyHeader", config.api_key_header)
-                    .withEnv("io_sapl_server-lt_allowedApiKeys", config.api_key);
+            container.withEnv("io_sapl_server-lt_apiKeyHeader", config.apiKeyHeader)
+                    .withEnv("io_sapl_server-lt_allowedApiKeys", config.apiKey);
         }
         container.withEnv("io_sapl_server-lt_allowOauth2Auth", String.valueOf(config.useOauth2));
         if ( config.useOauth2) {
             String  jwtIssuerUrl;
-            if ( config.oauth2_mock_server) {
+            if ( config.oauth2MockServer) {
                 jwtIssuerUrl = "http://auth-host:" + oauth2Container.getMappedPort(8080) + "/default";
             } else {
-                jwtIssuerUrl = config.oauth2_issuer_url;
+                jwtIssuerUrl = config.oauth2IssuerUrl;
             }
             container.withExtraHost("auth-host", "host-gateway")
                      .withEnv("spring_security_oauth2_resourceserver_jwt_issuer-uri", jwtIssuerUrl);
@@ -191,7 +191,7 @@ public class SaplBenchmark {
     }
 
     private void startContainersIfNeeded() {
-        if ( config.useOauth2 && config.oauth2_mock_server) {
+        if ( config.useOauth2 && config.oauth2MockServer) {
             oauth2Container = getOauth2Container();
             oauth2Container.start();
         }

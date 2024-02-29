@@ -29,7 +29,6 @@ import java.util.concurrent.Callable;
  */
 @Slf4j
 @ToString
-@SuppressWarnings("ALL")
 @Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
 public class BenchmarkCommand implements Callable<Integer> {
 

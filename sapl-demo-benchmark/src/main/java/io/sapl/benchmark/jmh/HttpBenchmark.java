@@ -35,7 +35,6 @@ import static io.sapl.benchmark.jmh.Helper.*;
 @State(Scope.Benchmark)
 public class HttpBenchmark {
     @Param({"{}"})
-    @SuppressWarnings("unused")
     String contextJsonString;
 
     private PolicyDecisionPoint noauthPdp;
@@ -95,42 +94,42 @@ public class HttpBenchmark {
 
 
     @Benchmark
-    public void NoAuthDecideSubscribe() {
+    public void noAuthDecideSubscribe() {
         decide(noauthPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void NoAuthDecideOnce() {
+    public void noAuthDecideOnce() {
         decideOnce(noauthPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void BasicAuthDecideSubscribe() {
+    public void basicAuthDecideSubscribe() {
         decide(basicAuthPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void BasicAuthDecideOnce() {
+    public void basicAuthDecideOnce() {
         decideOnce(basicAuthPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void ApiKeyDecideSubscribe() {
+    public void apiKeyDecideSubscribe() {
         decide(apiKeyPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void ApiKeyDecideOnce() {
+    public void apiKeyDecideOnce() {
         decideOnce(apiKeyPdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void Oauth2DecideSubscribe() {
+    public void oAuth2DecideSubscribe() {
         decide(oauth2Pdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void  Oauth2DecideOnce() {
+    public void  oAuth2DecideOnce() {
         decideOnce(oauth2Pdp, context.authorizationSubscription);
     }
 }
