@@ -30,29 +30,14 @@ After that pick a demo that matches your interest.
 
 * [sapl-demo-remote](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-remote): Connect to a dedicated SAPL PDP Server.
 
-
 * [sapl-demo-extension](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-extension): Write a custom Policy Information Point (PIP) and function library to extend SAPL with custom attributes and functions.
-
 
 * [sapl-demo-jwt](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-jwt): A resource server secured with OAuth 2.0, JSON Web Tokens (JWT) and SAPL, with a matching OAuth authorization server and client application.
 
-
-* [sapl-demo-ethereum](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-ethereum): Demonstrates how to use the Ethereum Blockchain as a Policy Information Point.
-
-
 * [sapl-demo-web-editor](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-web-editor): Demonstrates the Vaadin-based SAPL policy editor component.
-
 
 * [sapl-demo-playground](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-playground): An integrated policy testing and learning application. Also see <https://playground.sapl.io/> for a deployed version ready to use.
 
-
 * [sapl-demo-testing](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-testing): Demonstrates how to test SAPL policies with unit tests, including test code coverage reports.
 
-
-* [sapl-demo-mqtt-pep](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pep): Demonstrates how to authorize MQTT subscriptions and publish messages with a Policy Enforcement Point.
-
-
 * [sapl-demo-mqtt-pip](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pip): Demonstrates how to evaluate MQTT messages with a Policy Information Point.
-
-
-
