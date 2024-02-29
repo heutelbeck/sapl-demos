@@ -1,2 +1,0 @@
-policy "permit all operations for system infrastructure" 
-permit subject == "SYSTEM"
