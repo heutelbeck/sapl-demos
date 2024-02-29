@@ -80,12 +80,6 @@ jobs:
         java-version: 17
         cache: 'maven'
 
-    - name: Set up Web3j in case servers for releases should be unreachable
-      run: |
-        mkdir ~/.web3j
-        mkdir ~/.web3j/solc
-        cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
-
     - name: Add auth-server to /etc/hosts for OAuth Integration Tests
       run: sudo sh -c 'echo "127.0.0.1 auth-server" >> /etc/hosts'
       
