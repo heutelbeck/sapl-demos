@@ -78,13 +78,6 @@ jobs:
       with:
         node-version: '20'
 
-    # Set up Web3j in case servers for releases should be unreachable.
-    - name: Set up Web3j
-      run: |
-        mkdir ~/.web3j
-        mkdir ~/.web3j/solc
-        cp sapl-demo-ethereum/src/main/solc/releases.json ~/.web3j/solc
-
     - name: Add auth-host to /etc/hosts for OAuth Integration Tests
       if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
       run: sudo sh -c 'echo "127.0.0.1 auth-host" >> /etc/hosts'
