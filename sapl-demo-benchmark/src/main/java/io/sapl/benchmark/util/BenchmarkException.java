@@ -1,4 +1,4 @@
-package io.sapl.benchmark;
+package io.sapl.benchmark.util;
 
 import lombok.experimental.StandardException;
 

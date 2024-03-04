@@ -50,11 +50,11 @@ public class EmbeddedBenchmark {
 
     @Benchmark
     public void noAuthDecideSubscribe() {
-        decide(pdp, context.authorizationSubscription);
+        decide(pdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void noAuthDecideOnce() {
-        decideOnce(pdp, context.authorizationSubscription);
+        decideOnce(pdp, context.getAuthorizationSubscription());
     }
 }

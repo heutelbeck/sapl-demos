@@ -16,8 +16,7 @@ public class StringController {
 
 	@GetMapping(value = "/string", produces = MediaType.APPLICATION_JSON_VALUE)
 	public String someString() {
-		var resultString = service.lowercase("IF ALL TEXT IS LOWERCASE THE SERVICE WAS CALLED."
+		return service.lowercase("IF ALL TEXT IS LOWERCASE THE SERVICE WAS CALLED."
 				+ " RIGHT TO THIS MESSAGE THERE IS A LOWERCASE 'HELLO MODIFICATION' THEN THE OBLICATION SUCCESSFULLY MODIFIED THE METHOD ARGUMENTS->");
-		return resultString;
 	}
 }

@@ -17,13 +17,16 @@
  */
 package io.sapl.pdp.benchmark;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import java.io.File;
 import java.io.IOException;
 
+import io.sapl.benchmark.util.BenchmarkException;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -45,26 +48,26 @@ class SaplPdpBenchmarkTest {
     private static void createEmptyBenchmarkFolder() throws IOException {
         var tmpReportPathFile = new File(tmpReportPath);
         FileUtils.deleteDirectory(tmpReportPathFile);
-
-        // noinspection ResultOfMethodCallIgnored
-        tmpReportPathFile.mkdir();
+        Assertions.assertTrue(tmpReportPathFile.mkdir());
     }
 
     @Test
     void whenExecutingEmbeddedBenchmark_withValidSubscription_thenDecisionIsAccepted()
             throws InitializationException, IOException {
         var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
-        benchmarkConfig.runHttpBenchmarks    = false;
-        benchmarkConfig.runRsocketBenchmarks = false;
+        benchmarkConfig.setRunHttpBenchmarks(false);
+        benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig
                 .setSubscription("{\"subject\": \"Willi\", \"action\": \"requests\", \"resource\": \"information\"}");
         var embeddedBenchmark = new EmbeddedBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
-            var benchmarkContext = benchmarkConfig.getBenchmarkExecutionContext(null, null);
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
-            embeddedBenchmark.noAuthDecideOnce();
-            embeddedBenchmark.noAuthDecideSubscribe();
+            assertDoesNotThrow(() -> {
+                embeddedBenchmark.noAuthDecideOnce();
+                embeddedBenchmark.noAuthDecideSubscribe();
+            });
         }
     }
 
@@ -72,58 +75,62 @@ class SaplPdpBenchmarkTest {
     void whenExecutingEmbeddedBenchmark_withInvalidSubscription_thenExceptionIsThrown()
             throws InitializationException, IOException {
         var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
-        benchmarkConfig.runHttpBenchmarks    = false;
-        benchmarkConfig.runRsocketBenchmarks = false;
+        benchmarkConfig.setRunHttpBenchmarks(false);
+        benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig.setSubscription(
                 "{\"subject\": \"Willi\", \"action\": \"invalid action\", \"resource\": \"information\"}");
         var embeddedBenchmark = new EmbeddedBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
-            var benchmarkContext = benchmarkConfig.getBenchmarkExecutionContext(null, null);
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
-            assertThrows(RuntimeException.class, embeddedBenchmark::noAuthDecideOnce);
-            assertThrows(RuntimeException.class, embeddedBenchmark::noAuthDecideSubscribe);
+            assertThrows(BenchmarkException.class, embeddedBenchmark::noAuthDecideOnce);
+            assertThrows(BenchmarkException.class, embeddedBenchmark::noAuthDecideSubscribe);
         }
     }
 
     @Test
     void whenLoadingContaxtFromString_withInvalidJson_thenExcpetionIsThrown() {
-        assertThrows(RuntimeException.class, () -> BenchmarkExecutionContext.fromString("{invalidjson]"));
+        assertThrows(BenchmarkException.class, () -> BenchmarkExecutionContext.fromString("{invalidjson]"));
     }
 
     @Test
     void whenExecutingHttpBenchmark_thenDecisionIsAccepted() throws IOException {
         var mockedContainer = Mockito.mock(GenericContainer.class);
         var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
-        benchmarkConfig.runHttpBenchmarks    = false;
-        benchmarkConfig.runRsocketBenchmarks = false;
-        benchmarkConfig.useBasicAuth         = true;
-        benchmarkConfig.basicClientKey       = "123";
-        benchmarkConfig.basicClientSecret    = "123";
-        benchmarkConfig.useAuthApiKey        = true;
-        benchmarkConfig.apiKeyHeader         = "API_KEY";
-        benchmarkConfig.apiKey               = "123";
-        benchmarkConfig.useOauth2            = true;
+        benchmarkConfig.setRunEmbeddedBenchmarks(true);
+        benchmarkConfig.setRunHttpBenchmarks(true);
+        benchmarkConfig.setRunHttpBenchmarks(true);
+        benchmarkConfig.setRunRsocketBenchmarks(false);
+        benchmarkConfig.setUseBasicAuth(true);
+        benchmarkConfig.setBasicClientKey("123");
+        benchmarkConfig.setBasicClientSecret("123");
+        benchmarkConfig.setUseAuthApiKey(true);
+        benchmarkConfig.setApiKeyHeader("API_KEY");
+        benchmarkConfig.setApiKeySecret("123");
+        benchmarkConfig.setUseOauth2(true);
         var benchmark = new HttpBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer, mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
-            var benchmarkContext = benchmarkConfig.getBenchmarkExecutionContext(mockedContainer, mockedContainer);
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
                 mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
                 mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
-                // NoAuth
-                benchmark.noAuthDecideOnce();
-                benchmark.noAuthDecideSubscribe();
-                // BasicAuth
-                benchmark.basicAuthDecideOnce();
-                benchmark.basicAuthDecideSubscribe();
-                // ApiKey
-                benchmark.apiKeyDecideOnce();
-                benchmark.apiKeyDecideSubscribe();
-                // Oauth2
-                benchmark.oAuth2DecideOnce();
-                benchmark.oAuth2DecideSubscribe();
+                assertDoesNotThrow(() -> {
+                    // NoAuth
+                    benchmark.noAuthDecideOnce();
+                    benchmark.noAuthDecideSubscribe();
+                    // BasicAuth
+                    benchmark.basicAuthDecideOnce();
+                    benchmark.basicAuthDecideSubscribe();
+                    // ApiKey
+                    benchmark.apiKeyDecideOnce();
+                    benchmark.apiKeyDecideSubscribe();
+                    // Oauth2
+                    benchmark.oAuth2DecideOnce();
+                    benchmark.oAuth2DecideSubscribe();
+                });
             }
         }
     }
@@ -131,35 +138,39 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingRsocketBenchmark_thenDecisionIsAccepted() throws IOException {
         var mockedContainer = Mockito.mock(GenericContainer.class);
+        Mockito.when(mockedContainer.getHost()).thenReturn("localhost");
         var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
-        benchmarkConfig.runHttpBenchmarks    = false;
-        benchmarkConfig.runRsocketBenchmarks = false;
-        benchmarkConfig.useBasicAuth         = true;
-        benchmarkConfig.basicClientKey       = "123";
-        benchmarkConfig.basicClientSecret    = "123";
-        benchmarkConfig.useAuthApiKey        = true;
-        benchmarkConfig.apiKeyHeader         = "API_KEY";
-        benchmarkConfig.apiKey               = "123";
+        benchmarkConfig.setRunEmbeddedBenchmarks(false);
+        benchmarkConfig.setRunHttpBenchmarks(false);
+        benchmarkConfig.setRunRsocketBenchmarks(true);
+        benchmarkConfig.setUseBasicAuth(true);
+        benchmarkConfig.setBasicClientKey("123");
+        benchmarkConfig.setBasicClientSecret("123");
+        benchmarkConfig.setUseAuthApiKey(true);
+        benchmarkConfig.setApiKeyHeader("API_KEY");
+        benchmarkConfig.setApiKeySecret("123");
         var benchmark = new RsocketBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer, mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
-            var benchmarkContext = benchmarkConfig.getBenchmarkExecutionContext(mockedContainer, mockedContainer);
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
                 mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
                 mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
-                // NoAuth
-                benchmark.noAuthDecideOnce();
-                benchmark.noAuthDecideSubscribe();
-                // BasicAuth
-                benchmark.basicAuthDecideOnce();
-                benchmark.basicAuthDecideSubscribe();
-                // ApiKey
-                benchmark.apiKeyDecideOnce();
-                benchmark.apiKeyDecideSubscribe();
-                // Oauth2
-                benchmark.oAuth2DecideOnce();
-                benchmark.oAuth2DecideSubscribe();
+                assertDoesNotThrow(() -> {
+                    // NoAuth
+                    benchmark.noAuthDecideOnce();
+                    benchmark.noAuthDecideSubscribe();
+                    // BasicAuth
+                    benchmark.basicAuthDecideOnce();
+                    benchmark.basicAuthDecideSubscribe();
+                    // ApiKey
+                    benchmark.apiKeyDecideOnce();
+                    benchmark.apiKeyDecideSubscribe();
+                    // Oauth2
+                    benchmark.oAuth2DecideOnce();
+                    benchmark.oAuth2DecideSubscribe();
+                });
             }
         }
     }
