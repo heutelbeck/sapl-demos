@@ -34,10 +34,10 @@ class SaplPdpBenchmarkIT {
 
     @BeforeAll
     private static void createEmptyBenchmarkResultFolder() throws IOException {
-        var tmpReportPathFile = new File(tmpReportPath);
+        var tmpReportPathFile = new File("results" + File.pathSeparator + tmpReportPath);
         FileUtils.deleteDirectory(tmpReportPathFile);
         // noinspection ResultOfMethodCallIgnored
-        tmpReportPathFile.mkdir();
+        tmpReportPathFile.mkdirs();
     }
 
     @Test

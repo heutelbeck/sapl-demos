@@ -276,16 +276,16 @@ public class BenchmarkConfiguration {
         }
 
         if (useNoAuth) {
-            authMethods.add("NoAuth");
+            authMethods.add("noAuth");
         }
         if (useBasicAuth) {
-            authMethods.add("BasicAuth");
+            authMethods.add("basicAuth");
         }
         if (useAuthApiKey) {
-            authMethods.add("ApiKey");
+            authMethods.add("apiKey");
         }
         if (useOauth2) {
-            authMethods.add("Oauth2");
+            authMethods.add("oauth2");
         }
 
         if (runDecideOnceBenchmarks) {
