@@ -36,7 +36,6 @@ import static io.sapl.benchmark.jmh.Helper.decideOnce;
 public class EmbeddedBenchmark {
 
     @Param({"{}"})
-    @SuppressWarnings("unused")
     String contextJsonString;
     private PolicyDecisionPoint pdp;
     private BenchmarkExecutionContext context;
@@ -50,12 +49,12 @@ public class EmbeddedBenchmark {
     }
 
     @Benchmark
-    public void NoAuthDecideSubscribe() {
+    public void noAuthDecideSubscribe() {
         decide(pdp, context.authorizationSubscription);
     }
 
     @Benchmark
-    public void NoAuthDecideOnce() {
+    public void noAuthDecideOnce() {
         decideOnce(pdp, context.authorizationSubscription);
     }
 }
