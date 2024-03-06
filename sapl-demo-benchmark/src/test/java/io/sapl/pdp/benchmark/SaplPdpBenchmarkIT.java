@@ -30,21 +30,21 @@ import io.sapl.benchmark.BenchmarkCommand;
 import picocli.CommandLine;
 
 class SaplPdpBenchmarkIT {
-    private static final String tmpReportPath = "target/tmp_benchmark_test";
+    private static final String tmpReportPath = "results/tmp_benchmark_test";
 
     @BeforeAll
     private static void createEmptyBenchmarkResultFolder() throws IOException {
         var tmpReportPathFile = new File(tmpReportPath);
         FileUtils.deleteDirectory(tmpReportPathFile);
         // noinspection ResultOfMethodCallIgnored
-        tmpReportPathFile.mkdir();
+        tmpReportPathFile.mkdirs();
     }
 
     @Test
     void whenExecutingEmbeddedBenchmark_withNoAuth_thenReportsAreCreated() {
         var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
                 "src/test/resources/test_benchmark_config.yaml", "--output", tmpReportPath);
-        Assertions.assertEquals(returnCode, 0);
+        Assertions.assertEquals(0, returnCode);
         var reportFiles = List.of("Report.html", "average_response.json", "custom.css", "favicon.png",
                 "img/Decide Subscribe - Average Response Time.png", "img/Decide Subscribe - NoAuth - throughput.png",
                 "img/EmbeddedBenchmark.NoAuthDecideSubscribe response time.png",

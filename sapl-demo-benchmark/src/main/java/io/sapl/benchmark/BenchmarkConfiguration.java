@@ -17,84 +17,99 @@
  */
 package io.sapl.benchmark;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-import org.testcontainers.containers.GenericContainer;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.benchmark.util.BenchmarkException;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 public class BenchmarkConfiguration {
-    private static final String ENABLED       = "enabled";
-    private static final String CLIENT_SECRET = "client_secret";
     private final ObjectMapper  mapper        = new ObjectMapper();
-    public static final String  DOCKER        = "docker";
-    public static final String  REMOTE        = "remote";
-    public String               target        = DOCKER;
+    private static final String ENABLED = "enabled";
+    private static final String CLIENT_SECRET = "client_secret";
+    private static final String DOCKER = "docker";
+    private static final String REMOTE = "remote";
+    private String benchmarkTarget = DOCKER;
+
+    private static void failOnFurtherMapEntries(Set<String> keyList, String parentEntryPath){
+        for (String key : keyList) {
+            if ( key != null){
+                throw new BenchmarkException("Unknown configuration entry " + parentEntryPath +"." + key);
+            }
+        }
+    }
 
     // ---------------------------
     // - Connectivity setup
     // ---------------------------
     @JsonProperty("target")
-    public void setTarget(String target) {
+    public void setBenchmarkTarget(String target) {
         if (target.equals(DOCKER) || target.equals(REMOTE)) {
-            this.target = target;
+            this.benchmarkTarget = target;
         } else {
             throw new BenchmarkException("invalid target=" + target);
         }
     }
 
-    public String    docker_pdp_image;
-    public String    oauth2_mock_image;
-    public final int DOCKER_RSOCKET_PORT = 7000;
-    public final int DOCKER_HTTP_PORT    = 8080;
-    public boolean   docker_use_ssl      = true;
+    @Getter
+    private String dockerPdpImage;
+    @Getter
+    private String oauth2MockImage;
 
-    @JsonProperty("docker")
+    public static final int DOCKER_DEFAULT_RSOCKET_PORT = 7000;
+    public static final int DOCKER_DEFAULT_HTTP_PORT = 8080;
+    @Getter
+    private boolean dockerUseSsl = true;
+
+    @JsonProperty(DOCKER)
     public void setDocker(Map<String, String> map) {
-        this.docker_pdp_image = map.remove("pdp_image");
-        this.docker_use_ssl   = Boolean.parseBoolean(map.remove("use_ssl"));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry remote." + key);
-        }
+        this.dockerPdpImage = map.remove("pdp_image");
+        this.dockerUseSsl = Boolean.parseBoolean(map.remove("use_ssl"));
+        failOnFurtherMapEntries(map.keySet(), DOCKER);
     }
 
-    public String  remote_base_url;
-    public String  remote_rsocket_host;
-    public int     remote_rsocket_port;
-    public boolean remote_use_ssl;
+    @Getter
+    private String remoteBaseUrl;
+    @Getter
+    private String remoteRsocketHost;
+    @Getter
+    private int remoteRsocketPort;
+    @Getter
+    private boolean remoteUseSsl;
 
-    @JsonProperty("remote")
+    @JsonProperty(REMOTE)
     public void setRemote(Map<String, String> map) {
-        this.remote_base_url     = map.remove("base_url");
-        this.remote_rsocket_host = map.remove("rsocket_host");
-        this.remote_rsocket_port = Integer.parseInt(map.remove("rsocket_port"));
-        this.remote_use_ssl      = Boolean.parseBoolean(map.remove("use_ssl"));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry remote." + key);
-        }
+        this.remoteBaseUrl = map.remove("base_url");
+        this.remoteRsocketHost = map.remove("rsocket_host");
+        this.remoteRsocketPort = Integer.parseInt(map.remove("rsocket_port"));
+        this.remoteUseSsl = Boolean.parseBoolean(map.remove("use_ssl"));
+        failOnFurtherMapEntries(map.keySet(), REMOTE);
     }
 
     // ---------------------------
     // - Subscription
     // ---------------------------
-    public AuthorizationSubscription authorizationSubscription = AuthorizationSubscription.of("Willi", "eat", "apple");
+    @Getter
+    private AuthorizationSubscription authorizationSubscription = AuthorizationSubscription.of("Willi", "eat", "apple");
 
-    @JsonProperty("subscription")
+    @JsonSetter("subscription")
     public void setSubscription(String subscription) throws JsonProcessingException {
         this.authorizationSubscription = mapper.readValue(subscription, AuthorizationSubscription.class);
     }
@@ -102,55 +117,66 @@ public class BenchmarkConfiguration {
     // ---------------------------
     // - Benchmark scope
     // ---------------------------
-    public boolean runEmbeddedBenchmarks        = true;
-    public boolean runHttpBenchmarks            = true;
-    public boolean runRsocketBenchmarks         = true;
-    public boolean runDecideOnceBenchmarks      = true;
-    public boolean runDecideSubscribeBenchmarks = true;
+    @Setter
+    private boolean runEmbeddedBenchmarks        = true;
+    @Setter
+    private boolean runHttpBenchmarks            = true;
+    @Setter
+    private boolean runRsocketBenchmarks         = true;
+    private boolean runDecideOnceBenchmarks      = true;
+    private boolean runDecideSubscribeBenchmarks = true;
 
     @JsonProperty("benchmark_pdp")
     public void setBenchmarkPdp(Map<String, String> map) {
         this.runEmbeddedBenchmarks = Boolean.parseBoolean(map.remove("embedded"));
         this.runHttpBenchmarks     = Boolean.parseBoolean(map.remove("http"));
         this.runRsocketBenchmarks  = Boolean.parseBoolean(map.remove("rsocket"));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry benchmark_pdp." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "benchmark_pdp");
     }
 
     @JsonProperty("decision_method")
     public void setDecisionMethod(Map<String, String> map) {
         this.runDecideOnceBenchmarks      = Boolean.parseBoolean(map.remove("decide_once"));
         this.runDecideSubscribeBenchmarks = Boolean.parseBoolean(map.remove("decide_subscribe"));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry decision_method." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "decision_method");
     }
 
     // ---------------------------
     // - Authentication
     // ---------------------------
-    public boolean useNoAuth        = true;
-    public boolean useBasicAuth     = true;
-    public boolean useAuthApiKey    = true;
-    public boolean useOauth2        = false;
-    public String  basicClientKey;
-    public String  basicClientSecret;
-    public String  apiKeyHeader;
-    public String  apiKey;
-    public boolean oauth2MockServer = true;
-    public String  oauth2ClientId;
-    public String  oauth2ClientSecret;
-    public String  oauth2Scope;
-    public String  oauth2TokenUri;
-    public String  oauth2IssuerUrl;
+    @Getter @Setter
+    private boolean useNoAuth        = true;
+    @Getter @Setter
+    private boolean useBasicAuth     = true;
+    @Getter @Setter
+    private boolean useAuthApiKey    = true;
+    @Getter @Setter
+    private boolean useOauth2        = false;
+    @Getter @Setter
+    private String  basicClientKey;
+    @Getter @Setter
+    private String  basicClientSecret;
+    @Getter @Setter
+    private String  apiKeyHeader;
+    @Getter @Setter
+    private String apiKeySecret;
+    @Getter
+    private boolean oauth2MockServer = true;
+    @Getter
+    private String  oauth2ClientId;
+    @Getter
+    private String  oauth2ClientSecret;
+    @Getter
+    private String  oauth2Scope;
+    @Getter
+    private String  oauth2TokenUri;
+    @Getter
+    private String  oauth2IssuerUrl;
 
     @JsonProperty("noauth")
     public void setNoAuth(Map<String, String> map) {
         this.useNoAuth = Boolean.parseBoolean(map.remove(ENABLED));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry noauth." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "noauth");
     }
 
     @JsonProperty("basic")
@@ -162,9 +188,7 @@ public class BenchmarkConfiguration {
         }
         map.remove("client_key");
         map.remove(CLIENT_SECRET);
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry basic." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "basic");
     }
 
     @JsonProperty("apikey")
@@ -172,13 +196,11 @@ public class BenchmarkConfiguration {
         this.useAuthApiKey = Boolean.parseBoolean(map.remove(ENABLED));
         if (this.useAuthApiKey) {
             this.apiKeyHeader = map.get("api_key_header");
-            this.apiKey       = map.get("api_key");
+            this.apiKeySecret = map.get("api_key");
         }
         map.remove("api_key_header");
         map.remove("api_key");
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry apikey." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "apikey");
     }
 
     @JsonProperty("oauth2")
@@ -186,7 +208,7 @@ public class BenchmarkConfiguration {
         this.useOauth2 = Boolean.parseBoolean(map.remove(ENABLED));
         if (this.useOauth2) {
             this.oauth2MockServer   = Boolean.parseBoolean(map.get("mock_server"));
-            this.oauth2_mock_image  = map.get("mock_image");
+            this.oauth2MockImage = map.get("mock_image");
             this.oauth2ClientId     = map.get("client_id");
             this.oauth2ClientSecret = map.get(CLIENT_SECRET);
             this.oauth2Scope        = map.get("scope");
@@ -202,28 +224,33 @@ public class BenchmarkConfiguration {
         map.remove("scope");
         map.remove("token_uri");
         map.remove("issuer_url");
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry oauth2." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "oauth2");
     }
 
     // ---------------------------
     // - Gerneral benchamrk settings
     // ---------------------------
-    @JsonProperty
+    @Getter
+    @JsonProperty("forks")
     public Integer      forks         = 2;
-    @JsonProperty
-    public List<String> jvm_args      = new ArrayList<>();
-    @JsonProperty
-    public boolean      fail_on_error = false;
+    @Getter
+    @JsonProperty("jvm_args")
+    private List<String> jvmArgs = new ArrayList<>();
+    @Getter
+    @JsonProperty("fail_on_error")
+    private boolean failOnError = false;
 
     // ---------------------------
     // - Average Response Time
     // ---------------------------
-    public Integer responseTimeWarmupSeconds         = 10;
-    public Integer responseTimeWarmupIterations      = 2;
-    public Integer responseTimeMeasurementSeconds    = 10;
-    public Integer responseTimeMeasurementIterations = 10;
+    @Getter
+    private Integer responseTimeWarmupSeconds         = 10;
+    @Getter
+    private Integer responseTimeWarmupIterations      = 2;
+    @Getter
+    private Integer responseTimeMeasurementSeconds    = 10;
+    @Getter
+    private Integer responseTimeMeasurementIterations = 10;
 
     @JsonProperty("response_time")
     public void setResponseTime(Map<String, String> map) {
@@ -231,32 +258,32 @@ public class BenchmarkConfiguration {
         this.responseTimeWarmupIterations      = Integer.valueOf(map.remove("warmup_iterations"));
         this.responseTimeMeasurementSeconds    = Integer.valueOf(map.remove("measure_seconds"));
         this.responseTimeMeasurementIterations = Integer.valueOf(map.remove("measure_iterations"));
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry response_time." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "response_time");
     }
 
     // ---------------------------
     // - throughput
     // ---------------------------
-    public List<Integer> throughputThreadList            = List.of(1);
-    public Integer       throughputWarmupSeconds         = 10;
-    public Integer       throughputWarmupIterations      = 2;
-    public Integer       throughputMeasurementSeconds    = 10;
-    public Integer       throughputMeasurementIterations = 10;
+    @Getter
+    private List<Integer> throughputThreadList            = List.of(1);
+    @Getter
+    private Integer       throughputWarmupSeconds         = 10;
+    @Getter
+    private Integer       throughputWarmupIterations      = 2;
+    @Getter
+    private Integer       throughputMeasurementSeconds    = 10;
+    @Getter
+    private Integer       throughputMeasurementIterations = 10;
 
     @JsonProperty("throughput")
     public void setThroughput(Map<String, Object> map) throws JsonProcessingException {
         this.throughputThreadList            = mapper.readValue(String.valueOf(map.remove("threads")),
-                new TypeReference<>() {
-                                                     });
+                new TypeReference<>() {});
         this.throughputWarmupSeconds         = (Integer) map.remove("warmup_seconds");
         this.throughputWarmupIterations      = (Integer) map.remove("warmup_iterations");
         this.throughputMeasurementSeconds    = (Integer) map.remove("measure_seconds");
         this.throughputMeasurementIterations = (Integer) map.remove("measure_iterations");
-        for (String key : map.keySet()) {
-            throw new BenchmarkException("Unknown configuration entry throughput." + key);
-        }
+        failOnFurtherMapEntries(map.keySet(), "throughput");
     }
 
     @JsonIgnore
@@ -276,16 +303,16 @@ public class BenchmarkConfiguration {
         }
 
         if (useNoAuth) {
-            authMethods.add("NoAuth");
+            authMethods.add("noAuth");
         }
         if (useBasicAuth) {
-            authMethods.add("BasicAuth");
+            authMethods.add("basicAuth");
         }
         if (useAuthApiKey) {
-            authMethods.add("ApiKey");
+            authMethods.add("apiKey");
         }
         if (useOauth2) {
-            authMethods.add("Oauth2");
+            authMethods.add("oauth2");
         }
 
         if (runDecideOnceBenchmarks) {
@@ -309,49 +336,6 @@ public class BenchmarkConfiguration {
     }
 
     public boolean requiredDockerEnvironment() {
-        return target.equals(DOCKER) && (runHttpBenchmarks || runRsocketBenchmarks);
-    }
-
-    @SuppressWarnings("rawtypes")
-    public BenchmarkExecutionContext getBenchmarkExecutionContext(GenericContainer pdpContainer,
-            GenericContainer oauthContainer) {
-        var context = new BenchmarkExecutionContext();
-        context.authorizationSubscription = authorizationSubscription;
-        if (requiredDockerEnvironment()) {
-            context.rsocketHost = pdpContainer.getHost();
-            context.rsocketPort = pdpContainer.getMappedPort(DOCKER_RSOCKET_PORT);
-            context.use_ssl     = docker_use_ssl;
-            if (context.use_ssl) {
-                context.http_base_url = "https://" + pdpContainer.getHost() + ":"
-                        + pdpContainer.getMappedPort(DOCKER_HTTP_PORT);
-            } else {
-                // noinspection HttpUrlsUsage
-                context.http_base_url = "http://" + pdpContainer.getHost() + ":"
-                        + pdpContainer.getMappedPort(DOCKER_HTTP_PORT);
-            }
-        } else {
-            context.rsocketHost   = remote_rsocket_host;
-            context.rsocketPort   = remote_rsocket_port;
-            context.use_ssl       = remote_use_ssl;
-            context.http_base_url = remote_base_url;
-        }
-        context.basic_client_key    = basicClientKey;
-        context.basic_client_secret = basicClientSecret;
-        context.api_key_header      = apiKeyHeader;
-        context.api_key             = apiKey;
-        if (useOauth2 && oauth2MockServer) {
-            context.oauth2_token_uri = "http://auth-host:" + oauthContainer.getMappedPort(8080) + "/default/token";
-        } else {
-            context.oauth2_token_uri = oauth2TokenUri;
-        }
-        context.oauth2_client_id     = oauth2ClientId;
-        context.oauth2_client_secret = oauth2ClientSecret;
-        context.oauth2_scope         = oauth2Scope;
-
-        context.useNoAuth     = useNoAuth;
-        context.useBasicAuth  = useBasicAuth;
-        context.useAuthApiKey = useAuthApiKey;
-        context.useOauth2     = useOauth2;
-        return context;
+        return benchmarkTarget.equals(DOCKER) && (runHttpBenchmarks || runRsocketBenchmarks);
     }
 }

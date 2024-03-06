@@ -43,8 +43,8 @@ public class LineChart {
                 true, true, false);
     }
 
-    public void addValue(Double y_value, String category, String x_value ){
-        dataset.addValue( y_value, category, x_value);
+    public void addValue(Double yValue, String category, String xValue ){
+        dataset.addValue( yValue, category, xValue);
     }
 
 

@@ -23,12 +23,13 @@ import io.sapl.api.interpreter.Val;
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.api.validation.Text;
-import lombok.experimental.UtilityClass;
 import reactor.core.publisher.Flux;
 
-@UtilityClass
 @PolicyInformationPoint(name = "echo", description = "PIP echoing the input value after 0,5 seconds")
 public class EchoPIP {
+    private EchoPIP() {
+        throw new IllegalStateException("Utility class");
+    }
 
     @Attribute(name = "delayed")
     public static Flux<Val> delayed(@Text Val value) {

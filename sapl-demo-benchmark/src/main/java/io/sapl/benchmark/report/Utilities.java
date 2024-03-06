@@ -20,6 +20,11 @@ package io.sapl.benchmark.report;
 import org.jfree.data.category.CategoryDataset;
 
 public class Utilities {
+
+    private Utilities() {
+        throw new IllegalStateException("Utility class");
+    }
+
     public static Double getMaxValue(CategoryDataset dataset){
         double max = Double.MIN_VALUE;
         for (int r = 0; r < dataset.getRowCount(); r++) {
