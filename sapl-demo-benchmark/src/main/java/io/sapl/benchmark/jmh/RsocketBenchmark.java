@@ -17,13 +17,19 @@
  */
 package io.sapl.benchmark.jmh;
 
+import io.netty.channel.ChannelOption;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.benchmark.BenchmarkExecutionContext;
+import io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
+import io.sapl.pdp.remote.RemoteRsocketPolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
 import org.openjdk.jmh.annotations.*;
+import reactor.netty.http.client.HttpClient;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
+import java.time.Duration;
 
 import static io.sapl.benchmark.jmh.Helper.*;
 
@@ -39,71 +45,78 @@ public class RsocketBenchmark {
     private PolicyDecisionPoint       oauth2Pdp;
     private BenchmarkExecutionContext context;
 
+    private RemoteRsocketPolicyDecisionPoint.RemoteRsocketPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
+        return RemotePolicyDecisionPoint.builder()
+            .rsocket()
+            .host(context.getRsocketHost())
+            .port(context.getRsocketPort())
+            .withUnsecureSSL();
+    }
+
     @Setup(Level.Trial)
     public void setup() throws IOException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
         log.info("initializing pdp connections");
-        if (context.useNoAuth) {
-            noauthPdp = RemotePolicyDecisionPoint.builder().rsocket().host(context.rsocketHost)
-                    .port(context.rsocketPort).withUnsecureSSL().build();
+        if (context.isUseNoAuth()) {
+            noauthPdp = getBaseBuilder().build();
         }
 
-        if (context.useBasicAuth) {
-            basicAuthPdp = RemotePolicyDecisionPoint.builder().rsocket().host(context.rsocketHost)
-                    .port(context.rsocketPort).withUnsecureSSL()
-                    .basicAuth(context.basic_client_key, context.basic_client_secret).build();
-        }
-
-        if (context.useAuthApiKey) {
-            apiKeyPdp = RemotePolicyDecisionPoint.builder().rsocket().host(context.rsocketHost)
-                    .port(context.rsocketPort).withUnsecureSSL().apiKey(context.api_key_header, context.api_key)
+        if (context.isUseBasicAuth()) {
+            basicAuthPdp = getBaseBuilder()
+                    .basicAuth(context.getBasicClientKey(), context.getBasicClientSecret())
                     .build();
         }
 
-        if (context.useOauth2) {
-            oauth2Pdp = RemotePolicyDecisionPoint.builder().rsocket().host(context.rsocketHost)
-                    .port(context.rsocketPort).withUnsecureSSL()
-                    .oauth2(getClientRegistrationRepository(context), "saplPdp").build();
+        if (context.isUseOauth2()) {
+            apiKeyPdp = getBaseBuilder()
+                    .apiKey(context.getApiKeyHeader(), context.getApiKey())
+                    .build();
+        }
+
+        if (context.isUseOauth2()) {
+            oauth2Pdp = getBaseBuilder()
+                    .oauth2(getClientRegistrationRepository(context), "saplPdp")
+                    .build();
         }
     }
 
     @Benchmark
     public void noAuthDecideSubscribe() {
-        decide(noauthPdp, context.authorizationSubscription);
+        decide(noauthPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void noAuthDecideOnce() {
-        decideOnce(noauthPdp, context.authorizationSubscription);
+        decideOnce(noauthPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void basicAuthDecideSubscribe() {
-        decide(basicAuthPdp, context.authorizationSubscription);
+        decide(basicAuthPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void basicAuthDecideOnce() {
-        decideOnce(basicAuthPdp, context.authorizationSubscription);
+        decideOnce(basicAuthPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void apiKeyDecideSubscribe() {
-        decide(apiKeyPdp, context.authorizationSubscription);
+        decide(apiKeyPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void apiKeyDecideOnce() {
-        decideOnce(apiKeyPdp, context.authorizationSubscription);
+        decideOnce(apiKeyPdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void oAuth2DecideSubscribe() {
-        decide(oauth2Pdp, context.authorizationSubscription);
+        decide(oauth2Pdp, context.getAuthorizationSubscription());
     }
 
     @Benchmark
     public void oAuth2DecideOnce() {
-        decideOnce(oauth2Pdp, context.authorizationSubscription);
+        decideOnce(oauth2Pdp, context.getAuthorizationSubscription());
     }
 }

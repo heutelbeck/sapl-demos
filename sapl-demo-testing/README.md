@@ -34,7 +34,9 @@ It's using the default project structure of a [Maven](https://maven.apache.org/)
 
 The configuration of the test execution and the [sapl-maven-plugin](https://github.com/heutelbeck/sapl-policy-engine/sapl-maven-plugin) is in the `pom.xml`.
 
-For a detailed description of the available parameters for the [sapl-maven-plugin](https://github.com/heutelbeck/sapl-policy-engine/sapl-maven-plugin) consult the [SAPL Docs](https://sapl.io/docs/latest/sapl-reference.html#code-coverage-reports-via-the-sapl-maven-plugin)
+For a detailed description of the available parameters for the [sapl-maven-plugin]
+(https://github.com/heutelbeck/sapl-policy-engine/sapl-maven-plugin) consult the [SAPL 
+Docs](https://sapl.io/docs/latest/9_9_CodeCoverageReportsviatheSAPLMavenPlugin/)
 
 
 Running the Maven "test" goal is executing the JUnit Tests containing the SAPL policy tests.

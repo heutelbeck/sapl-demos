@@ -1,15 +1,3 @@
-package io.sapl.benchmark;
-
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.concurrent.Callable;
-
 /*
  * Copyright (C) 2017-2024 Dominic Heutelbeck (dominic@heutelbeck.com)
  *
@@ -27,6 +15,19 @@ import java.util.concurrent.Callable;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package io.sapl.benchmark;
+
+import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.Callable;
+
 @Slf4j
 @ToString
 @Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
@@ -42,10 +43,10 @@ public class BenchmarkCommand implements Callable<Integer> {
     private String cfgFilePath;
 
     @Option(names = {"--skipBenchmark"})
-    private Boolean skipBenchmark = Boolean.FALSE;
+    private boolean skipBenchmark = false;
 
     @Option(names = {"--skipReportGeneration"})
-    private Boolean skipReportGeneration = Boolean.FALSE;
+    private boolean skipReportGeneration = false;
 
 
     @Override

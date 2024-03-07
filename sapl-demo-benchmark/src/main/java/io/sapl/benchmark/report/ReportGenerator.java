@@ -23,6 +23,7 @@ import com.nimbusds.jose.shaded.gson.JsonArray;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonObject;
 import com.nimbusds.jose.shaded.gson.JsonParser;
+import io.sapl.benchmark.util.BenchmarkException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
@@ -36,9 +37,25 @@ import java.util.*;
 
 @Slf4j
 public class ReportGenerator {
+    static String pdpNameField = "pdpName";
+    static String scoreField = "score";
+    static String benchmarkField = "benchmark";
+    static String primaryMetricField = "primaryMetric";
+    static String scorePercentilesField = "scorePercentiles";
+    static String chartField = "chart";
+    private ReportGenerator() {
+        throw new IllegalStateException("Utility class");
+    }
+
     private static double round(double value) {
         double d = Math.pow(10, 2);
         return Math.round(value * d) / d;
+    }
+
+    private static int getThreadCountFromFileName(String fileName){
+        return Integer.parseInt(
+                fileName.replaceFirst("throughput_(\\d+)threads.json", "$1")
+        );
     }
 
     private static java.util.List<String> getThroughputJsonFiles(String bechmarkFolder){
@@ -46,7 +63,7 @@ public class ReportGenerator {
         FilenameFilter filenameFilter = (d, s) -> s.matches("throughput_\\d+threads.json");
         var treadResultFiles = new File(bechmarkFolder).list(filenameFilter);
         return Arrays.stream(Optional.ofNullable(treadResultFiles).orElse(new String[0])).sorted(
-                Comparator.comparing(s -> Integer.valueOf(s.replaceAll("\\w+_(\\d+)threads.json", "$1")))
+                Comparator.comparing(ReportGenerator::getThreadCountFromFileName)
         ).toList();
     }
 
@@ -54,22 +71,22 @@ public class ReportGenerator {
                                                   List<Map<String, Object>> tableData) throws IOException{
         var chart = new BarChart(title, "ops/s");
         for ( var row: tableData) {
-            chart.addBenchmarkResult((String) row.get("threads"), (String) row.get("pdpName"), round((Double) row.get("score")));
+            chart.addBenchmarkResult((String) row.get("threads"), (String) row.get(pdpNameField), round((Double) row.get(scoreField)));
         }
         chart.showLabels(new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat("#"), new DecimalFormat("#")));
         chart.useLogAxis();
-        chart.saveToPNGFile( new File( bechmarkFolder + "/" + outputFilename ));
+        chart.saveToPNGFile( new File( bechmarkFolder + File.separator + outputFilename ));
     }
 
     public static void generateResponsetimeBarChart(String bechmarkFolder, String outputFilename, String title,
                                                     List<Map<String, Object>> tableData) throws IOException{
         var chart = new BarChart(title, "ms/op");
         for ( var row: tableData) {
-            chart.addBenchmarkResult((String) row.get("authName"), (String) row.get("pdpName"), round((Double) row.get("score")));
+            chart.addBenchmarkResult((String) row.get("authName"), (String) row.get(pdpNameField), round((Double) row.get(scoreField)));
         }
         chart.showLabels();
         chart.useLogAxis();
-        chart.saveToPNGFile( new File( bechmarkFolder + "/" + outputFilename ));
+        chart.saveToPNGFile( new File( bechmarkFolder + File.separator + outputFilename ));
     }
 
 
@@ -85,7 +102,7 @@ public class ReportGenerator {
                 chart.addValue(e3.getAsDouble(), fork, String.valueOf(iteration++));
             }
         }
-        chart.saveToPNGFile( new File( bechmarkFolder + "/" + filePath ));
+        chart.saveToPNGFile( new File( bechmarkFolder + File.separator + filePath ));
     }
 
     private static String getBenchmarkNameFromFqn(String methodFqn){
@@ -101,7 +118,7 @@ public class ReportGenerator {
         } else if ( methodName.endsWith("DecideSubscribe") || methodName.endsWith("Decide")){
             return "Decide Subscribe";
         } else {
-            throw new RuntimeException("Unable to determine DecisionMethod in " + methodName);
+            throw new BenchmarkException("Unable to determine DecisionMethod in " + methodName);
         }
     }
 
@@ -113,46 +130,46 @@ public class ReportGenerator {
 
     private static String getPdpFromBenchmarkName(String benchmarkName){
         String[] benchmarkNames = benchmarkName.split("\\.");
-        return benchmarkNames[benchmarkNames.length-2].replace("Benchmark", "").toLowerCase();
+        return benchmarkNames[benchmarkNames.length-2].replace(benchmarkField, "").toLowerCase();
     }
 
     private static Map<String, Object> getSummaryTableContext(String bechmarkFolder) throws IOException {
-        List<String> header_facts = new ArrayList<>();
+        List<String> headerFacts = new ArrayList<>();
         Map<String, Map<String, Map<String, List<Object>>>> rowData = Maps.newHashMap();
-        header_facts.add("avg ms/op");
+        headerFacts.add("avg ms/op");
 
         // get data from average_response
         JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder+"/average_response.json")).getAsJsonArray();
         for (JsonElement e : jsonContent) {
             JsonObject runResult = e.getAsJsonObject();
-            String benchmarkName = runResult.get("benchmark").getAsString();
+            String benchmarkName = runResult.get(benchmarkField).getAsString();
             String pdp = getPdpFromBenchmarkName(benchmarkName);
             String decisionMethod = getDecisionMethodFromBenchmarkName(benchmarkName);
             String authMethod = getAuthMethodFromBenchmarkName(benchmarkName);
-            var base_entry = rowData.computeIfAbsent(decisionMethod, __ -> Maps.newHashMap())
-                                    .computeIfAbsent(authMethod, __ -> Maps.newHashMap())
-                                    .computeIfAbsent(pdp, __ -> new ArrayList<>());
-            base_entry.add(runResult.get("primaryMetric").getAsJsonObject().get("score").getAsDouble());
+            var baseEntry = rowData.computeIfAbsent(decisionMethod, xY -> Maps.newHashMap())
+                                    .computeIfAbsent(authMethod, xY -> Maps.newHashMap())
+                                    .computeIfAbsent(pdp, xY -> new ArrayList<>());
+            baseEntry.add(runResult.get(primaryMetricField).getAsJsonObject().get(scoreField).getAsDouble());
         }
 
         // get data from average_response
         for ( String filename: getThroughputJsonFiles(bechmarkFolder) ) {
-            jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + "/" + filename)).getAsJsonArray();
-            String threads = filename.replaceAll("\\w+_(\\d+)threads.json", "$1-threads");
-            header_facts.add("throughput ops/s<br>("+threads+")");
+            jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + File.separator + filename)).getAsJsonArray();
+            String threads = getThreadCountFromFileName(filename) + "-threads";
+            headerFacts.add("throughput ops/s<br>("+threads+")");
             for (JsonElement e : jsonContent) {
                 JsonObject runResult = e.getAsJsonObject();
-                String benchmarkName = runResult.get("benchmark").getAsString();
+                String benchmarkName = runResult.get(benchmarkField).getAsString();
                 String pdp = getPdpFromBenchmarkName(benchmarkName);
                 String decisionMethod = getDecisionMethodFromBenchmarkName(benchmarkName);
                 String authMethod = getAuthMethodFromBenchmarkName(benchmarkName);
-                var base_entry = rowData.computeIfAbsent(decisionMethod, __ -> Maps.newHashMap())
-                        .computeIfAbsent(authMethod, __ -> Maps.newHashMap())
-                        .computeIfAbsent(pdp, __ -> new ArrayList<>());
-                base_entry.add(runResult.get("primaryMetric").getAsJsonObject().get("score").getAsDouble());
+                var baseEntry = rowData.computeIfAbsent(decisionMethod, xY -> Maps.newHashMap())
+                        .computeIfAbsent(authMethod, xY -> Maps.newHashMap())
+                        .computeIfAbsent(pdp, xY -> new ArrayList<>());
+                baseEntry.add(runResult.get(primaryMetricField).getAsJsonObject().get(scoreField).getAsDouble());
             }
         }
-        return Map.of("header_facts", header_facts, "row_data", rowData);
+        return Map.of("header_facts", headerFacts, "row_data", rowData);
     }
 
     private static Map<String, Map<String, Object>> getResponseTimeContext(String bechmarkFolder) throws IOException {
@@ -161,37 +178,38 @@ public class ReportGenerator {
         JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + "/average_response.json")).getAsJsonArray();
         for (JsonElement e : jsonContent) {
             JsonObject runResult = e.getAsJsonObject();
-            String benchmarkName = getBenchmarkNameFromFqn(runResult.get("benchmark").getAsString());
+            String benchmarkName = getBenchmarkNameFromFqn(runResult.get(benchmarkField).getAsString());
             String decisionMethod = getDecisionMethodFromBenchmarkName(benchmarkName);
             String section = decisionMethod + " - Average Response Time";
 
             // generate detail graph
             var chartFilePath = "img/" + benchmarkName + " response time.png";
             createDetailLineChart(bechmarkFolder, chartFilePath, benchmarkName + " - response time",
-                    runResult.get("primaryMetric").getAsJsonObject().get("rawData").getAsJsonArray()
+                    runResult.get(primaryMetricField).getAsJsonObject().get("rawData").getAsJsonArray()
             );
 
             // add table entry
-            var entry = baseData.computeIfAbsent(section, __ -> new ArrayList<>());
+            var entry = baseData.computeIfAbsent(section, xY -> new ArrayList<>());
             entry.add(Map.of(
-                    "benchmark", benchmarkName,
+                    benchmarkField, benchmarkName,
                     "authName", getAuthMethodFromBenchmarkName(benchmarkName),
-                    "pdpName", getPdpFromBenchmarkName(benchmarkName),
-                    "score", runResult.get("primaryMetric").getAsJsonObject().get("score").getAsDouble(),
-                    "error", runResult.get("primaryMetric").getAsJsonObject().get("scoreError").getAsDouble(),
-                    "pct_90", runResult.get("primaryMetric").getAsJsonObject().get("scorePercentiles").getAsJsonObject().get("90.0").getAsDouble(),
-                    "pct_95", runResult.get("primaryMetric").getAsJsonObject().get("scorePercentiles").getAsJsonObject().get("95.0").getAsDouble(),
-                    "pct_99", runResult.get("primaryMetric").getAsJsonObject().get("scorePercentiles").getAsJsonObject().get("99.0").getAsDouble(),
-                    "chart", chartFilePath
+                    pdpNameField, getPdpFromBenchmarkName(benchmarkName),
+                    scoreField, runResult.get(primaryMetricField).getAsJsonObject().get(scoreField).getAsDouble(),
+                    "error", runResult.get(primaryMetricField).getAsJsonObject().get("scoreError").getAsDouble(),
+                    "pct_90", runResult.get(primaryMetricField).getAsJsonObject().get(scorePercentilesField).getAsJsonObject().get("90.0").getAsDouble(),
+                    "pct_95", runResult.get(primaryMetricField).getAsJsonObject().get(scorePercentilesField).getAsJsonObject().get("95.0").getAsDouble(),
+                    "pct_99", runResult.get(primaryMetricField).getAsJsonObject().get(scorePercentilesField).getAsJsonObject().get("99.0").getAsDouble(),
+                    chartField, chartFilePath
             ));
         }
 
         Map<String, Map<String, Object>> resultMap = Maps.newHashMap();
-        for (String section: baseData.keySet()){
+        for (Map.Entry<String, List<Map<String, Object>>> entry : baseData.entrySet()) {
+            String section = entry.getKey();
             String fileName = "img/" + section + ".png";
             generateResponsetimeBarChart(bechmarkFolder, fileName, section, baseData.get(section));
             resultMap.put(section, Map.of(
-                    "chart", fileName,
+                    chartField, fileName,
                     "tableData", baseData.get(section))
             );
         }
@@ -204,11 +222,11 @@ public class ReportGenerator {
         Map<String, List<Map<String, Object>>> baseData = Maps.newHashMap();
 
         for ( String filename: getThroughputJsonFiles(bechmarkFolder) ) {
-            JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + "/" + filename)).getAsJsonArray();
-            String threads = filename.replaceAll("\\w+_(\\d+)threads.json", "$1-threads");
+            JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + File.separator + filename)).getAsJsonArray();
+            String threads = getThreadCountFromFileName(filename) + "-threads";
             for (JsonElement e : jsonContent) {
                 JsonObject runResult = e.getAsJsonObject();
-                String benchmarkName = getBenchmarkNameFromFqn(runResult.get("benchmark").getAsString());
+                String benchmarkName = getBenchmarkNameFromFqn(runResult.get(benchmarkField).getAsString());
                 String decisionMethod = getDecisionMethodFromBenchmarkName(benchmarkName);
                 String authMethod = getAuthMethodFromBenchmarkName(benchmarkName);
                 String section = decisionMethod + " - " + authMethod + " - throughput";
@@ -216,28 +234,29 @@ public class ReportGenerator {
                 // generate detail
                 var chartFilePath = "img/" + benchmarkName + " throughput.png";
                 createDetailLineChart(bechmarkFolder, chartFilePath, benchmarkName + " - Throughput",
-                        runResult.get("primaryMetric").getAsJsonObject().get("rawData").getAsJsonArray()
+                        runResult.get(primaryMetricField).getAsJsonObject().get("rawData").getAsJsonArray()
                 );
 
                 // add table entry
-                var entry = baseData.computeIfAbsent(section, __ -> new ArrayList<>());
+                var entry = baseData.computeIfAbsent(section, xY -> new ArrayList<>());
                 entry.add(Map.of(
-                        "benchmark", benchmarkName,
-                        "pdpName", getPdpFromBenchmarkName(benchmarkName),
+                        benchmarkField, benchmarkName,
+                        pdpNameField, getPdpFromBenchmarkName(benchmarkName),
                         "threads", threads,
-                        "score", runResult.get("primaryMetric").getAsJsonObject().get("score").getAsDouble(),
-                        "error", runResult.get("primaryMetric").getAsJsonObject().get("scoreError").getAsDouble(),
-                        "chart", chartFilePath
+                        scoreField, runResult.get(primaryMetricField).getAsJsonObject().get(scoreField).getAsDouble(),
+                        "error", runResult.get(primaryMetricField).getAsJsonObject().get("scoreError").getAsDouble(),
+                        chartField, chartFilePath
                 ));
             }
         }
 
         Map<String, Map<String, Object>> resultMap = Maps.newHashMap();
-        for (String section: baseData.keySet()){
+        for (Map.Entry<String, List<Map<String, Object>>> entry : baseData.entrySet()) {
+            String section = entry.getKey();
             String fileName = "img/" + section + ".png";
             generateThroughputBarChart(bechmarkFolder, fileName, section, baseData.get(section));
             resultMap.put(section, Map.of(
-                    "chart", fileName,
+                    chartField, fileName,
                     "tableData", baseData.get(section))
             );
         }
@@ -272,7 +291,7 @@ public class ReportGenerator {
         for (String file: new String[]{"custom.css", "favicon.png"}) {
             inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream(file);
             if (inputStream != null) {
-                FileUtils.copyInputStreamToFile(inputStream, new File(benchmarkFolder + "/" + file));
+                FileUtils.copyInputStreamToFile(inputStream, new File(benchmarkFolder + File.separator + file));
             }
         }
     }
