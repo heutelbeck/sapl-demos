@@ -15,7 +15,7 @@ import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pdp.EmbeddedPolicyDecisionPoint;
 import io.sapl.pdp.config.filesystem.FileSystemVariablesAndCombinatorSource;
 import io.sapl.pdp.config.fixed.FixedFunctionsAndAttributesPDPConfigurationProvider;
-import io.sapl.prp.GenericInMemoryIndexedPolicyRetrievalPoint;
+import io.sapl.prp.GenericInMemoryIndexedPolicyRetrievalPointSource;
 import io.sapl.prp.filesystem.FileSystemPrpUpdateEventSource;
 import io.sapl.prp.index.naive.NaiveImmutableParsedDocumentIndex;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ public class MultiTenantConfiguration {
 		log.info("PDP for path: {}", path);
 		var pdpUpdateEventSource  = new FileSystemPrpUpdateEventSource(path, interpreter);
 		var seedIndex             = new NaiveImmutableParsedDocumentIndex();
-		var policyRetrievalPoint  = new GenericInMemoryIndexedPolicyRetrievalPoint(seedIndex, pdpUpdateEventSource);
+		var policyRetrievalPoint  = new GenericInMemoryIndexedPolicyRetrievalPointSource(seedIndex, pdpUpdateEventSource);
 		var combinatorProvider    = new FileSystemVariablesAndCombinatorSource(path);
 		var configurationProvider = new FixedFunctionsAndAttributesPDPConfigurationProvider(attributeContext,
 				functionContext, combinatorProvider, List.of(), List.of());

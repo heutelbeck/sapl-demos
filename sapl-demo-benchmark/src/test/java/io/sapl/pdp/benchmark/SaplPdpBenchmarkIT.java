@@ -17,18 +17,21 @@
  */
 package io.sapl.pdp.benchmark;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import io.sapl.benchmark.BenchmarkCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import io.sapl.benchmark.BenchmarkCommand;
 import picocli.CommandLine;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@Slf4j
 class SaplPdpBenchmarkIT {
     private static final String tmpReportPath = "results/tmp_benchmark_test";
 
@@ -36,8 +39,7 @@ class SaplPdpBenchmarkIT {
     private static void createEmptyBenchmarkResultFolder() throws IOException {
         var tmpReportPathFile = new File(tmpReportPath);
         FileUtils.deleteDirectory(tmpReportPathFile);
-        // noinspection ResultOfMethodCallIgnored
-        tmpReportPathFile.mkdirs();
+        assertTrue(tmpReportPathFile.mkdirs());
     }
 
     @Test
@@ -46,18 +48,19 @@ class SaplPdpBenchmarkIT {
                 "src/test/resources/test_benchmark_config.yaml", "--output", tmpReportPath);
         Assertions.assertEquals(0, returnCode);
         var reportFiles = List.of("Report.html", "average_response.json", "custom.css", "favicon.png",
-                "img/Decide Subscribe - Average Response Time.png", "img/Decide Subscribe - NoAuth - throughput.png",
-                "img/EmbeddedBenchmark.NoAuthDecideSubscribe response time.png",
-                "img/EmbeddedBenchmark.NoAuthDecideSubscribe throughput.png",
-                "img/HttpBenchmark.NoAuthDecideSubscribe response time.png",
-                "img/HttpBenchmark.NoAuthDecideSubscribe throughput.png",
-                "img/RsocketBenchmark.NoAuthDecideSubscribe response time.png",
-                "img/RsocketBenchmark.NoAuthDecideSubscribe throughput.png", "test_benchmark_config.yaml",
-                "throughput_1threads.json");
+                "img/Decide Subscribe - Average Response Time.png", "img/Decide Subscribe - noAuth - throughput.png",
+                "img/EmbeddedBenchmark.noAuthDecideSubscribe response time.png",
+                "img/EmbeddedBenchmark.noAuthDecideSubscribe throughput.png",
+                "img/HttpBenchmark.noAuthDecideSubscribe response time.png",
+                "img/HttpBenchmark.noAuthDecideSubscribe throughput.png",
+                "img/RsocketBenchmark.noAuthDecideSubscribe response time.png",
+                "img/RsocketBenchmark.noAuthDecideSubscribe throughput.png",
+                "test_benchmark_config.yaml", "throughput_1threads.json");
         for (String fileName : reportFiles) {
             File reportFile = new File(tmpReportPath + "/" + fileName);
-            Assertions.assertTrue(reportFile.exists(), reportFile + " does not exist");
-            Assertions.assertTrue(reportFile.length() >= 0, reportFile + " is empty");
+            assertTrue(reportFile.exists(), reportFile + " does not exist");
+            assertTrue(reportFile.length() >= 0, reportFile + " is empty");
+
         }
     }
 }
