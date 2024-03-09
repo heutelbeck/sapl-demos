@@ -1,6 +1,8 @@
 package io.sapl.demo;
 
 import java.time.Clock;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
@@ -12,14 +14,17 @@ import io.sapl.functions.SchemaValidationLibrary;
 import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
 import io.sapl.interpreter.InitializationException;
-import io.sapl.interpreter.combinators.CombiningAlgorithmFactory;
 import io.sapl.interpreter.combinators.PolicyDocumentCombiningAlgorithm;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.pdp.config.PDPConfiguration;
 import io.sapl.pdp.config.PDPConfigurationProvider;
 import io.sapl.pip.TimePolicyInformationPoint;
+import io.sapl.prp.Document;
+import io.sapl.prp.PolicyRetrievalPoint;
+import io.sapl.prp.PolicyRetrievalResult;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Configuration
 public class SaplConfiguration {
@@ -33,14 +38,29 @@ public class SaplConfiguration {
         functionContext.loadLibrary(StandardFunctionLibrary.class);
         functionContext.loadLibrary(TemporalFunctionLibrary.class);
         functionContext.loadLibrary(SchemaValidationLibrary.class);
-        var staticPlaygroundConfiguration = new PDPConfiguration(attributeContext, functionContext, Map.of(),
-                CombiningAlgorithmFactory.getCombiningAlgorithm(PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES),
-                UnaryOperator.identity(), UnaryOperator.identity());
-        return new PDPConfigurationProvider() {
+        var dummyPrp = new PolicyRetrievalPoint() {
+
             @Override
-            public Flux<PDPConfiguration> pdpConfiguration() {
-                return Flux.just(staticPlaygroundConfiguration);
+            public Mono<PolicyRetrievalResult> retrievePolicies() {
+                return Mono.empty();
             }
+
+            @Override
+            public Collection<Document> allDocuments() {
+                return List.of();
+            }
+
+            @Override
+            public boolean isConsistent() {
+                return true;
+            }
+
         };
+
+        var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
+                Map.of(), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
+                UnaryOperator.identity(), dummyPrp);
+
+        return () -> Flux.just(staticPlaygroundConfiguration);
     }
 }

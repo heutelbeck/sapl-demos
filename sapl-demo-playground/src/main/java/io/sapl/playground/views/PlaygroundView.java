@@ -320,7 +320,7 @@ public class PlaygroundView extends VerticalLayout {
         this.evaluationError.setVisible(false);
 
         var saplString = event.getNewValue();
-        if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
+        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return;
         }
@@ -427,7 +427,7 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private SAPL getSAPLDocument(String saplString) {
-        if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
+        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return null;
         } else {
