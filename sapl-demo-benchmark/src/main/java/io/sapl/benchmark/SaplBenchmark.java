@@ -17,7 +17,14 @@
  */
 package io.sapl.benchmark;
 
-import lombok.extern.slf4j.Slf4j;
+import static io.sapl.benchmark.report.ReportGenerator.generateHTMLReport;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -32,13 +39,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.concurrent.TimeUnit;
-
-import static io.sapl.benchmark.report.ReportGenerator.generateHTMLReport;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SaplBenchmark {
@@ -60,7 +61,6 @@ public class SaplBenchmark {
     private GenericContainer<?> getServerLtContainer(){
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
-        @java.lang.SuppressWarnings("java:S1075")
         var dockerKeystorePath = "/pdp/keystore.p12";
 
         var errorLogLevel =  "ERROR";

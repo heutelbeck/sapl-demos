@@ -17,18 +17,24 @@
  */
 package io.sapl.benchmark.jmh;
 
+import static io.sapl.benchmark.jmh.Helper.decide;
+import static io.sapl.benchmark.jmh.Helper.decideOnce;
+
+import java.util.List;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.benchmark.BenchmarkExecutionContext;
 import io.sapl.benchmark.util.EchoPIP;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.pdp.PolicyDecisionPointFactory;
 import lombok.extern.slf4j.Slf4j;
-import org.openjdk.jmh.annotations.*;
-
-import java.util.List;
-
-import static io.sapl.benchmark.jmh.Helper.decide;
-import static io.sapl.benchmark.jmh.Helper.decideOnce;
 
 
 @Slf4j
