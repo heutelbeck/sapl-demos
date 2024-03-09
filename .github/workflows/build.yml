@@ -31,7 +31,7 @@ jobs:
     strategy:
       matrix:
         java: [ '17', '21' ]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest ] #, windows-latest, macos-latest]
     name: JDK ${{ matrix.java }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 20
@@ -124,25 +124,27 @@ jobs:
         java-version: 17
         cache: 'maven'
 
-    - name: Configure servers
-      uses: s4u/maven-settings-action@60912582505985be4cc55d2b890eb32767f8de5f # v2.8.0
-      with:
-        githubServer: false
-        servers: |
-          [{
-              "id": "ghcr.io",
-              "username": "${{ secrets.GHUB_USERNAME }}",
-              "password": "${{ secrets.GHUB_ACCESS_TOKEN }}"
-           }]
-               
-    - name: Build Modules
-      run: mvn -B install -DskipTests -pl sapl-demo-playground -P production
-
     - name: Build SAPL Demo Playground Image
-      run: mvn -B dockerfile:build -pl sapl-demo-playground -P docker,production -DskipTests
+      run: mvn -B spring-boot:build-image -pl sapl-demo-playground -Pproduction -DskipTests
 
-    - name: Push Image
-      run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,production -DskipTests
+    - name: Log in to the Container registry
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHUB_ACCESS_TOKEN }}
+
+    - name: Get version
+      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      id: get-version
+      run: |
+        VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+        echo "version=$VERSION" >> $GITHUB_OUTPUT        
         
+    - name: Push Server LT Image to ghcr.io
+      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      run: |
+        docker push ghcr.io/heutelbeck/sapl-demo-playground:${{ steps.get-version.outputs.VERSION }}
+
     - name: Clean up local repository before caching 
       run: rm -rf ~/.m2/repository/io/sapl
