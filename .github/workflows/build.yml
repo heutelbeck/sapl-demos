@@ -1,4 +1,4 @@
-
+#
 # Copyright © 2017-2024 Dominic Heutelbeck (dominic@heutelbeck.com)
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,228 +13,138 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-name: Testing and Publishing
+
+# Note: when updating actions version pinning can be done using:
+# https://app.stepsecurity.io/secureworkflow before committing the changes.
+
+name: Build
 
 on:
   workflow_dispatch:
-  repository_dispatch:
-  create:
-    branches:
-      - '**'
   push:
-    branches:
-      - '**'
-    paths-ignore:
-      - '.github/workflows/**'
-      - '!.github/workflows/build.yml'
-      - '**.md'
-  pull_request:
-    paths-ignore:
-      - '.github/workflows/**'
-      - '!.github/workflows/build.yml'
-      - '**.md'
-
-permissions:
-  contents: read
+    branches: [master, workflows]
+  repository_dispatch:
+    branches: [master]
 
 jobs:
-  build:
+  tests:
     strategy:
       matrix:
         java: [ '17', '21' ]
-        os: [ubuntu-latest, windows-latest, macos-latest]
-      fail-fast: false
-    name: Build (JDK ${{ matrix.java }} on ${{ matrix.os }})
+        os: [ubuntu-latest ] #, windows-latest, macos-latest]
+    name: JDK ${{ matrix.java }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    permissions:
-      checks: write # for scacap/action-surefire-report to publish result as PR check
-    timeout-minutes: 45
-
-    env:
-      # Run Sonar, Integration Tests, and JaCoCo only for Ubuntu JDK 17. All other platforms, just do quick unit tests.
-      RUN_ANALYSIS: ${{ (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
-      # PRs from Dependabot are treated the same as those from forks since secrets are not accessible
-      # (see: https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-852541544).
-      IS_FORK: ${{ github.event.pull_request.head.repo.fork || (github.actor == 'dependabot[bot]') }}
+    timeout-minutes: 20
 
     steps:
-    - name: Harden Runner
-      # Currently not supported for windows and macos
-      # (see: https://github.com/step-security/harden-runner/discussions/121).
-      if: ${{ matrix.os == 'ubuntu-latest' }}
-      uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
-      with:
-        egress-policy: audit
-
     - name: Check out
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
-        lfs: true
         fetch-depth: 0
-
-      # This Action will scan dependency manifest files that change as part of a Pull Request,
-      # surfacing known-vulnerable versions of the packages declared or updated in the PR.
-      # Once installed, if the workflow run is marked as required,
-      # PRs introducing known-vulnerable packages will be blocked from merging.
-    - name: Dependency Review
-      if: ${{ (env.RUN_ANALYSIS == 'true') && (github.event_name == 'pull_request') }}
-      uses: actions/dependency-review-action@4901385134134e04cec5fbe5ddfe3b2c5bd5d976 # v4.0.0
 
     - name: Set up JDK ${{ matrix.java }}
       uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
       with:
-        distribution: 'temurin'
+        distribution: 'adopt'
         java-version: ${{ matrix.java }}
         cache: 'maven'
 
-    - name: Setup Maven
-      uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
-      with:
-        maven-version: 3.9.6
+    - name: Run tests
+      # make sure to activate Vaadin production to catch potential errors during vite JS processing
+      run: mvn -B package -Pproduction
 
-    - name: Set up Node.js
-      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
-      with:
-        node-version: '20'
-
-    - name: Add auth-host to /etc/hosts for OAuth Integration Tests
-      if: env.RUN_ANALYSIS == 'true'
-      run: sudo sh -c 'echo "127.0.0.1 auth-host" >> /etc/hosts'
-
-    - name: Build Modules
-      if: env.RUN_ANALYSIS == 'true'
-      run: mvn -U -B install -DskipTests -pl !:sapl-demo-testing
-
-    - name: Build Integration Test Images
-      if: env.RUN_ANALYSIS == 'true'
-      run: mvn -B dockerfile:build -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -P docker -DskipTests
-
-    - name: Run Unit Tests Only
-      if: env.RUN_ANALYSIS == 'false'
-      # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
-      run: mvn -B package -fae -Pproduction
-
-    - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
-      if: env.RUN_ANALYSIS == 'true'
-      # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
-      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report spotbugs:spotbugs -fae -pl !:sapl-demo-oauth2-jwt-client-application -Pproduction,it
-
-    - name: Cache Sonar Packages
-      if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'false') }}
-      uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
-      with:
-        path: ~/.sonar/cache
-        key: ${{ runner.os }}-sonar
-        restore-keys: ${{ runner.os }}-sonar
-
-    - name: Run SonarCloud Analysis
-      if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'false') }}
-      env:
-        SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
-      run: >
-        mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
-        -pl !:sapl-demo-oauth2-jwt-client-application
-        -Dsonar.organization=heutelbeck
-        -Dsonar.host.url=https://sonarcloud.io
-        -Dsonar.projectKey=heutelbeck_sapl-demos
-        -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
-        -Dsonar.java.spotbugs.reportPaths=target/spotbugsXml.xml
-        -Dsonar.qualitygate.wait=true
-
-    - name: Save PR Number # needed for subsequent SonarCloud workflow for PRs from fork
-      if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'true') }}
-      run: echo "${{ github.event.number }}" > pr_data.txt
-
-    - name: Upload Artifact # needed for subsequent SonarCloud workflow for PRs from fork
-      if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'true') }}
-      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
-      with:
-        name: pr_build
-        path: |
-          **/src
-          **/target/spotbugsXml.xml
-          **/target/classes
-          **/target/test-classes
-          **/target/site/jacoco/jacoco.xml
-          **/pom.xml
-          pom.xml
-          pr_data.txt
-          .git
-        retention-days: 1
-
-    - name: Publish Test Report
-      if: ${{ (success() || failure()) && (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'false') }}
-      uses: scacap/action-surefire-report@a2911bd1a4412ec18dde2d93b1758b3e56d2a880 # v1.8.0
-
-    - name: Clean up Local Repository before Caching
-      shell: bash # needed to run script on windows
+    - name: Clean up local repository before caching (Linux/Mac)
+      if: ${{ matrix.os != 'windows-latest'}}
       run: rm -rf ~/.m2/repository/io/sapl
 
-  deploy:
-    if: ${{ github.ref == 'refs/heads/master' }}
-    needs: [ build ]
-    name: Publish Project Assets
+    - name: Clean up local repository before caching (Win)
+      if: ${{ matrix.os == 'windows-latest'}}
+      run: rm -Recurse -Force ~/.m2/repository/io/sapl
+
+  analyze:
+    needs: [tests]
+    name: Code Analysis, Test Coverage, Integration Tests
     runs-on: ubuntu-latest
-    permissions:
-      actions: write # for Mattraks/delete-workflow-runs
-    timeout-minutes: 35
+    timeout-minutes: 20
 
     steps:
-    - name: Harden Runner
-      uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
-      with:
-        egress-policy: audit
-
     - name: Check out
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       with:
-        lfs: true
         fetch-depth: 0
 
     - name: Set up JDK 17
       uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
       with:
-        distribution: 'temurin'
-        java-version: '17'
+        distribution: 'adopt'
+        java-version: 17
         cache: 'maven'
 
-    - name: Setup Maven
-      uses: stCarolas/setup-maven@d6af6abeda15e98926a57b5aa970a96bb37f97d1 # v5
-      with:
-        maven-version: 3.9.6
+    - name: Add auth-server to /etc/hosts for OAuth Integration Tests
+      run: sudo sh -c 'echo "127.0.0.1 auth-server" >> /etc/hosts'
 
-    - name: Set up Node.js
-      uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
-      with:
-        node-version: '20'
+    - name: Build Modules
+      run: mvn -B install -DskipTests -pl !:sapl-demo-testing
 
-    - name: Configure Servers
-      uses: s4u/maven-settings-action@7802f6aec16c9098b4798ad1f1d8ac75198194bd # v3.0.0
-      with:
-        githubServer: false
-        servers: |
-          [{
-              "id": "ghcr.io",
-              "username": "${{ secrets.GHUB_USERNAME }}",
-              "password": "${{ secrets.GHUB_ACCESS_TOKEN }}"
-           }]
+    - name: Build Integration Test Images
+      run: mvn -B spring-boot:build-image -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -DskipTests
 
-    - name: Build Module SAPL Demo Playground
-      run: mvn -B install -pl sapl-demo-playground -P production -DskipTests
+    - name: Run analysis (JaCoCo, Sonar)
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.7:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.7:report sonar:sonar failsafe:integration-test -P coverage,it -DskipITs=false -Dsonar.host.url=https://sonar.ftk.de -Dsonar.login=${SONAR_TOKEN} -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/* -pl !:sapl-demo-oauth2-jwt-client-application
 
-    - name: Build SAPL Demo Playground Image
-      run: mvn -B dockerfile:build -pl sapl-demo-playground -P docker,production -DskipTests
-
-    - name: Push SAPL Demo Playground Image
-      run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,production -DskipTests
-
-    - name: Delete Workflow Runs
-      uses: Mattraks/delete-workflow-runs@39f0bbed25d76b34de5594dceab824811479e5de # v2.0.6
+    - name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@99626ea7e2020a8ab987073a1e127e2597102694 # v2
       with:
         token: ${{ github.token }}
         repository: ${{ github.repository }}
         retain_days: 1
         keep_minimum_runs: 6
 
-    - name: Clean up Local Repository before Caching
+    - name: Clean up local repository before caching
+      run: rm -rf ~/.m2/repository/io/sapl
+
+  dockerize:
+    needs: [analyze]
+    name: Deliver server images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - name: Check out
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        fetch-depth: 0
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+      with:
+        distribution: 'adopt'
+        java-version: 17
+        cache: 'maven'
+
+    - name: Build SAPL Demo Playground Image
+      run: mvn -B spring-boot:build-image -pl sapl-demo-playground -Pproduction -DskipTests
+
+    - name: Log in to the Container registry
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHUB_ACCESS_TOKEN }}
+
+    - name: Get version
+      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      id: get-version
+      run: |
+        VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+        echo "version=$VERSION" >> $GITHUB_OUTPUT        
+
+    - name: Push Server LT Image to ghcr.io
+      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      run: |
+        docker push ghcr.io/heutelbeck/sapl-demo-playground:${{ steps.get-version.outputs.VERSION }}
+
+    - name: Clean up local repository before caching
       run: rm -rf ~/.m2/repository/io/sapl
