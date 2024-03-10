@@ -139,8 +139,27 @@
 				</executions>
 				<configuration>
 					<image>
-						<name>
-							${docker-registry-url}/${project.artifactId}:${project.version}</name>
+						<builder>paketobuildpacks/builder-jammy-tiny</builder>
+						<name>${docker-registry-url}/${project.artifactId}:${project.version}</name>
+						<createdDate>now</createdDate>
+						<tags>
+							<tag>${docker-registry-url}/${project.artifactId}:${project.version}</tag>
+						</tags>
+						<buildCache>
+							<volume>
+								<name>cache-${project.artifactId}.build</name>
+							</volume>
+						</buildCache>
+						<launchCache>
+							<volume>
+								<name>cache-${project.artifactId}.launch</name>
+							</volume>
+						</launchCache>
+						<applicationDirectory>/demo</applicationDirectory>
+						<env>
+							<BPE_LOADER_PATH>file:/demo/data/lib/</BPE_LOADER_PATH>
+							<BPE_JAVA_SECURITY_EGD>file:/dev/./urandom/</BPE_JAVA_SECURITY_EGD>
+						</env>
 					</image>
 					<layout>ZIP</layout>
 					<excludes>
@@ -157,44 +176,5 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>docker</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-						<configuration>
-							<image>
-								<publish>true</publish>
-							</image>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>com.spotify</groupId>
-						<artifactId>dockerfile-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>default</id>
-								<goals>
-									<goal>build</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<repository>
-								${docker-registry-url}/${project.artifactId}</repository>
-							<tag>${project.version}</tag>
-							<buildArgs>
-								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
-							</buildArgs>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
