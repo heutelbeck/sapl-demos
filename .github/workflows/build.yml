@@ -50,7 +50,7 @@ jobs:
         cache: 'maven'
 
     - name: Run tests
-      # make sure to activate Vaadin priduction to catch potential errors during vite JS processing
+      # make sure to activate Vaadin production to catch potential errors during vite JS processing
       run: mvn -B package -Pproduction
 
     - name: Clean up local repository before caching (Linux/Mac)
@@ -87,7 +87,7 @@ jobs:
       run: mvn -B install -DskipTests -pl !:sapl-demo-testing
 
     - name: Build Integration Test Images
-      run: mvn -B dockerfile:build -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -P docker -DskipTests
+      run: mvn -B spring-boot:build-image -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -DskipTests
 
     - name: Run analysis (JaCoCo, Sonar)
       env:
