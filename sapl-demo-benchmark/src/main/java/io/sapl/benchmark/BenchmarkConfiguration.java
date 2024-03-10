@@ -17,6 +17,15 @@
  */
 package io.sapl.benchmark;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -25,33 +34,26 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.benchmark.util.BenchmarkException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 @Slf4j
 public class BenchmarkConfiguration {
-    private final ObjectMapper  mapper        = new ObjectMapper();
-    private static final String ENABLED = "enabled";
-    private static final String CLIENT_SECRET = "client_secret";
-    private static final String DOCKER = "docker";
-    private static final String REMOTE = "remote";
-    private String benchmarkTarget = DOCKER;
+    private final ObjectMapper  mapper          = new ObjectMapper();
+    private static final String ENABLED         = "enabled";
+    private static final String CLIENT_SECRET   = "client_secret";
+    private static final String DOCKER          = "docker";
+    private static final String REMOTE          = "remote";
+    private String              benchmarkTarget = DOCKER;
 
-    private static void failOnFurtherMapEntries(Set<String> keyList, String parentEntryPath){
+    private static void failOnFurtherMapEntries(Set<String> keyList, String parentEntryPath) {
         for (String key : keyList) {
-            if ( key != null){
-                throw new BenchmarkException("Unknown configuration entry " + parentEntryPath +"." + key);
+            if (key != null) {
+                throw new BenchmarkException("Unknown configuration entry " + parentEntryPath + "." + key);
             }
         }
     }
@@ -61,7 +63,7 @@ public class BenchmarkConfiguration {
     // ---------------------------
     @JsonProperty("target")
     public void setBenchmarkTarget(String target) {
-        if (target.equals(DOCKER) || target.equals(REMOTE)) {
+        if (DOCKER.equals(target) || REMOTE.equals(target)) {
             this.benchmarkTarget = target;
         } else {
             throw new BenchmarkException("invalid target=" + target);
@@ -74,32 +76,32 @@ public class BenchmarkConfiguration {
     private String oauth2MockImage;
 
     public static final int DOCKER_DEFAULT_RSOCKET_PORT = 7000;
-    public static final int DOCKER_DEFAULT_HTTP_PORT = 8080;
+    public static final int DOCKER_DEFAULT_HTTP_PORT    = 8080;
     @Getter
-    private boolean dockerUseSsl = true;
+    private boolean         dockerUseSsl                = true;
 
     @JsonProperty(DOCKER)
     public void setDocker(Map<String, String> map) {
         this.dockerPdpImage = map.remove("pdp_image");
-        this.dockerUseSsl = Boolean.parseBoolean(map.remove("use_ssl"));
+        this.dockerUseSsl   = Boolean.parseBoolean(map.remove("use_ssl"));
         failOnFurtherMapEntries(map.keySet(), DOCKER);
     }
 
     @Getter
-    private String remoteBaseUrl;
+    private String  remoteBaseUrl;
     @Getter
-    private String remoteRsocketHost;
+    private String  remoteRsocketHost;
     @Getter
-    private int remoteRsocketPort;
+    private int     remoteRsocketPort;
     @Getter
     private boolean remoteUseSsl;
 
     @JsonProperty(REMOTE)
     public void setRemote(Map<String, String> map) {
-        this.remoteBaseUrl = map.remove("base_url");
+        this.remoteBaseUrl     = map.remove("base_url");
         this.remoteRsocketHost = map.remove("rsocket_host");
         this.remoteRsocketPort = Integer.parseInt(map.remove("rsocket_port"));
-        this.remoteUseSsl = Boolean.parseBoolean(map.remove("use_ssl"));
+        this.remoteUseSsl      = Boolean.parseBoolean(map.remove("use_ssl"));
         failOnFurtherMapEntries(map.keySet(), REMOTE);
     }
 
@@ -144,22 +146,30 @@ public class BenchmarkConfiguration {
     // ---------------------------
     // - Authentication
     // ---------------------------
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean useNoAuth        = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean useBasicAuth     = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean useAuthApiKey    = true;
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean useOauth2        = false;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String  basicClientKey;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String  basicClientSecret;
-    @Getter @Setter
+    @Getter
+    @Setter
     private String  apiKeyHeader;
-    @Getter @Setter
-    private String apiKeySecret;
+    @Getter
+    @Setter
+    private String  apiKeySecret;
     @Getter
     private boolean oauth2MockServer = true;
     @Getter
@@ -208,7 +218,7 @@ public class BenchmarkConfiguration {
         this.useOauth2 = Boolean.parseBoolean(map.remove(ENABLED));
         if (this.useOauth2) {
             this.oauth2MockServer   = Boolean.parseBoolean(map.get("mock_server"));
-            this.oauth2MockImage = map.get("mock_image");
+            this.oauth2MockImage    = map.get("mock_image");
             this.oauth2ClientId     = map.get("client_id");
             this.oauth2ClientSecret = map.get(CLIENT_SECRET);
             this.oauth2Scope        = map.get("scope");
@@ -232,13 +242,13 @@ public class BenchmarkConfiguration {
     // ---------------------------
     @Getter
     @JsonProperty("forks")
-    public Integer      forks         = 2;
+    public Integer       forks       = 2;
     @Getter
     @JsonProperty("jvm_args")
-    private List<String> jvmArgs = new ArrayList<>();
+    private List<String> jvmArgs     = new ArrayList<>();
     @Getter
     @JsonProperty("fail_on_error")
-    private boolean failOnError = false;
+    private boolean      failOnError = false;
 
     // ---------------------------
     // - Average Response Time
@@ -278,7 +288,8 @@ public class BenchmarkConfiguration {
     @JsonProperty("throughput")
     public void setThroughput(Map<String, Object> map) throws JsonProcessingException {
         this.throughputThreadList            = mapper.readValue(String.valueOf(map.remove("threads")),
-                new TypeReference<>() {});
+                new TypeReference<>() {
+                                                     });
         this.throughputWarmupSeconds         = (Integer) map.remove("warmup_seconds");
         this.throughputWarmupIterations      = (Integer) map.remove("warmup_iterations");
         this.throughputMeasurementSeconds    = (Integer) map.remove("measure_seconds");
@@ -336,6 +347,6 @@ public class BenchmarkConfiguration {
     }
 
     public boolean requiredDockerEnvironment() {
-        return benchmarkTarget.equals(DOCKER) && (runHttpBenchmarks || runRsocketBenchmarks);
+        return DOCKER.equals(benchmarkTarget) && (runHttpBenchmarks || runRsocketBenchmarks);
     }
 }

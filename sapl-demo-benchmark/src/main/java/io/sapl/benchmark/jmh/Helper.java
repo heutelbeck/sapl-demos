@@ -17,14 +17,15 @@
  */
 package io.sapl.benchmark.jmh;
 
-import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.benchmark.util.BenchmarkException;
-import io.sapl.benchmark.BenchmarkExecutionContext;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
+
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.Decision;
+import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.benchmark.BenchmarkExecutionContext;
+import io.sapl.benchmark.util.BenchmarkException;
 import reactor.core.publisher.Mono;
 
 

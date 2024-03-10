@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,7 +46,6 @@ import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
 import io.sapl.interpreter.DocumentEvaluationResult;
-import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.SAPLInterpreter;
 import io.sapl.interpreter.context.AuthorizationContext;
 import io.sapl.interpreter.pip.AttributeContext;
@@ -75,6 +75,8 @@ import reactor.util.context.Context;
 @Route(value = "", layout = MainLayout.class)
 public class PlaygroundView extends VerticalLayout {
 
+    private static final String INPUT_JSON_IS_NOT_VALID = "Input JSON is not valid";
+
     // UI element references
     private SaplEditor saplEditor;
 
@@ -86,31 +88,31 @@ public class PlaygroundView extends VerticalLayout {
 
     private Paragraph authzSubJsonInputError;
 
-    private List<MockingModel> currentMockingModel;
+    private transient List<MockingModel> currentMockingModel;
 
-    private AuthorizationSubscription currentAuthzSub;
+    private transient AuthorizationSubscription currentAuthzSub;
 
-    private SAPL currentPolicy;
+    private transient SAPL currentPolicy;
 
-    private JsonEditor jsonOutput;
+    private transient JsonEditor jsonOutput;
 
     private Paragraph evaluationError;
 
     // Internal global variables
-    private final SAPLInterpreter saplInterpreter;
+    private transient SAPLInterpreter saplInterpreter;
 
-    private List<AttributeMockReturnValues> attrReturnValues;
+    private transient List<AttributeMockReturnValues> attrReturnValues;
 
-    private final ObjectMapper             objectMapper;
-    private final PDPConfigurationProvider pdpConfigurationProvider;
-    private boolean                        ignoreNextPolicyEditorChangedEvent = false;
+    private final ObjectMapper                 objectMapper;
+    private transient PDPConfigurationProvider pdpConfigurationProvider;
+    private boolean                            ignoreNextPolicyEditorChangedEvent = false;
 
     private boolean ignoreNextAuthzSubJsonEditorChangedEvent = false;
 
     private boolean ignoreNextMockJsonEditorChangedEvent = false;
 
     public PlaygroundView(ExampleSelectedViewBus exampleSelectedViewBus,
-            PDPConfigurationProvider pdpConfigurationProvider) throws InitializationException {
+            PDPConfigurationProvider pdpConfigurationProvider) {
 
         exampleSelectedViewBus.setContentView(this);
 
@@ -202,7 +204,7 @@ public class PlaygroundView extends VerticalLayout {
 
         mockInput.add(this.mockDefinitionEditor);
 
-        this.mockDefinitionJsonInputError = new Paragraph("Input JSON is not valid");
+        this.mockDefinitionJsonInputError = new Paragraph(INPUT_JSON_IS_NOT_VALID);
         this.mockDefinitionJsonInputError.setVisible(false);
         this.mockDefinitionJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
         mockInput.add(this.mockDefinitionJsonInputError);
@@ -222,7 +224,7 @@ public class PlaygroundView extends VerticalLayout {
 
         authzSubscriptionEditor.add(this.authzSubEditor);
 
-        this.authzSubJsonInputError = new Paragraph("Input JSON is not valid");
+        this.authzSubJsonInputError = new Paragraph(INPUT_JSON_IS_NOT_VALID);
         this.authzSubJsonInputError.setVisible(false);
         this.authzSubJsonInputError.setClassName(LumoUtility.TextColor.ERROR);
         authzSubscriptionEditor.add(this.authzSubJsonInputError);
@@ -320,7 +322,7 @@ public class PlaygroundView extends VerticalLayout {
         this.evaluationError.setVisible(false);
 
         var saplString = event.getNewValue();
-        if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
+        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return;
         }
@@ -331,8 +333,9 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private boolean isPolicyMatchingAuthzSub() {
-        var attributeCtx  = new MockingAttributeContext(
-                this.pdpConfigurationProvider.pdpConfiguration().blockFirst().attributeContext());
+        var config = this.pdpConfigurationProvider.pdpConfiguration().blockFirst();
+        Objects.requireNonNull(config);
+        var attributeCtx  = new MockingAttributeContext(config.attributeContext());
         var matchesResult = this.currentPolicy.matches().contextWrite(
                 ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel, this.currentAuthzSub))
                 .block();
@@ -427,7 +430,7 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private SAPL getSAPLDocument(String saplString) {
-        if (saplString == null || saplString.isEmpty() || !this.saplInterpreter.analyze(saplString).isValid()) {
+        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return null;
         } else {
@@ -455,8 +458,9 @@ public class PlaygroundView extends VerticalLayout {
 
     private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
-        var functionCtx = new MockingFunctionContext(
-                this.pdpConfigurationProvider.pdpConfiguration().blockFirst().functionContext());
+        var config = this.pdpConfigurationProvider.pdpConfiguration().blockFirst();
+        Objects.requireNonNull(config);
+        var functionCtx = new MockingFunctionContext(config.functionContext());
         var variables   = new HashMap<String, Val>(1);
         this.attrReturnValues = new LinkedList<>();
 
@@ -500,7 +504,7 @@ public class PlaygroundView extends VerticalLayout {
         try {
             jsonInput = objectMapper.readTree(jsonInputString);
         } catch (JsonProcessingException e) {
-            updateErrorParagraph(this.authzSubJsonInputError, "Input JSON is not valid", true);
+            updateErrorParagraph(this.authzSubJsonInputError, INPUT_JSON_IS_NOT_VALID, true);
             return null;
         }
 

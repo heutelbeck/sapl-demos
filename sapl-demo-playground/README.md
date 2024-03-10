@@ -24,8 +24,14 @@ mvn spring-boot:run
 
 ### Running the Docker Image
 
-To run the server locally for testing in an environment like Docker Desktop, you can run the current image as follows:
+If the image is not available locally, download it from [GitHub](https://github.com/users/heutelbeck/packages/container/package/sapl-demo-playground). If image-pull-on-run is enabled, as is the case with Docker Desktop, the image does not need to be downloaded beforehand.
 
 ```shell
-docker run -d --name sapl-demo-playground -p 8080:8080 ghcr.io/heutelbeck/sapl-demo-playground:2.1.0-SNAPSHOT
+docker pull ghcr.io/heutelbeck/sapl-demo-playground:3.0.0-SNAPSHOT
+```
+
+To run the server locally, you can run the current image as follows:
+
+```shell
+docker run -d --name sapl-demo-playground -p 8080:8080 ghcr.io/heutelbeck/sapl-demo-playground:3.0.0-SNAPSHOT
 ```
