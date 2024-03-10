@@ -72,7 +72,7 @@ public class RsocketBenchmark {
                     .build();
         }
 
-        if (context.isUseOauth2()) {
+        if (context.isUseAuthApiKey()) {
             apiKeyPdp = getBaseBuilder()
                     .apiKey(context.getApiKeyHeader(), context.getApiKey())
                     .build();
