@@ -126,26 +126,6 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
-					<image>
-						<builder>paketobuildpacks/builder-jammy-tiny</builder>
-						<name>
-							${docker-registry-url}/${project.artifactId}:${project.version}</name>
-						<createdDate>now</createdDate>
-						<tags>
-							<tag>
-							${docker-registry-url}/${project.artifactId}:${project.version}</tag>
-							tag> </tags>
-						<buildCache>
-							<volume>
-								<name>cache-${project.artifactId}.build</name>
-							</volume>
-						</buildCache>
-						<launchCache>
-							<volume>
-								<name>cache-${project.artifactId}.launch</name>
-							</volume>
-						</launchCache>
-					</image>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -182,6 +162,50 @@
 			</dependencies>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+						<configuration>
+							<mainClass>io.sapl.playground.SAPLPlaygroundApplication</mainClass>
+							<layout>JAR</layout>
+							<jvmArguments>
+								-Xdebug
+								-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5262</jvmArguments>
+							<wait>500</wait>
+							<maxAttempts>240</maxAttempts>
+							<layers>
+								<enabled>true</enabled>
+							</layers>
+							<excludes>
+								<exclude>
+									<groupId>org.springframework.boot</groupId>
+									<artifactId>spring-boot-configuration-processor</artifactId>
+								</exclude>
+								<exclude>
+									<groupId>org.projectlombok</groupId>
+									<artifactId>lombok</artifactId>
+								</exclude>
+							</excludes>
+							<image>
+								<builder>paketobuildpacks/builder-jammy-tiny</builder>
+								<name>${docker-registry-url}/${project.artifactId}:${project.version}</name>
+								<createdDate>now</createdDate>
+								<tags>
+									<tag>${docker-registry-url}/${project.artifactId}:${project.version}</tag>
+								</tags>
+								<buildCache>
+									<volume>
+										<name>cache-${project.artifactId}.build</name>
+									</volume>
+								</buildCache>
+								<launchCache>
+									<volume>
+										<name>cache-${project.artifactId}.launch</name>
+									</volume>
+								</launchCache>
+							</image>
+						</configuration>
+					</plugin>
 					<plugin>
 						<groupId>com.vaadin</groupId>
 						<artifactId>vaadin-maven-plugin</artifactId>
