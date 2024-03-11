@@ -20,8 +20,8 @@ public class DemoData implements CommandLineRunner {
 
     public static final String DEFAULT_PASSWORD = "password";
 
-    public static final Book[] DEMO_BOOKS = new Book[] {
-            // @formatter:off
+    public static final List<Book> DEMO_BOOKS = List.of(
+    // @formatter:off
 			new Book(1L, "book1", 1),
 			new Book(2L, "book2", 1),
 			new Book(3L, "book3", 2),
@@ -29,7 +29,7 @@ public class DemoData implements CommandLineRunner {
 			new Book(5L, "book5", 4),
 			new Book(6L, "book6", 5)
 			// @formatter:on
-    };
+    );
 
     private final BookRepository            bookRepository;
     private final LibraryUserDetailsService userDetailsService;

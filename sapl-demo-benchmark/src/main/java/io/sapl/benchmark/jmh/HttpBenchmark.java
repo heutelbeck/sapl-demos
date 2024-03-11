@@ -41,56 +41,47 @@ import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.netty.http.client.HttpClient;
 
-
 @Slf4j
 @State(Scope.Benchmark)
 public class HttpBenchmark {
-    @Param({"{}"})
+    @Param({ "{}" })
     String contextJsonString;
 
-    private PolicyDecisionPoint noauthPdp;
-    private PolicyDecisionPoint basicAuthPdp;
-    private PolicyDecisionPoint apiKeyPdp;
-    private PolicyDecisionPoint oauth2Pdp;
+    private PolicyDecisionPoint       noauthPdp;
+    private PolicyDecisionPoint       basicAuthPdp;
+    private PolicyDecisionPoint       apiKeyPdp;
+    private PolicyDecisionPoint       oauth2Pdp;
     private BenchmarkExecutionContext context;
 
     private RemoteHttpPolicyDecisionPoint.RemoteHttpPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
-        return RemotePolicyDecisionPoint.builder()
-            .http()
-            .baseUrl(context.getHttpBaseUrl())
-            .withHttpClient(HttpClient.create().responseTimeout(Duration.ofSeconds(10)))
-            .withUnsecureSSL()
-            // set SO_LINGER to 0 so that the http sockets are closed immediately -> TIME_WAIT
-            .option(ChannelOption.SO_LINGER, 0);
+        return RemotePolicyDecisionPoint.builder().http().baseUrl(context.getHttpBaseUrl())
+                .withHttpClient(HttpClient.create().responseTimeout(Duration.ofSeconds(10))).withUnsecureSSL()
+                // set SO_LINGER to 0 so that the http sockets are closed immediately ->
+                // TIME_WAIT
+                .option(ChannelOption.SO_LINGER, 0);
     }
 
     @Setup(Level.Trial)
     public void setup() throws IOException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
         log.info("initializing pdp connections");
-        if ( context.isUseNoAuth() ) {
+        if (context.isUseNoAuth()) {
             noauthPdp = getBaseBuilder().build();
         }
 
-        if ( context.isUseBasicAuth() ) {
-            basicAuthPdp = getBaseBuilder()
-                    .basicAuth(context.getBasicClientKey(), context.getBasicClientSecret())
+        if (context.isUseBasicAuth()) {
+            basicAuthPdp = getBaseBuilder().basicAuth(context.getBasicClientKey(), context.getBasicClientSecret())
                     .build();
         }
 
-        if ( context.isUseAuthApiKey() ) {
-            apiKeyPdp = getBaseBuilder()
-                    .apiKey(context.getApiKeyHeader(), context.getApiKey())
-                    .build();
+        if (context.isUseAuthApiKey()) {
+            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKeyHeader(), context.getApiKey()).build();
         }
 
-        if ( context.isUseOauth2() ) {
-            oauth2Pdp = getBaseBuilder()
-                    .oauth2(getClientRegistrationRepository(context), "saplPdp")
-                    .build();
+        if (context.isUseOauth2()) {
+            oauth2Pdp = getBaseBuilder().oauth2(getClientRegistrationRepository(context), "saplPdp").build();
         }
     }
-
 
     @Benchmark
     public void noAuthDecideSubscribe() {
@@ -128,7 +119,7 @@ public class HttpBenchmark {
     }
 
     @Benchmark
-    public void  oAuth2DecideOnce() {
+    public void oAuth2DecideOnce() {
         decideOnce(oauth2Pdp, context.getAuthorizationSubscription());
     }
 }

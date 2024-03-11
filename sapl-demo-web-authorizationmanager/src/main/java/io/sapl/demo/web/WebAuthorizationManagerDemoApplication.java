@@ -21,8 +21,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class WebAuthorizationManagerDemoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(WebAuthorizationManagerDemoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(WebAuthorizationManagerDemoApplication.class, args);
+    }
 
 }

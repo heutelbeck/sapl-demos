@@ -23,14 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 public class RestService {
 
-	@GetMapping("public")
-	public String publicService() {
-		return "public information";
-	}
+    @GetMapping("public")
+    public String publicService() {
+        return "public information";
+    }
 
-	@GetMapping("secret")
-	public String secretService() {
-		return "secret information";
-	}
+    @GetMapping("secret")
+    public String secretService() {
+        return "secret information";
+    }
 
 }

@@ -29,10 +29,10 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 @EnableSaplMethodSecurity
 public class WebSecurityConfiguration {
 
-	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-		return http.build();
-	}
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        return http.build();
+    }
 
 }

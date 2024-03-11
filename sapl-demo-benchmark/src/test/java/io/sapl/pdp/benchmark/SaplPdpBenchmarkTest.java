@@ -60,7 +60,7 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig
                 .setSubscription("{\"subject\": \"Willi\", \"action\": \"requests\", \"resource\": \"information\"}");
         var embeddedBenchmark = new EmbeddedBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
+        var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
@@ -80,7 +80,7 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setSubscription(
                 "{\"subject\": \"Willi\", \"action\": \"invalid action\", \"resource\": \"information\"}");
         var embeddedBenchmark = new EmbeddedBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
+        var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
@@ -109,8 +109,9 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setApiKeyHeader("API_KEY");
         benchmarkConfig.setApiKeySecret("123");
         benchmarkConfig.setUseOauth2(true);
-        var benchmark = new HttpBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer, mockedContainer);
+        var benchmark        = new HttpBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
+                mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();
@@ -149,8 +150,9 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setUseAuthApiKey(true);
         benchmarkConfig.setApiKeyHeader("API_KEY");
         benchmarkConfig.setApiKeySecret("123");
-        var benchmark = new RsocketBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer, mockedContainer);
+        var benchmark        = new RsocketBenchmark();
+        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
+                mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();

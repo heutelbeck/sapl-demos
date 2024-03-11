@@ -14,11 +14,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BookController {
 
-	private final BookRepository repository;
+    private final BookRepository repository;
 
-	@GetMapping("/")
-	List<Book> findAll() {
-		return repository.findAll(Optional.empty());
-	}
+    @GetMapping("/")
+    List<Book> findAll() {
+        return repository.findAll(Optional.empty());
+    }
 
 }

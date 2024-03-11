@@ -26,10 +26,10 @@ import reactor.core.publisher.Flux;
 @Service
 public class DemoService {
 
-	@EnforceRecoverableIfDenied(subject = "authentication.getName()", action = "'read'", resource = "'time'")
-	public Flux<String> getFluxStringRecoverable() {
-		return Flux.interval(Duration.ofMillis(500L))
-				.map(i -> String.format("event after subscription %d - time %s", i, Instant.now()));
-	}
+    @EnforceRecoverableIfDenied(subject = "authentication.getName()", action = "'read'", resource = "'time'")
+    public Flux<String> getFluxStringRecoverable() {
+        return Flux.interval(Duration.ofMillis(500L))
+                .map(i -> String.format("event after subscription %d - time %s", i, Instant.now()));
+    }
 
 }

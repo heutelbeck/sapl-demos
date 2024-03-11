@@ -36,26 +36,26 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class BenchmarkExecutionContext {
 
-    private String rsocketHost;
-    private Integer rsocketPort;
-    private String basicClientKey;
-    private String basicClientSecret;
-    private String apiKey;
-    private String oauth2ClientSecret;
-    private String oauth2Scope;
-    private String oauth2TokenUri;
-    private String apiKeyHeader;
-    private String httpBaseUrl;
-    private boolean useNoAuth;
-    private boolean useBasicAuth;
-    private boolean useAuthApiKey;
-    private boolean useOauth2;
-    private String oauth2ClientId;
-    private boolean useSsl;
+    private String                    rsocketHost;
+    private Integer                   rsocketPort;
+    private String                    basicClientKey;
+    private String                    basicClientSecret;
+    private String                    apiKey;
+    private String                    oauth2ClientSecret;
+    private String                    oauth2Scope;
+    private String                    oauth2TokenUri;
+    private String                    apiKeyHeader;
+    private String                    httpBaseUrl;
+    private boolean                   useNoAuth;
+    private boolean                   useBasicAuth;
+    private boolean                   useAuthApiKey;
+    private boolean                   useOauth2;
+    private String                    oauth2ClientId;
+    private boolean                   useSsl;
     private AuthorizationSubscription authorizationSubscription;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    public static BenchmarkExecutionContext fromString(String jsonString){
+    public static BenchmarkExecutionContext fromString(String jsonString) {
         try {
             return MAPPER.readValue(jsonString, BenchmarkExecutionContext.class);
         } catch (JsonProcessingException e) {
@@ -63,7 +63,7 @@ public class BenchmarkExecutionContext {
         }
     }
 
-    public String toJsonString(){
+    public String toJsonString() {
         try {
             return MAPPER.writeValueAsString(this);
         } catch (JsonProcessingException e) {
@@ -71,14 +71,14 @@ public class BenchmarkExecutionContext {
         }
     }
 
-    public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg, GenericContainer pdpContainer,
-                                                                       GenericContainer oauthContainer){
+    public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg,
+            GenericContainer pdpContainer, GenericContainer oauthContainer) {
         var context = new BenchmarkExecutionContext();
         context.authorizationSubscription = cfg.getAuthorizationSubscription();
         if (cfg.requiredDockerEnvironment()) {
             context.rsocketHost = pdpContainer.getHost();
             context.rsocketPort = pdpContainer.getMappedPort(DOCKER_DEFAULT_RSOCKET_PORT);
-            context.useSsl = cfg.isDockerUseSsl();
+            context.useSsl      = cfg.isDockerUseSsl();
             if (context.useSsl) {
                 context.httpBaseUrl = "https://" + pdpContainer.getHost() + ":"
                         + pdpContainer.getMappedPort(DOCKER_DEFAULT_HTTP_PORT);
@@ -88,23 +88,23 @@ public class BenchmarkExecutionContext {
                         + pdpContainer.getMappedPort(DOCKER_DEFAULT_HTTP_PORT);
             }
         } else {
-            context.rsocketHost   = cfg.getRemoteRsocketHost();
-            context.rsocketPort   = cfg.getRemoteRsocketPort();
-            context.useSsl = cfg.isRemoteUseSsl();
+            context.rsocketHost = cfg.getRemoteRsocketHost();
+            context.rsocketPort = cfg.getRemoteRsocketPort();
+            context.useSsl      = cfg.isRemoteUseSsl();
             context.httpBaseUrl = cfg.getRemoteBaseUrl();
         }
-        context.basicClientKey = cfg.getBasicClientKey();
+        context.basicClientKey    = cfg.getBasicClientKey();
         context.basicClientSecret = cfg.getBasicClientSecret();
-        context.apiKeyHeader = cfg.getApiKeyHeader();
-        context.apiKey = cfg.getApiKeySecret();
+        context.apiKeyHeader      = cfg.getApiKeyHeader();
+        context.apiKey            = cfg.getApiKeySecret();
         if (cfg.isUseOauth2() && cfg.isOauth2MockServer()) {
             context.oauth2TokenUri = "http://auth-host:" + oauthContainer.getMappedPort(8080) + "/default/token";
         } else {
             context.oauth2TokenUri = cfg.getOauth2TokenUri();
         }
-        context.oauth2ClientId = cfg.getOauth2ClientId();
+        context.oauth2ClientId     = cfg.getOauth2ClientId();
         context.oauth2ClientSecret = cfg.getOauth2ClientSecret();
-        context.oauth2Scope = cfg.getOauth2Scope();
+        context.oauth2Scope        = cfg.getOauth2Scope();
 
         context.useNoAuth     = cfg.isUseNoAuth();
         context.useBasicAuth  = cfg.isUseBasicAuth();
@@ -113,7 +113,7 @@ public class BenchmarkExecutionContext {
         return context;
     }
 
-    public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg){
+    public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg) {
         return BenchmarkExecutionContext.fromBenchmarkConfiguration(cfg, null, null);
     }
 }

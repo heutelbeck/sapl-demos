@@ -21,6 +21,6 @@ import io.sapl.mvc.demo.domain.Relation;
 
 public interface PIPRelationRepository {
 
-	List<Relation> findByPatientId(Long id);
+    List<Relation> findByPatientId(Long id);
 
 }

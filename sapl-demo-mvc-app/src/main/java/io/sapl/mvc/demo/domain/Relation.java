@@ -29,17 +29,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Relation {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    Long id;
 
-	String username;
+    String username;
 
-	Long patientId;
+    Long patientId;
 
-	public Relation(String username, Long patientId) {
-		this.username = username;
-		this.patientId = patientId;
-	}
+    public Relation(String username, Long patientId) {
+        this.username  = username;
+        this.patientId = patientId;
+    }
 
 }

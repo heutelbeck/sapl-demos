@@ -30,12 +30,12 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class PatientsController {
 
-	public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	private final PatientsService service;
+    private final PatientsService service;
 
-	@GetMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Patient> patients() {
-		return service.getPatients();
-	}
+    @GetMapping(value = "/patients", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<Patient> patients() {
+        return service.getPatients();
+    }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
@@ -10,15 +10,20 @@
 		<relativePath>../../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 
-    <artifactId>sapl-demo-testing-dsl-plain</artifactId>
-    <name>SAPL Demo Policy Testing DSL Plain</name>
-    <description>Example for testing your SAPL policies using the SAPLTest DSL without a framework</description>
+	<artifactId>sapl-demo-testing-dsl-plain</artifactId>
+	<name>SAPL Demo Policy Testing DSL Plain</name>
+	<description>Example for testing your SAPL policies using the SAPLTest DSL
+		without a framework</description>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.sapl</groupId>
-            <artifactId>sapl-test</artifactId>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+	<dependencies>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-test</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+	</dependencies>
 </project>

@@ -33,22 +33,22 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/")
 public class DemoController {
 
-	private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    private static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	@GetMapping(value = "/numbers", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<JsonNode>> numbers() {
-		return Flux.range(0, 10).repeat().delayElements(Duration.ofMillis(500L))
-				.map(value -> ServerSentEvent.<JsonNode>builder().data(JSON.numberNode(value)).build());
-	}
+    @GetMapping(value = "/numbers", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<JsonNode>> numbers() {
+        return Flux.range(0, 10).repeat().delayElements(Duration.ofMillis(500L))
+                .map(value -> ServerSentEvent.<JsonNode>builder().data(JSON.numberNode(value)).build());
+    }
 
-	@GetMapping(value = "/public", produces = MediaType.TEXT_PLAIN_VALUE)
-	public Mono<String> publicData() {
-		return Mono.just("Public information");
-	}
+    @GetMapping(value = "/public", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> publicData() {
+        return Mono.just("Public information");
+    }
 
-	@GetMapping(value = "/secret", produces = MediaType.TEXT_PLAIN_VALUE)
-	public Mono<String> secretData() {
-		return Mono.just("Secret information");
-	}
+    @GetMapping(value = "/secret", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> secretData() {
+        return Mono.just("Secret information");
+    }
 
 }

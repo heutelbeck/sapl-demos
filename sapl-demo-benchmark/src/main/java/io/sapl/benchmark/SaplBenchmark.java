@@ -44,13 +44,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SaplBenchmark {
     private final BenchmarkConfiguration config;
-    private GenericContainer<?> pdpContainer;
-    private GenericContainer<?> oauth2Container;
-    private final String benchmarkFolder;
-
+    private GenericContainer<?>          pdpContainer;
+    private GenericContainer<?>          oauth2Container;
+    private final String                 benchmarkFolder;
 
     public SaplBenchmark(String cfgFilePath, String benchmarkFolder) throws IOException {
-        this.config = BenchmarkConfiguration.fromFile(cfgFilePath);
+        this.config          = BenchmarkConfiguration.fromFile(cfgFilePath);
         this.benchmarkFolder = benchmarkFolder;
         Files.createDirectories(Paths.get(benchmarkFolder));
         var sourceFile = new File(cfgFilePath);
@@ -58,32 +57,31 @@ public class SaplBenchmark {
     }
 
     @SuppressWarnings("rawtypes")
-    private GenericContainer<?> getServerLtContainer(){
+    private GenericContainer<?> getServerLtContainer() {
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
         var dockerKeystorePath = "/pdp/keystore.p12";
 
-        var errorLogLevel =  "ERROR";
-        var container = new GenericContainer(DockerImageName.parse(config.getDockerPdpImage()))
+        var errorLogLevel = "ERROR";
+        var container     = new GenericContainer(DockerImageName.parse(config.getDockerPdpImage()))
                 .withClasspathResourceMapping("keystore.p12", dockerKeystorePath, BindMode.READ_ONLY)
                 .withClasspathResourceMapping("policies/", "/pdp/data/", BindMode.READ_ONLY)
-                .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data")
-                .withEnv("spring_profiles_active", "local")
-                .withExposedPorts(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT, BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT)
+                .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data").withEnv("spring_profiles_active", "local")
+                .withExposedPorts(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT,
+                        BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT)
                 .waitingFor(Wait.forListeningPort())
 
                 // http settings
                 .withEnv("server_address", "0.0.0.0")
                 .withEnv("server_port", String.valueOf(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT))
                 .withEnv("server_ssl_enabled", String.valueOf(config.isDockerUseSsl()))
-                .withEnv("server_ssl_key-store-type", "PKCS12")
-                .withEnv("server_ssl_key-store", dockerKeystorePath)
-                .withEnv("server_ssl_key-store-password", "benchmarkonly")
-                .withEnv("server_ssl_key-alias", "tomcat")
+                .withEnv("server_ssl_key-store-type", "PKCS12").withEnv("server_ssl_key-store", dockerKeystorePath)
+                .withEnv("server_ssl_key-store-password", "benchmarkonly").withEnv("server_ssl_key-alias", "tomcat")
 
                 // rsocket settings
                 .withEnv("spring_rsocket_server_address", "0.0.0.0")
-                .withEnv("spring_rsocket_server_port", String.valueOf(BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT))
+                .withEnv("spring_rsocket_server_port",
+                        String.valueOf(BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT))
                 .withEnv("spring_rsocket_server_ssl_enabled", String.valueOf(config.isDockerUseSsl()))
                 .withEnv("spring_rsocket_server_ssl_key-store-type", "PKCS12")
                 .withEnv("spring_rsocket_server_ssl__key-store", dockerKeystorePath)
@@ -98,53 +96,45 @@ public class SaplBenchmark {
         // auth Settings
         container.withEnv("io_sapl_server-lt_allowNoAuth", String.valueOf(config.isUseNoAuth()));
         container.withEnv("io_sapl_server-lt_allowBasicAuth", String.valueOf(config.isUseBasicAuth()));
-        if ( config.isUseBasicAuth() ) {
-            container.withEnv("io_sapl_server-lt_key", config.getBasicClientKey())
-                    .withEnv("io_sapl_server-lt_secret", encoder.encode(config.getBasicClientSecret()));
+        if (config.isUseBasicAuth()) {
+            container.withEnv("io_sapl_server-lt_key", config.getBasicClientKey()).withEnv("io_sapl_server-lt_secret",
+                    encoder.encode(config.getBasicClientSecret()));
         }
         container.withEnv("io_sapl_server-lt_allowApiKeyAuth", String.valueOf(config.isUseAuthApiKey()));
-        if ( config.isUseAuthApiKey() ) {
+        if (config.isUseAuthApiKey()) {
             container.withEnv("io_sapl_server-lt_apiKeyHeader", config.getApiKeyHeader())
                     .withEnv("io_sapl_server-lt_allowedApiKeys", config.getApiKeySecret());
         }
         container.withEnv("io_sapl_server-lt_allowOauth2Auth", String.valueOf(config.isUseOauth2()));
-        if ( config.isUseOauth2()) {
-            String  jwtIssuerUrl;
-            if ( config.isOauth2MockServer()) {
+        if (config.isUseOauth2()) {
+            String jwtIssuerUrl;
+            if (config.isOauth2MockServer()) {
                 jwtIssuerUrl = "http://auth-host:" + oauth2Container.getMappedPort(8080) + "/default";
             } else {
                 jwtIssuerUrl = config.getOauth2IssuerUrl();
             }
             container.withExtraHost("auth-host", "host-gateway")
-                     .withEnv("spring_security_oauth2_resourceserver_jwt_issuer-uri", jwtIssuerUrl);
+                    .withEnv("spring_security_oauth2_resourceserver_jwt_issuer-uri", jwtIssuerUrl);
         }
         return container;
     }
 
     @SuppressWarnings("rawtypes")
-    private GenericContainer<?> getOauth2Container(){
+    private GenericContainer<?> getOauth2Container() {
         oauth2Container = new GenericContainer(DockerImageName.parse(config.getOauth2MockImage()))
-                .withExposedPorts(8080)
-                .waitingFor(Wait.forListeningPort());
+                .withExposedPorts(8080).waitingFor(Wait.forListeningPort());
         return oauth2Container;
     }
 
     void startResponseTimeBenchmark(BenchmarkExecutionContext context) throws RunnerException {
-        ChainedOptionsBuilder builder = new OptionsBuilder()
-                .include(config.getBenchmarkPattern());
+        ChainedOptionsBuilder builder = new OptionsBuilder().include(config.getBenchmarkPattern());
         builder.param("contextJsonString", context.toJsonString());
-        builder.jvmArgs(config.getJvmArgs().toArray(new String[0]))
-                .shouldFailOnError(config.isFailOnError())
-                .mode(Mode.AverageTime)
-                .timeUnit(TimeUnit.MILLISECONDS)
-                .resultFormat(ResultFormatType.JSON)
-                .result(benchmarkFolder + "/average_response.json")
-                .output(benchmarkFolder + "/average_response.log")
-                .shouldDoGC(true)
-                .forks(config.forks)
+        builder.jvmArgs(config.getJvmArgs().toArray(new String[0])).shouldFailOnError(config.isFailOnError())
+                .mode(Mode.AverageTime).timeUnit(TimeUnit.MILLISECONDS).resultFormat(ResultFormatType.JSON)
+                .result(benchmarkFolder + "/average_response.json").output(benchmarkFolder + "/average_response.log")
+                .shouldDoGC(true).forks(config.forks)
                 .warmupTime(TimeValue.seconds(config.getResponseTimeWarmupSeconds()))
-                .warmupIterations(config.getResponseTimeWarmupIterations())
-                .syncIterations(true)
+                .warmupIterations(config.getResponseTimeWarmupIterations()).syncIterations(true)
                 .measurementIterations(config.getResponseTimeMeasurementIterations())
                 .measurementTime(TimeValue.seconds(config.getResponseTimeMeasurementSeconds()));
         var benchmarkOptions = builder.build();
@@ -152,23 +142,15 @@ public class SaplBenchmark {
     }
 
     void startThroughputBenchmark(BenchmarkExecutionContext context) throws RunnerException {
-        for ( int threads: config.getThroughputThreadList()){
-            var builder = new OptionsBuilder()
-                    .include(config.getBenchmarkPattern())
+        for (int threads : config.getThroughputThreadList()) {
+            var builder          = new OptionsBuilder().include(config.getBenchmarkPattern())
                     .param("contextJsonString", context.toJsonString())
-                    .jvmArgs(config.getJvmArgs().toArray(new String[0]))
-                    .shouldFailOnError(config.isFailOnError())
-                    .mode(Mode.Throughput)
-                    .timeUnit(TimeUnit.SECONDS)
-                    .resultFormat(ResultFormatType.JSON)
+                    .jvmArgs(config.getJvmArgs().toArray(new String[0])).shouldFailOnError(config.isFailOnError())
+                    .mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS).resultFormat(ResultFormatType.JSON)
                     .result(benchmarkFolder + "/throughput_" + threads + "threads.json")
-                    .output(benchmarkFolder + "/throughput_" + threads + "threads.log")
-                    .shouldDoGC(true)
-                    .threads(threads)
-                    .forks(config.forks)
-                    .warmupIterations(config.getThroughputWarmupIterations())
-                    .warmupTime(TimeValue.seconds(config.getThroughputWarmupSeconds()))
-                    .syncIterations(true)
+                    .output(benchmarkFolder + "/throughput_" + threads + "threads.log").shouldDoGC(true)
+                    .threads(threads).forks(config.forks).warmupIterations(config.getThroughputWarmupIterations())
+                    .warmupTime(TimeValue.seconds(config.getThroughputWarmupSeconds())).syncIterations(true)
                     .measurementIterations(config.getThroughputMeasurementIterations())
                     .measurementTime(TimeValue.seconds(config.getThroughputWarmupSeconds()));
             var benchmarkOptions = builder.build();
@@ -196,22 +178,22 @@ public class SaplBenchmark {
     }
 
     private void startContainersIfNeeded() {
-        if ( config.isUseOauth2() && config.isOauth2MockServer()) {
+        if (config.isUseOauth2() && config.isOauth2MockServer()) {
             oauth2Container = getOauth2Container();
             oauth2Container.start();
         }
-        if ( config.requiredDockerEnvironment() ) {
-            pdpContainer= getServerLtContainer();
+        if (config.requiredDockerEnvironment()) {
+            pdpContainer = getServerLtContainer();
             pdpContainer.start();
         }
     }
 
     private void stopContainersIfRunning() {
         // stop containers if running
-        if (pdpContainer!= null) {
+        if (pdpContainer != null) {
             try {
                 pdpContainer.stop();
-            } catch  (Exception e) {
+            } catch (Exception e) {
                 log.error("An exception occurred!", e);
             }
         }

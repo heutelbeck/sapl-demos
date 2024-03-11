@@ -5,17 +5,17 @@ import org.testng.annotations.Test;
 
 public class TestClass implements ITest {
 
-    private final String name;
+    private final String   name;
     private final Runnable runnable;
 
     public TestClass(String name, Runnable runnable) {
-        this.name = name;
+        this.name     = name;
         this.runnable = runnable;
     }
 
     @Test
     public void test() {
-        if(runnable != null) {
+        if (runnable != null) {
             runnable.run();
         }
     }

@@ -36,47 +36,47 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DemoController {
 
-	public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	private final DemoService service;
+    private final DemoService service;
 
-	@GetMapping(value = "/numbers", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<JsonNode>> numbers() {
-		return service.getFluxNumbers()
-				.map(value -> ServerSentEvent.<JsonNode>builder().data(JSON.numberNode(value)).build());
-	}
+    @GetMapping(value = "/numbers", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<JsonNode>> numbers() {
+        return service.getFluxNumbers()
+                .map(value -> ServerSentEvent.<JsonNode>builder().data(JSON.numberNode(value)).build());
+    }
 
-	@GetMapping(value = "/string", produces = MediaType.TEXT_PLAIN_VALUE)
-	public Mono<String> string() {
-		return service.getMonoString();
-	}
+    @GetMapping(value = "/string", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> string() {
+        return service.getMonoString();
+    }
 
-	@GetMapping(value = "/changedstring", produces = MediaType.TEXT_PLAIN_VALUE)
-	public Mono<String> changedstring() {
-		return service.getMonoStringWithPreAndPost();
-	}
+    @GetMapping(value = "/changedstring", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> changedstring() {
+        return service.getMonoStringWithPreAndPost();
+    }
 
-	@GetMapping(value = "/enforcetilldeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<String>> tillDeny() {
-		return service.getFluxString().onErrorResume(AccessDeniedException.class,
-				e -> Flux.just(
-						"ACCESS DENIED ('" + e.getMessage() + "') (try reloading when the local minute rolls over)"))
-				.map(value -> ServerSentEvent.<String>builder().data(value).build());
-	}
+    @GetMapping(value = "/enforcetilldeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<String>> tillDeny() {
+        return service.getFluxString().onErrorResume(AccessDeniedException.class, e -> Flux.just(
+                String.format("ACCESS DENIED ('%s') (try reloading when the local minute rolls over)", e.getMessage())))
+                .map(value -> ServerSentEvent.<String>builder().data(value).build());
+    }
 
-	@GetMapping(value = "/enforcedropwhiledeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<String>> dropWhileDeny() {
-		return service.getFluxStringDroppable()
-				.onErrorResume(AccessDeniedException.class, e -> Flux.just("ACCESS DENIED ('" + e.getMessage() + "')"))
-				.map(value -> ServerSentEvent.<String>builder().data(value).build());
-	}
+    @GetMapping(value = "/enforcedropwhiledeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<String>> dropWhileDeny() {
+        return service.getFluxStringDroppable()
+                .onErrorResume(AccessDeniedException.class,
+                        e -> Flux.just(String.format("ACCESS DENIED ('%s')", e.getMessage())))
+                .map(value -> ServerSentEvent.<String>builder().data(value).build());
+    }
 
-	@GetMapping(value = "/enforcerecoverableifdeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-		return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class,
-				(error, reason) -> log.warn("ACCESS DENIED ('" + error.getMessage()
-						+ "') (data will automatically resume once access is granted again) - reason: " + reason))
-				.map(value -> ServerSentEvent.<String>builder().data(value).build());
-	}
+    @GetMapping(value = "/enforcerecoverableifdeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<String>> recoverAfterDeny() {
+        return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class, (error, reason) -> log
+                .warn("ACCESS DENIED ('{}') (data will automatically resume once access is granted again) - reason: {}",
+                        error.getMessage(), reason))
+                .map(value -> ServerSentEvent.<String>builder().data(value).build());
+    }
 
 }

@@ -28,9 +28,9 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 @EnableSaplMethodSecurity
 public class WebSecurityConfig {
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+    }
 
 }

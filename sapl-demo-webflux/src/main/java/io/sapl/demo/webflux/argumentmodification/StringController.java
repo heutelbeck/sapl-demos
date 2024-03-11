@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class StringController {
 
+    private final StringService service;
 
-	private final StringService service;
-
-	@GetMapping(value = "/string", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Mono<String> someString() {
-		return service.lowercase("IF ALL TEXT IS LOWERCASE THE SERVICE WAS CALLED. RIGHT TO THIS MESSAGE THERE IS A LOWERCASE 'HELLO MODIFICATION' THEN THE OBLICATION SUCCESSFULLY MODIFIED THE METHOD ARGUMENTS->");
-	}
+    @GetMapping(value = "/string", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<String> someString() {
+        return service.lowercase(
+                "IF ALL TEXT IS LOWERCASE THE SERVICE WAS CALLED. RIGHT TO THIS MESSAGE THERE IS A LOWERCASE 'HELLO MODIFICATION' THEN THE OBLICATION SUCCESSFULLY MODIFIED THE METHOD ARGUMENTS->");
+    }
 }

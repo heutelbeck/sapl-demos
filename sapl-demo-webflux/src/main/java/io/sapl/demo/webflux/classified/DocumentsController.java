@@ -28,10 +28,10 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class DocumentsController {
 
-	private final DocumentsService service;
+    private final DocumentsService service;
 
-	@GetMapping(value = "/documents", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Flux<Document> documents() {
-		return service.getDocuments();
-	}
+    @GetMapping(value = "/documents", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<Document> documents() {
+        return service.getDocuments();
+    }
 }

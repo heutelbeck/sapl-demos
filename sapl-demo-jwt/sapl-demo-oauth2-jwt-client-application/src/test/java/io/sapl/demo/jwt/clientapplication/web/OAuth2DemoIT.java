@@ -59,139 +59,139 @@ import lombok.experimental.FieldDefaults;
 @SpringBootTest(classes = OAuth2ClientApplication.class)
 class OAuth2DemoIT {
 
-	private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
-	private static final String REGISTRY = "ghcr.io/heutelbeck/";
-	private static final String TAG = ":3.0.0-SNAPSHOT";
+    private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
+    private static final String   REGISTRY       = "ghcr.io/heutelbeck/";
+    private static final String   TAG            = ":3.0.0-SNAPSHOT";
 
-	private static final int AUTH_SERVER_PORT = 9000;
-	private static final int RESOURCE_SERVER_PORT = 8090;
-	private static final Network IT_NETWORK = Network.newNetwork();
-	private static final String AUTH_SERVER = "auth-server";
+    private static final int     AUTH_SERVER_PORT     = 9000;
+    private static final int     RESOURCE_SERVER_PORT = 8090;
+    private static final Network IT_NETWORK           = Network.newNetwork();
+    private static final String  AUTH_SERVER          = "auth-server";
 
-	private static final String INDEX_URL = "http://localhost:8080/index";
-	private static final String INDEX_RESULT_PATH = "target/test-classes/xml/index_result.html";
+    private static final String INDEX_URL         = "http://localhost:8080/index";
+    private static final String INDEX_RESULT_PATH = "target/test-classes/xml/index_result.html";
 
-	private static final String AUTH_CODE_GRANT_TYPE_URL = "http://localhost:8080/authorize?grant_type=authorization_code";
-	private static final String AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN = "^" + Pattern.quote(
-			"http://auth-server:9000/oauth2/authorize?response_type=code&client_id=miskatonic-client&scope=books.read%20faculty.read%20bestiary.read&state=")
-			+ ".*" + Pattern.quote("%3D&redirect_uri=http://127.0.0.1:8080/authorized") + "$";
-	
-	private static final String AUTH_CREDENTIALS_GRANT_TYPE_URL = "http://localhost:8080/authorize?grant_type=client_credentials";
-	private static final String AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH = "target/test-classes/xml/credentials_grant_type_result.html";
+    private static final String AUTH_CODE_GRANT_TYPE_URL              = "http://localhost:8080/authorize?grant_type=authorization_code";
+    private static final String AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN = "^" + Pattern.quote(
+            "http://auth-server:9000/oauth2/authorize?response_type=code&client_id=miskatonic-client&scope=books.read%20faculty.read%20bestiary.read&state=")
+            + ".*" + Pattern.quote("%3D&redirect_uri=http://127.0.0.1:8080/authorized") + "$";
 
-	@RequiredArgsConstructor
-	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-	private static class PredicateMatcher<T> extends BaseMatcher<T> {
+    private static final String AUTH_CREDENTIALS_GRANT_TYPE_URL         = "http://localhost:8080/authorize?grant_type=client_credentials";
+    private static final String AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH = "target/test-classes/xml/credentials_grant_type_result.html";
 
-		Predicate<T> test;
+    @RequiredArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+    private static class PredicateMatcher<T> extends BaseMatcher<T> {
 
-		@Override
-		@SuppressWarnings("unchecked")
-		public boolean matches(Object actual) {
-			try {
-				return test.test((T) actual);
-			} catch (Exception e) {
-				return false;
-			}
-		}
+        Predicate<T> test;
 
-		@Override
-		public void describeTo(Description description) {
-			description.appendText("passes Predicate ").appendValue(test);
-		}
+        @Override
+        @SuppressWarnings("unchecked")
+        public boolean matches(Object actual) {
+            try {
+                return test.test((T) actual);
+            } catch (Exception e) {
+                return false;
+            }
+        }
 
-	}
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("passes Predicate ").appendValue(test);
+        }
 
-	@Container
-	static GenericContainer<?> authServer = new GenericContainer<>(
-			DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
-			.withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
-			.waitingFor(Wait.forListeningPort())
-			.waitingFor(Wait.forLogMessage(containsPattern("Started OAuth2AuthorizationServerApplication"), 1))
-			.withStartupTimeout(TIMEOUT_SPINUP)
-			.withCreateContainerCmdModifier(configureContainerStartup(AUTH_SERVER_PORT));
+    }
 
-	@Container
-	static GenericContainer<?> resourceServer = new GenericContainer<>(
-			DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-resource-server" + TAG))
-			.withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
-			.waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
-			.withStartupTimeout(TIMEOUT_SPINUP)
-			.withCreateContainerCmdModifier(configureContainerStartup(RESOURCE_SERVER_PORT));
+    @Container
+    static GenericContainer<?> authServer = new GenericContainer<>(
+            DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
+            .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
+            .waitingFor(Wait.forListeningPort())
+            .waitingFor(Wait.forLogMessage(containsPattern("Started OAuth2AuthorizationServerApplication"), 1))
+            .withStartupTimeout(TIMEOUT_SPINUP)
+            .withCreateContainerCmdModifier(configureContainerStartup(AUTH_SERVER_PORT));
 
-	private static String containsPattern(String pattern) {
-		return "^.*" + pattern.replaceAll("[\\^\\$]", "") + ".*$";
-	}
+    @Container
+    static GenericContainer<?> resourceServer = new GenericContainer<>(
+            DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-resource-server" + TAG))
+            .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
+            .waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
+            .withStartupTimeout(TIMEOUT_SPINUP)
+            .withCreateContainerCmdModifier(configureContainerStartup(RESOURCE_SERVER_PORT));
 
-	private static Consumer<CreateContainerCmd> configureContainerStartup(int fixedPort) {
-		return cmd -> cmd.getHostConfig()
-				.withPortBindings(new PortBinding(Ports.Binding.bindPort(fixedPort), new ExposedPort(fixedPort)));
-	}
+    private static String containsPattern(String pattern) {
+        return "^.*" + pattern.replaceAll("[\\^\\$]", "") + ".*$";
+    }
 
-	@SneakyThrows
-	static void printResponse(MockHttpServletResponse response) {
-		System.out.println(response.getStatus());
-		for (var header : response.getHeaderNames())
-			System.out.println(header + "\t:\t" + response.getHeaderValues(header));
-		System.out.println(response.getContentAsString());
-	}
+    private static Consumer<CreateContainerCmd> configureContainerStartup(int fixedPort) {
+        return cmd -> cmd.getHostConfig()
+                .withPortBindings(new PortBinding(Ports.Binding.bindPort(fixedPort), new ExposedPort(fixedPort)));
+    }
 
-	static <T> void printResponse(ResponseEntity<T> response) {
-		System.out.println(response.getStatusCode());
-		for (var header : response.getHeaders().keySet())
-			System.out.println(header + "\t:\t" + response.getHeaders().get(header));
-		System.out.println(response.getBody());
-	}
+    @SneakyThrows
+    static void printResponse(MockHttpServletResponse response) {
+        System.out.println(response.getStatus());
+        for (var header : response.getHeaderNames())
+            System.out.println(header + "\t:\t" + response.getHeaderValues(header));
+        System.out.println(response.getContentAsString());
+    }
 
-	@Autowired
-	WebApplicationContext webApplicationContext;
+    static <T> void printResponse(ResponseEntity<T> response) {
+        System.out.println(response.getStatusCode());
+        for (var header : response.getHeaders().keySet())
+            System.out.println(header + "\t:\t" + response.getHeaders().get(header));
+        System.out.println(response.getBody());
+    }
 
-	@Autowired
-	WebClient webClient;
+    @Autowired
+    WebApplicationContext webApplicationContext;
 
-	MockMvc mockMvc;
+    @Autowired
+    WebClient webClient;
 
-	@BeforeEach
-	void beforeEach() throws Exception {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-	}
+    MockMvc mockMvc;
 
-	@Test
-	@WithMockUser(username = "user1", password = "password")
-	void test_index() throws Exception {
-		var request = request(HttpMethod.GET, INDEX_URL);
-		var response = mockMvc.perform(request).andExpect(status().isOk())
-				.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-		assertThat(Input.fromString(response.getContentAsString())).and(Input.fromFile(INDEX_RESULT_PATH))
-				.areIdentical();
-	}
+    @BeforeEach
+    void beforeEach() throws Exception {
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
+    }
 
-	@Test
-	@WithMockUser(username = "user1", password = "password")
-	void test_codeGrantType_clientRedirect() throws Exception {
-		var request = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
-		var response = mockMvc.perform(request).andExpect(status().is3xxRedirection()).andExpect(content().string(""))
-				.andExpect(header().exists("Location"))
-				.andExpect(header().string("Location",
-						new PredicateMatcher<String>(
-								str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
-				.andReturn().getResponse();
-		//printResponse(response);
-		var redirectURI = response.getHeader("Location");
-		var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
-		assertTrue(authResponse.getStatusCode().is3xxRedirection());
-		assertTrue(authResponse.getHeaders().containsKey("Location"));
-		//printResponse(authResponse);
-	}
+    @Test
+    @WithMockUser(username = "user1", password = "password")
+    void test_index() throws Exception {
+        var request  = request(HttpMethod.GET, INDEX_URL);
+        var response = mockMvc.perform(request).andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
+        assertThat(Input.fromString(response.getContentAsString())).and(Input.fromFile(INDEX_RESULT_PATH))
+                .areIdentical();
+    }
 
-	@Test
-	@WithMockUser(username = "user1", password = "password")
-	void test_credectialsGrantType_accessToRessources() throws Exception {
-		var request = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
-		var response = mockMvc.perform(request).andExpect(status().isOk())
-				.andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-		assertThat(Input.fromString(response.getContentAsString()))
-				.and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();
-	}
+    @Test
+    @WithMockUser(username = "user1", password = "password")
+    void test_codeGrantType_clientRedirect() throws Exception {
+        var request  = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
+        var response = mockMvc.perform(request).andExpect(status().is3xxRedirection()).andExpect(content().string(""))
+                .andExpect(header().exists("Location"))
+                .andExpect(header().string("Location",
+                        new PredicateMatcher<String>(
+                                str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
+                .andReturn().getResponse();
+        // printResponse(response);
+        var redirectURI  = response.getHeader("Location");
+        var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
+        assertTrue(authResponse.getStatusCode().is3xxRedirection());
+        assertTrue(authResponse.getHeaders().containsKey("Location"));
+        // printResponse(authResponse);
+    }
+
+    @Test
+    @WithMockUser(username = "user1", password = "password")
+    void test_credectialsGrantType_accessToRessources() throws Exception {
+        var request  = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
+        var response = mockMvc.perform(request).andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
+        assertThat(Input.fromString(response.getContentAsString()))
+                .and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();
+    }
 
 }

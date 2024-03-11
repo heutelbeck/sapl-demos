@@ -47,70 +47,70 @@ import reactor.core.publisher.Flux;
 @PolicyInformationPoint(name = "patient", description = "retrieves information about patients")
 public class PatientPIP {
 
-	private final ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
-	private final PIPRelationRepository relationRepo;
+    private final PIPRelationRepository relationRepo;
 
-	private final PIPPatientRepository patientRepo;
+    private final PIPPatientRepository patientRepo;
 
-	/**
-	 * This attribute is accessed in a SAPL policy through an expression like this:
-	 *
-	 * resource.patientId.<patient.relatives>
-	 *
-	 * The value on the left-hand side of the <> expression is fed into the function
-	 * as the first parameter as a Val. The attribute is identified within the <>
-	 * and consists of the name of the PIP and the name of the attribute:
-	 * 'patient.relatives' Import statements in a policy can be used to provide a
-	 * shorthand in the policy.
-	 *
-	 * This implementation does not track changes in the repository, i.e. this is a
-	 * non-streaming PIP.
-	 * 
-	 * @param value     the id of the patient. This parameter must be a number, as
-	 *                  defined by the @Number annotation.
-	 * @param variables the variables in the current evaluation context
-	 * @return the relatives of the patient as registered in the relationRepo.
-	 *
-	 */
-	@Attribute(name = "relatives")
-	public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, Val> variables) {
-		final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.get().asLong());
-		final List<String>   relationNames = relations.stream().map(Relation::getUsername).toList();
-		final JsonNode       jsonNode      = mapper.convertValue(relationNames, JsonNode.class);
-		return Flux.just(Val.of(jsonNode));
-	}
+    /**
+     * This attribute is accessed in a SAPL policy through an expression like this:
+     *
+     * resource.patientId.<patient.relatives>
+     *
+     * The value on the left-hand side of the <> expression is fed into the function
+     * as the first parameter as a Val. The attribute is identified within the <>
+     * and consists of the name of the PIP and the name of the attribute:
+     * 'patient.relatives' Import statements in a policy can be used to provide a
+     * shorthand in the policy.
+     *
+     * This implementation does not track changes in the repository, i.e. this is a
+     * non-streaming PIP.
+     * 
+     * @param value     the id of the patient. This parameter must be a number, as
+     *                  defined by the @Number annotation.
+     * @param variables the variables in the current evaluation context
+     * @return the relatives of the patient as registered in the relationRepo.
+     *
+     */
+    @Attribute(name = "relatives")
+    public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, Val> variables) {
+        final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.get().asLong());
+        final List<String>   relationNames = relations.stream().map(Relation::getUsername).toList();
+        final JsonNode       jsonNode      = mapper.convertValue(relationNames, JsonNode.class);
+        return Flux.just(Val.of(jsonNode));
+    }
 
-	/**
-	 * This attribute is accessed in a SAPL policy through an expression like this:
-	 *
-	 * resource.patientId.<patient.patientRecord>
-	 *
-	 * The value on the left-hand side of the <> expression is fed into the function
-	 * as the first parameter as a Val. The attribute is identified within the <>
-	 * and consists of the name of the PIP and the name of the attribute:
-	 * 'patient.patientRecord' Import statements in a policy can be used to provide
-	 * a shorthand in the policy.
-	 *
-	 * This implementation does not track changes in the repository, i.e. this is a
-	 * non-streaming PIP.
-	 * 
-	 * @param patientId the id of the patient. This parameter must be a number, as
-	 *                  defined by the @Number annotation.
-	 * @param variables the variables in the current evaluation context
-	 * @return the patient record or null. This is a Flux containing only one value.
-	 *
-	 */
-	@Attribute(name = "patientRecord")
-	public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, Val> variables) {
-		try {
-			final Patient  patient  = patientRepo.findById(patientId.get().asLong())
-					.orElseThrow(PolicyEvaluationException::new);
-			final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
-			return Flux.just(Val.of(jsonNode));
-		} catch (IllegalArgumentException | PolicyEvaluationException e) {
-			return Flux.just(Val.NULL);
-		}
-	}
+    /**
+     * This attribute is accessed in a SAPL policy through an expression like this:
+     *
+     * resource.patientId.<patient.patientRecord>
+     *
+     * The value on the left-hand side of the <> expression is fed into the function
+     * as the first parameter as a Val. The attribute is identified within the <>
+     * and consists of the name of the PIP and the name of the attribute:
+     * 'patient.patientRecord' Import statements in a policy can be used to provide
+     * a shorthand in the policy.
+     *
+     * This implementation does not track changes in the repository, i.e. this is a
+     * non-streaming PIP.
+     * 
+     * @param patientId the id of the patient. This parameter must be a number, as
+     *                  defined by the @Number annotation.
+     * @param variables the variables in the current evaluation context
+     * @return the patient record or null. This is a Flux containing only one value.
+     *
+     */
+    @Attribute(name = "patientRecord")
+    public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, Val> variables) {
+        try {
+            final Patient  patient  = patientRepo.findById(patientId.get().asLong())
+                    .orElseThrow(PolicyEvaluationException::new);
+            final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
+            return Flux.just(Val.of(jsonNode));
+        } catch (IllegalArgumentException | PolicyEvaluationException e) {
+            return Flux.just(Val.NULL);
+        }
+    }
 
 }

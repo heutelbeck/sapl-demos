@@ -24,13 +24,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class WebfluxAuthorizationManagerDemoApplication {
 
-	/**
-	 * Starts the application.
-	 * 
-	 * @param args command line parameters
-	 */
-	public static void main(String[] args) {
-		SpringApplication.run(WebfluxAuthorizationManagerDemoApplication.class, args);
-	}
+    /**
+     * Starts the application.
+     * 
+     * @param args command line parameters
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(WebfluxAuthorizationManagerDemoApplication.class, args);
+    }
 
 }

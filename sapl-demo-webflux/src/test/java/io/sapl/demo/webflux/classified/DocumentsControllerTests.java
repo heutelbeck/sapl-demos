@@ -16,28 +16,23 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 @WebFluxTest(controllers = DocumentsController.class, excludeAutoConfiguration = {
-		ReactiveSecurityAutoConfiguration.class })
+        ReactiveSecurityAutoConfiguration.class })
 class DocumentsControllerTests {
 
-	@MockBean
-	DocumentsService documentsService;
+    @MockBean
+    DocumentsService documentsService;
 
-	@Autowired
-	WebTestClient webTestClient;
+    @Autowired
+    WebTestClient webTestClient;
 
-	@Test
-	void whenGetPatients_thenPatientsServiceCalled() {
-		var document  = new Document(NatoSecurityClassification.NATO_RESTRICTED, "name", "contents");
-		var documents = Flux.just(document);
-		when(documentsService.getDocuments()).thenReturn(documents);
-		webTestClient.get()
-				.uri("/documents")
-				.accept(MediaType.APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
-				.expectBodyList(Document.class)
-				.value(p -> p, hasItem(document));
-		verify(documentsService, times(1)).getDocuments();
-	}
+    @Test
+    void whenGetPatients_thenPatientsServiceCalled() {
+        var document  = new Document(NatoSecurityClassification.NATO_RESTRICTED, "name", "contents");
+        var documents = Flux.just(document);
+        when(documentsService.getDocuments()).thenReturn(documents);
+        webTestClient.get().uri("/documents").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
+                .expectBodyList(Document.class).value(p -> p, hasItem(document));
+        verify(documentsService, times(1)).getDocuments();
+    }
 
 }

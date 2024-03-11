@@ -11,34 +11,34 @@ import io.sapl.spring.constraints.api.FilterPredicateConstraintHandlerProvider;
 @Service
 public class FilterClassifiedDocumentsContraintHandlerProvider implements FilterPredicateConstraintHandlerProvider {
 
-	@Override
-	public boolean isResponsible(JsonNode constraint) {
-		return constraint != null && constraint.has("type")
-				&& "filterClassifiedDocuments".equals(constraint.findValue("type").asText());
-	}
+    @Override
+    public boolean isResponsible(JsonNode constraint) {
+        return constraint != null && constraint.has("type")
+                && "filterClassifiedDocuments".equals(constraint.findValue("type").asText());
+    }
 
-	@Override
-	public Predicate<Object> getHandler(JsonNode constraint) {
-		var clearanceAux = NatoSecurityClassification.NATO_UNCLASSIFIED;
+    @Override
+    public Predicate<Object> getHandler(JsonNode constraint) {
+        var clearanceAux = NatoSecurityClassification.NATO_UNCLASSIFIED;
 
-		if (constraint.has("clearance")) {
-			try {
-				clearanceAux = NatoSecurityClassification.valueOf(constraint.findValue("clearance").asText());
-			} catch (IllegalArgumentException e) {
-				// NOOP
-			}
-		}
+        if (constraint.has("clearance")) {
+            try {
+                clearanceAux = NatoSecurityClassification.valueOf(constraint.findValue("clearance").asText());
+            } catch (IllegalArgumentException e) {
+                // NOOP
+            }
+        }
 
-		var clearance = clearanceAux;
+        var clearance = clearanceAux;
 
-		return document -> clearanceMatchesOrIsHigherThanClassification(clearance,
-				((Document) document).classification());
+        return document -> clearanceMatchesOrIsHigherThanClassification(clearance,
+                ((Document) document).classification());
 
-	}
+    }
 
-	private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,
-			NatoSecurityClassification classification) {
-		return classification.compareTo(clearance) <= 0;
-	}
+    private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,
+            NatoSecurityClassification classification) {
+        return classification.compareTo(clearance) <= 0;
+    }
 
 }

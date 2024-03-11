@@ -24,9 +24,9 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class WebAuthorizationManagerDemoApplicationTest {
 
-	@Test
-	void contextLoads(ApplicationContext context) {
-		assertThat(context).isNotNull();
-	}
+    @Test
+    void contextLoads(ApplicationContext context) {
+        assertThat(context).isNotNull();
+    }
 
 }

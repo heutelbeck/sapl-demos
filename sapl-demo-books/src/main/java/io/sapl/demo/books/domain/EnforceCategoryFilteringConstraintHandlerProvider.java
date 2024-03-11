@@ -14,30 +14,30 @@ import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
 @Service
 public class EnforceCategoryFilteringConstraintHandlerProvider implements MethodInvocationConstraintHandlerProvider {
 
-	private static final String LIMIT_CATEGORIES = "limitCategoriesTo";
+    private static final String LIMIT_CATEGORIES = "limitCategoriesTo";
 
-	@Override
-	public boolean isResponsible(JsonNode constraint) {
-		return constraint.has(LIMIT_CATEGORIES) && constraint.get(LIMIT_CATEGORIES).isArray();
-	}
+    @Override
+    public boolean isResponsible(JsonNode constraint) {
+        return constraint.has(LIMIT_CATEGORIES) && constraint.get(LIMIT_CATEGORIES).isArray();
+    }
 
-	@Override
-	public Consumer<ReflectiveMethodInvocation> getHandler(JsonNode constraint) {
-		return methodInvocation -> {
+    @Override
+    public Consumer<ReflectiveMethodInvocation> getHandler(JsonNode constraint) {
+        return methodInvocation -> {
 
-			var constraintCategories = constraint.get(LIMIT_CATEGORIES);
-			var categories = new ArrayList<Integer>();
+            var constraintCategories = constraint.get(LIMIT_CATEGORIES);
+            var categories           = new ArrayList<Integer>();
 
-			if (constraintCategories.size() == 0) {
-				methodInvocation.setArguments(Optional.empty());
-				return;
-			}
+            if (constraintCategories.size() == 0) {
+                methodInvocation.setArguments(Optional.empty());
+                return;
+            }
 
-			for (var category : constraintCategories)
-				categories.add(category.asInt());
+            for (var category : constraintCategories)
+                categories.add(category.asInt());
 
-			methodInvocation.setArguments(Optional.of(categories));
-		};
-	}
+            methodInvocation.setArguments(Optional.of(categories));
+        };
+    }
 
 }

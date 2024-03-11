@@ -35,40 +35,38 @@ import reactor.util.function.Tuples;
 @RequiredArgsConstructor
 public class MiskatonicUniversityController {
 
-	private final PolicyDecisionPoint pdp;
+    private final PolicyDecisionPoint pdp;
 
-	private final ObjectMapper mapper;
+    private final ObjectMapper mapper;
 
-	@GetMapping("/books")
-	@PreEnforce(action = "'read'", resource = "'books'")
-	public String[] books(Principal principal) {
+    @GetMapping("/books")
+    @PreEnforce(action = "'read'", resource = "'books'")
+    public String[] books(Principal principal) {
 
-		/*
-		 * Uncomment to following line to see how a decision may change dynamically once
-		 * the token expires:
-		 */
+        /*
+         * Uncomment to following line to see how a decision may change dynamically once
+         * the token expires:
+         */
 
-		// doATimeoutDemoTest(principal);
-
-		// @formatter:off
+        // @formatter:off
 		return new String[] {	"Necronomicon",
 								"Nameless Cults",
 								"Book of Eibon"	};
 		// @formatter:on
-	}
+    }
 
-	public void doATimeoutDemoTest(Principal principal) {
-		var authzSub = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
-		var decisions = pdp.decide(authzSub).map(AuthorizationDecision::getDecision);
-		var ticktock = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
-		var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
-		decisionsWithTicker.subscribe();
-	}
+    public void doATimeoutDemoTest(Principal principal) {
+        var authzSub            = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
+        var decisions           = pdp.decide(authzSub).map(AuthorizationDecision::getDecision);
+        var ticktock            = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
+        var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
+        decisionsWithTicker.subscribe();
+    }
 
-	@GetMapping("/faculty")
-	@PreEnforce(action = "'read'", resource = "'faculty'")
-	public String[] getMessages() {
-		// @formatter:off
+    @GetMapping("/faculty")
+    @PreEnforce(action = "'read'", resource = "'faculty'")
+    public String[] getMessages() {
+        // @formatter:off
 		return new String[] { 	"Dr. Henry Armitage",
 								"Professor Ferdinand C. Ashley",
 								"Professor Atwood",
@@ -87,12 +85,12 @@ public class MiskatonicUniversityController {
 								"\"Old\" Waldron",
 								"Albert N. Wilmarth" };
 		// @formatter:on
-	}
+    }
 
-	@GetMapping("/bestiary")
-	@PreEnforce(action = "'read'", resource = "'bestiary'")
-	public String[] getBestiary() {
-		// @formatter:off
+    @GetMapping("/bestiary")
+    @PreEnforce(action = "'read'", resource = "'bestiary'")
+    public String[] getBestiary() {
+        // @formatter:off
 		return new String[] { 	"Byakhee",
 								"Deep Ones",
 								"Elder Things",
@@ -106,6 +104,6 @@ public class MiskatonicUniversityController {
 								"Serpent Men",
 								"Shoggoths" };
 		// @formatter:on
-	}
+    }
 
 }

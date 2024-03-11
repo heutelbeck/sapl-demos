@@ -33,21 +33,20 @@ import picocli.CommandLine.Option;
 @Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
 public class BenchmarkCommand implements Callable<Integer> {
 
-    private final LocalDateTime dateTime = LocalDateTime.now();
+    private final LocalDateTime     dateTime  = LocalDateTime.now();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    @Option(names = {"-o", "--output"}, description = "Path to the output directory for benchmark results.")
+    @Option(names = { "-o", "--output" }, description = "Path to the output directory for benchmark results.")
     private String outputPath = "results/" + formatter.format(dateTime);
 
-    @Option(names = {"-c", "--cfg"},  required = true, description = "YAML file to read json from")
+    @Option(names = { "-c", "--cfg" }, required = true, description = "YAML file to read json from")
     private String cfgFilePath;
 
-    @Option(names = {"--skipBenchmark"})
+    @Option(names = { "--skipBenchmark" })
     private boolean skipBenchmark = false;
 
-    @Option(names = {"--skipReportGeneration"})
+    @Option(names = { "--skipReportGeneration" })
     private boolean skipReportGeneration = false;
-
 
     @Override
     public Integer call() throws Exception {

@@ -21,42 +21,43 @@ import lombok.extern.slf4j.Slf4j;
 @EnableSaplMethodSecurity
 public class DemoSecurityConfiguration {
 
-	static final String         DEMO_USER      = "demoUser";
-	static final String         DEMO_PASSWORD  = "demoPassword";
-	private static final String DEMO_AUTHORITY = "demoAuthority";
+    static final String         DEMO_USER      = "demoUser";
+    static final String         DEMO_PASSWORD  = "demoPassword";
+    private static final String DEMO_AUTHORITY = "demoAuthority";
 
-	@Bean
-	@Primary
-	UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-		var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
-				List.of(new SimpleGrantedAuthority(DEMO_AUTHORITY)));
-		log.info("");
-		log.info("Generating demo user: {}", testUser);
-		log.info("use username : '{}' and password '{}' for login", DEMO_USER, DEMO_PASSWORD);
-		log.info("");
-		return new InMemoryUserDetailsManager(testUser);
-	}
+    @Bean
+    @Primary
+    UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+        var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
+                List.of(new SimpleGrantedAuthority(DEMO_AUTHORITY)));
+        log.info("");
+        log.info("Generating demo user: {}", testUser);
+        log.info("use username : '{}' and password '{}' for login", DEMO_USER, DEMO_PASSWORD);
+        log.info("");
+        return new InMemoryUserDetailsManager(testUser);
+    }
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // for demo purposes only! do not disable csrf in your application unless strictly necessary.
-        http.csrf(csrf -> csrf.disable()); 
-		return http.build();
-	}
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // for demo purposes only! do not disable csrf in your application unless
+        // strictly necessary.
+        http.csrf(csrf -> csrf.disable());
+        return http.build();
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return new PasswordEncoder() {
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder() {
 
-			@Override
-			public boolean matches(CharSequence rawPassword, String encodedPassword) {
-				return encodedPassword.equals(rawPassword);
-			}
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return encodedPassword.equals(rawPassword);
+            }
 
-			@Override
-			public String encode(CharSequence rawPassword) {
-				return rawPassword.toString();
-			}
-		};
-	}
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+        };
+    }
 }

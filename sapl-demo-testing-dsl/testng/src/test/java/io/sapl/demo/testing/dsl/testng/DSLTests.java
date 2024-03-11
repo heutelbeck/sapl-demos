@@ -1,15 +1,17 @@
 package io.sapl.demo.testing.dsl.testng;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.testng.annotations.Factory;
+
 import io.sapl.test.SaplTestException;
 import io.sapl.test.dsl.interfaces.TestNode;
 import io.sapl.test.dsl.setup.BaseTestAdapter;
 import io.sapl.test.dsl.setup.TestCase;
 import io.sapl.test.dsl.setup.TestContainer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Stream;
-import org.testng.annotations.Factory;
 
 public class DSLTests extends BaseTestAdapter<List<TestClass>> {
 
@@ -36,7 +38,10 @@ public class DSLTests extends BaseTestAdapter<List<TestClass>> {
             if (testNode instanceof TestCase testCase) {
                 return Stream.of(new TestClass(testCase.getIdentifier(), testCase));
             } else if (testNode instanceof TestContainer testContainer) {
-                return getDynamicContainersFromTestNode(testContainer.getTestNodes()).stream().map(testClass -> new TestClass(testContainer.getIdentifier() + " -> " + testClass.getTestName(), testClass.getRunnable()));
+                return getDynamicContainersFromTestNode(testContainer.getTestNodes()).stream()
+                        .map(testClass -> new TestClass(
+                                testContainer.getIdentifier() + " -> " + testClass.getTestName(),
+                                testClass.getRunnable()));
             }
             throw new SaplTestException("Unknown type of TestNode");
         }).toList();

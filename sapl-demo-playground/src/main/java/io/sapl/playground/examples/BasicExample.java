@@ -17,38 +17,38 @@ package io.sapl.playground.examples;
 
 public class BasicExample extends Example {
 
-	public BasicExample() {
+    public BasicExample() {
 
-		this.mockDefinition = """
-				[
-				  {
-				    "type"      : "ATTRIBUTE",
-				    "importName": "time.now",
-				    "sequence"  : [1, 2, 3]
-				  },
-				  {
-				    "type"      : "FUNCTION",
-				    "importName": "time.dayOfWeekFrom",
-				    "sequence"  : ["MONDAY", "TUESDAY", "WEDNESDAY"]
-				  }
-				]""";
+        this.mockDefinition = """
+                [
+                  {
+                    "type"      : "ATTRIBUTE",
+                    "importName": "time.now",
+                    "sequence"  : [1, 2, 3]
+                  },
+                  {
+                    "type"      : "FUNCTION",
+                    "importName": "time.dayOfWeekFrom",
+                    "sequence"  : ["MONDAY", "TUESDAY", "WEDNESDAY"]
+                  }
+                ]""";
 
-		this.policy = """
-				policy "policy 1"
-				permit
-				    action == "read"
-				where
-				    subject == "WILLI";
-				    time.dayOfWeekFrom(<time.now>) =~ "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY";""";
+        this.policy = """
+                policy "policy 1"
+                permit
+                    action == "read"
+                where
+                    subject == "WILLI";
+                    time.dayOfWeekFrom(<time.now>) =~ "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY";""";
 
-		this.authzSub = """
-				{
-				 "subject"     : "WILLI",
-				 "action"      : "read",
-				 "resource"    : "something"
-				}""";
+        this.authzSub = """
+                {
+                 "subject"     : "WILLI",
+                 "action"      : "read",
+                 "resource"    : "something"
+                }""";
 
-		this.displayName = "Basic";
-	}
+        this.displayName = "Basic";
+    }
 
 }

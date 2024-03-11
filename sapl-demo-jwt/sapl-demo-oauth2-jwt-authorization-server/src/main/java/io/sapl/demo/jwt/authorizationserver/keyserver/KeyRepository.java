@@ -26,14 +26,14 @@ import com.nimbusds.jose.jwk.JWK;
 @Component
 public class KeyRepository {
 
-	private Map<String, JWK> keysById = new HashMap<>();
+    private Map<String, JWK> keysById = new HashMap<>();
 
-	public void add(JWK key) {
-		keysById.put(key.getKeyID(), key);
-	}
+    public void add(JWK key) {
+        keysById.put(key.getKeyID(), key);
+    }
 
-	public Optional<JWK> findById(String keyId) {
-		return Optional.ofNullable(keysById.get(keyId));
-	}
+    public Optional<JWK> findById(String keyId) {
+        return Optional.ofNullable(keysById.get(keyId));
+    }
 
 }

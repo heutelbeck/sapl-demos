@@ -35,22 +35,22 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DemoController {
 
-	public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
 
-	private final DemoService       service;
-	private final MqttClientService mqttClient;
+    private final DemoService       service;
+    private final MqttClientService mqttClient;
 
-	@GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
-	public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-		return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class,
-				(error, reason) -> log.warn("ACCESS DENIED ('" + error.getMessage()
-						+ "') (data will automatically resume once the MQTT topic 'status' gets an 'emergency' event."))
-				.map(value -> ServerSentEvent.<String>builder().data(value).build());
-	}
+    @GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
+    public Flux<ServerSentEvent<String>> recoverAfterDeny() {
+        return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class,
+                (error, reason) -> log.warn("ACCESS DENIED ('" + error.getMessage()
+                        + "') (data will automatically resume once the MQTT topic 'status' gets an 'emergency' event."))
+                .map(value -> ServerSentEvent.<String>builder().data(value).build());
+    }
 
-	@GetMapping(value = "/publishMqttEvent")
-	public Mono<String> publichMqttEvent() {
-		return mqttClient.publish("demoTopic", "aMessage", true).map(Object::toString);
-	}
+    @GetMapping(value = "/publishMqttEvent")
+    public Mono<String> publichMqttEvent() {
+        return mqttClient.publish("demoTopic", "aMessage", true).map(Object::toString);
+    }
 
 }

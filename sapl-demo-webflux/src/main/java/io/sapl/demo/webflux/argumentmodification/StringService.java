@@ -8,8 +8,8 @@ import reactor.core.publisher.Mono;
 @Service
 public class StringService {
 
-	@PreEnforce
-	public Mono<String> lowercase(String aString) {
-		return Mono.just(aString.toLowerCase());
-	}
+    @PreEnforce
+    public Mono<String> lowercase(String aString) {
+        return Mono.just(aString.toLowerCase());
+    }
 }

@@ -25,12 +25,12 @@ public class Utilities {
         throw new IllegalStateException("Utility class");
     }
 
-    public static Double getMaxValue(CategoryDataset dataset){
+    public static Double getMaxValue(CategoryDataset dataset) {
         double max = Double.MIN_VALUE;
         for (int r = 0; r < dataset.getRowCount(); r++) {
             for (int c = 0; c < dataset.getColumnCount(); c++) {
                 Number number = dataset.getValue(r, c);
-                double value = number == null ? Double.NaN : number.doubleValue();
+                double value  = number == null ? Double.NaN : number.doubleValue();
                 if (value > max) {
                     max = value;
                 }

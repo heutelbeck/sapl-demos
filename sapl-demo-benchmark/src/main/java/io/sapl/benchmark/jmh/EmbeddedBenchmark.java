@@ -36,22 +36,21 @@ import io.sapl.interpreter.InitializationException;
 import io.sapl.pdp.PolicyDecisionPointFactory;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @State(Scope.Benchmark)
 public class EmbeddedBenchmark {
 
-    @Param({"{}"})
-    String contextJsonString;
-    private PolicyDecisionPoint pdp;
+    @Param({ "{}" })
+    String                            contextJsonString;
+    private PolicyDecisionPoint       pdp;
     private BenchmarkExecutionContext context;
 
     @Setup(Level.Trial)
     public void setup() throws InitializationException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
         log.info("initializing embedded PDP");
-        pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class),
-                List::of, List::of);
+        pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class), List::of,
+                List::of);
     }
 
     @Benchmark

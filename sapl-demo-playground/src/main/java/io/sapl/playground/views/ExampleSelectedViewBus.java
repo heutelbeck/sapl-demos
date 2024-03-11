@@ -28,14 +28,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExampleSelectedViewBus implements Serializable {
 
-	private PlaygroundView contentView;
+    private PlaygroundView contentView;
 
-	public PlaygroundView getContentView() {
-		return this.contentView;
-	}
+    public PlaygroundView getContentView() {
+        return this.contentView;
+    }
 
-	public void setContentView(PlaygroundView contentView) {
-		this.contentView = contentView;
-	}
+    public void setContentView(PlaygroundView contentView) {
+        this.contentView = contentView;
+    }
 
 }

@@ -20,5 +20,5 @@ import java.util.Optional;
 import io.sapl.mvc.demo.domain.Patient;
 
 public interface PIPPatientRepository {
-	Optional<Patient> findById(Long id);
+    Optional<Patient> findById(Long id);
 }

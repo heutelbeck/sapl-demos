@@ -27,69 +27,69 @@ import io.sapl.playground.examples.SpringDataExample;
 import io.sapl.playground.examples.SpringSecurityExample;
 
 public class MainLayout extends AppLayout {
-	
-	private final ExampleSelectedViewBus exampleSelectedViewBus;
-	private HashMap<String, Example>     examples;
 
-	public MainLayout(ExampleSelectedViewBus exampleSelectedViewBus) {
-		this.exampleSelectedViewBus = exampleSelectedViewBus;
-		initializeExamples();
-		addToNavbar(createHeaderContent());
+    private final ExampleSelectedViewBus exampleSelectedViewBus;
+    private HashMap<String, Example>     examples;
 
-	}
+    public MainLayout(ExampleSelectedViewBus exampleSelectedViewBus) {
+        this.exampleSelectedViewBus = exampleSelectedViewBus;
+        initializeExamples();
+        addToNavbar(createHeaderContent());
 
-	private Component createHeaderContent() {
-		var header = new Header();
-		header.addClassNames(BoxSizing.BORDER, Display.FLEX, FlexDirection.COLUMN, Width.FULL);
+    }
 
-		var layout = new HorizontalLayout();
-		layout.addClassNames(Display.FLEX, AlignItems.CENTER, Padding.Horizontal.SMALL);
-		layout.getStyle().set("max-height", "55px");
+    private Component createHeaderContent() {
+        var header = new Header();
+        header.addClassNames(BoxSizing.BORDER, Display.FLEX, FlexDirection.COLUMN, Width.FULL);
 
-		var appName = new H1("SAPL Playground");
-		appName.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.XLARGE, Margin.AUTO);
+        var layout = new HorizontalLayout();
+        layout.addClassNames(Display.FLEX, AlignItems.CENTER, Padding.Horizontal.SMALL);
+        layout.getStyle().set("max-height", "55px");
 
-		var linkToDocs = new Anchor("https://sapl.io", "SAPL Homepage");
+        var appName = new H1("SAPL Playground");
+        appName.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.XLARGE, Margin.AUTO);
 
-		layout.add(logo(), appName, linkToDocs, exampleSelector());
+        var linkToDocs = new Anchor("https://sapl.io", "SAPL Homepage");
 
-		header.add(layout);
-		return header;
-	}
+        layout.add(logo(), appName, linkToDocs, exampleSelector());
 
-	private Component logo() {
-		var logo = new Image("images/logo-header.png", "SAPL Logo");
-		logo.addClassNames(Margin.LARGE);
-		logo.setHeight(44, Unit.PIXELS);
-		return logo;
-	}
+        header.add(layout);
+        return header;
+    }
 
-	private Component exampleSelector() {
-		Select<String> select = new Select<>();
-		select.setPlaceholder("Examples");
-		select.setItems(this.examples.keySet());
-		select.setId("dropdownButton");
-		select.addValueChangeListener(event -> this.exampleSelectedViewBus.getContentView()
-				.setExample(this.examples.get(event.getValue()), true));
-		return select;
-	}
+    private Component logo() {
+        var logo = new Image("images/logo-header.png", "SAPL Logo");
+        logo.addClassNames(Margin.LARGE);
+        logo.setHeight(44, Unit.PIXELS);
+        return logo;
+    }
 
-	private void initializeExamples() {
-		this.examples = new HashMap<>();
+    private Component exampleSelector() {
+        Select<String> select = new Select<>();
+        select.setPlaceholder("Examples");
+        select.setItems(this.examples.keySet());
+        select.setId("dropdownButton");
+        select.addValueChangeListener(event -> this.exampleSelectedViewBus.getContentView()
+                .setExample(this.examples.get(event.getValue()), true));
+        return select;
+    }
 
-		Example example;
+    private void initializeExamples() {
+        this.examples = new HashMap<>();
 
-		example = new BasicExample();
-		this.examples.put(example.getDisplayName(), example);
+        Example example;
 
-		example = new SpringSecurityExample();
-		this.examples.put(example.getDisplayName(), example);
-
-		example = new SpringDataExample();
-		this.examples.put(example.getDisplayName(), example);
-		
-		example = new SchemaExample();
+        example = new BasicExample();
         this.examples.put(example.getDisplayName(), example);
-	}
+
+        example = new SpringSecurityExample();
+        this.examples.put(example.getDisplayName(), example);
+
+        example = new SpringDataExample();
+        this.examples.put(example.getDisplayName(), example);
+
+        example = new SchemaExample();
+        this.examples.put(example.getDisplayName(), example);
+    }
 
 }

@@ -23,41 +23,34 @@ import reactor.core.publisher.Mono;
 @DependsOn("mqttBrokerLifecycleService")
 public class MqttClientService implements DisposableBean {
 
-	Mqtt5AsyncClient mqttClient;
+    Mqtt5AsyncClient mqttClient;
 
-	public MqttClientService() throws InterruptedException, ExecutionException {
-		mqttClient = Mqtt5Client.builder()
-				.identifier("demoClient")
-				.serverHost("localhost")
-				.serverPort(1883)
-				.buildAsync();
-		log.debug("Connect MQTT client... ");
-		var connAckMessage = mqttClient.connect().get(); // Block for Demo
-		if (connAckMessage.getReasonCode() != Mqtt5ConnAckReasonCode.SUCCESS) {
-			throw new IllegalStateException("Connection to the mqtt broker couldn't be established:" +
-					connAckMessage.getReasonCode());
-		}
-		log.debug("Connect MQTT client... success");
-	}
+    public MqttClientService() throws InterruptedException, ExecutionException {
+        mqttClient = Mqtt5Client.builder().identifier("demoClient").serverHost("localhost").serverPort(1883)
+                .buildAsync();
+        log.debug("Connect MQTT client... ");
+        var connAckMessage = mqttClient.connect().get(); // Block for Demo
+        if (connAckMessage.getReasonCode() != Mqtt5ConnAckReasonCode.SUCCESS) {
+            throw new IllegalStateException(
+                    "Connection to the mqtt broker couldn't be established:" + connAckMessage.getReasonCode());
+        }
+        log.debug("Connect MQTT client... success");
+    }
 
-	public Mono<Mqtt5PublishResult> publish(String topic, String payload, boolean retain) {
-		return Mono.fromFuture(() -> mqttClient.publish(buildMqttPublishMessage(topic, payload, retain)));
-	}
+    public Mono<Mqtt5PublishResult> publish(String topic, String payload, boolean retain) {
+        return Mono.fromFuture(() -> mqttClient.publish(buildMqttPublishMessage(topic, payload, retain)));
+    }
 
-	private static Mqtt5Publish buildMqttPublishMessage(String topic, String payload, boolean retain) {
-		return Mqtt5Publish.builder()
-				.topic(topic)
-				.qos(MqttQos.AT_MOST_ONCE)
-				.retain(retain)
-				.payloadFormatIndicator(Mqtt5PayloadFormatIndicator.UTF_8)
-				.payload(payload.getBytes(StandardCharsets.UTF_8))
-				.build();
-	}
+    private static Mqtt5Publish buildMqttPublishMessage(String topic, String payload, boolean retain) {
+        return Mqtt5Publish.builder().topic(topic).qos(MqttQos.AT_MOST_ONCE).retain(retain)
+                .payloadFormatIndicator(Mqtt5PayloadFormatIndicator.UTF_8)
+                .payload(payload.getBytes(StandardCharsets.UTF_8)).build();
+    }
 
-	@Override
-	public void destroy() throws InterruptedException, ExecutionException {
-		log.debug("Disconnect MQTT client");
-		mqttClient.disconnect().get();// Block for Demo
-	}
+    @Override
+    public void destroy() throws InterruptedException, ExecutionException {
+        log.debug("Disconnect MQTT client");
+        mqttClient.disconnect().get();// Block for Demo
+    }
 
 }

@@ -1,5 +1,6 @@
 package io.sapl.demo.views;
 
+import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -26,22 +27,22 @@ import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
 import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
+
 import io.sapl.demo.views.jsoneditor.JSONEditorView;
 import io.sapl.demo.views.sapleditor.SAPLEditorView;
 import io.sapl.demo.views.sapltesteditor.SAPLTestEditorView;
-import org.vaadin.lineawesome.LineAwesomeIcon;
 
 /**
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
 
-	/**
+    /**
      * A simple navigation item component, based on ListItem element.
      */
     public static class MenuItemInfo extends ListItem {
 
-    	private final Class<? extends Component> view;
+        private final Class<? extends Component> view;
 
         public MenuItemInfo(String menuTitle, Component icon, Class<? extends Component> view) {
             this.view = view;
@@ -101,11 +102,10 @@ public class MainLayout extends AppLayout {
     }
 
     private MenuItemInfo[] createMenuItems() {
-        return new MenuItemInfo[]{ //
+        return new MenuItemInfo[] { //
                 new MenuItemInfo("SAPL Editor", LineAwesomeIcon.EDIT.create(), SAPLEditorView.class),
                 new MenuItemInfo("SAPL Test Editor", LineAwesomeIcon.EDIT.create(), SAPLTestEditorView.class),
-                new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class),
-        };
+                new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class), };
     }
 
 }

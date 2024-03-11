@@ -61,26 +61,28 @@ import lombok.RequiredArgsConstructor;
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
 
-	@Value("${oauth.key}")
-	private String privateKey;
+    @Value("${oauth.key}")
+    private String privateKey;
 
-	@Value("${oauth.kid}")
-	private String kid;
+    @Value("${oauth.kid}")
+    private String kid;
 
-	private final KeyRepository keyRepo;
+    private final KeyRepository keyRepo;
 
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
-		MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
-		http.authorizeHttpRequests(requests -> requests.requestMatchers(mvcMatcherBuilder.pattern("/public-key/**")).permitAll());
-		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-		http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(withDefaults());
-		http.formLogin(withDefaults());
-		return http.build();
-	}
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http,
+            HandlerMappingIntrospector introspector) throws Exception {
+        MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
+        http.authorizeHttpRequests(
+                requests -> requests.requestMatchers(mvcMatcherBuilder.pattern("/public-key/**")).permitAll());
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(withDefaults());
+        http.formLogin(withDefaults());
+        return http.build();
+    }
 
-	// @formatter:off
+    // @formatter:off
 	@Bean
 	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
@@ -107,36 +109,35 @@ public class AuthorizationServerConfig {
 	}
 	// @formatter:on
 
-	@Bean
-	OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
-			RegisteredClientRepository registeredClientRepository) {
-		return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
-	}
+    @Bean
+    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
+            RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+    }
 
-	@Bean
-	OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
-			RegisteredClientRepository registeredClientRepository) {
-		return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
-	}
+    @Bean
+    OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+            RegisteredClientRepository registeredClientRepository) {
+        return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
+    }
 
-	@Bean
-	JWKSource<SecurityContext> jwkSource() throws JOSEException {
-		JWK jwk = JWK.parseFromPEMEncodedObjects(privateKey);
-		jwk = new RSAKey.Builder(jwk.toRSAKey()).keyID(kid).build();
-		// JWK jwk = Jwks.generateRsa();
-		keyRepo.add(jwk);
-		JWKSet jwkSet = new JWKSet(jwk);
-		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-	}
+    @Bean
+    JWKSource<SecurityContext> jwkSource() throws JOSEException {
+        JWK jwk = JWK.parseFromPEMEncodedObjects(privateKey);
+        jwk = new RSAKey.Builder(jwk.toRSAKey()).keyID(kid).build();
+        keyRepo.add(jwk);
+        JWKSet jwkSet = new JWKSet(jwk);
+        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+    }
 
-	@Bean
-	AuthorizationServerSettings authorizationServerSettings() {
-		return AuthorizationServerSettings.builder().issuer("http://auth-server:9000").build();
-	}
+    @Bean
+    AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder().issuer("http://auth-server:9000").build();
+    }
 
-	@Bean
-	EmbeddedDatabase embeddedDatabase() {
-		// @formatter:off
+    @Bean
+    EmbeddedDatabase embeddedDatabase() {
+        // @formatter:off
 		return new EmbeddedDatabaseBuilder()
 				.generateUniqueName(true)
 				.setType(EmbeddedDatabaseType.H2)
@@ -146,6 +147,6 @@ public class AuthorizationServerConfig {
 				.addScript("org/springframework/security/oauth2/server/authorization/client/oauth2-registered-client-schema.sql")
 				.build();
 		// @formatter:on
-	}
+    }
 
 }

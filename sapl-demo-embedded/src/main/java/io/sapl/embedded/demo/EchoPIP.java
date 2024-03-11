@@ -27,9 +27,9 @@ import reactor.core.publisher.Flux;
 @PolicyInformationPoint(name = "echo", description = "PIP echoing the input value")
 public class EchoPIP {
 
-	@Attribute(name = "echo")
-	public static Flux<Val> echo(@Text Val value) {
-		return Flux.just(value);
-	}
+    @Attribute(name = "echo")
+    public static Flux<Val> echo(@Text Val value) {
+        return Flux.just(value);
+    }
 
 }

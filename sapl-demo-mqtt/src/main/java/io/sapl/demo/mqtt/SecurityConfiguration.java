@@ -33,14 +33,14 @@ import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 @EnableReactiveSaplMethodSecurity
 public class SecurityConfiguration {
 
-	@Bean
-	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-		// @formatter:off
+    @Bean
+    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        // @formatter:off
 		http.authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
             .formLogin(form-> form.disable())
             .httpBasic(basic -> basic.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
 		return http.build();
 		// @formatter:on
-	}
+    }
 
 }

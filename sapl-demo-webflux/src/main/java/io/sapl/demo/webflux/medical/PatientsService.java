@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 @Service
 public class PatientsService {
 
-	// @formatter:off
+    // @formatter:off
 	private static final Patient[] PATIENTS = {
 			new Patient("Phocas Zephyros",      "BA50",             "Past myocardial infarction diagnosed by ECG or other special investigation, but currently presenting no symptoms."),
 			new Patient("Myrrhine Mattithyahu", "BB03",             "A postnatal pathological change in form or function of one or more pulmonary veins."),
@@ -25,9 +25,9 @@ public class PatientsService {
 	};
 	// @formatter:on
 
-	@PreEnforce
-	public Flux<Patient> getPatients() {
-		return Flux.fromArray(PATIENTS);
-	}
+    @PreEnforce
+    public Flux<Patient> getPatients() {
+        return Flux.fromArray(PATIENTS);
+    }
 
 }

@@ -12,15 +12,15 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class LibraryUser extends org.springframework.security.core.userdetails.User implements UserDetails {
 
-	@Getter
-	private int department;
-	@Getter
-	private List<Integer> dataScope = List.of();
+    @Getter
+    private int           department;
+    @Getter
+    private List<Integer> dataScope = List.of();
 
-	public LibraryUser(String username, int department, List<Integer> dataScope, String password) {
-		super(username, password, true, true, true, true, List.of());
-		this.department = department;
-		this.dataScope = dataScope;
-	}
+    public LibraryUser(String username, int department, List<Integer> dataScope, String password) {
+        super(username, password, true, true, true, true, List.of());
+        this.department = department;
+        this.dataScope  = dataScope;
+    }
 
 }

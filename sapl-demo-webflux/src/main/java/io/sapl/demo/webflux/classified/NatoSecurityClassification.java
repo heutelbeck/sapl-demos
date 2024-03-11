@@ -6,17 +6,15 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum NatoSecurityClassification {
-	NATO_UNCLASSIFIED("NATO UNCLASSIFIED", "NU"),
-	NATO_RESTRICTED("NATO RESTRICTED", "NR"),
-	NATO_CONFIDENTIAL("NATO CONFIDENTIAL", "NC"),
-	NATO_SECRET("NATO SECRET", "NS"),
-	COSMIC_TOP_SECRET("COSMIC TOP SECRET", "CTS");
+    NATO_UNCLASSIFIED("NATO UNCLASSIFIED", "NU"), NATO_RESTRICTED("NATO RESTRICTED", "NR"),
+    NATO_CONFIDENTIAL("NATO CONFIDENTIAL", "NC"), NATO_SECRET("NATO SECRET", "NS"),
+    COSMIC_TOP_SECRET("COSMIC TOP SECRET", "CTS");
 
-	private String name;
-	private String abbreviation;
+    private String name;
+    private String abbreviation;
 
-	@Override
-	public String toString() {
-		return name + " (" + abbreviation + ')';
-	}
+    @Override
+    public String toString() {
+        return name + " (" + abbreviation + ')';
+    }
 }

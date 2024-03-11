@@ -34,22 +34,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-	private final ReactiveSaplAuthorizationManager saplAuthzManager;
+    private final ReactiveSaplAuthorizationManager saplAuthzManager;
 
-	@Bean
-	MapReactiveUserDetailsService userDetailsService() {
-		@SuppressWarnings("deprecation") // Demo Code!
-		UserDetails user = User.withDefaultPasswordEncoder()
-				.username("user")
-				.password("user")
-				.roles("USER")
-				.build();
-		return new MapReactiveUserDetailsService(user);
-	}
+    @Bean
+    MapReactiveUserDetailsService userDetailsService() {
+        @SuppressWarnings("deprecation") // Demo Code!
+        UserDetails user = User.withDefaultPasswordEncoder().username("user").password("user").roles("USER").build();
+        return new MapReactiveUserDetailsService(user);
+    }
 
-	@Bean
-	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-		// @formatter:off
+    @Bean
+    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+        // @formatter:off
 		return http.authorizeExchange(exchange -> 
 		            	exchange.anyExchange()
 				                .access(saplAuthzManager)

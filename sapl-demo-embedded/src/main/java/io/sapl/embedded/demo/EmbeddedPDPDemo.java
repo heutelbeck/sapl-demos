@@ -42,6 +42,8 @@ import picocli.CommandLine.Option;
         + "The demo runs a few performance tests and illustrates different ways of invoking the PDP. " + "By default, ")
 public class EmbeddedPDPDemo implements Callable<Integer> {
 
+    private static final String LINE = "------------------------------------------------------------------------";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
     @Option(names = { "-p",
@@ -154,7 +156,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
         LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
         LOGGER.info("");
-        LOGGER.info("------------------------------------------------------------------------");
+        LOGGER.info(LINE);
 
     }
 
@@ -174,7 +176,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         pdp.decide(WRITE_SUBSCRIPTION).take(1)
                 .subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
         LOGGER.info("");
-        LOGGER.info("------------------------------------------------------------------------");
+        LOGGER.info(LINE);
     }
 
     private static void handleAuthorizationDecision(String action, AuthorizationDecision authzDecision) {
@@ -199,7 +201,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         LOGGER.info("");
         logResults("Benchmark results for blocking PDP access:", runs, start, end);
         LOGGER.info("");
-        LOGGER.info("------------------------------------------------------------------------");
+        LOGGER.info(LINE);
     }
 
     private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
@@ -221,7 +223,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         LOGGER.info("");
         logResults("Benchmark results for .take(1) access:", runs, start, end);
         LOGGER.info("");
-        LOGGER.info("------------------------------------------------------------------------");
+        LOGGER.info(LINE);
     }
 
     private static double nanoToMs(double nanoseconds) {

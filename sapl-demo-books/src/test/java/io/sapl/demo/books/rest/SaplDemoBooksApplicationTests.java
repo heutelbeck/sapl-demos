@@ -32,11 +32,11 @@ class SaplDemoBooksApplicationTests {
     private record UserAndAccessibleBooks(LibraryUser user, List<Book> books) {
     }
 
-    private static final Book[] ALL_CATEGORIES    = DemoData.DEMO_BOOKS;
-    private static final Book[] CATEGORIES_1_TO_3 = new Book[] { DemoData.DEMO_BOOKS[0], DemoData.DEMO_BOOKS[1],
-            DemoData.DEMO_BOOKS[2], DemoData.DEMO_BOOKS[3] };
-    private static final Book[] CATEGORIES_1_TO_2 = new Book[] { DemoData.DEMO_BOOKS[0], DemoData.DEMO_BOOKS[1],
-            DemoData.DEMO_BOOKS[2] };
+    private static final Book[] ALL_CATEGORIES    = (Book[]) DemoData.DEMO_BOOKS.toArray();
+    private static final Book[] CATEGORIES_1_TO_3 = new Book[] { DemoData.DEMO_BOOKS.get(0), DemoData.DEMO_BOOKS.get(1),
+            DemoData.DEMO_BOOKS.get(2), DemoData.DEMO_BOOKS.get(3) };
+    private static final Book[] CATEGORIES_1_TO_2 = new Book[] { DemoData.DEMO_BOOKS.get(0), DemoData.DEMO_BOOKS.get(1),
+            DemoData.DEMO_BOOKS.get(2) };
 
     @Autowired
     BookController controller;

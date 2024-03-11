@@ -32,10 +32,10 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
-@SuppressWarnings("deprecation") // NoOp Encoder OK for demo ! 
+@SuppressWarnings("deprecation") // NoOp Encoder OK for demo !
 public class DefaultSecurityConfig {
 
-	// @formatter:off
+    // @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
 		MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
@@ -48,7 +48,7 @@ public class DefaultSecurityConfig {
 	}
 	// @formatter:on
 
-	// @formatter:off
+    // @formatter:off
 	@Bean
 	UserDetailsService users() {
 		var userDetailsService = new InMemoryUserDetailsManager();
@@ -62,9 +62,9 @@ public class DefaultSecurityConfig {
 	}
 	// @formatter:on
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return NoOpPasswordEncoder.getInstance();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return NoOpPasswordEncoder.getInstance();
+    }
 
 }

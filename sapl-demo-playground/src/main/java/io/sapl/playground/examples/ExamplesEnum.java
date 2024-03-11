@@ -17,16 +17,16 @@ package io.sapl.playground.examples;
 
 public enum ExamplesEnum {
 
-	Basic("Basic"), SpringSecurity("Spring Security"), SpringData("Spring Data"), Schema("JSON Schema");
+    BASIC("Basic"), SPRING_SECURITY("Spring Security"), SPRING_DATA("Spring Data"), SCHEMA("JSON Schema");
 
-	private final String displayValue;
+    private final String displayValue;
 
-	ExamplesEnum(String displayValue) {
-		this.displayValue = displayValue;
-	}
+    ExamplesEnum(String displayValue) {
+        this.displayValue = displayValue;
+    }
 
-	public String getDisplayValue() {
-		return displayValue;
-	}
+    public String getDisplayValue() {
+        return displayValue;
+    }
 
 }

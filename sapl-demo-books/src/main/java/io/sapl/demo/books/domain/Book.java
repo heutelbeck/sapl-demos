@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
-	@Id
-	Long id;
-	String name;
-	Integer category;
+    @Id
+    Long    id;
+    String  name;
+    Integer category;
 }

@@ -12,12 +12,12 @@ import io.sapl.spring.method.metadata.PreEnforce;
 
 public interface BookRepository extends CrudRepository<Book, Long> {
 
-	@PreEnforce
-	// @formatter:off
+    @PreEnforce
+    // @formatter:off
 	@Query("SELECT book FROM Book book"
 	     + " WHERE :#{#filter == null} = true"
 		 + " OR book.category IN :filter")
 	// @formatter:on
-	List<Book> findAll(@Param("filter") Optional<Collection<Integer>> filter);
+    List<Book> findAll(@Param("filter") Optional<Collection<Integer>> filter);
 
 }

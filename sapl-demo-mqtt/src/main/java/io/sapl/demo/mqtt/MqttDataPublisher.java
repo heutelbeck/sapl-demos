@@ -13,18 +13,18 @@ import reactor.core.publisher.Flux;
 @Service
 public class MqttDataPublisher implements DisposableBean {
 
-	Disposable publisher;
+    Disposable publisher;
 
-	public MqttDataPublisher(MqttClientService mqttClient) {
-		log.debug("Starting to send status events...");
-		publisher = Flux.interval(Duration.ofSeconds(3L)).map(i -> i % 2 == 0 ? "ok" : "emergency")
-				.flatMap(status -> mqttClient.publish("status", status, true)).subscribe();
-	}
+    public MqttDataPublisher(MqttClientService mqttClient) {
+        log.debug("Starting to send status events...");
+        publisher = Flux.interval(Duration.ofSeconds(3L)).map(i -> i % 2 == 0 ? "ok" : "emergency")
+                .flatMap(status -> mqttClient.publish("status", status, true)).subscribe();
+    }
 
-	@Override
-	public void destroy() throws Exception {
-		log.debug("Stop sending status events...");
-		publisher.dispose();
-	}
+    @Override
+    public void destroy() throws Exception {
+        log.debug("Stop sending status events...");
+        publisher.dispose();
+    }
 
 }

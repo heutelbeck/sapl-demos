@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.Issue;
@@ -19,15 +20,15 @@ public class SAPLTestEditorView extends VerticalLayout {
 
     private static final String DEFAULT_TEST = """
             test "policyWithSimpleFunction" {
-               scenario "test_policyWithSimpleFunction"
-               register
-            	   - library TemporalFunctionLibrary
-               when subject "willi" attempts action "read" on resource "something"
-               then expect permit;
-           }""";
+              scenario "test_policyWithSimpleFunction"
+              register
+                - library TemporalFunctionLibrary
+              when subject "willi" attempts action "read" on resource "something"
+              then expect permit;
+            }""";
 
-    private final Button addDocumentChangedListenerButton;
-    private final Button addValidationChangedListenerButton;
+    private final Button         addDocumentChangedListenerButton;
+    private final Button         addValidationChangedListenerButton;
     private final SaplTestEditor saplEditor;
 
     private Button removeDocumentChangedListenerButton;

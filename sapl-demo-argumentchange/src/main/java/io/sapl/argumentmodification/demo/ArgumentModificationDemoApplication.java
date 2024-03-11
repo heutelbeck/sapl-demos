@@ -21,8 +21,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ArgumentModificationDemoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ArgumentModificationDemoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ArgumentModificationDemoApplication.class, args);
+    }
 
 }

@@ -15,7 +15,6 @@
  */
 package io.sapl.demo;
 
-import io.sapl.test.grammar.web.SAPLTestServlet;
 import java.time.Clock;
 import java.util.List;
 
@@ -36,6 +35,7 @@ import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pip.TimePolicyInformationPoint;
+import io.sapl.test.grammar.web.SAPLTestServlet;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")

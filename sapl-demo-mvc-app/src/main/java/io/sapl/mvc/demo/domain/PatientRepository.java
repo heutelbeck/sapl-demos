@@ -27,61 +27,61 @@ import jakarta.transaction.Transactional;
 
 public interface PatientRepository {
 
-	@PostEnforce(resource = "returnObject")
-	Optional<Patient> findById(Long id);
+    @PostEnforce(resource = "returnObject")
+    Optional<Patient> findById(Long id);
 
-	@PreEnforce
-	Optional<Patient> findByName(String name);
+    @PreEnforce
+    Optional<Patient> findByName(String name);
 
-	@PreEnforce
-	List<Patient> findAll();
+    @PreEnforce
+    List<Patient> findAll();
 
-	@PreEnforce
-	Patient save(Patient patient);
+    @PreEnforce
+    Patient save(Patient patient);
 
-	@PreEnforce
-	void deleteById(Long id);
+    @PreEnforce
+    void deleteById(Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.name = ?1 where p.id = ?2")
-	void updateNameById(String name, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.name = ?1 where p.id = ?2")
+    void updateNameById(String name, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.diagnosisText = ?1 where p.id = ?2")
-	void updateDiagnosisTextById(String diagnosisText, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.diagnosisText = ?1 where p.id = ?2")
+    void updateDiagnosisTextById(String diagnosisText, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.icd11Code = ?1 where p.id = ?2")
-	void updateIcd11CodeById(String icd11Code, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.icd11Code = ?1 where p.id = ?2")
+    void updateIcd11CodeById(String icd11Code, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.phoneNumber = ?1 where p.id = ?2")
-	void updatePhoneNumberById(String phoneNumber, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.phoneNumber = ?1 where p.id = ?2")
+    void updatePhoneNumberById(String phoneNumber, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.attendingDoctor = ?1 where p.id = ?2")
-	void updateAttendingDoctorById(String attendingDoctor, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.attendingDoctor = ?1 where p.id = ?2")
+    void updateAttendingDoctorById(String attendingDoctor, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.attendingNurse = ?1 where p.id = ?2")
-	void updateAttendingNurseById(String attendingNurse, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.attendingNurse = ?1 where p.id = ?2")
+    void updateAttendingNurseById(String attendingNurse, Long id);
 
-	@Modifying
-	@PreEnforce
-	@Transactional
-	@Query("update Patient p set p.roomNumber = ?1 where p.id = ?2")
-	void updateRoomNumberById(String roomNumber, Long id);
+    @Modifying
+    @PreEnforce
+    @Transactional
+    @Query("update Patient p set p.roomNumber = ?1 where p.id = ?2")
+    void updateRoomNumberById(String roomNumber, Long id);
 
 }

@@ -28,34 +28,31 @@ import io.sapl.benchmark.BenchmarkExecutionContext;
 import io.sapl.benchmark.util.BenchmarkException;
 import reactor.core.publisher.Mono;
 
-
 public class Helper {
     private Helper() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription){
+    public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decide(authorizationSubscription).blockFirst();
-        if ( decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT ){
+        if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }
 
-    public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription){
+    public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decideOnce(authorizationSubscription).block();
-        if ( decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT ){
+        if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }
 
-    public static ReactiveClientRegistrationRepository getClientRegistrationRepository(BenchmarkExecutionContext config){
-        return registrationId -> Mono.just(ClientRegistration
-                .withRegistrationId(registrationId)
-                .tokenUri(config.getOauth2TokenUri())
-                .clientId(config.getOauth2ClientId())
-                .clientSecret(config.getOauth2ClientSecret())
-                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                .scope(config.getOauth2Scope())
-                .build());
+    public static ReactiveClientRegistrationRepository getClientRegistrationRepository(
+            BenchmarkExecutionContext config) {
+        return registrationId -> Mono
+                .just(ClientRegistration.withRegistrationId(registrationId).tokenUri(config.getOauth2TokenUri())
+                        .clientId(config.getOauth2ClientId()).clientSecret(config.getOauth2ClientSecret())
+                        .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+                        .scope(config.getOauth2Scope()).build());
     }
 }

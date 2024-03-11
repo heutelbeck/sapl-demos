@@ -32,28 +32,24 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 public class LineChart {
-    private final JFreeChart chart;
-    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+    private final JFreeChart             chart;
+    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
     public LineChart(String title, String valueAxisLabel) {
-        chart = ChartFactory.createLineChart(
-                title,
-                "iteration", valueAxisLabel,
-                dataset, PlotOrientation.VERTICAL,
+        chart = ChartFactory.createLineChart(title, "iteration", valueAxisLabel, dataset, PlotOrientation.VERTICAL,
                 true, true, false);
     }
 
-    public void addValue(Double yValue, String category, String xValue ){
-        dataset.addValue( yValue, category, xValue);
+    public void addValue(Double yValue, String category, String xValue) {
+        dataset.addValue(yValue, category, xValue);
     }
 
-
-    public void arrangeYAxis(){
-        var maxValue = getMaxValue(dataset);
-        CategoryPlot plot = chart.getCategoryPlot();
-        var yAxis = (NumberAxis)plot.getRangeAxis();
+    public void arrangeYAxis() {
+        var          maxValue = getMaxValue(dataset);
+        CategoryPlot plot     = chart.getCategoryPlot();
+        var          yAxis    = (NumberAxis) plot.getRangeAxis();
         yAxis.setAutoRange(false);
-        yAxis.setUpperBound(maxValue*1.05);
+        yAxis.setUpperBound(maxValue * 1.05);
         yAxis.setLowerBound(0);
         chart.getCategoryPlot().setRenderer(plot.getRenderer());
 

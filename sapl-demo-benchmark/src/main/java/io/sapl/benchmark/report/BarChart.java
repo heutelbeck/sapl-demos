@@ -36,43 +36,40 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
 public class BarChart {
-    private final JFreeChart chart;
-    private final CategoryPlot categoryPlot;
-    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset( );
+    private final JFreeChart             chart;
+    private final CategoryPlot           categoryPlot;
+    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
-    public BarChart(String title, String valueAxisLabel){
-        chart = ChartFactory.createBarChart(
-                title,
-                null, valueAxisLabel,
-                dataset, PlotOrientation.VERTICAL,
-                true, true, false);
+    public BarChart(String title, String valueAxisLabel) {
+        chart = ChartFactory.createBarChart(title, null, valueAxisLabel, dataset, PlotOrientation.VERTICAL, true, true,
+                false);
 
         categoryPlot = chart.getCategoryPlot();
         BarRenderer br = (BarRenderer) categoryPlot.getRenderer();
         br.setMaximumBarWidth(.1); // set maximum width to 10% of chart
     }
 
-    public void useLogAxis(){
+    public void useLogAxis() {
         final NumberAxis rangeAxis = new LogarithmicAxis(categoryPlot.getRangeAxis().getLabel());
-        rangeAxis.setUpperBound(getMaxValue(dataset)*2);
+        rangeAxis.setUpperBound(getMaxValue(dataset) * 2);
         categoryPlot.setRangeAxis(rangeAxis);
         categoryPlot.setRenderer(categoryPlot.getRenderer());
     }
 
-    public void showLabels(){
+    public void showLabels() {
         showLabels(new StandardCategoryItemLabelGenerator());
     }
 
-    public void showLabels(CategoryItemLabelGenerator categoryItemLabelGenerator){
-        for (int i=0; i<dataset.getRowCount(); i++){
+    public void showLabels(CategoryItemLabelGenerator categoryItemLabelGenerator) {
+        for (int i = 0; i < dataset.getRowCount(); i++) {
             categoryPlot.getRenderer().setSeriesItemLabelGenerator(i, categoryItemLabelGenerator);
             categoryPlot.getRenderer().setSeriesItemLabelsVisible(i, true);
         }
         categoryPlot.setRenderer(categoryPlot.getRenderer());
     }
 
-    public void addBenchmarkResult(String pdp, String authMethod, Double score){
-        dataset.addValue( score, pdp, authMethod);
+    public void addBenchmarkResult(String pdp, String authMethod, Double score) {
+        dataset.addValue(score, pdp, authMethod);
     }
 
     public void saveToPNGFile(File file) throws IOException {

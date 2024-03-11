@@ -32,21 +32,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PublicKeyController {
 
-	private static Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
+    private static final Base64.Encoder ENCODER = Base64.getUrlEncoder().withoutPadding();
 
-	// TODO: replace with ? private final JWKSource<SecurityContext> jwkSource;
-	private final KeyRepository keyRepo;
+    private final KeyRepository keyRepo;
 
-	@GetMapping(path = "/public-key/{keyId}", produces = MediaType.TEXT_PLAIN_VALUE)
-	public String getPublicKey(@PathVariable String keyId) throws JOSEException {
-		return publicKey(keyId);
-	}
+    @GetMapping(path = "/public-key/{keyId}", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getPublicKey(@PathVariable String keyId) throws JOSEException {
+        return publicKey(keyId);
+    }
 
-	private String publicKey(String keyId) throws JOSEException {
-		var key = keyRepo.findById(keyId);
-		if (key.isEmpty())
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find key with ID " + keyId);
-		return ENCODER.encodeToString(key.get().toRSAKey().toRSAPublicKey().getEncoded());
-	}
+    private String publicKey(String keyId) throws JOSEException {
+        var key = keyRepo.findById(keyId);
+        if (key.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find key with ID " + keyId);
+        return ENCODER.encodeToString(key.get().toRSAKey().toRSAPublicKey().getEncoded());
+    }
 
 }

@@ -33,20 +33,16 @@ import io.sapl.spring.manager.SaplAuthorizationManager;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-	@Bean
-	UserDetailsService userDetailsService() {
-		@SuppressWarnings("deprecation") // Demo Code!
-		UserDetails user = User.withDefaultPasswordEncoder()
-				.username("user")
-				.password("user")
-				.roles("USER")
-				.build();
-		return new InMemoryUserDetailsManager(user);
-	}
+    @Bean
+    UserDetailsService userDetailsService() {
+        @SuppressWarnings("deprecation") // Demo Code!
+        UserDetails user = User.withDefaultPasswordEncoder().username("user").password("user").roles("USER").build();
+        return new InMemoryUserDetailsManager(user);
+    }
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) throws Exception {
-		// @formatter:off
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) throws Exception {
+        // @formatter:off
 		return http.authorizeHttpRequests(requests -> 
 						requests.anyRequest()
 				                .access(saplAuthzManager)
@@ -55,6 +51,6 @@ public class SecurityConfiguration {
 				   .httpBasic(withDefaults())
 				   .build();
 		// @formatter:on
-	}
+    }
 
 }

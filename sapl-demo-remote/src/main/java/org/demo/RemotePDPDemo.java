@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 
 import javax.net.ssl.SSLException;
 
-import io.sapl.api.pdp.PolicyDecisionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.MultiAuthorizationSubscription;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -36,24 +36,23 @@ import picocli.CommandLine.Option;
 @Command
 public class RemotePDPDemo implements Callable<Integer> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
-    private static final int RSOCKETPORT = 7000;
+    private static final Logger LOG         = LoggerFactory.getLogger(RemotePDPDemo.class);
+    private static final int    RSOCKETPORT = 7000;
     private static final String RSOCKETHOST = "localhost";
 
-    @Option(names = {"-h",
-            "-host"}, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
+    @Option(names = { "-h",
+            "-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
     private String host = "https://localhost:8443";
 
     // The default option set here are the default credentials of the pdp-server-lt
 
-    @Option(names = {"-k",
-            "-key"}, description = "Client key for the demo application, to be obtained from the PDP administrator.")
+    @Option(names = { "-k",
+            "-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
     private String clientKey = "xwuUaRD65G";
 
-    @Option(names = {"-s",
-            "-secret"}, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
+    @Option(names = { "-s",
+            "-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
     private String clientSecret = "3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_";
-
 
     public static void main(String... args) {
         System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
@@ -64,20 +63,11 @@ public class RemotePDPDemo implements Callable<Integer> {
         PolicyDecisionPoint pdp;
 
         if (host.startsWith("rsocket")) {
-            pdp = RemotePolicyDecisionPoint.builder()
-                    .rsocket()
-                    .host(RSOCKETHOST)
-                    .port(RSOCKETPORT)
-                    .basicAuth(clientKey, clientSecret)
-                    .withUnsecureSSL()
-                    .build();
+            pdp = RemotePolicyDecisionPoint.builder().rsocket().host(RSOCKETHOST).port(RSOCKETPORT)
+                    .basicAuth(clientKey, clientSecret).withUnsecureSSL().build();
         } else {
-            pdp = RemotePolicyDecisionPoint.builder()
-                    .http()
-                    .baseUrl(host)
-                    .basicAuth(clientKey, clientSecret)
-                    .withUnsecureSSL()
-                    .build();
+            pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).basicAuth(clientKey, clientSecret)
+                    .withUnsecureSSL().build();
         }
 
         /*
@@ -91,15 +81,15 @@ public class RemotePDPDemo implements Callable<Integer> {
         LOG.info("Subscription: {}", authzSubscription);
 
         var multiSubscription = new MultiAuthorizationSubscription()
-                .addAuthorizationSubscription("id-1", AuthorizationSubscription.of("bs@simpsons.com", "read",
-                        "file://example/med/record/patient/BartSimpson"))
+                .addAuthorizationSubscription("id-1",
+                        AuthorizationSubscription.of("bs@simpsons.com", "read",
+                                "file://example/med/record/patient/BartSimpson"))
                 .addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
                         "file://example/med/record/patient/MaggieSimpson"));
         LOG.info("Multi: {}", multiSubscription);
         var mapper = new ObjectMapper();
-        var json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
+        var json   = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);
         LOG.info("JSON: {}", json);
-
 
         /*
          * This just consumes the first decision in a blocking fashion to quickly

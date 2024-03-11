@@ -1,15 +1,16 @@
 package io.sapl.demo.testing.dsl.plain;
 
-import io.sapl.test.SaplTestException;
-import io.sapl.test.dsl.setup.BaseTestAdapter;
-import io.sapl.test.dsl.setup.TestCase;
-import io.sapl.test.dsl.setup.TestContainer;
-import io.sapl.test.dsl.interfaces.TestNode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
+
+import io.sapl.test.SaplTestException;
+import io.sapl.test.dsl.interfaces.TestNode;
+import io.sapl.test.dsl.setup.BaseTestAdapter;
+import io.sapl.test.dsl.setup.TestCase;
+import io.sapl.test.dsl.setup.TestContainer;
 
 public class TestAdapter extends BaseTestAdapter<List<TestCase>> {
     @Override
@@ -38,7 +39,7 @@ public class TestAdapter extends BaseTestAdapter<List<TestCase>> {
         tests.forEach(test -> {
             try {
                 test.run();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 failedTests.put(test.getIdentifier(), e);
             }
         });

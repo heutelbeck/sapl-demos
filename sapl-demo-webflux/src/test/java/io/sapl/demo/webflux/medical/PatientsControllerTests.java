@@ -16,28 +16,23 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 @WebFluxTest(controllers = PatientsController.class, excludeAutoConfiguration = {
-		ReactiveSecurityAutoConfiguration.class })
+        ReactiveSecurityAutoConfiguration.class })
 class PatientsControllerTests {
 
-	@MockBean
-	PatientsService patientsService;
+    @MockBean
+    PatientsService patientsService;
 
-	@Autowired
-	WebTestClient webTestClient;
+    @Autowired
+    WebTestClient webTestClient;
 
-	@Test
-	void whenGetPatients_thenPatientsServiceCalled() {
-		var patientZero = new Patient("name", "icd", "diag");
-		var patients    = Flux.just(patientZero);
-		when(patientsService.getPatients()).thenReturn(patients);
-		webTestClient.get()
-				.uri("/patients")
-				.accept(MediaType.APPLICATION_JSON)
-				.exchange()
-				.expectStatus().isOk()
-				.expectBodyList(Patient.class)
-				.value(p -> p, hasItem(patientZero));
-		verify(patientsService, times(1)).getPatients();
-	}
+    @Test
+    void whenGetPatients_thenPatientsServiceCalled() {
+        var patientZero = new Patient("name", "icd", "diag");
+        var patients    = Flux.just(patientZero);
+        when(patientsService.getPatients()).thenReturn(patients);
+        webTestClient.get().uri("/patients").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
+                .expectBodyList(Patient.class).value(p -> p, hasItem(patientZero));
+        verify(patientsService, times(1)).getPatients();
+    }
 
 }

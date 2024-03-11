@@ -18,46 +18,46 @@ import reactor.test.StepVerifier;
 @SpringBootTest
 class DocumentsServiceTests {
 
-	@Autowired
-	DocumentsService documentsService;
+    @Autowired
+    DocumentsService documentsService;
 
-	@MockBean
-	Clock mockClock;
+    @MockBean
+    Clock mockClock;
 
-	@Test
-	@WithAnonymousUser
-	void whenTimeZeroSecondOfMinute_thenAllRestricted() {
-		when(mockClock.instant()).thenReturn(Instant.EPOCH);
-		StepVerifier.create(documentsService.getDocuments())		
-		            .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_RESTRICTED))
-		            .verifyComplete();
-	}
+    @Test
+    @WithAnonymousUser
+    void whenTimeZeroSecondOfMinute_thenAllRestricted() {
+        when(mockClock.instant()).thenReturn(Instant.EPOCH);
+        StepVerifier.create(documentsService.getDocuments())
+                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_RESTRICTED))
+                .verifyComplete();
+    }
 
-	private Predicate<Document> documentMactchesClearanceLevel(NatoSecurityClassification clearance) {
-		return doc -> clearanceMatchesOrIsHigherThanClassification(clearance, doc.classification());
-	}
+    private Predicate<Document> documentMactchesClearanceLevel(NatoSecurityClassification clearance) {
+        return doc -> clearanceMatchesOrIsHigherThanClassification(clearance, doc.classification());
+    }
 
-	private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,
-			NatoSecurityClassification classification) {
-		return classification.compareTo(clearance) <= 0;
-	}
+    private boolean clearanceMatchesOrIsHigherThanClassification(NatoSecurityClassification clearance,
+            NatoSecurityClassification classification) {
+        return classification.compareTo(clearance) <= 0;
+    }
 
-	@Test
-	@WithAnonymousUser
-	void whenTime25thSecondOfMinute_thenAllTopSecret() {
-		when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(25)));
-		StepVerifier.create(documentsService.getDocuments())		
-        .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.COSMIC_TOP_SECRET))
-        .verifyComplete();
-	}
+    @Test
+    @WithAnonymousUser
+    void whenTime25thSecondOfMinute_thenAllTopSecret() {
+        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(25)));
+        StepVerifier.create(documentsService.getDocuments())
+                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.COSMIC_TOP_SECRET))
+                .verifyComplete();
+    }
 
-	@Test
-	@WithAnonymousUser
-	void whenTime45thSecondOfMinute_thenAllUnclassified() {
-		when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45)));
-		StepVerifier.create(documentsService.getDocuments())		
-        .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_UNCLASSIFIED))
-        .verifyComplete();
-	}
+    @Test
+    @WithAnonymousUser
+    void whenTime45thSecondOfMinute_thenAllUnclassified() {
+        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45)));
+        StepVerifier.create(documentsService.getDocuments())
+                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_UNCLASSIFIED))
+                .verifyComplete();
+    }
 
 }
