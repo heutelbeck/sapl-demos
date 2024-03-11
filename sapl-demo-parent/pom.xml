@@ -31,6 +31,8 @@
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<version.lombok>1.18.30</version.lombok>
 		<docker-registry-url>ghcr.io/heutelbeck</docker-registry-url>
+		<spotbugs.version>4.7.3.6</spotbugs.version>
+		<sbcontrib.version>7.6.0</sbcontrib.version>
 		<argLine />
 	</properties>
 
@@ -234,6 +236,23 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<version>${springboot.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>com.github.spotbugs</groupId>
+					<artifactId>spotbugs-maven-plugin</artifactId>
+					<version>${spotbugs.version}</version>
+					<configuration>
+						<excludeFilterFile>spotbugsExcludeFilter.xml</excludeFilterFile>
+						<includeTests>true</includeTests>
+						<addSourceDirs>true</addSourceDirs>
+						<plugins>
+							<plugin>
+								<groupId>com.mebigfatguy.sb-contrib</groupId>
+								<artifactId>sb-contrib</artifactId>
+								<version>${sbcontrib.version}</version>
+							</plugin>
+						</plugins>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
