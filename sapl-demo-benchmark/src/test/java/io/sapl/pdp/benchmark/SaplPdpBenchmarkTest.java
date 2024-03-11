@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.any;
 import java.io.File;
 import java.io.IOException;
 
-import io.sapl.benchmark.util.BenchmarkException;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -39,6 +38,7 @@ import io.sapl.benchmark.jmh.EmbeddedBenchmark;
 import io.sapl.benchmark.jmh.Helper;
 import io.sapl.benchmark.jmh.HttpBenchmark;
 import io.sapl.benchmark.jmh.RsocketBenchmark;
+import io.sapl.benchmark.util.BenchmarkException;
 import io.sapl.interpreter.InitializationException;
 
 class SaplPdpBenchmarkTest {

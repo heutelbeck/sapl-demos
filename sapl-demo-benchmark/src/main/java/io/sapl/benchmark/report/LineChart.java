@@ -17,6 +17,12 @@
  */
 package io.sapl.benchmark.report;
 
+import static io.sapl.benchmark.report.Utilities.getMaxValue;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -24,12 +30,6 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import static io.sapl.benchmark.report.Utilities.getMaxValue;
 
 public class LineChart {
     private final JFreeChart chart;

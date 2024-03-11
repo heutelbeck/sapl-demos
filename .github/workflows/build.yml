@@ -107,7 +107,7 @@ jobs:
 
     - name: Build Integration Test Images
       if: env.RUN_ANALYSIS == 'true'
-      run: mvn -B dockerfile:build -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -P docker -DskipTests
+      run: mvn -B spring-boot:build-image -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -DskipTests
 
     - name: Run Unit Tests Only
       if: env.RUN_ANALYSIS == 'false'
@@ -208,25 +208,28 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Configure Servers
-      uses: s4u/maven-settings-action@7802f6aec16c9098b4798ad1f1d8ac75198194bd # v3.0.0
+    - name: Log in to the Container Registry
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
       with:
-        githubServer: false
-        servers: |
-          [{
-              "id": "ghcr.io",
-              "username": "${{ secrets.GHUB_USERNAME }}",
-              "password": "${{ secrets.GHUB_ACCESS_TOKEN }}"
-           }]
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GHUB_ACCESS_TOKEN }}
 
     - name: Build Module SAPL Demo Playground
       run: mvn -B install -pl sapl-demo-playground -P production -DskipTests
 
     - name: Build SAPL Demo Playground Image
-      run: mvn -B dockerfile:build -pl sapl-demo-playground -P docker,production -DskipTests
+      run: mvn -B spring-boot:build-image -pl sapl-demo-playground -Pproduction -DskipTests
+
+    - name: Get Version
+      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      id: get-version
+      run: |
+        VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
+        echo "version=$VERSION" >> $GITHUB_OUTPUT 
 
     - name: Push SAPL Demo Playground Image
-      run: mvn -B dockerfile:push -pl sapl-demo-playground -P docker,production -DskipTests
+      run: docker push ghcr.io/heutelbeck/sapl-demo-playground:${{ steps.get-version.outputs.VERSION }}
 
     - name: Delete Workflow Runs
       uses: Mattraks/delete-workflow-runs@39f0bbed25d76b34de5594dceab824811479e5de # v2.0.6

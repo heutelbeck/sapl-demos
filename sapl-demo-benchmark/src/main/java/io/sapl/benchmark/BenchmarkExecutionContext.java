@@ -17,17 +17,19 @@
  */
 package io.sapl.benchmark;
 
+import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT;
+import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT;
+
+import org.testcontainers.containers.GenericContainer;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.benchmark.util.BenchmarkException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.testcontainers.containers.GenericContainer;
-
-import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT;
-import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT;
 
 @Getter
 @Setter

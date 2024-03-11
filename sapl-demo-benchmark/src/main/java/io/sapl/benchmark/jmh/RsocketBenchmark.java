@@ -17,21 +17,26 @@
  */
 package io.sapl.benchmark.jmh;
 
-import io.netty.channel.ChannelOption;
+import static io.sapl.benchmark.jmh.Helper.decide;
+import static io.sapl.benchmark.jmh.Helper.decideOnce;
+import static io.sapl.benchmark.jmh.Helper.getClientRegistrationRepository;
+
+import java.io.IOException;
+
+import javax.net.ssl.SSLException;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.benchmark.BenchmarkExecutionContext;
-import io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import io.sapl.pdp.remote.RemoteRsocketPolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
-import org.openjdk.jmh.annotations.*;
-import reactor.netty.http.client.HttpClient;
-
-import javax.net.ssl.SSLException;
-import java.io.IOException;
-import java.time.Duration;
-
-import static io.sapl.benchmark.jmh.Helper.*;
 
 @Slf4j
 @State(Scope.Benchmark)

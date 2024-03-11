@@ -30,7 +30,6 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<version.lombok>1.18.30</version.lombok>
-		<dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
 		<docker-registry-url>ghcr.io/heutelbeck</docker-registry-url>
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
@@ -237,11 +236,6 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<version>${springboot.version}</version>
-				</plugin>
-				<plugin>
-					<groupId>com.spotify</groupId>
-					<artifactId>dockerfile-maven-plugin</artifactId>
-					<version>${dockerfile-maven-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
