@@ -56,7 +56,6 @@ public class SaplBenchmark {
         FileUtils.copyFile(sourceFile, new File(benchmarkFolder + File.separator + sourceFile.getName()));
     }
 
-    @SuppressWarnings("rawtypes")
     private GenericContainer<?> getServerLtContainer() {
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
@@ -119,9 +118,8 @@ public class SaplBenchmark {
         return container;
     }
 
-    @SuppressWarnings("rawtypes")
     private GenericContainer<?> getOauth2Container() {
-        oauth2Container = new GenericContainer(DockerImageName.parse(config.getOauth2MockImage()))
+        oauth2Container = new GenericContainer<>(DockerImageName.parse(config.getOauth2MockImage()))
                 .withExposedPorts(8080).waitingFor(Wait.forListeningPort());
         return oauth2Container;
     }
