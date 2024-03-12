@@ -333,7 +333,8 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private boolean isPolicyMatchingAuthzSub() {
-        var config = this.pdpConfigurationProvider.pdpConfiguration().blockFirst();
+        Objects.requireNonNull(pdpConfigurationProvider);
+        var config = pdpConfigurationProvider.pdpConfiguration().blockFirst();
         Objects.requireNonNull(config);
         var attributeCtx  = new MockingAttributeContext(config.attributeContext());
         var matchesResult = this.currentPolicy.matches().contextWrite(
@@ -360,11 +361,9 @@ public class PlaygroundView extends VerticalLayout {
 
             StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
                     .consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
-
         } else {
-
-            var attributeCtx = new MockingAttributeContext(
-                    this.pdpConfigurationProvider.pdpConfiguration().blockFirst().attributeContext());
+            var attributeCtx = new MockingAttributeContext(Objects
+                    .requireNonNull(pdpConfigurationProvider.pdpConfiguration().blockFirst()).attributeContext());
 
             Step<AuthorizationDecision> steps = StepVerifier
                     .create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision)

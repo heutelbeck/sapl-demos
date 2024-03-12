@@ -30,11 +30,11 @@ public class ExampleSelectedViewBus implements Serializable {
 
     private PlaygroundView contentView;
 
-    public PlaygroundView getContentView() {
+    public synchronized PlaygroundView getContentView() {
         return this.contentView;
     }
 
-    public void setContentView(PlaygroundView contentView) {
+    public synchronized void setContentView(PlaygroundView contentView) {
         this.contentView = contentView;
     }
 

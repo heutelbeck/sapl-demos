@@ -52,7 +52,7 @@ public class MockingModel {
      */
     List<Val> sequence;
 
-    public static final String KEY_VALuE_RETURN_SEQUENCE_VALUES = "sequence";
+    public static final String KEY_VALUE_RETURN_SEQUENCE_VALUES = "sequence";
 
     public static List<MockingModel> parseMockingJsonInputToModel(JsonNode mockInput)
             throws MockDefinitionParsingException {
@@ -81,11 +81,11 @@ public class MockingModel {
 
     private static void parseMockValuesField(JsonNode mockElement, MockingModel mockModel)
             throws MockDefinitionParsingException {
-        if (mockElement.has(KEY_VALuE_RETURN_SEQUENCE_VALUES)) {
-            var values = mockElement.get(KEY_VALuE_RETURN_SEQUENCE_VALUES);
+        if (mockElement.has(KEY_VALUE_RETURN_SEQUENCE_VALUES)) {
+            var values = mockElement.get(KEY_VALUE_RETURN_SEQUENCE_VALUES);
             if (!values.isArray()) {
                 throw new MockDefinitionParsingException(
-                        "Expecting an array for field \"" + KEY_VALuE_RETURN_SEQUENCE_VALUES + "\""
+                        "Expecting an array for field \"" + KEY_VALUE_RETURN_SEQUENCE_VALUES + "\""
                                 + " for importName \"" + mockModel.getImportName() + "\"!");
 
             }
@@ -106,9 +106,9 @@ public class MockingModel {
 
     private static void checkOnlyOneOfOptionalFieldsIsSet(JsonNode mockElement, MockingModel mockModel)
             throws MockDefinitionParsingException {
-        if (mockElement.has(KEY_VALUE_ALWAYS_RETURN_VALUE) && mockElement.has(KEY_VALuE_RETURN_SEQUENCE_VALUES)) {
+        if (mockElement.has(KEY_VALUE_ALWAYS_RETURN_VALUE) && mockElement.has(KEY_VALUE_RETURN_SEQUENCE_VALUES)) {
             throw new MockDefinitionParsingException("You cannot specify an always-returned \""
-                    + KEY_VALUE_ALWAYS_RETURN_VALUE + "\" " + "AND an array of \"" + KEY_VALuE_RETURN_SEQUENCE_VALUES
+                    + KEY_VALUE_ALWAYS_RETURN_VALUE + "\" " + "AND an array of \"" + KEY_VALUE_RETURN_SEQUENCE_VALUES
                     + "\" for importName \"" + mockModel.getImportName() + "\". Specify only one!");
         }
     }

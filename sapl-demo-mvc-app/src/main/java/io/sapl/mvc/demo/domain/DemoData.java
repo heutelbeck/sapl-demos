@@ -76,13 +76,13 @@ public class DemoData implements CommandLineRunner {
 
     public static final String DEFAULT_RAW_PASSWORD = "password";
 
-    public static final String[] USER_NAMES = new String[] { NAME_DOMINIC, NAME_JULIA, NAME_PETER, NAME_ALINA,
-            NAME_THOMAS, NAME_BRIGITTE, NAME_JANOSCH, NAME_JANINA, NAME_HORST };
+    public static final List<String> USER_NAMES = List.of(NAME_DOMINIC, NAME_JULIA, NAME_PETER, NAME_ALINA, NAME_THOMAS,
+            NAME_BRIGITTE, NAME_JANOSCH, NAME_JANINA, NAME_HORST);
 
-    public static final String[] DOCTOR_NAMES = new String[] { NAME_JULIA, NAME_PETER, NAME_ALINA };
+    public static final List<String> DOCTOR_NAMES = List.of(NAME_JULIA, NAME_PETER, NAME_ALINA);
 
-    public static final String[] NON_DOCTOR_NAMES = new String[] { NAME_DOMINIC, NAME_THOMAS, NAME_BRIGITTE,
-            NAME_JANOSCH, NAME_JANINA, NAME_HORST };
+    public static final List<String> NON_DOCTOR_NAMES = List.of(NAME_DOMINIC, NAME_THOMAS, NAME_BRIGITTE, NAME_JANOSCH,
+            NAME_JANINA, NAME_HORST);
 
     private final PatientRepository patientRepository;
 
@@ -108,7 +108,7 @@ public class DemoData implements CommandLineRunner {
         SecurityContextHolder.getContext().setAuthentication(auth);
         // Create patients, if none are present
         // (else assume they are in persistent storage and do nothing)
-        if (patientRepository.findAll().size() == 0) {
+        if (patientRepository.findAll().isEmpty()) {
             patientRepository.save(new Patient(null, "123456", NAME_LENNY, "DA63.Z/ME24.90",
                     "Duodenal ulcer with acute haemorrhage.", NAME_JULIA, NAME_THOMAS, "+78(0)456-789", "A.3.47"));
             patientRepository.save(new Patient(null, "987654", NAME_KARL, "9B71.0Z/5A11", "Type 2 diabetes mellitus",
@@ -117,10 +117,14 @@ public class DemoData implements CommandLineRunner {
         // Establish relations between users and patients, if none are present
         // (else assume they are in persistent storage and do nothing)
         if (StreamSupport.stream(relationRepository.findAll().spliterator(), false).findAny().isEmpty()) {
-            relationRepository.save(new Relation(NAME_DOMINIC, patientRepository.findByName(NAME_LENNY).get().getId()));
-            relationRepository.save(new Relation(NAME_JULIA, patientRepository.findByName(NAME_KARL).get().getId()));
-            relationRepository.save(new Relation(NAME_ALINA, patientRepository.findByName(NAME_KARL).get().getId()));
-            relationRepository.save(new Relation(NAME_JANOSCH, patientRepository.findByName(NAME_KARL).get().getId()));
+            patientRepository.findByName(NAME_LENNY)
+                    .ifPresent(p -> relationRepository.save(new Relation(NAME_DOMINIC, p.getId())));
+            patientRepository.findByName(NAME_KARL)
+                    .ifPresent(p -> relationRepository.save(new Relation(NAME_JULIA, p.getId())));
+            patientRepository.findByName(NAME_KARL)
+                    .ifPresent(p -> relationRepository.save(new Relation(NAME_ALINA, p.getId())));
+            patientRepository.findByName(NAME_KARL)
+                    .ifPresent(p -> relationRepository.save(new Relation(NAME_JANOSCH, p.getId())));
         }
     }
 

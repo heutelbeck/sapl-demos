@@ -18,7 +18,6 @@ package io.sapl.mvc.demo;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,15 +56,15 @@ class MvcDemoApplicationTest {
     }
 
     static Collection<String> userNameSource() {
-        return List.of(DemoData.USER_NAMES);
+        return DemoData.USER_NAMES;
     }
 
     static Collection<String> doctorNameSource() {
-        return List.of(DemoData.DOCTOR_NAMES);
+        return DemoData.DOCTOR_NAMES;
     }
 
     static Collection<String> nonDoctorNameSource() {
-        return List.of(DemoData.NON_DOCTOR_NAMES);
+        return DemoData.NON_DOCTOR_NAMES;
     }
 
     static void assertPatientsList(HtmlPage page, IntegerAndString... idsAndNames) {

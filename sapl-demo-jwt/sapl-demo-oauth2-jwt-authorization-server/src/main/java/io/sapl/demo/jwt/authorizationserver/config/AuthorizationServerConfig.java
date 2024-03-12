@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
@@ -84,7 +84,7 @@ public class AuthorizationServerConfig {
 
     // @formatter:off
 	@Bean
-	RegisteredClientRepository registeredClientRepository(JdbcTemplate jdbcTemplate) {
+	RegisteredClientRepository registeredClientRepository(JdbcOperations jdbcOperations) {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
 				.clientId("miskatonic-client")
 				.clientSecret("secret")
@@ -102,7 +102,7 @@ public class AuthorizationServerConfig {
 				.build();
 
 		// Save registered client in DB as if in-memory
-		JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcTemplate);
+		JdbcRegisteredClientRepository registeredClientRepository = new JdbcRegisteredClientRepository(jdbcOperations);
 		registeredClientRepository.save(registeredClient);
 
 		return registeredClientRepository;
@@ -110,15 +110,15 @@ public class AuthorizationServerConfig {
 	// @formatter:on
 
     @Bean
-    OAuth2AuthorizationService authorizationService(JdbcTemplate jdbcTemplate,
+    OAuth2AuthorizationService authorizationService(JdbcOperations jdbcOperations,
             RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationService(jdbcTemplate, registeredClientRepository);
+        return new JdbcOAuth2AuthorizationService(jdbcOperations, registeredClientRepository);
     }
 
     @Bean
-    OAuth2AuthorizationConsentService authorizationConsentService(JdbcTemplate jdbcTemplate,
+    OAuth2AuthorizationConsentService authorizationConsentService(JdbcOperations jdbcOperations,
             RegisteredClientRepository registeredClientRepository) {
-        return new JdbcOAuth2AuthorizationConsentService(jdbcTemplate, registeredClientRepository);
+        return new JdbcOAuth2AuthorizationConsentService(jdbcOperations, registeredClientRepository);
     }
 
     @Bean

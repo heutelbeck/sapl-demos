@@ -26,33 +26,25 @@ import java.security.spec.EllipticCurve;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 final class KeyGeneratorUtils {
 
+    @SneakyThrows
     static SecretKey generateSecretKey() {
-        SecretKey hmacKey;
-        try {
-            hmacKey = KeyGenerator.getInstance("HmacSha256").generateKey();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return hmacKey;
+        return KeyGenerator.getInstance("HmacSha256").generateKey();
     }
 
+    @SneakyThrows
     static KeyPair generateRsaKey() {
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048);
+        return keyPairGenerator.generateKeyPair();
     }
 
+    @SneakyThrows
     static KeyPair generateEcKey() {
         EllipticCurve   ellipticCurve   = new EllipticCurve(
                 new ECFieldFp(new BigInteger(
@@ -65,15 +57,9 @@ final class KeyGeneratorUtils {
         ECParameterSpec ecParameterSpec = new ECParameterSpec(ellipticCurve, ecPoint,
                 new BigInteger("115792089210356248762697446949407573529996955224135760342422259061068512044369"), 1);
 
-        KeyPair keyPair;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
-            keyPairGenerator.initialize(ecParameterSpec);
-            keyPair = keyPairGenerator.generateKeyPair();
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
-        return keyPair;
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC");
+        keyPairGenerator.initialize(ecParameterSpec);
+        return keyPairGenerator.generateKeyPair();
     }
 
 }
