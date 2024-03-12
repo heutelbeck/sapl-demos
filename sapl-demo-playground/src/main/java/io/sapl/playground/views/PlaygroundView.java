@@ -334,7 +334,7 @@ public class PlaygroundView extends VerticalLayout {
 
     private boolean isPolicyMatchingAuthzSub() {
         Objects.requireNonNull(pdpConfigurationProvider);
-        var config = pdpConfigurationProvider.pdpConfiguration().blockFirst();
+        var config = Objects.requireNonNull(pdpConfigurationProvider.pdpConfiguration()).blockFirst();
         Objects.requireNonNull(config);
         var attributeCtx  = new MockingAttributeContext(config.attributeContext());
         var matchesResult = this.currentPolicy.matches().contextWrite(
@@ -362,6 +362,7 @@ public class PlaygroundView extends VerticalLayout {
             StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
                     .consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
         } else {
+            Objects.requireNonNull(pdpConfigurationProvider);
             var attributeCtx = new MockingAttributeContext(Objects
                     .requireNonNull(pdpConfigurationProvider.pdpConfiguration().blockFirst()).attributeContext());
 
@@ -457,6 +458,7 @@ public class PlaygroundView extends VerticalLayout {
 
     private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
+        Objects.requireNonNull(pdpConfigurationProvider);
         var config = this.pdpConfigurationProvider.pdpConfiguration().blockFirst();
         Objects.requireNonNull(config);
         var functionCtx = new MockingFunctionContext(config.functionContext());

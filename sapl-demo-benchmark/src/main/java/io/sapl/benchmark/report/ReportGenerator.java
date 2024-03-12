@@ -151,7 +151,8 @@ public class ReportGenerator {
         headerFacts.add("avg ms/op");
 
         // get data from average_response
-        JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + "/average_response.json"))
+        JsonArray jsonContent = JsonParser
+                .parseReader(new FileReader(bechmarkFolder + "/average_response.json", StandardCharsets.UTF_8))
                 .getAsJsonArray();
         for (JsonElement e : jsonContent) {
             JsonObject runResult      = e.getAsJsonObject();
