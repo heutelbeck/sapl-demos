@@ -65,7 +65,7 @@ public class BenchmarkExecutionContext {
     }
 
     public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg,
-            GenericContainer pdpContainer, GenericContainer oauthContainer) {
+            GenericContainer<?> pdpContainer, GenericContainer<?> oauthContainer) {
         var context = new BenchmarkExecutionContext();
         context.authorizationSubscription = cfg.getAuthorizationSubscription();
         if (cfg.requiredDockerEnvironment()) {
