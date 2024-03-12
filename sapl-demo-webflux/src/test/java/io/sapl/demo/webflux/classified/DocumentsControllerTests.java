@@ -5,6 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
@@ -31,7 +33,7 @@ class DocumentsControllerTests {
         var documents = Flux.just(document);
         when(documentsService.getDocuments()).thenReturn(documents);
         webTestClient.get().uri("/documents").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
-                .expectBodyList(Document.class).value(p -> p, hasItem(document));
+                .expectBodyList(Document.class).value(Function.identity(), hasItem(document));
         verify(documentsService, times(1)).getDocuments();
     }
 

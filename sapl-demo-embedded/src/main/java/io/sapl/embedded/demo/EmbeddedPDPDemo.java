@@ -235,10 +235,12 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     private static void logResults(String title, int runs, long start, long end) {
-        LOGGER.info(title);
-        LOGGER.info("Runs  : {}", runs);
-        LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
-        LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / runs)));
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(title);
+            LOGGER.info("Runs  : {}", runs);
+            LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
+            LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / runs)));
+        }
     }
 
 }

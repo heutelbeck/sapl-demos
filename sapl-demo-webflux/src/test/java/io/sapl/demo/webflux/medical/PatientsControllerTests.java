@@ -5,6 +5,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Function;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
@@ -31,7 +33,7 @@ class PatientsControllerTests {
         var patients    = Flux.just(patientZero);
         when(patientsService.getPatients()).thenReturn(patients);
         webTestClient.get().uri("/patients").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
-                .expectBodyList(Patient.class).value(p -> p, hasItem(patientZero));
+                .expectBodyList(Patient.class).value(Function.identity(), hasItem(patientZero));
         verify(patientsService, times(1)).getPatients();
     }
 
