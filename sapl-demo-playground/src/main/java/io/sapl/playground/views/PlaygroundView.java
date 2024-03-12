@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -333,9 +332,17 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private boolean isPolicyMatchingAuthzSub() {
-        Objects.requireNonNull(pdpConfigurationProvider);
-        var config = Objects.requireNonNull(pdpConfigurationProvider.pdpConfiguration()).blockFirst();
-        Objects.requireNonNull(config);
+        if (pdpConfigurationProvider == null) {
+            return false;
+        }
+        var configs = pdpConfigurationProvider.pdpConfiguration();
+        if (configs == null) {
+            return false;
+        }
+        var config = configs.blockFirst();
+        if (config == null) {
+            return false;
+        }
         var attributeCtx  = new MockingAttributeContext(config.attributeContext());
         var matchesResult = this.currentPolicy.matches().contextWrite(
                 ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel, this.currentAuthzSub))
@@ -362,9 +369,18 @@ public class PlaygroundView extends VerticalLayout {
             StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
                     .consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
         } else {
-            Objects.requireNonNull(pdpConfigurationProvider);
-            var attributeCtx = new MockingAttributeContext(Objects
-                    .requireNonNull(pdpConfigurationProvider.pdpConfiguration().blockFirst()).attributeContext());
+            if (pdpConfigurationProvider == null) {
+                return;
+            }
+            var configs = pdpConfigurationProvider.pdpConfiguration();
+            if (configs == null) {
+                return;
+            }
+            var config = configs.blockFirst();
+            if (config == null) {
+                return;
+            }
+            var attributeCtx = new MockingAttributeContext(config.attributeContext());
 
             Step<AuthorizationDecision> steps = StepVerifier
                     .create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision)
@@ -458,9 +474,17 @@ public class PlaygroundView extends VerticalLayout {
 
     private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
-        Objects.requireNonNull(pdpConfigurationProvider);
-        var config = this.pdpConfigurationProvider.pdpConfiguration().blockFirst();
-        Objects.requireNonNull(config);
+        if (pdpConfigurationProvider == null) {
+            throw new IllegalStateException("pdpConfigurationProvider == null");
+        }
+        var configs = pdpConfigurationProvider.pdpConfiguration();
+        if (configs == null) {
+            throw new IllegalStateException("pdpConfigurationProvider.pdpConfiguration() == null");
+        }
+        var config = configs.blockFirst();
+        if (config == null) {
+            throw new IllegalStateException("config == null");
+        }
         var functionCtx = new MockingFunctionContext(config.functionContext());
         var variables   = new HashMap<String, Val>(1);
         this.attrReturnValues = new LinkedList<>();
