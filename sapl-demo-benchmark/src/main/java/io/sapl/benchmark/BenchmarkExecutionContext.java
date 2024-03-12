@@ -22,14 +22,13 @@ import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PO
 
 import org.testcontainers.containers.GenericContainer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.benchmark.util.BenchmarkException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
 
 @Getter
 @Setter
@@ -55,20 +54,14 @@ public class BenchmarkExecutionContext {
     private AuthorizationSubscription authorizationSubscription;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @SneakyThrows
     public static BenchmarkExecutionContext fromString(String jsonString) {
-        try {
-            return MAPPER.readValue(jsonString, BenchmarkExecutionContext.class);
-        } catch (JsonProcessingException e) {
-            throw new BenchmarkException(e);
-        }
+        return MAPPER.readValue(jsonString, BenchmarkExecutionContext.class);
     }
 
+    @SneakyThrows
     public String toJsonString() {
-        try {
-            return MAPPER.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new BenchmarkException(e);
-        }
+        return MAPPER.writeValueAsString(this);
     }
 
     public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg,

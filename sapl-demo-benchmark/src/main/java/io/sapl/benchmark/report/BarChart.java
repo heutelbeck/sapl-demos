@@ -20,8 +20,9 @@ package io.sapl.benchmark.report;
 import static io.sapl.benchmark.report.Utilities.getMaxValue;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
@@ -53,7 +54,6 @@ public class BarChart {
         final NumberAxis rangeAxis = new LogarithmicAxis(categoryPlot.getRangeAxis().getLabel());
         rangeAxis.setUpperBound(getMaxValue(dataset) * 2);
         categoryPlot.setRangeAxis(rangeAxis);
-        categoryPlot.setRenderer(categoryPlot.getRenderer());
     }
 
     public void showLabels() {
@@ -65,7 +65,6 @@ public class BarChart {
             categoryPlot.getRenderer().setSeriesItemLabelGenerator(i, categoryItemLabelGenerator);
             categoryPlot.getRenderer().setSeriesItemLabelsVisible(i, true);
         }
-        categoryPlot.setRenderer(categoryPlot.getRenderer());
     }
 
     public void addBenchmarkResult(String pdp, String authMethod, Double score) {
@@ -77,7 +76,7 @@ public class BarChart {
     }
 
     public void saveToPNGFile(File file, int width, int height) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
+        OutputStream fos = Files.newOutputStream(file.toPath());
         ChartUtils.writeScaledChartAsPNG(fos, chart, width, height, 3, 3);
         fos.close();
     }

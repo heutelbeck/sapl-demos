@@ -50,8 +50,8 @@ public class BenchmarkConfiguration {
     private static final String REMOTE          = "remote";
     private String              benchmarkTarget = DOCKER;
 
-    private static void failOnFurtherMapEntries(Set<String> keyList, String parentEntryPath) {
-        for (String key : keyList) {
+    private static void failOnFurtherMapEntries(Set<String> keySet, String parentEntryPath) {
+        for (String key : keySet) {
             if (key != null) {
                 throw new BenchmarkException("Unknown configuration entry " + parentEntryPath + "." + key);
             }

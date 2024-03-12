@@ -143,7 +143,7 @@ public class SaplBenchmark {
 
     void startThroughputBenchmark(BenchmarkExecutionContext context) throws RunnerException {
         for (int threads : config.getThroughputThreadList()) {
-            var builder          = new OptionsBuilder().include(config.getBenchmarkPattern())
+            new Runner(new OptionsBuilder().include(config.getBenchmarkPattern())
                     .param("contextJsonString", context.toJsonString())
                     .jvmArgs(config.getJvmArgs().toArray(new String[0])).shouldFailOnError(config.isFailOnError())
                     .mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS).resultFormat(ResultFormatType.JSON)
@@ -152,9 +152,7 @@ public class SaplBenchmark {
                     .threads(threads).forks(config.forks).warmupIterations(config.getThroughputWarmupIterations())
                     .warmupTime(TimeValue.seconds(config.getThroughputWarmupSeconds())).syncIterations(true)
                     .measurementIterations(config.getThroughputMeasurementIterations())
-                    .measurementTime(TimeValue.seconds(config.getThroughputWarmupSeconds()));
-            var benchmarkOptions = builder.build();
-            new Runner(benchmarkOptions).run();
+                    .measurementTime(TimeValue.seconds(config.getThroughputWarmupSeconds())).build()).run();
         }
     }
 

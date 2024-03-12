@@ -1,7 +1,7 @@
 package io.sapl.demo.testing.dsl.testng;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -29,9 +29,9 @@ public class DSLTests extends BaseTestAdapter<List<TestClass>> {
         return tests.toArray();
     }
 
-    private List<TestClass> getDynamicContainersFromTestNode(List<? extends TestNode> testNodes) {
+    private List<TestClass> getDynamicContainersFromTestNode(Collection<? extends TestNode> testNodes) {
         if (testNodes == null) {
-            return Collections.emptyList();
+            return List.of();
         }
 
         return testNodes.stream().flatMap(testNode -> {

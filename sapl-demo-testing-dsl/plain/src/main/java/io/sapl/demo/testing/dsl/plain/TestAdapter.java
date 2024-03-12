@@ -1,5 +1,6 @@
 package io.sapl.demo.testing.dsl.plain;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,7 @@ public class TestAdapter extends BaseTestAdapter<List<TestCase>> {
         return getDynamicContainersFromTestNode(testContainer.getTestNodes());
     }
 
-    private List<TestCase> getDynamicContainersFromTestNode(List<? extends TestNode> testNodes) {
+    private List<TestCase> getDynamicContainersFromTestNode(Collection<? extends TestNode> testNodes) {
         if (testNodes == null) {
             return Collections.emptyList();
         }

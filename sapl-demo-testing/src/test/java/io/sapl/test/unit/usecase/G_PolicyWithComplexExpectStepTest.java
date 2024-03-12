@@ -123,9 +123,9 @@ class G_PolicyWithComplexExpectStepTest {
                     // check obligation
                     boolean containsExpectedObligation = false;
                     for (JsonNode node : dec.getObligations().get()) {
-                        if (node.has("type") && node.get("type").asText().equals("logAccess") && node.has("message")
-                                && node.get("message").asText()
-                                        .equals("Willi has accessed patient data (id=56) as an administrator.")) {
+                        if (node.has("type") && "logAccess".equals(node.get("type").asText()) && node.has("message")
+                                && "Willi has accessed patient data (id=56) as an administrator."
+                                        .equals(node.get("message").asText())) {
                             containsExpectedObligation = true;
                         }
                     }
@@ -133,11 +133,11 @@ class G_PolicyWithComplexExpectStepTest {
                     // check resource
                     boolean containsExpectedResource = false;
                     JsonNode resource         = dec.getResource().get();
-                    if (resource.has("id") && resource.get("id").asText().equals("56") && resource.has("diagnosisText")
-                            && resource.get("diagnosisText").asText().equals(
-                                    "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588")
-                            && resource.has("icd11Code") && resource.get("icd11Code").asText()
-                                    .equals("ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588")) {
+                    if (resource.has("id") && "56".equals(resource.get("id").asText()) && resource.has("diagnosisText")
+                            && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                    .equals(resource.get("diagnosisText").asText())
+                            && resource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                    .equals(resource.get("icd11Code").asText())) {
                         containsExpectedResource = true;
                     }
 
@@ -156,9 +156,10 @@ class G_PolicyWithComplexExpectStepTest {
                         //// hasObligation(mapper.createObjectNode().put("foo", "bar")),
                         // or Predicate
                         hasObligationMatching((JsonNode obligation) -> {
-                            return obligation.has("type") && obligation.get("type").asText().equals("logAccess")
-                                    && obligation.has("message") && obligation.get("message").asText()
-                                            .equals("Willi has accessed patient data (id=56) as an administrator.");
+                            return obligation.has("type") && "logAccess".equals(obligation.get("type").asText())
+                                    && obligation.has("message")
+                                    && "Willi has accessed patient data (id=56) as an administrator."
+                                            .equals(obligation.get("message").asText());
                         }),
 
                         hasObligationContainingKeyValue("type", "logAccess"),
@@ -177,11 +178,11 @@ class G_PolicyWithComplexExpectStepTest {
                         // ObjectMapper().createObjectNode().put("foo", "bar")),
                         // or Predicate
                         hasResourceMatching((JsonNode resource) -> resource.has("id")
-                                && resource.get("id").asText().equals("56") && resource.has("diagnosisText")
-                                && resource.get("diagnosisText").asText().equals(
-                                        "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588")
-                                && resource.has("icd11Code") && resource.get("icd11Code").asText()
-                                        .equals("ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"))))
+                                && "56".equals(resource.get("id").asText()) && resource.has("diagnosisText")
+                                && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                        .equals(resource.get("diagnosisText").asText())
+                                && resource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                        .equals(resource.get("icd11Code").asText()))))
                 .verify();
 
     }

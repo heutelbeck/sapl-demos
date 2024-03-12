@@ -78,7 +78,7 @@ public class ReportGenerator {
     }
 
     public static void generateThroughputBarChart(String bechmarkFolder, String outputFilename, String title,
-            List<Map<String, Object>> tableData) throws IOException {
+            Iterable<Map<String, Object>> tableData) throws IOException {
         var chart = new BarChart(title, "ops/s");
         for (var row : tableData) {
             chart.addBenchmarkResult((String) row.get("threads"), (String) row.get(pdpNameField),
@@ -90,7 +90,7 @@ public class ReportGenerator {
     }
 
     public static void generateResponsetimeBarChart(String bechmarkFolder, String outputFilename, String title,
-            List<Map<String, Object>> tableData) throws IOException {
+            Iterable<Map<String, Object>> tableData) throws IOException {
         var chart = new BarChart(title, "ms/op");
         for (var row : tableData) {
             chart.addBenchmarkResult((String) row.get("authName"), (String) row.get(pdpNameField),
@@ -166,7 +166,8 @@ public class ReportGenerator {
 
         // get data from average_response
         for (String filename : getThroughputJsonFiles(bechmarkFolder)) {
-            jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + File.separator + filename))
+            jsonContent = JsonParser
+                    .parseReader(new FileReader(bechmarkFolder + File.separator + filename, StandardCharsets.UTF_8))
                     .getAsJsonArray();
             String threads = getThreadCountFromFileName(filename) + "-threads";
             headerFacts.add("throughput ops/s<br>(" + threads + ")");
@@ -188,7 +189,8 @@ public class ReportGenerator {
     private static Map<String, Map<String, Object>> getResponseTimeContext(String bechmarkFolder) throws IOException {
         Map<String, List<Map<String, Object>>> baseData = Maps.newHashMap();
 
-        JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + "/average_response.json"))
+        JsonArray jsonContent = JsonParser
+                .parseReader(new FileReader(bechmarkFolder + "/average_response.json", StandardCharsets.UTF_8))
                 .getAsJsonArray();
         for (JsonElement e : jsonContent) {
             JsonObject runResult      = e.getAsJsonObject();
@@ -233,7 +235,8 @@ public class ReportGenerator {
         Map<String, List<Map<String, Object>>> baseData = Maps.newHashMap();
 
         for (String filename : getThroughputJsonFiles(bechmarkFolder)) {
-            JsonArray jsonContent = JsonParser.parseReader(new FileReader(bechmarkFolder + File.separator + filename))
+            JsonArray jsonContent = JsonParser
+                    .parseReader(new FileReader(bechmarkFolder + File.separator + filename, StandardCharsets.UTF_8))
                     .getAsJsonArray();
             String    threads     = getThreadCountFromFileName(filename) + "-threads";
             for (JsonElement e : jsonContent) {
@@ -287,7 +290,7 @@ public class ReportGenerator {
             String fileContent    = jnj.render(template, context);
             var    reportFilePath = benchmarkFolder + "/Report.html";
             log.info("generating report: {}", reportFilePath);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(reportFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(reportFilePath, StandardCharsets.UTF_8));
             writer.write(fileContent);
             writer.close();
         }
