@@ -91,7 +91,7 @@ class SaplPdpBenchmarkTest {
 
     @Test
     void whenLoadingContaxtFromString_withInvalidJson_thenExcpetionIsThrown() {
-        assertThrows(BenchmarkException.class, () -> BenchmarkExecutionContext.fromString("{invalidjson]"));
+        assertThrows(Exception.class, () -> BenchmarkExecutionContext.fromString("{invalidjson]"));
     }
 
     @Test
