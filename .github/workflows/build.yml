@@ -222,7 +222,6 @@ jobs:
       run: mvn -B spring-boot:build-image -pl sapl-demo-playground -Pproduction -DskipTests
 
     - name: Get Version
-      if: ${{ (github.ref == 'refs/heads/master') && (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
       id: get-version
       run: |
         VERSION=$( mvn help:evaluate -Dexpression=project.version -q -DforceStdout )
