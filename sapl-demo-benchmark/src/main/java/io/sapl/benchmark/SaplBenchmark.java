@@ -59,11 +59,11 @@ public class SaplBenchmark {
     private GenericContainer<?> getServerLtContainer() {
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
-        var dockerKeystorePath = "/pdp/keystore.p12";
+        var dockerKeystoreLocation = "/pdp/keystore.p12";
 
         var errorLogLevel = "ERROR";
-        var container     = new GenericContainer(DockerImageName.parse(config.getDockerPdpImage()))
-                .withClasspathResourceMapping("keystore.p12", dockerKeystorePath, BindMode.READ_ONLY)
+        var container     = new GenericContainer<>(DockerImageName.parse(config.getDockerPdpImage()))
+                .withClasspathResourceMapping("keystore.p12", dockerKeystoreLocation, BindMode.READ_ONLY)
                 .withClasspathResourceMapping("policies/", "/pdp/data/", BindMode.READ_ONLY)
                 .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data").withEnv("spring_profiles_active", "local")
                 .withExposedPorts(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT,
@@ -74,7 +74,7 @@ public class SaplBenchmark {
                 .withEnv("server_address", "0.0.0.0")
                 .withEnv("server_port", String.valueOf(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT))
                 .withEnv("server_ssl_enabled", String.valueOf(config.isDockerUseSsl()))
-                .withEnv("server_ssl_key-store-type", "PKCS12").withEnv("server_ssl_key-store", dockerKeystorePath)
+                .withEnv("server_ssl_key-store-type", "PKCS12").withEnv("server_ssl_key-store", dockerKeystoreLocation)
                 .withEnv("server_ssl_key-store-password", "benchmarkonly").withEnv("server_ssl_key-alias", "tomcat")
 
                 // rsocket settings
@@ -83,7 +83,7 @@ public class SaplBenchmark {
                         String.valueOf(BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT))
                 .withEnv("spring_rsocket_server_ssl_enabled", String.valueOf(config.isDockerUseSsl()))
                 .withEnv("spring_rsocket_server_ssl_key-store-type", "PKCS12")
-                .withEnv("spring_rsocket_server_ssl__key-store", dockerKeystorePath)
+                .withEnv("spring_rsocket_server_ssl__key-store", dockerKeystoreLocation)
                 .withEnv("spring_rsocket_server_ssl__key-store-password", "benchmarkonly")
                 .withEnv("spring_rsocket_server_ssl__key-alias", "tomcat")
 
