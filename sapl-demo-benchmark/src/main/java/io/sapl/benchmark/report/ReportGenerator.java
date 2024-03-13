@@ -33,6 +33,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
@@ -178,9 +179,9 @@ public class ReportGenerator {
                 String     pdp            = getPdpFromBenchmarkName(benchmarkName);
                 String     decisionMethod = getDecisionMethodFromBenchmarkName(benchmarkName);
                 String     authMethod     = getAuthMethodFromBenchmarkName(benchmarkName);
-                var        baseEntry      = rowData.computeIfAbsent(decisionMethod, xY -> Maps.newHashMap())
-                        .computeIfAbsent(authMethod, xY -> Maps.newHashMap())
-                        .computeIfAbsent(pdp, xY -> new ArrayList<>());
+                var        baseEntry      = rowData.computeIfAbsent(decisionMethod, xY -> new HashMap<>(1))
+                        .computeIfAbsent(authMethod, xY -> new HashMap<>(1))
+                        .computeIfAbsent(pdp, xY -> new ArrayList<>(1));
                 baseEntry.add(runResult.get(primaryMetricField).getAsJsonObject().get(scoreField).getAsDouble());
             }
         }
@@ -188,7 +189,7 @@ public class ReportGenerator {
     }
 
     private static Map<String, Map<String, Object>> getResponseTimeContext(String bechmarkFolder) throws IOException {
-        Map<String, List<Map<String, Object>>> baseData = Maps.newHashMap();
+        Map<String, List<Map<String, Object>>> baseData = new HashMap<>(1);
 
         JsonArray jsonContent = JsonParser
                 .parseReader(new FileReader(bechmarkFolder + "/average_response.json", StandardCharsets.UTF_8))
@@ -220,7 +221,7 @@ public class ReportGenerator {
                     chartField, chartFilePath));
         }
 
-        Map<String, Map<String, Object>> resultMap = Maps.newHashMap();
+        Map<String, Map<String, Object>> resultMap = new HashMap<>(1);
         for (Map.Entry<String, List<Map<String, Object>>> entry : baseData.entrySet()) {
             String section  = entry.getKey();
             String fileName = "img/" + section + ".png";
@@ -229,11 +230,10 @@ public class ReportGenerator {
         }
 
         return resultMap;
-
     }
 
     private static Map<String, Map<String, Object>> getThroughputContext(String bechmarkFolder) throws IOException {
-        Map<String, List<Map<String, Object>>> baseData = Maps.newHashMap();
+        Map<String, List<Map<String, Object>>> baseData = new HashMap<>(1);
 
         for (String filename : getThroughputJsonFiles(bechmarkFolder)) {
             JsonArray jsonContent = JsonParser
@@ -262,7 +262,7 @@ public class ReportGenerator {
             }
         }
 
-        Map<String, Map<String, Object>> resultMap = Maps.newHashMap();
+        Map<String, Map<String, Object>> resultMap = new HashMap<>(1);
         for (Map.Entry<String, List<Map<String, Object>>> entry : baseData.entrySet()) {
             String section  = entry.getKey();
             String fileName = "img/" + section + ".png";

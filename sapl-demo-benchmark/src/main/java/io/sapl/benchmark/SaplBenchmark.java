@@ -141,16 +141,18 @@ public class SaplBenchmark {
 
     void startThroughputBenchmark(BenchmarkExecutionContext context) throws RunnerException {
         for (int threads : config.getThroughputThreadList()) {
-            new Runner(new OptionsBuilder().include(config.getBenchmarkPattern())
-                    .param("contextJsonString", context.toJsonString())
-                    .jvmArgs(config.getJvmArgs().toArray(new String[0])).shouldFailOnError(config.isFailOnError())
+            ChainedOptionsBuilder builder = new OptionsBuilder().include(config.getBenchmarkPattern());
+            builder.param("contextJsonString", context.toJsonString());
+            builder.jvmArgs(config.getJvmArgs().toArray(new String[0])).shouldFailOnError(config.isFailOnError())
                     .mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS).resultFormat(ResultFormatType.JSON)
                     .result(benchmarkFolder + "/throughput_" + threads + "threads.json")
                     .output(benchmarkFolder + "/throughput_" + threads + "threads.log").shouldDoGC(true)
                     .threads(threads).forks(config.forks).warmupIterations(config.getThroughputWarmupIterations())
                     .warmupTime(TimeValue.seconds(config.getThroughputWarmupSeconds())).syncIterations(true)
                     .measurementIterations(config.getThroughputMeasurementIterations())
-                    .measurementTime(TimeValue.seconds(config.getThroughputWarmupSeconds())).build()).run();
+                    .measurementTime(TimeValue.seconds(config.getThroughputWarmupSeconds()));
+            var benchmarkOptions = builder.build();
+            new Runner(benchmarkOptions).run();
         }
     }
 

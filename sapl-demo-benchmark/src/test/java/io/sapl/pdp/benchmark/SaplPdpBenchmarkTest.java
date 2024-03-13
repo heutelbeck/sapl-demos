@@ -118,20 +118,18 @@ class SaplPdpBenchmarkTest {
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
                 mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
                 mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
-                assertDoesNotThrow(() -> {
-                    // NoAuth
-                    benchmark.noAuthDecideOnce();
-                    benchmark.noAuthDecideSubscribe();
-                    // BasicAuth
-                    benchmark.basicAuthDecideOnce();
-                    benchmark.basicAuthDecideSubscribe();
-                    // ApiKey
-                    benchmark.apiKeyDecideOnce();
-                    benchmark.apiKeyDecideSubscribe();
-                    // Oauth2
-                    benchmark.oAuth2DecideOnce();
-                    benchmark.oAuth2DecideSubscribe();
-                });
+                // NoAuth
+                assertDoesNotThrow(benchmark::noAuthDecideOnce);
+                assertDoesNotThrow(benchmark::noAuthDecideSubscribe);
+                // BasicAuth
+                assertDoesNotThrow(benchmark::basicAuthDecideOnce);
+                assertDoesNotThrow(benchmark::basicAuthDecideSubscribe);
+                // ApiKey
+                assertDoesNotThrow(benchmark::apiKeyDecideOnce);
+                assertDoesNotThrow(benchmark::apiKeyDecideSubscribe);
+                // Oauth2
+                assertDoesNotThrow(benchmark::oAuth2DecideOnce);
+                assertDoesNotThrow(benchmark::oAuth2DecideSubscribe);
             }
         }
     }
@@ -159,20 +157,18 @@ class SaplPdpBenchmarkTest {
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
                 mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
                 mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
-                assertDoesNotThrow(() -> {
-                    // NoAuth
-                    benchmark.noAuthDecideOnce();
-                    benchmark.noAuthDecideSubscribe();
-                    // BasicAuth
-                    benchmark.basicAuthDecideOnce();
-                    benchmark.basicAuthDecideSubscribe();
-                    // ApiKey
-                    benchmark.apiKeyDecideOnce();
-                    benchmark.apiKeyDecideSubscribe();
-                    // Oauth2
-                    benchmark.oAuth2DecideOnce();
-                    benchmark.oAuth2DecideSubscribe();
-                });
+                // NoAuth
+                assertDoesNotThrow(benchmark::noAuthDecideOnce);
+                assertDoesNotThrow(benchmark::noAuthDecideSubscribe);
+                // BasicAuth
+                assertDoesNotThrow(benchmark::basicAuthDecideOnce);
+                assertDoesNotThrow(benchmark::basicAuthDecideSubscribe);
+                // ApiKey
+                assertDoesNotThrow(benchmark::apiKeyDecideOnce);
+                assertDoesNotThrow(benchmark::apiKeyDecideSubscribe);
+                // Oauth2
+                assertDoesNotThrow(benchmark::oAuth2DecideOnce);
+                assertDoesNotThrow(benchmark::oAuth2DecideSubscribe);
             }
         }
     }
