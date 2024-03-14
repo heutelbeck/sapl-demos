@@ -54,6 +54,7 @@ public class SaplBenchmark {
     }
 
     private void configureServerLtContainer(GenericContainer<?> container) {
+        this.pdpContainer = container;
         if (container == null) {
             return;
         }
@@ -177,6 +178,7 @@ public class SaplBenchmark {
     }
 
     void configureOAuthContainer(GenericContainer<?> container) {
+        this.oauth2Container = container;
         if (container == null) {
             return;
         }
