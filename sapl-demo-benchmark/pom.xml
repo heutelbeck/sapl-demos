@@ -192,7 +192,8 @@
 		</pluginManagement>
 
 		<plugins>
-			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which
+			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file
+			which
 			contains the code from this module and in addition, all dependencies are
 			packed into the JAR as well. This results in a self-contained executable
 			Java application directly runnable via 'java -jar'. -->
@@ -206,8 +207,10 @@
 						</manifest>
 					</archive>
 					<descriptors>
-						<!-- See: https://stackoverflow.com/questions/65172081/maven-xtext-the-string-resource-ui-diagnosticroot-diagnostic-could-not-be-l -->
-						<!-- See: https://stackoverflow.com/questions/8085996/maven-overwrite-resource-file-in-dependency/24578209#24578209 -->
+						<!-- See:
+						https://stackoverflow.com/questions/65172081/maven-xtext-the-string-resource-ui-diagnosticroot-diagnostic-could-not-be-l -->
+						<!-- See:
+						https://stackoverflow.com/questions/8085996/maven-overwrite-resource-file-in-dependency/24578209#24578209 -->
 						<descriptor>src/main/assembly/fatjar.xml</descriptor>
 					</descriptors>
 				</configuration>
@@ -220,6 +223,17 @@
 						</goals>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<sourceExcludes>
+						<sourceExclude>target/generated-test-sources/**</sourceExclude>
+						<sourceExclude>target/generated-sources/**</sourceExclude>
+					</sourceExcludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
