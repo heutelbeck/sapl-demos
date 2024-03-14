@@ -39,9 +39,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class SaplBenchmark {
     private final BenchmarkConfiguration config;
     private GenericContainer<?>          pdpContainer;
@@ -56,14 +53,16 @@ public class SaplBenchmark {
         FileUtils.copyFile(sourceFile, new File(benchmarkFolder + File.separator + sourceFile.getName()));
     }
 
-    private GenericContainer<?> getServerLtContainer() {
+    private void configureServerLtContainer(GenericContainer<?> container) {
+        if (container == null) {
+            return;
+        }
         Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
         var dockerKeystoreLocation = "/pdp/keystore.p12";
 
         var errorLogLevel = "ERROR";
-        var container     = new GenericContainer<>(DockerImageName.parse(config.getDockerPdpImage()))
-                .withClasspathResourceMapping("keystore.p12", dockerKeystoreLocation, BindMode.READ_ONLY)
+        container.withClasspathResourceMapping("keystore.p12", dockerKeystoreLocation, BindMode.READ_ONLY)
                 .withClasspathResourceMapping("policies/", "/pdp/data/", BindMode.READ_ONLY)
                 .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data").withEnv("spring_profiles_active", "local")
                 .withExposedPorts(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT,
@@ -115,13 +114,6 @@ public class SaplBenchmark {
             container.withExtraHost("auth-host", "host-gateway")
                     .withEnv("spring_security_oauth2_resourceserver_jwt_issuer-uri", jwtIssuerUrl);
         }
-        return container;
-    }
-
-    private GenericContainer<?> getOauth2Container() {
-        oauth2Container = new GenericContainer<>(DockerImageName.parse(config.getOauth2MockImage()))
-                .withExposedPorts(8080).waitingFor(Wait.forListeningPort());
-        return oauth2Container;
     }
 
     void startResponseTimeBenchmark(BenchmarkExecutionContext context) throws RunnerException {
@@ -167,39 +159,42 @@ public class SaplBenchmark {
     }
 
     public void executeBenchmark() throws RunnerException {
-        try {
-            startContainersIfNeeded();
+        var useOAuthContainer    = config.isUseOauth2() && config.isOauth2MockServer();
+        var useServerLTContainer = config.requiredDockerEnvironment();
+
+        try (var oauth2Cont = useOAuthContainer
+                ? new GenericContainer<>(DockerImageName.parse(config.getOauth2MockImage()))
+                : null;
+                var pdpCont = useServerLTContainer
+                        ? new GenericContainer<>(DockerImageName.parse(config.getDockerPdpImage()))
+                        : null) {
+            configureOAuthContainer(oauth2Cont);
+            configureServerLtContainer(pdpCont);
+            startContainers(oauth2Cont, pdpCont);
             startBenchmarks();
-        } finally {
-            stopContainersIfRunning();
+            stopContainersIfRunning(oauth2Cont, pdpCont);
         }
     }
 
-    private void startContainersIfNeeded() {
-        if (config.isUseOauth2() && config.isOauth2MockServer()) {
-            oauth2Container = getOauth2Container();
-            oauth2Container.start();
+    void configureOAuthContainer(GenericContainer<?> container) {
+        if (container == null) {
+            return;
         }
-        if (config.requiredDockerEnvironment()) {
-            pdpContainer = getServerLtContainer();
-            pdpContainer.start();
-        }
+        container.withExposedPorts(8080).waitingFor(Wait.forListeningPort());
     }
 
-    private void stopContainersIfRunning() {
-        // stop containers if running
-        if (pdpContainer != null) {
-            try {
-                pdpContainer.stop();
-            } catch (Exception e) {
-                log.error("An exception occurred!", e);
+    private void startContainers(GenericContainer<?>... containers) {
+        for (var container : containers) {
+            if (container != null) {
+                container.start();
             }
         }
-        if (this.oauth2Container != null) {
-            try {
-                oauth2Container.stop();
-            } catch (Exception e) {
-                log.error("An exception occurred!", e);
+    }
+
+    private void stopContainersIfRunning(GenericContainer<?>... containers) {
+        for (var container : containers) {
+            if (container != null) {
+                container.stop();
             }
         }
     }

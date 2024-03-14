@@ -17,21 +17,20 @@
  */
 package io.sapl.pdp.benchmark;
 
-import io.sapl.benchmark.BenchmarkCommand;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import picocli.CommandLine;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-@Slf4j
+import io.sapl.benchmark.BenchmarkCommand;
+import picocli.CommandLine;
+
 class SaplPdpBenchmarkIT {
     private static final String tmpReportPath = "results/tmp_benchmark_test";
 
@@ -54,8 +53,8 @@ class SaplPdpBenchmarkIT {
                 "img/HttpBenchmark.noAuthDecideSubscribe response time.png",
                 "img/HttpBenchmark.noAuthDecideSubscribe throughput.png",
                 "img/RsocketBenchmark.noAuthDecideSubscribe response time.png",
-                "img/RsocketBenchmark.noAuthDecideSubscribe throughput.png",
-                "test_benchmark_config.yaml", "throughput_1threads.json");
+                "img/RsocketBenchmark.noAuthDecideSubscribe throughput.png", "test_benchmark_config.yaml",
+                "throughput_1threads.json");
         for (String fileName : reportFiles) {
             File reportFile = new File(tmpReportPath + "/" + fileName);
             assertTrue(reportFile.exists(), reportFile + " does not exist");
