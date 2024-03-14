@@ -11,6 +11,8 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Theme(value = "sapldemowebeditor", variant = Lumo.DARK)
 public class SAPLWebEditorDemoApplication implements AppShellConfigurator {
 
+    private static final long serialVersionUID = -8117421629399543738L;
+
     public static void main(String[] args) {
         SpringApplication.run(SAPLWebEditorDemoApplication.class, args);
     }

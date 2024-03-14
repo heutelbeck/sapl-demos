@@ -11,6 +11,8 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Theme(value = "sapl", variant = Lumo.DARK)
 public class SAPLPlaygroundApplication implements AppShellConfigurator {
 
+    private static final long serialVersionUID = 6639034366431726176L;
+
     public static void main(String[] args) {
         SpringApplication.run(SAPLPlaygroundApplication.class, args);
     }

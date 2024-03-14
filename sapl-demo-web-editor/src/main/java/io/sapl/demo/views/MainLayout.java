@@ -37,10 +37,14 @@ import io.sapl.demo.views.sapltesteditor.SAPLTestEditorView;
  */
 public class MainLayout extends AppLayout {
 
+    private static final long serialVersionUID = -6536520143745082768L;
+
     /**
      * A simple navigation item component, based on ListItem element.
      */
     public static class MenuItemInfo extends ListItem {
+
+        private static final long serialVersionUID = -902293824094793592L;
 
         private final Class<? extends Component> view;
 

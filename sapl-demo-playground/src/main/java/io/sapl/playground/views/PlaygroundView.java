@@ -74,6 +74,8 @@ import reactor.util.context.Context;
 @Route(value = "", layout = MainLayout.class)
 public class PlaygroundView extends VerticalLayout {
 
+    private static final long serialVersionUID = -4566788729267935131L;
+
     private static final String INPUT_JSON_IS_NOT_VALID = "Input JSON is not valid";
 
     // UI element references
@@ -133,7 +135,7 @@ public class PlaygroundView extends VerticalLayout {
      */
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        setExample(new BasicExample(), false);
+        setExample(new BasicExample());
     }
 
     private Component policyEditor() {
@@ -253,9 +255,9 @@ public class PlaygroundView extends VerticalLayout {
         }
     }
 
-    public void setExample(Example example, boolean ignoreNextChangedEvents) {
+    public void setExample(Example example) {
 
-        updateComponentsWithNewExample(example, ignoreNextChangedEvents);
+        updateComponentsWithNewExample(example);
 
         this.currentAuthzSub     = getAuthzSubForJsonString(example.getAuthzSub());
         this.currentPolicy       = getSAPLDocument(example.getPolicy());
@@ -269,7 +271,7 @@ public class PlaygroundView extends VerticalLayout {
      * therefore multiple evaluations of the policy to prevent these multiple
      * concurrent evaluations, ignore the documentChanged events
      */
-    private void updateComponentsWithNewExample(Example example, boolean ignoreNextChangedEvents) {
+    private void updateComponentsWithNewExample(Example example) {
         this.getUI().ifPresent(ui -> ui.access(() -> {
             this.saplEditor.setDocument(example.getPolicy());
             this.authzSubEditor.setDocument(example.getAuthzSub());

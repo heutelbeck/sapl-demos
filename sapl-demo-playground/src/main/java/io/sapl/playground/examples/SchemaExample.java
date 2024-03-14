@@ -17,6 +17,8 @@ package io.sapl.playground.examples;
 
 public class SchemaExample extends Example {
 
+    private static final long serialVersionUID = 2893406766869649219L;
+
     public SchemaExample() {
 
         this.mockDefinition = "[]";

@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @Route(value = "", layout = MainLayout.class)
 public class SAPLEditorView extends VerticalLayout {
 
+    private static final long serialVersionUID = 8813800405531649047L;
+
     private static final String DEFAULT_POLICY = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
 
     private final Button     addDocumentChangedListenerButton;

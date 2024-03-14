@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Route(value = "json", layout = MainLayout.class)
 public class JSONEditorView extends VerticalLayout {
 
+    private static final long serialVersionUID = -1749356040098438225L;
+
     private static final String DEFAULT_JSON = """
             [
                 {

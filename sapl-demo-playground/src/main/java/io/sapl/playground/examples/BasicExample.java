@@ -17,6 +17,8 @@ package io.sapl.playground.examples;
 
 public class BasicExample extends Example {
 
+    private static final long serialVersionUID = -3542370940847615035L;
+
     public BasicExample() {
 
         this.mockDefinition = """

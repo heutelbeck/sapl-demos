@@ -17,6 +17,8 @@ package io.sapl.playground.examples;
 
 public class SpringDataExample extends Example {
 
+    private static final long serialVersionUID = 842250550969354096L;
+
     public SpringDataExample() {
 
         this.mockDefinition = """

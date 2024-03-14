@@ -17,6 +17,8 @@ package io.sapl.playground.examples;
 
 public class SpringSecurityExample extends Example {
 
+    private static final long serialVersionUID = -4315516643292965109L;
+
     public SpringSecurityExample() {
 
         this.mockDefinition = "[]";

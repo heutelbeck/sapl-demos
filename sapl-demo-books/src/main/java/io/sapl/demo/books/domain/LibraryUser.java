@@ -12,6 +12,8 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 public class LibraryUser extends org.springframework.security.core.userdetails.User implements UserDetails {
 
+    private static final long serialVersionUID = -7244331453519181420L;
+
     @Getter
     private int           department;
     @Getter

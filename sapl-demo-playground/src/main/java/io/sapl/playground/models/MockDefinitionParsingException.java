@@ -19,4 +19,5 @@ import lombok.experimental.StandardException;
 
 @StandardException
 public class MockDefinitionParsingException extends Exception {
+    private static final long serialVersionUID = -6189036860100415989L;
 }

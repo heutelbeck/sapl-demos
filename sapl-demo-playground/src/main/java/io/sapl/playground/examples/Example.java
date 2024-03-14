@@ -19,6 +19,8 @@ import java.io.Serializable;
 
 public abstract class Example implements Serializable {
 
+    private static final long serialVersionUID = -3103005046506361984L;
+
     protected String mockDefinition;
 
     protected String policy;

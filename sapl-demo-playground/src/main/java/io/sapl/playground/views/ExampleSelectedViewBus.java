@@ -28,6 +28,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ExampleSelectedViewBus implements Serializable {
 
+    private static final long serialVersionUID = -1077399416535417195L;
+
     private PlaygroundView contentView;
 
     public synchronized PlaygroundView getContentView() {

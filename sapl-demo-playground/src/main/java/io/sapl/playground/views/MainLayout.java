@@ -28,6 +28,8 @@ import io.sapl.playground.examples.SpringSecurityExample;
 
 public class MainLayout extends AppLayout {
 
+    private static final long serialVersionUID = -8326758523006330212L;
+
     private final ExampleSelectedViewBus exampleSelectedViewBus;
     private HashMap<String, Example>     examples;
 
@@ -70,7 +72,7 @@ public class MainLayout extends AppLayout {
         select.setItems(this.examples.keySet());
         select.setId("dropdownButton");
         select.addValueChangeListener(event -> this.exampleSelectedViewBus.getContentView()
-                .setExample(this.examples.get(event.getValue()), true));
+                .setExample(this.examples.get(event.getValue())));
         return select;
     }
 

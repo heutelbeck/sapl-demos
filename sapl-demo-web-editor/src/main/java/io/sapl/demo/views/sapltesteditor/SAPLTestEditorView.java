@@ -18,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @Route(value = "sapltesteditor", layout = MainLayout.class)
 public class SAPLTestEditorView extends VerticalLayout {
 
+    private static final long serialVersionUID = -2637310974422530266L;
+
     private static final String DEFAULT_TEST = """
             test "policyWithSimpleFunction" {
               scenario "test_policyWithSimpleFunction"
