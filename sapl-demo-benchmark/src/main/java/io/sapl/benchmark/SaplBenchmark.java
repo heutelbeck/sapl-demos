@@ -53,7 +53,7 @@ public class SaplBenchmark {
         FileUtils.copyFile(sourceFile, new File(benchmarkFolder + File.separator + sourceFile.getName()));
     }
 
-    private void configureServerLtContainer(GenericContainer<?> container) {
+    private void configureAndStartServerLtContainer(GenericContainer<?> container) {
         this.pdpContainer = container;
         if (container == null) {
             return;
@@ -115,6 +115,7 @@ public class SaplBenchmark {
             container.withExtraHost("auth-host", "host-gateway")
                     .withEnv("spring_security_oauth2_resourceserver_jwt_issuer-uri", jwtIssuerUrl);
         }
+        container.start();
     }
 
     void startResponseTimeBenchmark(BenchmarkExecutionContext context) throws RunnerException {
@@ -169,28 +170,20 @@ public class SaplBenchmark {
                 var pdpCont = useServerLTContainer
                         ? new GenericContainer<>(DockerImageName.parse(config.getDockerPdpImage()))
                         : null) {
-            configureOAuthContainer(oauth2Cont);
-            configureServerLtContainer(pdpCont);
-            startContainers(oauth2Cont, pdpCont);
+            configureAndStartOAuthContainer(oauth2Cont);
+            configureAndStartServerLtContainer(pdpCont);
             startBenchmarks();
             stopContainersIfRunning(oauth2Cont, pdpCont);
         }
     }
 
-    void configureOAuthContainer(GenericContainer<?> container) {
+    void configureAndStartOAuthContainer(GenericContainer<?> container) {
         this.oauth2Container = container;
         if (container == null) {
             return;
         }
         container.withExposedPorts(8080).waitingFor(Wait.forListeningPort());
-    }
-
-    private void startContainers(GenericContainer<?>... containers) {
-        for (var container : containers) {
-            if (container != null) {
-                container.start();
-            }
-        }
+        container.start();
     }
 
     private void stopContainersIfRunning(GenericContainer<?>... containers) {

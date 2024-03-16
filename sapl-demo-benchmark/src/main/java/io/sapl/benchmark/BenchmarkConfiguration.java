@@ -323,7 +323,7 @@ public class BenchmarkConfiguration {
             authMethods.add("apiKey");
         }
         if (useOauth2) {
-            authMethods.add("oauth2");
+            authMethods.add("oAuth2");
         }
 
         if (runDecideOnceBenchmarks) {
