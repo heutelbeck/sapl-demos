@@ -58,7 +58,7 @@ class SaplPdpBenchmarkIT {
                 reportFiles.add("img/" + decisionMethod + " - " + authMethod + " - throughput.png");
                 for (var benchmarkType: List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
                     // embedded supports only noAuth
-                    if ( !benchmarkType.equals("EmbeddedBenchmark") || authMethod.equals("noAuth") ) {
+                    if ( ! "EmbeddedBenchmark".equals(benchmarkType) || "noAuth".equals(authMethod) ) {
                         reportFiles.add("img/" + benchmarkType + "." + authMethod +
                                 decisionMethod.replace(" ", "") + " response time.png");
                         reportFiles.add("img/" + benchmarkType + "." + authMethod +
