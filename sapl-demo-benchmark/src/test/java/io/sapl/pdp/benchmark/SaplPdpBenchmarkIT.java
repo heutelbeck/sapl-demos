@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -43,18 +44,31 @@ class SaplPdpBenchmarkIT {
 
     @Test
     void whenExecutingEmbeddedBenchmark_withNoAuth_thenReportsAreCreated() {
+        // start benchmark
         var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
                 "src/test/resources/test_benchmark_config.yaml", "--output", tmpReportPath);
         Assertions.assertEquals(0, returnCode);
-        var reportFiles = List.of("Report.html", "average_response.json", "custom.css", "favicon.png",
-                "img/Decide Subscribe - Average Response Time.png", "img/Decide Subscribe - noAuth - throughput.png",
-                "img/EmbeddedBenchmark.noAuthDecideSubscribe response time.png",
-                "img/EmbeddedBenchmark.noAuthDecideSubscribe throughput.png",
-                "img/HttpBenchmark.noAuthDecideSubscribe response time.png",
-                "img/HttpBenchmark.noAuthDecideSubscribe throughput.png",
-                "img/RsocketBenchmark.noAuthDecideSubscribe response time.png",
-                "img/RsocketBenchmark.noAuthDecideSubscribe throughput.png", "test_benchmark_config.yaml",
-                "throughput_1threads.json");
+
+        // build a list of expected report files
+        List<String> reportFiles = new ArrayList<>(List.of("Report.html", "average_response.json", "custom.css",
+                "favicon.png", "test_benchmark_config.yaml", "throughput_1threads.json"));
+        for (var decisionMethod: List.of("Decide Subscribe", "Decide Once")) {
+            reportFiles.add("img/" + decisionMethod + " - Average Response Time.png");
+            for (var authMethod: List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
+                reportFiles.add("img/" + decisionMethod + " - " + authMethod + " - throughput.png");
+                for (var benchmarkType: List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
+                    // embedded supports only noAuth
+                    if ( !benchmarkType.equals("EmbeddedBenchmark") || authMethod.equals("noAuth") ) {
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod +
+                                decisionMethod.replace(" ", "") + " response time.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod +
+                                decisionMethod.replace(" ", "") + " throughput.png");
+                    }
+                }
+            }
+        }
+
+        // ensure that all expected report files are present and not empty
         for (String fileName : reportFiles) {
             File reportFile = new File(tmpReportPath + "/" + fileName);
             assertTrue(reportFile.exists(), reportFile + " does not exist");
