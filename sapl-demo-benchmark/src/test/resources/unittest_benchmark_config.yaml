@@ -46,25 +46,17 @@ basic:
 
 apikey:
   enabled: false
-  api_key_header: API_KEY
-  api_key: rWVD3Gvo5x7q32_w9T/HKd122!IX5r8_JY
+  api_key: sapl_JC69csjFH1_yjh1CX63Pw6xBkm0PxZBsj2mbFx1m52A
 
 oauth2:
   enabled: false
 
 
 # ---------------------------
-forks: 1
-jvm_args: ["-Xms1G", "-Xmx1G"]
-fail_on_error: true
-
-response_time:
-  warmup_seconds: 1
-  warmup_iterations: 1
-  measure_seconds: 1
-  measure_iterations: 1
-
-throughput:
+execution:
+  forks: 1
+  fail_on_error: true
+  jvm_args: ["-Xms1G", "-Xmx1G"]
   threads: [1]
   warmup_seconds: 1
   warmup_iterations: 1

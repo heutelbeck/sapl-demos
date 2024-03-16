@@ -30,22 +30,23 @@ import picocli.CommandLine.Option;
 
 @Slf4j
 @ToString
-@Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark on the PRP indexing data structures.")
+@Command(name = "sapl-demo-benchmark", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "Performs a benchmark against an embedded, docker or remote PDP.")
 public class BenchmarkCommand implements Callable<Integer> {
 
     private final LocalDateTime     dateTime  = LocalDateTime.now();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    @Option(names = { "-o", "--output" }, description = "Path to the output directory for benchmark results.")
-    private String outputPath = "results/" + formatter.format(dateTime);
+    @Option(names = { "-o", "--output" }, required = true, description = "Path to the output directory for benchmark results.")
+    private String outputPath;
 
-    @Option(names = { "-c", "--cfg" }, required = true, description = "YAML file to read json from")
+    @Option(names = { "-c", "--cfg" }, required = true, description = "YAML file to read configuration from")
     private String cfgFilePath;
 
-    @Option(names = { "--skipBenchmark" })
+    @Option(names = { "--skipBenchmark" }, description = "Skips the benchmark execution, useful to generate the report based on existing data.")
     private boolean skipBenchmark = false;
 
-    @Option(names = { "--skipReportGeneration" })
+    @Option(names = { "--skipReportGeneration" }, description = "Skips the report generation.")
+
     private boolean skipReportGeneration = false;
 
     @Override
@@ -54,7 +55,7 @@ public class BenchmarkCommand implements Callable<Integer> {
         var benchmark = new SaplBenchmark(cfgFilePath, outputPath);
         if (!skipBenchmark) {
             log.info("Writing results to outputPath={}", outputPath);
-            benchmark.executeBenchmark();
+            benchmark.startBenchmark();
         }
         if (!skipReportGeneration) {
             log.info("Generating report in outputPath={}", outputPath);

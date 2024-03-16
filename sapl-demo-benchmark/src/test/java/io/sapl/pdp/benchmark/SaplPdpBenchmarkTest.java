@@ -106,7 +106,6 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setBasicClientKey("123");
         benchmarkConfig.setBasicClientSecret("123");
         benchmarkConfig.setUseAuthApiKey(true);
-        benchmarkConfig.setApiKeyHeader("API_KEY");
         benchmarkConfig.setApiKeySecret("123");
         benchmarkConfig.setUseOauth2(true);
         var benchmark        = new HttpBenchmark();
@@ -146,7 +145,6 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setBasicClientKey("123");
         benchmarkConfig.setBasicClientSecret("123");
         benchmarkConfig.setUseAuthApiKey(true);
-        benchmarkConfig.setApiKeyHeader("API_KEY");
         benchmarkConfig.setApiKeySecret("123");
         var benchmark        = new RsocketBenchmark();
         var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,

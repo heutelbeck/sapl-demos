@@ -59,7 +59,7 @@ public class RsocketBenchmark {
     @Setup(Level.Trial)
     public void setup() throws IOException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
-        log.info("initializing pdp connections");
+        log.info("initializing PDP and starting Benchmark ...");
         if (context.isUseNoAuth()) {
             noauthPdp = getBaseBuilder().build();
         }
@@ -70,7 +70,7 @@ public class RsocketBenchmark {
         }
 
         if (context.isUseAuthApiKey()) {
-            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKeyHeader(), context.getApiKey()).build();
+            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKey()).build();
         }
 
         if (context.isUseOauth2()) {

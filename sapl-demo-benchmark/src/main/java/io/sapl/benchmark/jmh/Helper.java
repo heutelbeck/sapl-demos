@@ -33,6 +33,9 @@ public class Helper {
         throw new IllegalStateException("Utility class");
     }
 
+    /**
+     * Send AuthorizationSubscription to PDP and ensure that Decision equals Permit
+     */
     public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decide(authorizationSubscription).blockFirst();
         if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
@@ -40,6 +43,9 @@ public class Helper {
         }
     }
 
+    /**
+     * Send AuthorizationSubscription to PDP using the decide-once API and ensure that Decision equals Permit
+     */
     public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decideOnce(authorizationSubscription).block();
         if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
@@ -47,12 +53,15 @@ public class Helper {
         }
     }
 
+    /**
+     * Retrieve Oauth2 client registry from benchmakr context
+     */
     public static ReactiveClientRegistrationRepository getClientRegistrationRepository(
-            BenchmarkExecutionContext config) {
+            BenchmarkExecutionContext context) {
         return registrationId -> Mono
-                .just(ClientRegistration.withRegistrationId(registrationId).tokenUri(config.getOauth2TokenUri())
-                        .clientId(config.getOauth2ClientId()).clientSecret(config.getOauth2ClientSecret())
+                .just(ClientRegistration.withRegistrationId(registrationId).tokenUri(context.getOauth2TokenUri())
+                        .clientId(context.getOauth2ClientId()).clientSecret(context.getOauth2ClientSecret())
                         .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-                        .scope(config.getOauth2Scope()).build());
+                        .scope(context.getOauth2Scope()).build());
     }
 }

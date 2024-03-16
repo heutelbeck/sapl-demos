@@ -56,15 +56,14 @@ public class HttpBenchmark {
     private RemoteHttpPolicyDecisionPoint.RemoteHttpPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
         return RemotePolicyDecisionPoint.builder().http().baseUrl(context.getHttpBaseUrl())
                 .withHttpClient(HttpClient.create().responseTimeout(Duration.ofSeconds(10))).withUnsecureSSL()
-                // set SO_LINGER to 0 so that the http sockets are closed immediately ->
-                // TIME_WAIT
+                // set SO_LINGER to 0 so that the http sockets are closed immediately -> TIME_WAIT
                 .option(ChannelOption.SO_LINGER, 0);
     }
 
     @Setup(Level.Trial)
     public void setup() throws IOException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
-        log.info("initializing pdp connections");
+        log.info("initializing PDP and starting Benchmark ...");
         if (context.isUseNoAuth()) {
             noauthPdp = getBaseBuilder().build();
         }
@@ -75,7 +74,7 @@ public class HttpBenchmark {
         }
 
         if (context.isUseAuthApiKey()) {
-            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKeyHeader(), context.getApiKey()).build();
+            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKey()).build();
         }
 
         if (context.isUseOauth2()) {

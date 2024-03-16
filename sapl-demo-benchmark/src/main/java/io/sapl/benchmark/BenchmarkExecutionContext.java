@@ -30,6 +30,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
+/**
+ * This class is holding the benchmark execution context derived from configuration and optional the container
+ * environment. The class object is then mapped to json, so that they can be passed via command line parameters
+ * to the JMH process executing the actual benchmark.
+ */
 @Getter
 @Setter
 @RequiredArgsConstructor
@@ -43,7 +48,6 @@ public class BenchmarkExecutionContext {
     private String                    oauth2ClientSecret;
     private String                    oauth2Scope;
     private String                    oauth2TokenUri;
-    private String                    apiKeyHeader;
     private String                    httpBaseUrl;
     private boolean                   useNoAuth;
     private boolean                   useBasicAuth;
@@ -88,7 +92,6 @@ public class BenchmarkExecutionContext {
         }
         context.basicClientKey    = cfg.getBasicClientKey();
         context.basicClientSecret = cfg.getBasicClientSecret();
-        context.apiKeyHeader      = cfg.getApiKeyHeader();
         context.apiKey            = cfg.getApiKeySecret();
         if (cfg.isUseOauth2() && cfg.isOauth2MockServer()) {
             context.oauth2TokenUri = "http://auth-host:" + oauthContainer.getMappedPort(8080) + "/default/token";

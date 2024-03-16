@@ -45,14 +45,13 @@ basic:
 
 apikey:
   enabled: false
-  api_key_header: API_KEY
-  api_key: rWVj3vo5x7qw9THKdIX8JY
+  api_key: sapl_JC69csjFH1_yjh1CX63Pw6xBkm0PxZBsj2mbFx1m52A
 
 # Example using OKTA authentication provider
 oauth2:
   enabled: true
   client_id: 0oae86d5t8GVJxg3z5d7
-  client_secret: "_W-U0vaBB3HMCsTnd9II9fW614bCF60cK6rnvuGfWVFRwYI49piC4piKzP1GnTNk"
+  client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
   scope: sapl
   # mock_oauth2_server: true required "auth-host" hosts entry pointing to the docker host
   mock_server: false
@@ -62,23 +61,15 @@ oauth2:
   issuer_url: https://dev-13759895.okta.com/oauth2/default
 
 
-# ---------------------------
-# Benchmark setup
-# ---------------------------
-forks: 1
-jvm_args: ["-Xms1G", "-Xmx1G"]
-fail_on_error: true
-
-response_time:
+# ------------------------------
+# Benchmark execution parameters
+# ------------------------------
+execution:
+  forks: 1
+  jvm_args: [ "-Xms1G", "-Xmx1G" ]
+  fail_on_error: true
+  threads: [1,2,8]
   warmup_seconds: 10
-  warmup_iterations: 1
+  warmup_iterations: 2
   measure_seconds: 10
-  measure_iterations: 2
-
-throughput:
-  threads: [2,8]
-  warmup_seconds: 10
-  warmup_iterations: 1
-  measure_seconds: 10
-  measure_iterations: 2
-
+  measure_iterations: 6
