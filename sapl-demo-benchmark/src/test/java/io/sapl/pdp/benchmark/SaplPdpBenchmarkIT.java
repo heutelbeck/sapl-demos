@@ -46,12 +46,12 @@ class SaplPdpBenchmarkIT {
     void whenExecutingEmbeddedBenchmark_withNoAuth_thenReportsAreCreated() {
         // start benchmark
         var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
-                "src/test/resources/test_benchmark_config.yaml", "--output", tmpReportPath);
+                "src/test/resources/integrationtest_benchmark_config.yaml", "--output", tmpReportPath);
         Assertions.assertEquals(0, returnCode);
 
         // build a list of expected report files
         List<String> reportFiles = new ArrayList<>(List.of("Report.html", "average_response.json", "custom.css",
-                "favicon.png", "test_benchmark_config.yaml", "throughput_1threads.json"));
+                "favicon.png", "integrationtest_benchmark_config.yaml", "throughput_1threads.json"));
         for (var decisionMethod: List.of("Decide Subscribe", "Decide Once")) {
             reportFiles.add("img/" + decisionMethod + " - Average Response Time.png");
             for (var authMethod: List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {

@@ -54,7 +54,7 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingEmbeddedBenchmark_withValidSubscription_thenDecisionIsAccepted()
             throws InitializationException, IOException {
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
+        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig
@@ -74,7 +74,7 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingEmbeddedBenchmark_withInvalidSubscription_thenExceptionIsThrown()
             throws InitializationException, IOException {
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
+        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig.setSubscription(
@@ -97,7 +97,7 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingHttpBenchmark_thenDecisionIsAccepted() throws IOException {
         var mockedContainer = Mockito.mock(GenericContainer.class);
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
+        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunEmbeddedBenchmarks(true);
         benchmarkConfig.setRunHttpBenchmarks(true);
         benchmarkConfig.setRunHttpBenchmarks(true);
@@ -138,7 +138,7 @@ class SaplPdpBenchmarkTest {
     void whenExecutingRsocketBenchmark_thenDecisionIsAccepted() throws IOException {
         var mockedContainer = Mockito.mock(GenericContainer.class);
         Mockito.when(mockedContainer.getHost()).thenReturn("localhost");
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/test_benchmark_config.yaml");
+        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunEmbeddedBenchmarks(false);
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(true);
