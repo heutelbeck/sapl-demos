@@ -137,6 +137,8 @@ jobs:
         -Dsonar.organization=heutelbeck
         -Dsonar.host.url=https://sonarcloud.io
         -Dsonar.projectKey=heutelbeck_sapl-demos
+        -Dsonar.sources=pom.xml,src/ 
+        -Dsonar.inclusions=**/pom.xml,**/src/main/java/**,**/src/main/resources/**
         -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
         -Dsonar.java.spotbugs.reportPaths=target/spotbugsXml.xml
         -Dsonar.qualitygate.wait=true
