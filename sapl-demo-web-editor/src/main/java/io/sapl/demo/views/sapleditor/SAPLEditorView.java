@@ -2,6 +2,7 @@ package io.sapl.demo.views.sapleditor;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -96,7 +97,16 @@ public class SAPLEditorView extends VerticalLayout {
         toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
         add(toggleReadOnlyButton);
 
+        IntegerField configurationIdField = new IntegerField("Configuration Id");
+        configurationIdField.addValueChangeListener(value -> saplEditor.setConfigurationId(value.toString()));
+        configurationIdField.setStepButtonsVisible(true);
+        configurationIdField.setMin(1);
+        configurationIdField.setMax(5);
+        configurationIdField.setValue(1);
+        add(configurationIdField);
+
         saplEditor.setDocument(DEFAULT_POLICY);
+        saplEditor.setConfigurationId(configurationIdField.getValue().toString());
         setSizeFull();
     }
 
