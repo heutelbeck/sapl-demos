@@ -1,0 +1,30 @@
+//this file contains 2 requirement definitions, one for checking read access and one for checking write access
+requirement "Policy Simple should grant read access for willi on something" {
+	//to avoid redundant given definitions for each scenario in a requirement a central given definition is possible
+    // it has the same syntax as the scenario specific given
+    // this allows to keep the scenario itself short if the share common logic regarding their given setup
+    // the given block can still defined in the scenario itself and will then overwrite the policy definition part of the central given
+    given
+    	- policy "policySimple"
+
+	scenario "willi tries to read something"
+    when "willi" attempts "read" on "something"
+    expect permit;
+
+    scenario "not_willi tries to read something"
+    when "not_willi" attempts "read" on "something"
+    expect deny;
+}
+
+requirement "Policy Simple should deny write access for willi on something" {
+    given
+    	- policy "policySimple"
+
+	scenario "willi tries to write something"
+    when "willi" attempts "write" on "something"
+    expect deny;
+
+    scenario "not_willi tries to write something"
+    when "not_willi" attempts "write" on "something"
+    expect deny;
+}

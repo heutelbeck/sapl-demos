@@ -1,6 +1,0 @@
-test "policySimpleWithNestedObligation" {
-	scenario "nested"
-    when subject "willi" attempts action "read" on resource "something"
-    then expect
-    - decision is permit, with obligation containing key "key1" with value matching object where { "nested1" is text with regex "A.*C" and "nested2" is text containing stream "fo", "ar" in order };
-}

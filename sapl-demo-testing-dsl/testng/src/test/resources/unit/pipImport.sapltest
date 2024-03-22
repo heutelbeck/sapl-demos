@@ -1,0 +1,29 @@
+requirement "uses uppercase PIP to decide" {
+    given
+    	- policy "policyWithSimplePIP"
+
+	scenario "willi can read using actual uppercase PIP"
+    given
+        - pip "upper" //by using a pip import we can refer to a specific registration in our io.sapl.demo.testing.dsl.junit.TestAdapter by name (e.g. Map.of(ImportType.PIP, Map.of("upper", new TestPIP()))
+    when "willi" attempts "read" on "something"
+    expect permit;
+
+    scenario "klaus can not read using actual uppercase PIP"
+    given
+        - pip "upper"
+    when "klaus" attempts "read" on "something"
+    expect notApplicable;
+
+    scenario "klaus can read if there is a BAR value with subject as key in environment"
+    given
+        - environment { "klaus": "BAR" } //define an environment that is registered in the AuthorizationContext and passed to the PIP
+        - pip "upper"
+    when "klaus" attempts "read" on "something"
+    expect permit;
+
+    scenario "klaus can read if there is a FOO value with subject as key in AuthorizationSubscription"
+    given
+        - pip "upper"
+    when "klaus" attempts "read" on "something" in { "klaus": "FOO" } //define an environment that is part of the AuthorizationSubscription
+    expect permit;
+}

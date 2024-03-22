@@ -13,8 +13,7 @@
 
 	<artifactId>sapl-demo-testing-dsl-junit</artifactId>
 	<name>SAPL Demo Policy Testing DSL JUnit</name>
-	<description>Example for testing your SAPL policies using the SAPLTest DSL
-		with JUnit</description>
+	<description>Example for testing your SAPL policies using the SAPLTest DSL with JUnit</description>
 
 	<dependencies>
 		<dependency>
@@ -38,11 +37,25 @@
 						<phase>test</phase>
 					</execution>
 				</executions>
+				<dependencies>
+					<!-- surefire plugin to provide a Tree view for nested JUnit Dynamic Tests, see https://github.com/fabriciorby/maven-surefire-junit5-tree-reporter -->
+					<dependency>
+						<groupId>me.fabriciorby</groupId>
+						<artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+						<version>1.2.1</version>
+					</dependency>
+				</dependencies>
 				<configuration>
+					<!-- set file Encoding to UTF-8 in case of special chars in test definition -->
 					<argLine>-Dfile.encoding=UTF-8</argLine>
-					<dependenciesToScan>
-						<dependency>io.sapl:sapl-test-junit</dependency>
-					</dependenciesToScan>
+					<!-- the block below configures the maven-surefire-junit5-tree-reporter to provide a Tree view for nested JUnit Dynamic Tests -->
+					<reportFormat>plain</reportFormat>
+					<consoleOutputReporter>
+						<disable>false</disable>
+					</consoleOutputReporter>
+					<statelessTestsetInfoReporter
+							implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+					</statelessTestsetInfoReporter>
 				</configuration>
 			</plugin>
 		</plugins>
