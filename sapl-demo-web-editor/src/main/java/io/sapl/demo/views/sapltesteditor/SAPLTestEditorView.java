@@ -21,12 +21,18 @@ public class SAPLTestEditorView extends VerticalLayout {
     private static final long serialVersionUID = -2637310974422530266L;
 
     private static final String DEFAULT_TEST = """
-            test "policyWithSimpleFunction" {
-              scenario "test_policyWithSimpleFunction"
-              register
-                - library TemporalFunctionLibrary
-              when subject "willi" attempts action "read" on resource "something"
-              then expect permit;
+            requirement "Policy Simple should grant read access for willi on something" {
+                scenario "willi tries to read something" //define a scenario with a specific name. This scenario represents a single isolated test case within the requirment. A requirment can contain 1:n scenario definitions. The scenario name needs to be unique within a requirement.
+                given //marks the start of the "given" section which is used to define the policy under test (and a lot more which is shown in the other examples)
+                    - policy "policySimple" //define the name of the policy to test, has to be located in src/main/resources (or in a folder structure below this folder)
+                when subject "willi" attempts action "read" on resource "something" //defines the AuthorizationSubscription that should be used for the test
+                expect permit; // defines the expected AuthorizationDecision to compare against the actual outcome. scenario is finished with an ";"
+
+                scenario "not_willi tries to read something" //second scenario for negative test
+                given
+                    - policy "policySimple"
+                when "not_willi" attempts "read" on "something" //short form to define the AuthorizationSubscription omitting the keywords "subject", "action" and "resource"
+                expect deny; // expect deny here since the policy only permits read access for "willi" and not for "not_willi"
             }""";
 
     private final Button         addDocumentChangedListenerButton;

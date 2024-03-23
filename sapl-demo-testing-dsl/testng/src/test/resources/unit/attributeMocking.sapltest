@@ -1,0 +1,51 @@
+requirement "Policy with simple PIP should permit read for subject.<test.upper> equal to WILLI" {
+    given
+        - policy "policyWithSimplePIP"
+
+	scenario "willi tries to read something with simple attribute mocking"
+    given
+        // mocks the PIP to return "WILLI" when "test.upper" is called
+    	- attribute "test.upper" emits "WILLI"
+    when "willi" attempts "read" on "something"
+    expect permit;
+
+    scenario "willi tries to read something with specific parent value attribute mocking"
+    given
+        // specify the parent value in "<>" that is expected
+    	- attribute "test.upper" of <"willi"> emits "WILLI"
+    when "willi" attempts "read" on "something"
+    expect permit;
+
+    scenario "willi tries to read something with PIP returning error"
+    given
+        // specify the parent value in "<>" that is expected and return an error
+    	- attribute "test.upper" of <"willi"> emits error("something is wrong")
+    when "willi" attempts "read" on "something"
+    expect indeterminate;
+    }
+
+requirement "Policy with complex PIP should only permit read when pip.attributeWithParams emits true" {
+    given
+        - policy "policyWithComplexPIP"
+
+    scenario "willi tries to read something with specific parent value and exact parameter matchers attribute mocking"
+    given
+        //attribute 1 and attribute 2 are used by pip.attributeWithParams
+        - attribute "pip.attribute1" emits 1
+        - attribute "pip.attribute2" emits 2
+        // parent value is always true for this case, parameters are the return of attribute 1 and attribute 2
+    	- attribute "pip.attributeWithParams" of <true>(1, 2) emits true
+    when "willi" attempts "read" on "something"
+    expect permit;
+
+    scenario "willi tries to read something with specific parent value and mixed parameter matchers attribute mocking"
+    given
+        //attribute 1 and attribute 2 are used by pip.attributeWithParams
+        - attribute "pip.attribute1" emits 1
+        - attribute "pip.attribute2" emits 2
+        // parent value is always true for this case, parameters are the return of attribute 1 and attribute 2
+        // allows the same matching logic as functions do, and exact JSON value, any or a JsonNodeMatcher, see https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-test#jsonnodematcher for all possible matcher definitions
+    	- attribute "pip.attributeWithParams" of <true>(matching number 1, any) emits true
+    when "willi" attempts "read" on "something"
+    expect permit;
+}

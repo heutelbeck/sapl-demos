@@ -1,0 +1,78 @@
+requirement "ROLE_DOCTOR can access when secondOf time.Now is larger than 4" {
+    given
+    	- policy "policyStreaming"
+        - static-function-library "temporal"
+
+	scenario "subject ROLE_DOCTOR can access 2 times without attribute timing"
+    given
+        - attribute "time.now" emits "2021-02-08T16:16:01.000Z", "2021-02-08T16:16:02.000Z", "2021-02-08T16:16:03.000Z", "2021-02-08T16:16:04.000Z", "2021-02-08T16:16:05.000Z", "2021-02-08T16:16:06.000Z"
+    when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
+    // expect block is a list of expected AuthorizationDecision in order
+    expect
+    - notApplicable 4 times
+    - permit 2 times;
+
+    scenario "subject ROLE_DOCTOR can access 2 times with attribute timing"
+    given
+        - virtual-time // use virtual-time feature of project reactor to be able to provide timing for attribute
+        - attribute "time.now" emits "2021-02-08T16:16:01.000Z", "2021-02-08T16:16:02.000Z", "2021-02-08T16:16:03.000Z", "2021-02-08T16:16:04.000Z", "2021-02-08T16:16:05.000Z", "2021-02-08T16:16:06.000Z" with timing "PT1S" //specify Duration in Java Duration format
+    when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
+    //then block where you can adjust attribute behaviour or specify wait time in between expects
+    //then/expect blocks can define multiple steps and must alternate
+    //also it is required that the last block is an expect block
+    then
+    	- wait "PT1S"
+    expect
+    	- notApplicable once
+    then
+    	- wait "PT1S"
+    expect
+    	- notApplicable once
+    then
+    	- wait "PT1S"
+    expect
+    	- notApplicable once
+    then
+    	- wait "PT1S"
+    expect
+    	- notApplicable once
+    then
+    	- wait "PT1S"
+    expect
+    	- permit once
+    then
+    	- wait "PT1S"
+    expect
+    	- permit once;
+
+    scenario "subject ROLE_DOCTOR can access once without attribute timing and with time.secondOf mocking"
+    given
+        - attribute "time.now" emits "2021-02-08T16:16:01.000Z", "2021-02-08T16:16:02.000Z"
+        //create 2 mock entries here, first invocation will return 4, second one 5 and will verify that there a 2 calls in total for time.secondOf
+        - function "time.secondOf" maps to stream 4
+        - function "time.secondOf" maps to stream 5
+    when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
+    expect
+    	- notApplicable once
+        - permit once;
+
+    scenario "subject ROLE_DOCTOR can access once without attribute timing and with time.secondOf mocking with multiple values"
+    given
+        - attribute "time.now" emits "foo", "bar", "baz"
+        //mock time.secondOf to return values in sequence
+        - function "time.secondOf" maps to stream 3, 4, 5
+    when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
+    expect
+    	- notApplicable once
+        - notApplicable once
+        - permit once;
+
+    scenario "subject ROLE_DOCTOR can access 3 times without attribute timing and with time.secondOf mocking mocking with times called verification"
+    given
+        - attribute "time.now" emits "foo", "bar", "baz"
+        //mock time.secondOf to return 5 and verify it is called 3 times
+        - function "time.secondOf" maps to 5 is called 3 times
+    when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
+    expect
+        - permit 3 times;
+}
