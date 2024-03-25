@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import io.sapl.test.coverage.api.CoverageAPIFactory;
 
 public class Main {
-    static Logger logger = LoggerFactory.getLogger(Main.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException {
         //init the test adapter and a Map to hold failed tests
@@ -28,10 +28,10 @@ public class Main {
 
         //evaluate the results
         if (!failedTests.isEmpty()) {
-            logger.info("There are failed tests:");
-            failedTests.forEach((key, value) -> logger.info("Test '%s' failed with error: '%s'".formatted(key, value)));
+            LOGGER.info("There are failed tests:");
+            failedTests.forEach((key, value) -> LOGGER.info("Test '%s' failed with error: '%s'".formatted(key, value)));
         } else {
-            logger.info("All tests passed");
+            LOGGER.info("All tests passed");
         }
         printCoverage();
     }
@@ -55,11 +55,11 @@ public class Main {
      */
     private static void printCoverage() throws IOException {
         final var coverageHitReader = CoverageAPIFactory.constructCoverageHitReader(Paths.get("target").resolve("sapl-coverage"));
-        logger.info("policy hits");
-        coverageHitReader.readPolicyHits().forEach(policyHit -> logger.info(policyHit.toString()));
-        logger.info("policy set hits");
-        coverageHitReader.readPolicySetHits().forEach(policySetHit -> logger.info(policySetHit.toString()));
-        logger.info("policy condition hits");
-        coverageHitReader.readPolicyConditionHits().forEach(policyConditionHit -> logger.info(policyConditionHit.toString()));
+        LOGGER.info("policy hits");
+        coverageHitReader.readPolicyHits().forEach(policyHit -> LOGGER.info(policyHit.toString()));
+        LOGGER.info("policy set hits");
+        coverageHitReader.readPolicySetHits().forEach(policySetHit -> LOGGER.info(policySetHit.toString()));
+        LOGGER.info("policy condition hits");
+        coverageHitReader.readPolicyConditionHits().forEach(policyConditionHit -> LOGGER.info(policyConditionHit.toString()));
     }
 }

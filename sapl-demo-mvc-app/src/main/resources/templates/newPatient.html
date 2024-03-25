@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.springframework.org/security/tags">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.springframework.org/security/tags"
+      lang="en">
     <head>
         <title>Spring Security Example </title>
    	    <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css"> 
@@ -8,14 +10,14 @@
     <body>
         <h3>Create a new patient</h3>
         <form id="newPatientForm" th:action="@{/patients}" th:object="${patient}" method="post">
-            <div><label> Medical record number: </label><input type="text" th:field="*{medicalRecordNumber}"/> </div>
-            <div><label> Name : </label><input type="text" th:field="*{name}"/> </div>
-            <div><label> ICD 11 Code : </label><input type="text" th:field="*{icd11Code}"/> </div>
-            <div><label> Diagnosis : </label><input type="text" th:field="*{diagnosisText}"/> </div>
-            <div><label> Attending Doctor : </label><input type="text" th:field="*{attendingDoctor}"/> </div>
-            <div><label> Attending Nurse : </label><input type="text" th:field="*{attendingNurse}"/> </div>
-            <div><label> Phone : </label><input type="text" th:field="*{phoneNumber}"/> </div>
-            <div><label> Room Number : </label><input type="text" th:field="*{roomNumber}"/> </div>
+            <div><label> Medical record number: <input type="text" th:field="*{medicalRecordNumber}"/></label></div>
+            <div><label> Name : <input type="text" th:field="*{name}"/></label></div>
+            <div><label> ICD 11 Code : <input type="text" th:field="*{icd11Code}"/></label></div>
+            <div><label> Diagnosis : <input type="text" th:field="*{diagnosisText}"/></label></div>
+            <div><label> Attending Doctor : <input type="text" th:field="*{attendingDoctor}"/></label></div>
+            <div><label> Attending Nurse : <input type="text" th:field="*{attendingNurse}"/></label></div>
+            <div><label> Phone : <input type="text" th:field="*{phoneNumber}"/></label></div>
+            <div><label> Room Number : <input type="text" th:field="*{roomNumber}"/></label></div>
             <div><input type="submit" value="Create"/></div>
         </form>        
 

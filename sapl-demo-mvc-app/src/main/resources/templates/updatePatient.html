@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:th="http://www.thymeleaf.org"
-	xmlns:sec="http://www.springframework.org/security/tags">
+	xmlns:sec="http://www.springframework.org/security/tags"
+	lang="en">
 <head>
 <title>Spring Security Example</title>
 <link rel="stylesheet" type="text/css" href="/css/saplDemoMain.css">
@@ -16,16 +17,16 @@
 		</div>
 
 		<div>
-			<label> Name : </label><input type="text" th:name="name" th:id="name"
-				th:field="${patient.name}" />
+			<label> Name : <input type="text" th:name="name" th:id="name"
+				th:field="${patient.name}" /></label>
 		</div>
 
 		<div th:if="${permittedToUpdateIcdClassification}">
-			<label> ICD-11 : </label><input type="text" th:name="icd11Code"
-				th:id="icd11Code" th:field="${patient.icd11Code}" />
+			<label> ICD-11 : <input type="text" th:name="icd11Code"
+				th:id="icd11Code" th:field="${patient.icd11Code}" /></label>
 		</div>
 		<div th:unless="${permittedToUpdateIcdClassification}">
-			<label> ICD-11 : </label><span th:text="${patient.icd11Code}"></span>
+			ICD-11 : <span th:text="${patient.icd11Code}"></span>
 		</div>
 
 		<div th:if="${permittedToUpdateDiagnosis}">

@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+      lang="en">
     <head>
         <title>Spring Security Example</title>
         <style>
@@ -12,7 +15,8 @@
     </head>
     <body>
         <h1>Error page</h1>
-        <table>
+        <table aria-hidden="true">
+            <caption>Error Summary</caption>
             <tr>
                 <td>Date</td>
                 <td th:text="${timestamp}"/>
