@@ -30,10 +30,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;

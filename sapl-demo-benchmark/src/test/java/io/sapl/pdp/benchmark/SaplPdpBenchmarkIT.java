@@ -52,17 +52,17 @@ class SaplPdpBenchmarkIT {
         // build a list of expected report files
         List<String> reportFiles = new ArrayList<>(List.of("Report.html", "average_response.json", "custom.css",
                 "favicon.png", "integrationtest_benchmark_config.yaml", "throughput_1threads.json"));
-        for (var decisionMethod: List.of("Decide Subscribe", "Decide Once")) {
+        for (var decisionMethod : List.of("Decide Subscribe", "Decide Once")) {
             reportFiles.add("img/" + decisionMethod + " - Average Response Time.png");
-            for (var authMethod: List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
+            for (var authMethod : List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
                 reportFiles.add("img/" + decisionMethod + " - " + authMethod + " - throughput.png");
-                for (var benchmarkType: List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
+                for (var benchmarkType : List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
                     // embedded supports only noAuth
-                    if ( ! "EmbeddedBenchmark".equals(benchmarkType) || "noAuth".equals(authMethod) ) {
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod +
-                                decisionMethod.replace(" ", "") + " response time.png");
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod +
-                                decisionMethod.replace(" ", "") + " throughput.png");
+                    if (!"EmbeddedBenchmark".equals(benchmarkType) || "noAuth".equals(authMethod)) {
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
+                                + " response time.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
+                                + " throughput.png");
                     }
                 }
             }

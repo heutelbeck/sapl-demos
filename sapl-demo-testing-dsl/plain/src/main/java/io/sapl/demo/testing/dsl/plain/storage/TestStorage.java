@@ -3,7 +3,8 @@ package io.sapl.demo.testing.dsl.plain.storage;
 import java.util.Map;
 
 /**
- *  minimal working example to represent some kind of storage for SAPLTest definitions with a static accessor
+ * minimal working example to represent some kind of storage for SAPLTest
+ * definitions with a static accessor
  */
 public class TestStorage {
     private TestStorage() {
@@ -115,20 +116,20 @@ public class TestStorage {
                     - set "demoSet" // refer to the identifier in your test setup to define how this is resolved to a list of Policies and a PDP Configuration
                 when "WILLI" attempts "read" on "foo" //defines the AuthorizationSubscription that should be used for the test
                 expect permit;
-                        
+
                 scenario "WILLI tries to read foo using concrete policies definition with default pdp configuration"
                 given
                     // if the pdp Configuration path is ommited, the default Strategy DENY_OVERRIDES is used
                     - policies "policy_A", "policy_B", "policy_C"
                 when "WILLI" attempts "read" on "foo"
                 expect deny;
-                        
+
                 scenario "WILLI tries to read foo using concrete policies definition with concrete pdp configuration"
                 given
                     - policies "policy_A", "policy_B", "policy_C" with pdp configuration "demoPDPConfig" //search policiesIT folder for a pdp.json file to load configuration from in this case same behavior as first scenario
                 when "WILLI" attempts "read" on "foo"
                 expect permit;
-                        
+
                 scenario "WILLI tries to read foo using single identifier and variable override"
                 given
                     - set "demoSet"
@@ -136,7 +137,7 @@ public class TestStorage {
                     - pdp variables {}
                 when "WILLI" attempts "read" on "foo"
                 expect permit;
-                        
+
                 scenario "WILLI tries to read foo using single identifier and variable + combining algorithm override"
                 //given has to follow order:
                     // - policy definiton

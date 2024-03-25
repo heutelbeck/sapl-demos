@@ -50,12 +50,10 @@ public class RsocketBenchmark {
     private PolicyDecisionPoint       oauth2Pdp;
     private BenchmarkExecutionContext context;
 
-    private RemoteRsocketPolicyDecisionPoint.RemoteRsocketPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
-        return RemotePolicyDecisionPoint.builder()
-            .rsocket()
-            .host(context.getRsocketHost())
-            .port(context.getRsocketPort())
-            .withUnsecureSSL();
+    private RemoteRsocketPolicyDecisionPoint.RemoteRsocketPolicyDecisionPointBuilder getBaseBuilder()
+            throws SSLException {
+        return RemotePolicyDecisionPoint.builder().rsocket().host(context.getRsocketHost())
+                .port(context.getRsocketPort()).withUnsecureSSL();
     }
 
     @Setup(Level.Trial)
@@ -67,21 +65,16 @@ public class RsocketBenchmark {
         }
 
         if (context.isUseBasicAuth()) {
-            basicAuthPdp = getBaseBuilder()
-                    .basicAuth(context.getBasicClientKey(), context.getBasicClientSecret())
+            basicAuthPdp = getBaseBuilder().basicAuth(context.getBasicClientKey(), context.getBasicClientSecret())
                     .build();
         }
 
         if (context.isUseAuthApiKey()) {
-            apiKeyPdp = getBaseBuilder()
-                    .apiKey(context.getApiKeyHeader(), context.getApiKey())
-                    .build();
+            apiKeyPdp = getBaseBuilder().apiKey(context.getApiKeyHeader(), context.getApiKey()).build();
         }
 
         if (context.isUseOauth2()) {
-            oauth2Pdp = getBaseBuilder()
-                    .oauth2(getClientRegistrationRepository(context), "saplPdp")
-                    .build();
+            oauth2Pdp = getBaseBuilder().oauth2(getClientRegistrationRepository(context), "saplPdp").build();
         }
     }
 

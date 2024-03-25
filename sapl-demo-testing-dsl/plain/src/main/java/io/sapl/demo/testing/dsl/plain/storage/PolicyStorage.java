@@ -3,7 +3,8 @@ package io.sapl.demo.testing.dsl.plain.storage;
 import java.util.Map;
 
 /**
- * minimal working example to represent some kind of storage for policy definitions with a static accessor
+ * minimal working example to represent some kind of storage for policy
+ * definitions with a static accessor
  */
 public class PolicyStorage {
     private PolicyStorage() {
@@ -12,7 +13,7 @@ public class PolicyStorage {
     private static final String POLICY_SIMPLE = """
             set "testSet"
             deny-unless-permit
-                        
+
             policy "policySimple"
             permit
                 action == "read"
@@ -54,6 +55,7 @@ public class PolicyStorage {
             """;
 
     public static Map<String, String> getPolicyStore() {
-        return Map.of("policySimple", POLICY_SIMPLE, "policyStreaming", POLICY_STREAMING, "policy_A", POLICY_A, "policy_B", POLICY_B, "policy_C", POLICY_C);
+        return Map.of("policySimple", POLICY_SIMPLE, "policyStreaming", POLICY_STREAMING, "policy_A", POLICY_A,
+                "policy_B", POLICY_B, "policy_C", POLICY_C);
     }
 }

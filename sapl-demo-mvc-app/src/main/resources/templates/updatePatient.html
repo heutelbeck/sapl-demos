@@ -30,42 +30,42 @@
 		</div>
 
 		<div th:if="${permittedToUpdateDiagnosis}">
-			<label> Diagnosis : </label><input type="text"
+			<label> Diagnosis : <input type="text"
 				th:name="diagnosisText" th:id="diagnosisText"
-				th:field="${patient.diagnosisText}" />
+				th:field="${patient.diagnosisText}" /></label>
 		</div>
 		<div th:unless="${permittedToUpdateDiagnosis}">
-			<label> Diagnosis : </label><span
+			<b>Diagnosis :</b> <span
 				th:text="${patient.diagnosisText}"></span>
 		</div>
 
 		<div th:if="${permittedToUpdateAttendingDoctor}">
-			<label> Attending Doctor : </label><input type="text"
+			<label> Attending Doctor : <input type="text"
 				th:name="attendingDoctor" th:id="attendingDoctor"
-				th:field="${patient.attendingDoctor}" />
+				th:field="${patient.attendingDoctor}" /></label>
 		</div>
 		<div th:unless="${permittedToUpdateAttendingDoctor}">
-			<label> Attending Doctor : </label><span
+			<b>Attending Doctor :</b> <span
 				th:text="${patient.attendingDoctor}"></span>
 		</div>
 
 		<div th:if="${permittedToUpdateAttendingNurse}">
-			<label> Attending Nurse : </label><input type="text"
+			<label> Attending Nurse : <input type="text"
 				th:name="attendingNurse" th:id="attendingNurse"
-				th:field="${patient.attendingNurse}" />
+				th:field="${patient.attendingNurse}" /></label>
 		</div>
 		<div th:unless="${permittedToUpdateAttendingNurse}">
-			<label> Attending Nurse : </label><span
+			<b> Attending Nurse : </b><span
 				th:text="${patient.attendingNurse}"></span>
 		</div>
 
 		<div>
-			<label> Phone : </label><input type="text" th:name="phoneNumber"
-				th:id="phoneNumber" th:field="${patient.phoneNumber}" />
+			<label> Phone : <input type="text" th:name="phoneNumber"
+				th:id="phoneNumber" th:field="${patient.phoneNumber}" /></label>
 		</div>
 
 		<div>
-			<label> Room : </label><input type="text" th:name="roomNumber"
+			<b> Room : </b><input type="text" th:name="roomNumber"
 				th:id="roomNumber" th:field="${patient.roomNumber}" />
 		</div>
 

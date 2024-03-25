@@ -15,11 +15,12 @@
  */
 package io.sapl.demo.testing.dsl.testng;
 
+import java.util.Map;
+
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pip.Attribute;
 import io.sapl.api.pip.PolicyInformationPoint;
 import io.sapl.api.validation.Text;
-import java.util.Map;
 import reactor.core.publisher.Flux;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
@@ -42,7 +43,7 @@ public class TestPIP {
     @Attribute
     public Flux<Val> hasAuthzSubVar(@Text Val leftHandValue, Map<String, Val> variables) {
         final var env = variables.get("environment");
-        if(env.isUndefined()) {
+        if (env.isUndefined()) {
             return Flux.just(Val.of("no environment"));
         }
         return Flux.just(Val.of(env.getObjectNode().get(leftHandValue.getText()).asText("something else")));

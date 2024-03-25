@@ -71,8 +71,8 @@ public class MainLayout extends AppLayout {
         select.setPlaceholder("Examples");
         select.setItems(this.examples.keySet());
         select.setId("dropdownButton");
-        select.addValueChangeListener(event -> this.exampleSelectedViewBus.getContentView()
-                .setExample(this.examples.get(event.getValue())));
+        select.addValueChangeListener(
+                event -> this.exampleSelectedViewBus.getContentView().setExample(this.examples.get(event.getValue())));
         return select;
     }
 
