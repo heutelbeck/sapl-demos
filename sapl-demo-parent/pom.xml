@@ -254,6 +254,14 @@
 						</plugins>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.12.1</version>
+					<configuration>
+						<parameters>true</parameters>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -279,8 +287,9 @@
 							<artifactId>maven-compiler-plugin</artifactId>
 							<version>3.12.1</version>
 							<configuration>
+								<parameters>true</parameters>
 								<compilerArgs>
-									<arg>-proc:full -parameters</arg>
+									<arg>-proc:full</arg>
 								</compilerArgs>
 							</configuration>
 						</plugin>
