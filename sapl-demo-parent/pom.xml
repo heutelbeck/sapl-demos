@@ -280,7 +280,7 @@
 							<version>3.12.1</version>
 							<configuration>
 								<compilerArgs>
-									<arg>-proc:full</arg>
+									<arg>-proc:full -parameters</arg>
 								</compilerArgs>
 							</configuration>
 						</plugin>
