@@ -45,12 +45,6 @@
                         <artifactId>surefire-testng</artifactId>
                         <version>3.2.2</version>
                     </dependency>
-                    <!-- surefire plugin to provide a Tree view for nested JUnit Dynamic Tests, see https://github.com/fabriciorby/maven-surefire-junit5-tree-reporter -->
-                    <dependency>
-                        <groupId>me.fabriciorby</groupId>
-                        <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
-                        <version>1.2.1</version>
-                    </dependency>
                     </dependencies>
                 <configuration>
                     <argLine>-Dfile.encoding=UTF-8</argLine>
@@ -58,9 +52,6 @@
                     <consoleOutputReporter>
                         <disable>false</disable>
                     </consoleOutputReporter>
-                    <statelessTestsetInfoReporter
-                            implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
-                    </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>
         </plugins>
