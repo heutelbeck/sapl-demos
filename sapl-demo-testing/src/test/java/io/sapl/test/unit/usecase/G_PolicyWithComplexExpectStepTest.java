@@ -44,37 +44,26 @@ class G_PolicyWithComplexExpectStepTest {
     private ObjectMapper mapper;
 
     static class SubjectDTO {
-
-        public String name = "Willi";
-
+        public String name      = "Willi";
         public String authority = "ROLE_ADMIN";
-
     }
 
     private final Object subject = new SubjectDTO();
 
     static class ActionDTO {
-
         static class JavaDTO {
-
             public String name = "findById";
-
         }
 
         public JavaDTO java = new JavaDTO();
-
     }
 
     private final Object action = new ActionDTO();
 
     static class ResourceDTO {
-
-        public String id = "56";
-
+        public String id            = "56";
         public String diagnosisText = "diagnosisText";
-
-        public String icd11Code = "icd11Code";
-
+        public String icd11Code     = "icd11Code";
     }
 
     private final Object resource = new ResourceDTO();
@@ -94,15 +83,15 @@ class G_PolicyWithComplexExpectStepTest {
         ArrayNode obligations = mapper.createArrayNode();
         obligations.add(obligation);
 
-        ObjectNode resource = mapper.createObjectNode();
-        resource.put("id", "56");
-        resource.put("diagnosisText", "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
-        resource.put("icd11Code", "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
+        ObjectNode aResource = mapper.createObjectNode();
+        aResource.put("id", "56");
+        aResource.put("diagnosisText", "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
+        aResource.put("icd11Code", "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
 
         AuthorizationDecision decision = new AuthorizationDecision(Decision.PERMIT).withObligations(obligations)
-                .withResource(resource);
+                .withResource(aResource);
 
-        fixture.constructTestCase().when(AuthorizationSubscription.of(subject, action, resource)).expect(decision)
+        fixture.constructTestCase().when(AuthorizationSubscription.of(subject, action, aResource)).expect(decision)
                 .verify();
 
     }
@@ -132,12 +121,12 @@ class G_PolicyWithComplexExpectStepTest {
 
                     // check resource
                     boolean containsExpectedResource = false;
-                    JsonNode resource         = dec.getResource().get();
-                    if (resource.has("id") && "56".equals(resource.get("id").asText()) && resource.has("diagnosisText")
+                    JsonNode aResource         = dec.getResource().get();
+                    if (aResource.has("id") && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
                             && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
-                                    .equals(resource.get("diagnosisText").asText())
-                            && resource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
-                                    .equals(resource.get("icd11Code").asText())) {
+                                    .equals(aResource.get("diagnosisText").asText())
+                            && aResource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                    .equals(aResource.get("icd11Code").asText())) {
                         containsExpectedResource = true;
                     }
 
@@ -177,12 +166,12 @@ class G_PolicyWithComplexExpectStepTest {
                         //// isResourceEquals(new
                         // ObjectMapper().createObjectNode().put("foo", "bar")),
                         // or Predicate
-                        hasResourceMatching((JsonNode resource) -> resource.has("id")
-                                && "56".equals(resource.get("id").asText()) && resource.has("diagnosisText")
+                        hasResourceMatching((JsonNode aResource) -> aResource.has("id")
+                                && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
                                 && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
-                                        .equals(resource.get("diagnosisText").asText())
-                                && resource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
-                                        .equals(resource.get("icd11Code").asText()))))
+                                        .equals(aResource.get("diagnosisText").asText())
+                                && aResource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                        .equals(aResource.get("icd11Code").asText()))))
                 .verify();
 
     }
