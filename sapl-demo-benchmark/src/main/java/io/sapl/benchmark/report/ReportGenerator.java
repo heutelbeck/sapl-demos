@@ -116,22 +116,18 @@ public class ReportGenerator {
 
 
 
-    private List<BenchmarkResult> getBenchmarkResultsFromFile(String fileName) {
-        try {
-            JsonArray jsonContent = JsonParser
-                    .parseReader(new FileReader(benchmarkFolder + "/" + fileName, StandardCharsets.UTF_8))
-                    .getAsJsonArray();
-            List<BenchmarkResult> benchmarkResults = new ArrayList<>();
-            for (JsonElement jsonElement : jsonContent) {
-                benchmarkResults.add(new BenchmarkResult(jsonElement));
-            }
-            return benchmarkResults;
-        } catch (IOException e){
-            throw new BenchmarkReportException("Failed to load results from " + fileName, e);
+    private List<BenchmarkResult> getBenchmarkResultsFromFile(String fileName) throws IOException {
+        JsonArray jsonContent = JsonParser
+                .parseReader(new FileReader(benchmarkFolder + "/" + fileName, StandardCharsets.UTF_8))
+                .getAsJsonArray();
+        List<BenchmarkResult> benchmarkResults = new ArrayList<>();
+        for (JsonElement jsonElement : jsonContent) {
+            benchmarkResults.add(new BenchmarkResult(jsonElement));
         }
+        return benchmarkResults;
     }
 
-    private Map<String, Object> getSummaryTableContext() {
+    private Map<String, Object> getSummaryTableContext() throws IOException {
         List<String>                                          headerFacts = new ArrayList<>(0);
         Map<String, Map<String, Map<String, List<Object>>>> tableData     = Maps.newHashMap();
 

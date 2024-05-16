@@ -147,7 +147,8 @@ public class SaplBenchmark {
                 StandardCharsets.UTF_8)) {
             var tmpOutput = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
             var matchedBenchmarkList =  BenchmarkList.defaultList()
-                    .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of());
+                    .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of())
+                    .stream().toList();
             var estimatedDurationInSeconds = (
                         // warmup
                         config.getWarmupIterations() * config.getWarmupSeconds()
