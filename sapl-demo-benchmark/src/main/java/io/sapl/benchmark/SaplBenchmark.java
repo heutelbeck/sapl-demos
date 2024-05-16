@@ -176,32 +176,35 @@ public class SaplBenchmark {
         log.info("Benchmark started at " + timeFormatter.format(new Date()));
         logEstimatedDuration();
 
+        // setup builder with base parameters
+        var benchmarkBuilder = new OptionsBuilder()
+                .include(config.getBenchmarkPattern())
+                .param("contextJsonString", context.toJsonString())
+                .jvmArgs(config.getJvmArgs().toArray(new String[0]))
+                .shouldFailOnError(config.isFailOnError())
+                .mode(Mode.Throughput)
+                .timeUnit(TimeUnit.SECONDS)
+                .resultFormat(ResultFormatType.JSON)
+                .shouldDoGC(true)
+                .syncIterations(true)
+                .forks(config.forks)
+                .warmupIterations(config.getWarmupIterations())
+                .warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
+                .measurementIterations(config.getMeasurementIterations())
+                .measurementTime(TimeValue.seconds(config.getWarmupSeconds()));
+
         // iterate over thread list and start benchmark for each thread parameter
         for (int threads : config.getThreadList()) {
             var resultFile = benchmarkFolder + "/results_" + threads + "threads.json";
             var outputFile = benchmarkFolder + "/results_" + threads + "threads.log";
             log.info("Starting Benchmark with " + threads +" threads matching pattern: " + config.getBenchmarkPattern());
             log.info("Writing results to " + resultFile + " and logs to " + outputFile);
-
-            var benchmarkOptions = new OptionsBuilder()
-                    .include(config.getBenchmarkPattern())
-                    .param("contextJsonString", context.toJsonString())
-                    .jvmArgs(config.getJvmArgs().toArray(new String[0]))
-                    .shouldFailOnError(config.isFailOnError())
-                    .mode(Mode.Throughput)
-                    .timeUnit(TimeUnit.SECONDS)
-                    .resultFormat(ResultFormatType.JSON)
-                    .result(resultFile)
-                    .output(outputFile)
-                    .shouldDoGC(true)
-                    .syncIterations(true)
-                    .threads(threads).forks(config.forks)
-                    .warmupIterations(config.getWarmupIterations())
-                    .warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
-                    .measurementIterations(config.getMeasurementIterations())
-                    .measurementTime(TimeValue.seconds(config.getWarmupSeconds()))
-                    .build();
-            new Runner(benchmarkOptions).run();
+            new Runner(benchmarkBuilder
+                            .threads(threads)
+                            .result(resultFile)
+                            .output(outputFile)
+                            .build()
+            ).run();
         }
         log.info("Benchmark ended at " + timeFormatter.format(new Date()));
     }

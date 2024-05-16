@@ -127,7 +127,7 @@ public class ReportGenerator {
             }
             return benchmarkResults;
         } catch (IOException e){
-            throw new BenchmarkReportException("Failed to load results from " + fileName + ": " + e);
+            throw new BenchmarkReportException("Failed to load results from " + fileName, e);
         }
     }
 
