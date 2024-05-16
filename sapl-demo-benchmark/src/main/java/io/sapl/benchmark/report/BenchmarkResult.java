@@ -29,7 +29,7 @@ public class BenchmarkResult {
     @Getter
     private final Integer measureTimeInSeconds;
 
-    private final String PRIMARY_METRIC_FIELD = "primaryMetric";
+    private static final String PRIMARY_METRIC_FIELD = "primaryMetric";
     private final String[] benchmarkNameElements;
 
     BenchmarkResult(JsonElement resultJsonElement){
