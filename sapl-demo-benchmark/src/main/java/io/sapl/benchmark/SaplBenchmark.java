@@ -27,7 +27,6 @@ import org.openjdk.jmh.runner.BenchmarkList;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.format.OutputFormatFactory;
-import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
 import org.openjdk.jmh.runner.options.VerboseMode;
@@ -40,6 +39,7 @@ import org.testcontainers.utility.DockerImageName;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -65,7 +65,7 @@ public class SaplBenchmark {
         if (container == null) {
             return;
         }
-        Argon2PasswordEncoder encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        var encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
         var dockerKeystoreLocation = "/pdp/keystore.p12";
 
@@ -143,9 +143,10 @@ public class SaplBenchmark {
      * Estimates the benchmark duration based on the given config and logs this.
      */
     private void logEstimatedDuration(){
-        try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream())) {
+        try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream(), true,
+                StandardCharsets.UTF_8)) {
             var tmpOutput = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
-            var benchmarkList =  BenchmarkList.defaultList()
+            var matchedBenchmarkList =  BenchmarkList.defaultList()
                     .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of());
             var estimatedDurationInSeconds = (
                         // warmup
@@ -155,9 +156,9 @@ public class SaplBenchmark {
                         // benchmark initialization
                         + 5)
                     * config.getThreadList().size()
-                    * benchmarkList.size();
+                    * matchedBenchmarkList.size();
 
-            log.info("Executing " + benchmarkList.size() + " Benchmarks with "+  config.getThreadList() + " threads ...");
+            log.info("Executing " + matchedBenchmarkList.size() + " Benchmarks with "+  config.getThreadList() + " threads ...");
             int seconds = estimatedDurationInSeconds % 60;
             int minutes = estimatedDurationInSeconds / 60 % 60;
             int hours = estimatedDurationInSeconds / 60 / 60;
@@ -171,7 +172,7 @@ public class SaplBenchmark {
      */
     private void executeJmHBenchmarks() throws RunnerException {
         var context = BenchmarkExecutionContext.fromBenchmarkConfiguration(config, pdpContainer, oauth2Container);
-        SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm:ss");
+        var timeFormatter = new SimpleDateFormat("HH:mm:ss");
         log.info("Benchmark started at " + timeFormatter.format(new Date()));
         logEstimatedDuration();
 
@@ -182,7 +183,7 @@ public class SaplBenchmark {
             log.info("Starting Benchmark with " + threads +" threads matching pattern: " + config.getBenchmarkPattern());
             log.info("Writing results to " + resultFile + " and logs to " + outputFile);
 
-            ChainedOptionsBuilder builder = new OptionsBuilder()
+            var benchmarkOptions = new OptionsBuilder()
                     .include(config.getBenchmarkPattern())
                     .param("contextJsonString", context.toJsonString())
                     .jvmArgs(config.getJvmArgs().toArray(new String[0]))
@@ -198,8 +199,8 @@ public class SaplBenchmark {
                     .warmupIterations(config.getWarmupIterations())
                     .warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
                     .measurementIterations(config.getMeasurementIterations())
-                    .measurementTime(TimeValue.seconds(config.getWarmupSeconds()));
-            var benchmarkOptions = builder.build();
+                    .measurementTime(TimeValue.seconds(config.getWarmupSeconds()))
+                    .build();
             new Runner(benchmarkOptions).run();
         }
         log.info("Benchmark ended at " + timeFormatter.format(new Date()));

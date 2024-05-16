@@ -9,11 +9,12 @@ import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 public class BenchmarkResult {
-    private final JsonObject benchmarkResult;
+    private final JsonObject benchmarkResultJson;
 
     @Getter
     private final String benchmarkFullName;
@@ -28,10 +29,15 @@ public class BenchmarkResult {
     @Getter
     private final Integer measureTimeInSeconds;
 
+    private final String PRIMARY_METRIC_FIELD = "primaryMetric";
+    private final String[] benchmarkNameElements;
+
     BenchmarkResult(JsonElement resultJsonElement){
-        this.benchmarkResult = resultJsonElement.getAsJsonObject();
-        this.benchmarkFullName = benchmarkResult.get("benchmark").getAsString();
-        this.threads = benchmarkResult.get("threads").getAsInt();
+        this.benchmarkResultJson = resultJsonElement.getAsJsonObject();
+        var benchmarkName = benchmarkResultJson.get("benchmark").getAsString();
+        this.benchmarkFullName = benchmarkName;
+        this.benchmarkNameElements = benchmarkName.split("\\.");
+        this.threads = benchmarkResultJson.get("threads").getAsInt();
         this.pdp = getPdpFromBenchmarkName(this.benchmarkFullName);
         this.decisionMethod = getDecisionMethodFromBenchmarkName(this.benchmarkFullName);
         this.authMethod = getAuthMethodFromBenchmarkName(this.benchmarkFullName);
@@ -39,15 +45,15 @@ public class BenchmarkResult {
     }
 
     private static String getPdpFromBenchmarkName(String benchmarkName) {
-        String[] benchmarkNames = benchmarkName.split("\\.");
+        var benchmarkNames = benchmarkName.split("\\.");
         return benchmarkNames[benchmarkNames.length - 2]
                 .replaceAll("Benchmark$", "")
                 .toLowerCase();
     }
 
     private static String getDecisionMethodFromBenchmarkName(String benchmarkName) {
-        String[] benchmarkNames = benchmarkName.split("\\.");
-        String   methodName     = benchmarkNames[benchmarkNames.length - 1];
+        var benchmarkNames = benchmarkName.split("\\.");
+        var methodName     = benchmarkNames[benchmarkNames.length - 1];
         if (methodName.endsWith("DecideOnce")) {
             return "Decide Once";
         } else if (methodName.endsWith("DecideSubscribe") || methodName.endsWith("Decide")) {
@@ -58,13 +64,13 @@ public class BenchmarkResult {
     }
 
     private static String getAuthMethodFromBenchmarkName(String benchmarkName) {
-        String[] benchmarkNames = benchmarkName.split("\\.");
-        String   methodName     = benchmarkNames[benchmarkNames.length - 1];
+        var benchmarkNames = benchmarkName.split("\\.");
+        var methodName     = benchmarkNames[benchmarkNames.length - 1];
         return methodName.replaceAll("Decide(Once|Subscribe)?$", "");
     }
 
     private Integer getThroughputInSeconds(){
-        var measureTimeStr = benchmarkResult.get("measurementTime").getAsString();
+        var measureTimeStr = benchmarkResultJson.get("measurementTime").getAsString();
         return Integer.valueOf(measureTimeStr.replaceAll(" s$", ""));
     }
 
@@ -78,17 +84,17 @@ public class BenchmarkResult {
 
 
     public Double getThoughputAvg(){
-        return benchmarkResult.get("primaryMetric")
+        return benchmarkResultJson.get(PRIMARY_METRIC_FIELD)
                 .getAsJsonObject()
                 .get("score")
                 .getAsDouble();
     }
 
-   public ArrayList<ArrayList<Double>> getThroughputRawResults(){
-        ArrayList<ArrayList<Double>> resultArray = new ArrayList<>();
-        var jsonRawData = benchmarkResult.get("primaryMetric").getAsJsonObject().get("rawData").getAsJsonArray();
+   public List<List<Double>> getThroughputRawResults(){
+       List<List<Double>> resultArray = new ArrayList<>();
+        var jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData").getAsJsonArray();
         for (JsonElement forkData: jsonRawData) {
-            ArrayList<Double> forkResultArray = new ArrayList<>();
+            List<Double> forkResultArray = new ArrayList<>();
             for (JsonElement entry : forkData.getAsJsonArray()) {
                 forkResultArray.add(entry.getAsDouble());
             }
@@ -97,11 +103,11 @@ public class BenchmarkResult {
         return resultArray;
     }
 
-    public ArrayList<ArrayList<Double>> getResponseTimeRawResults(){
-        ArrayList<ArrayList<Double>> resultArray = new ArrayList<>();
-        var jsonRawData = benchmarkResult.get("primaryMetric").getAsJsonObject().get("rawData").getAsJsonArray();
+    public List<List<Double>> getResponseTimeRawResults(){
+        List<List<Double>> resultArray = new ArrayList<>();
+        var jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData").getAsJsonArray();
         for (JsonElement forkData: jsonRawData) {
-            ArrayList<Double> forkResultArray = new ArrayList<>();
+            List<Double> forkResultArray = new ArrayList<>();
             for (JsonElement entry : forkData.getAsJsonArray()) {
                 forkResultArray.add(throughputToResponseTimeInMs(entry.getAsDouble()));
             }
@@ -110,16 +116,16 @@ public class BenchmarkResult {
         return resultArray;
     }
 
-    public ArrayList<Double> getThroughputAllRawResults(){
-        ArrayList<Double> resultArray = new ArrayList<>();
+    public List<Double> getThroughputAllRawResults(){
+        List<Double> resultArray = new ArrayList<>();
         for (var forkData: getThroughputRawResults()) {
             resultArray.addAll(forkData);
         }
         return resultArray;
     }
 
-    public ArrayList<Double> getResponseTimeAllRawResults(){
-        ArrayList<Double> resultArray = new ArrayList<>();
+    public List<Double> getResponseTimeAllRawResults(){
+        List<Double> resultArray = new ArrayList<>();
         for (var forkData: getResponseTimeRawResults()) {
             resultArray.addAll(forkData);
         }
@@ -145,9 +151,8 @@ public class BenchmarkResult {
     }
 
     public String getBenchmarkShortName(){
-        var benchmarkNameElements = this.benchmarkFullName.split("\\.");
         return Arrays.stream(benchmarkNameElements)
-                .skip(benchmarkNameElements.length - 2)
+                .skip(benchmarkNameElements.length - (long) 2)
                 .map(String::valueOf)
                 .collect(Collectors.joining("."));
     }

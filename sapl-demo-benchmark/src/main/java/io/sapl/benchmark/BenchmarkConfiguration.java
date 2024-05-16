@@ -53,7 +53,7 @@ public class BenchmarkConfiguration {
     private String              benchmarkTarget = DOCKER;
 
     private static void failOnFurtherMapEntries(Set<String> keySet, String parentEntryPath) {
-        for (String key : keySet) {
+        for (var key : keySet) {
             if (key != null) {
                 throw new BenchmarkException("Unknown configuration entry " + parentEntryPath + "." + key);
             }
@@ -311,8 +311,8 @@ public class BenchmarkConfiguration {
      * Load Benchmark configuration from file to BenchmarkConfiguration object.
      */
     public static BenchmarkConfiguration fromFile(String filePath) throws IOException {
-        File               file   = new File(filePath);
-        final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        var file   = new File(filePath);
+        var mapper = new ObjectMapper(new YAMLFactory());
         mapper.configure(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         return mapper.readValue(file, BenchmarkConfiguration.class);

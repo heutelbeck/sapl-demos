@@ -45,17 +45,16 @@ public class ReportSectionData {
     }
 
     public Map<String, Object> getMap(){
-        return new HashMap<>() {{
-            put("benchmark", getBenchmarkName());
-            put("pdpName", getPdpName());
-            put("threads", getThreads());
-            put("thrpt", getThroughputAvg());
-            put("thrpt_stddev", getThroughputStdDev());
-            put("rspt", getResponseTimeAvg());
-            put("rspt_stddev", getResponseTimeStdDev());
-            put("rspt_min", benchmarkResult.getResponseTimeMin());
-            put("rspt_max", benchmarkResult.getResponseTimeMax());
-            put("chart", chartFilePath);
-        }};
+        return java.util.Map.of(
+                "benchmark", getBenchmarkName(),
+                "pdpName", getPdpName(),
+                "threads", getThreads(),
+                "thrpt", getThroughputAvg(),
+                "thrpt_stddev", getThroughputStdDev(),
+                "rspt", getResponseTimeAvg(),
+                "rspt_stddev", getResponseTimeStdDev(),
+                "rspt_min", benchmarkResult.getResponseTimeMin(),
+                "rspt_max", benchmarkResult.getResponseTimeMax(),
+                "chart", chartFilePath);
     }
 }

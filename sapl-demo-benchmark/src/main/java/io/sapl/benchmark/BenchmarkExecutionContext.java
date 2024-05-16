@@ -70,7 +70,11 @@ public class BenchmarkExecutionContext {
 
     public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg,
             GenericContainer<?> pdpContainer, GenericContainer<?> oauthContainer) {
+
+        //initialize new context
         var context = new BenchmarkExecutionContext();
+
+        // get docker/remote specific settings
         context.authorizationSubscription = cfg.getAuthorizationSubscription();
         if (cfg.requiredDockerEnvironment()) {
             context.rsocketHost = pdpContainer.getHost();
@@ -90,9 +94,13 @@ public class BenchmarkExecutionContext {
             context.useSsl      = cfg.isRemoteUseSsl();
             context.httpBaseUrl = cfg.getRemoteBaseUrl();
         }
+
+        // collecting auth specific settings
         context.basicClientKey    = cfg.getBasicClientKey();
         context.basicClientSecret = cfg.getBasicClientSecret();
         context.apiKey            = cfg.getApiKeySecret();
+
+        // collecting OAuth2 specific settings
         if (cfg.isUseOauth2() && cfg.isOauth2MockServer()) {
             context.oauth2TokenUri = "http://auth-host:" + oauthContainer.getMappedPort(8080) + "/default/token";
         } else {
@@ -102,6 +110,7 @@ public class BenchmarkExecutionContext {
         context.oauth2ClientSecret = cfg.getOauth2ClientSecret();
         context.oauth2Scope        = cfg.getOauth2Scope();
 
+        // specifying which auth methods to use
         context.useNoAuth     = cfg.isUseNoAuth();
         context.useBasicAuth  = cfg.isUseBasicAuth();
         context.useAuthApiKey = cfg.isUseAuthApiKey();
