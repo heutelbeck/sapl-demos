@@ -43,26 +43,27 @@ class SaplPdpBenchmarkIT {
     }
 
     @Test
-    void whenExecutingEmbeddedBenchmark_withNoAuth_thenReportsAreCreated() {
+    void whenExecutingEmbeddedBenchmark_withAllSettings_thenReportsAreCreated() {
         // start benchmark
         var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
                 "src/test/resources/integrationtest_benchmark_config.yaml", "--output", tmpReportPath);
         Assertions.assertEquals(0, returnCode);
 
         // build a list of expected report files
-        List<String> reportFiles = new ArrayList<>(List.of("Report.html", "average_response.json", "custom.css",
-                "favicon.png", "integrationtest_benchmark_config.yaml", "throughput_1threads.json"));
+        List<String> reportFiles = new ArrayList<>(List.of("Report.html", "custom.css", "favicon.png",
+                "integrationtest_benchmark_config.yaml", "results_1threads.json", "results_1threads.log"));
         for (var decisionMethod : List.of("Decide Subscribe", "Decide Once")) {
-            reportFiles.add("img/" + decisionMethod + " - Average Response Time.png");
-            for (var authMethod : List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
-                reportFiles.add("img/" + decisionMethod + " - " + authMethod + " - throughput.png");
-                for (var benchmarkType : List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
+            reportFiles.add("img/Average Response Time - " + decisionMethod + " - 1 thread(s).png");
+            for (var benchmarkType : List.of("EmbeddedBenchmark", "HttpBenchmark", "RsocketBenchmark")) {
+                reportFiles.add("img/Throughput - " + decisionMethod + " - "
+                        + benchmarkType.replace("Benchmark", "").toLowerCase() + ".png");
+                for (var authMethod : List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
                     // embedded supports only noAuth
                     if (!"EmbeddedBenchmark".equals(benchmarkType) || "noAuth".equals(authMethod)) {
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
-                                + " response time.png");
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
-                                + " throughput.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod
+                                + decisionMethod.replace(" ", "") + "_1_threads_rspt.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod
+                                + decisionMethod.replace(" ", "") + "_1_threads_thrpt.png");
                     }
                 }
             }

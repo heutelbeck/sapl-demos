@@ -48,7 +48,7 @@ public class EmbeddedBenchmark {
     @Setup(Level.Trial)
     public void setup() throws InitializationException {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
-        log.info("initializing embedded PDP");
+        log.info("initializing PDP and starting Benchmark ...");
         pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class), List::of,
                 List::of);
     }

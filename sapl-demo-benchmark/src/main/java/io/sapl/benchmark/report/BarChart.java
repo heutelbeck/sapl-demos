@@ -17,66 +17,88 @@
  */
 package io.sapl.benchmark.report;
 
-import static io.sapl.benchmark.report.Utilities.getMaxValue;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.LogarithmicAxis;
+import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.CategoryItemLabelGenerator;
+import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.ItemLabelAnchor;
+import org.jfree.chart.labels.ItemLabelPosition;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.BarRenderer;
-import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.chart.ui.TextAnchor;
+import org.jfree.chart.util.SortOrder;
+import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
+
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.text.DecimalFormat;
 
 public class BarChart {
     private final JFreeChart             chart;
-    private final CategoryPlot           categoryPlot;
-    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    private final DefaultStatisticalCategoryDataset dataset;
 
-    public BarChart(String title, String valueAxisLabel) {
-        chart = ChartFactory.createBarChart(title, null, valueAxisLabel, dataset, PlotOrientation.VERTICAL, true, true,
-                false);
+    public BarChart(String title, DefaultStatisticalCategoryDataset dataset, String valueAxisLabel, String labelFormat) {
+        this.dataset = dataset;
+        // format axis
+        var xAxis = new CategoryAxis();
+        var yAxis = new NumberAxis(valueAxisLabel);
+        xAxis.setLowerMargin(0.015d);
+        xAxis.setUpperMargin(0.015d);
+        yAxis.setUpperMargin(0.15d);
 
-        categoryPlot = chart.getCategoryPlot();
-        BarRenderer br = (BarRenderer) categoryPlot.getRenderer();
-        br.setMaximumBarWidth(.1); // set maximum width to 10% of chart
-    }
+        // define the plot
+        var renderer = new BarRenderer();
+        var categoryPlot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
+        categoryPlot.setOrientation(PlotOrientation.HORIZONTAL);
+        categoryPlot.setRowRenderingOrder(SortOrder.ASCENDING);
+        categoryPlot.setColumnRenderingOrder(SortOrder.ASCENDING);
 
-    public void useLogAxis() {
-        final NumberAxis rangeAxis = new LogarithmicAxis(categoryPlot.getRangeAxis().getLabel());
-        rangeAxis.setUpperBound(getMaxValue(dataset) * 2);
-        categoryPlot.setRangeAxis(rangeAxis);
-    }
 
-    public void showLabels() {
-        showLabels(new StandardCategoryItemLabelGenerator());
-    }
+        chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, categoryPlot, true);
+        new StandardChartTheme("JFree").apply(chart);
 
-    public void showLabels(CategoryItemLabelGenerator categoryItemLabelGenerator) {
+        // outline around the var
+        renderer.setDrawBarOutline(true);
+        renderer.setDefaultOutlinePaint(Color.darkGray);
+
+        // add labels
+        renderer.setDefaultItemLabelsVisible(true);
+        renderer.setDefaultItemLabelGenerator(
+                new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat(labelFormat), new DecimalFormat(labelFormat))
+        );
+        renderer.setDefaultPositiveItemLabelPosition(
+            new ItemLabelPosition(ItemLabelAnchor.OUTSIDE3, TextAnchor.CENTER_LEFT)
+        );
+
+        // set bar colors
+        categoryPlot.setBackgroundPaint(new Color(211, 211, 211));
+        Paint[] colorPalette = new Paint[]{
+            new Color(0, 172, 178, 200),
+            new Color(18, 67, 109, 179),
+            new Color(239, 96, 19, 152),
+            new Color(85, 177, 69, 200),
+        };
         for (int i = 0; i < dataset.getRowCount(); i++) {
-            categoryPlot.getRenderer().setSeriesItemLabelGenerator(i, categoryItemLabelGenerator);
-            categoryPlot.getRenderer().setSeriesItemLabelsVisible(i, true);
+            if ( i < colorPalette.length ) {
+                renderer.setSeriesPaint(i, colorPalette[i]);
+            }
         }
     }
 
-    public void addBenchmarkResult(String pdp, String authMethod, Double score) {
-        dataset.addValue(score, pdp, authMethod);
-    }
-
     public void saveToPNGFile(File file) throws IOException {
-        saveToPNGFile(file, 640, 400);
+        var height = 100 + dataset.getColumnCount() * dataset.getRowCount() * 22;
+        saveToPNGFile(file, 900, height);
     }
 
     public void saveToPNGFile(File file, int width, int height) throws IOException {
-        OutputStream fos = Files.newOutputStream(file.toPath());
+        var fos = Files.newOutputStream(file.toPath());
         ChartUtils.writeScaledChartAsPNG(fos, chart, width, height, 3, 3);
         fos.close();
     }

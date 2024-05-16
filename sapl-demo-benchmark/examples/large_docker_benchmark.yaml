@@ -45,11 +45,10 @@ basic:
 
 apikey:
   enabled: true
-  api_key_header: API_KEY
-  api_key: rWVD3Gvo5x7q32_w9T/HKd122!IX5r8_JY
+  api_key: sapl_JC69csjFH1_yjh1CX63Pw6xBkm0PxZBsj2mbFx1m52A
 
 oauth2:
-  enabled: false
+  enabled: true
   client_id: WXcUf7kvlW89Q
   client_secret: aBqen8Py4NCgzeTc
   scope: sapl
@@ -61,21 +60,14 @@ oauth2:
   issuer_url: https://dev-13759895.okta.com/oauth2/default
 
 
-# ---------------------------
-# Benchmark setup: 1*2*(8*50 + 3*8*50)/60=53 min
-# ---------------------------
-forks: 1
-jvm_args: ["-Xms1G", "-Xmx1G"]
-fail_on_error: true
-
-response_time:
-  warmup_seconds: 10
-  warmup_iterations: 2
-  measure_seconds: 10
-  measure_iterations: 6
-
-throughput:
-  threads: [2,8,16]
+# ------------------------------
+# Benchmark execution parameters
+# ------------------------------
+execution:
+  forks: 1
+  jvm_args: [ "-Xms1G", "-Xmx1G" ]
+  fail_on_error: true
+  threads: [1,4,8,16]
   warmup_seconds: 10
   warmup_iterations: 2
   measure_seconds: 10

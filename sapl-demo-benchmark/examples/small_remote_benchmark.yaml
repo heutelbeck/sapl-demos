@@ -39,35 +39,27 @@ noauth:
   enabled: false
 
 basic:
-  enabled: false
-  client_key: mAH6PZQw2En6PVT1SPlCog
-  client_secret: yoyszNuHsHvBeRTu6AlX2WDEXVstWR22Zo5XZpTAlQk=
+  enabled: true
+  client_key: kNnsNXWCJ7h_GUkvP6lDhg
+  client_secret: jZ44HSBFeNT577+EkU1IoCvPtVI4f5Eny6EWcnpKyC4=
 
 apikey:
   enabled: true
-  api_key_header: API_KEY
-  api_key: qGZH3N7E7dwr2CevWqVNnQ.Re41S+ipxV7XfDj2LO73PZ/hWbwMt+43d7UnC1X9ve4=
+  api_key: sapl_uAmDwgp2l8iFGbEcSIBI5w_b5MHcV3gvqiNo7N+CZjengEYpeI4gh+cd1Ow2PUn9Sw=
 
 oauth2:
   enabled: false
 
 
-# ---------------------------
-# Benchmark setup: 2*(4*50+2*4*50)/60=20 min
-# ---------------------------
-forks: 1
-jvm_args: ["-Xms1G", "-Xmx1G"]
-fail_on_error: true
-
-response_time:
-  warmup_seconds: 10
+# ------------------------------
+# Benchmark execution parameters
+# ------------------------------
+execution:
+  forks: 1
+  jvm_args: [ "-Xms1G", "-Xmx1G" ]
+  fail_on_error: true
+  threads: [1]
+  warmup_seconds: 3
   warmup_iterations: 1
-  measure_seconds: 10
-  measure_iterations: 2
-
-throughput:
-  threads: [4,8]
-  warmup_seconds: 10
-  warmup_iterations: 1
-  measure_seconds: 10
+  measure_seconds: 3
   measure_iterations: 2

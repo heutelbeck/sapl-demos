@@ -17,53 +17,48 @@
  */
 package io.sapl.benchmark.report;
 
-import static io.sapl.benchmark.report.Utilities.getMaxValue;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
+import static io.sapl.benchmark.report.Utilities.getMaxValue;
+
 public class LineChart {
-    private final JFreeChart             chart;
-    private final DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+    private final JFreeChart        chart;
 
-    public LineChart(String title, String valueAxisLabel) {
-        chart = ChartFactory.createLineChart(title, "iteration", valueAxisLabel, dataset, PlotOrientation.VERTICAL,
-                true, true, false);
-    }
+    public LineChart(String title, DefaultCategoryDataset dataset, String valueAxisLabel) {
+        chart = ChartFactory.createLineChart(title, "iteration", valueAxisLabel, dataset,
+                PlotOrientation.VERTICAL,true, true, false);
 
-    public void addValue(Double yValue, String category, String xValue) {
-        dataset.addValue(yValue, category, xValue);
-    }
+        // add marks to the data points in the graph
+        var plot = chart.getCategoryPlot();
+        var renderer = (LineAndShapeRenderer) plot.getRenderer();
+        renderer.setDefaultShapesVisible(true);
+        plot.setRenderer(renderer);
 
-    public void arrangeYAxis() {
-        var          maxValue = getMaxValue(dataset);
-        CategoryPlot plot     = chart.getCategoryPlot();
-        var          yAxis    = (NumberAxis) plot.getRangeAxis();
+        // format axis
+        var maxValue = getMaxValue(dataset);
+        var yAxis    = (NumberAxis) plot.getRangeAxis();
         yAxis.setAutoRange(false);
         yAxis.setUpperBound(maxValue * 1.05);
         yAxis.setLowerBound(0);
-        chart.getCategoryPlot().setRenderer(plot.getRenderer());
 
     }
 
     public void saveToPNGFile(File file) throws IOException {
-        arrangeYAxis();
-        saveToPNGFile(file, 640, 400);
+        saveToPNGFile(file, 900, 600);
     }
 
     public void saveToPNGFile(File file, int width, int height) throws IOException {
-        arrangeYAxis();
-        OutputStream fos = Files.newOutputStream(file.toPath());
+        var fos = Files.newOutputStream(file.toPath());
         ChartUtils.writeScaledChartAsPNG(fos, chart, width, height, 3, 3);
         fos.close();
     }
