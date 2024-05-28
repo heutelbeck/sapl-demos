@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Profile;
@@ -41,6 +43,7 @@ import reactor.core.publisher.Flux;
 @AllArgsConstructor
 public class DataLoader implements ApplicationRunner {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataLoader.class);
 	private final UserRepository userRepository;
 
 	@Override
@@ -59,7 +62,7 @@ public class DataLoader implements ApplicationRunner {
            var usersFromFile = objectMapper.readValue(inputStream, new TypeReference<List<User>>() {});
            users.addAll(usersFromFile);
         } catch (IOException e) {
-            e.printStackTrace();
+        	LOGGER.error("Error: ", e);
         }
         
 		return Flux.fromIterable(users);

@@ -18,11 +18,13 @@
 package io.sapl.springdatar2dbcdemo.integration;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +42,9 @@ import reactor.test.StepVerifier;
 @SpringBootTest
 @ActiveProfiles("test")
 class DemoRestControllerIT extends TestContainerBase {
+	
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoRestControllerIT.class);
+
 
 	@Autowired
 	DemoRestController r2dbcPersonController;
@@ -47,14 +52,14 @@ class DemoRestControllerIT extends TestContainerBase {
 	@Test
 	void when_findAll_then_getDataWithManipulationByPDP() {
 		// GIVEN
-        var inputStream = new ByteArrayInputStream(getPersons().getBytes(StandardCharsets.UTF_8));
+        var inputStream = new ByteArrayInputStream(personsJsonString.getBytes(StandardCharsets.UTF_8));
         var persons = new ArrayList<Person>();
 
         var objectMapper = new ObjectMapper();
         try {
         	persons.addAll(objectMapper.readValue(inputStream, new TypeReference<List<Person>>() {}));
         } catch (IOException e) {
-            e.printStackTrace();
+        	LOGGER.error("Error: ", e);
         }
 
 		// WHEN
@@ -90,8 +95,7 @@ class DemoRestControllerIT extends TestContainerBase {
 		StepVerifier.create(result).expectErrorMatches(error -> error instanceof BadSqlGrammarException).verify();
 	}
 	
-	private String getPersons() {
-		return """
+	private final String personsJsonString = """
 [
   {
     "personId": 0,
@@ -365,5 +369,5 @@ class DemoRestControllerIT extends TestContainerBase {
    }
    ]
 """;
-	}
+	
 }

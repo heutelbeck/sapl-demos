@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -41,20 +43,22 @@ import reactor.test.StepVerifier;
 @ActiveProfiles("test")
 class DemoRestControllerIT extends TestContainerBase {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoRestControllerIT.class);
+
 	@Autowired
 	DemoRestController reactiveMongoUserController;
 
 	@Test
 	void when_findAll_then_getDataWithManipulationByPDP() {
 		// GIVEN
-        var inputStream = new ByteArrayInputStream(getUsers().getBytes(StandardCharsets.UTF_8));
+        var inputStream = new ByteArrayInputStream(usersAsJsonString.getBytes(StandardCharsets.UTF_8));
         var users = new ArrayList<User>();
 
         var objectMapper = new ObjectMapper();
         try {
             users.addAll(objectMapper.readValue(inputStream, new TypeReference<List<User>>() {}));
         } catch (IOException e) {
-            e.printStackTrace();
+        	LOGGER.error("Error: ", e);
         }
 	
 		// WHEN
@@ -91,8 +95,7 @@ class DemoRestControllerIT extends TestContainerBase {
 		StepVerifier.create(result).expectNext(expectedPersons).verifyComplete();
 	}
 
-	private String getUsers() {
-		return """
+	private final String usersAsJsonString = """
 [
   {
     "id": "64de3bd9fbf82799677ed336",
@@ -176,5 +179,5 @@ class DemoRestControllerIT extends TestContainerBase {
   }
 ]
 """;
-	}
+	
 }

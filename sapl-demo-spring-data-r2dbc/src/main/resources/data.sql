@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS Person;
 DROP TABLE IF EXISTS Address;
 
-CREATE TABLE Address (addressId INT PRIMARY KEY, street VARCHAR(255), city VARCHAR(255), zip_code VARCHAR(20));
-CREATE TABLE Person (personId INT PRIMARY KEY, firstname VARCHAR(255), lastname VARCHAR(255), age INTEGER, role VARCHAR(255), active BOOLEAN, addressId INT, FOREIGN KEY (addressId) REFERENCES Address(addressId));
+CREATE TABLE Address (addressId INT PRIMARY KEY, street VARCHAR2(255), city VARCHAR2(255), zip_code VARCHAR2(20));
+CREATE TABLE Person (personId INT PRIMARY KEY, firstname VARCHAR2(255), lastname VARCHAR2(255), age INTEGER, role VARCHAR2(255), active BOOLEAN, addressId INT, FOREIGN KEY (addressId) REFERENCES Address(addressId));
 
 
 insert into Address (addressId, street, city, zip_code) values (1, 'Springs', 'Zhaoxiang', null);
@@ -17,7 +17,7 @@ insert into Address (addressId, street, city, zip_code) values (9, 'Donald', 'Ke
 insert into Address (addressId, street, city, zip_code) values (10, 'Manitowish', 'Tlučná', '330 26');
 insert into Address (addressId, street, city, zip_code) values (11, 'Maryland', 'Sabinópolis', '39750-000');
 insert into Address (addressId, street, city, zip_code) values (12, 'Grasskamp', 'Garibaldi', '95720-000');
-insert into Address (addressId, street, city, zip_code) values (13, 'Merry', 'Siquisique', null);
+insert into Address (addressId, street, city, zip_code) values (13, 'Merrie', 'Siquisique', null);
 insert into Address (addressId, street, city, zip_code) values (14, 'Golden Leaf', 'Mauren', '9488');
 insert into Address (addressId, street, city, zip_code) values (15, 'Northfield', 'Jesenice', '350 02');
 insert into Address (addressId, street, city, zip_code) values (16, 'Lukken', 'Sheksna', '162572');
@@ -34,7 +34,7 @@ insert into Address (addressId, street, city, zip_code) values (26, 'Stuart', 'M
 insert into Address (addressId, street, city, zip_code) values (27, 'High Crossing', 'Caherconlish', 'F45');
 insert into Address (addressId, street, city, zip_code) values (28, 'Valley Edge', 'Santa Nino', '2406');
 insert into Address (addressId, street, city, zip_code) values (29, 'Summer Ridge', 'Jiuhu', null);
-insert into Address (addressId, street, city, zip_code) values (30, 'Marcy', 'Kuala Lumpur', '72209');
+insert into Address (addressId, street, city, zip_code) values (30, 'Marcy', 'Kuala Lumpurr', '72209');
 insert into Address (addressId, street, city, zip_code) values (31, 'Kings', 'Urukh', '361366');
 insert into Address (addressId, street, city, zip_code) values (32, 'Hudson', 'Hammarö', '663 42');
 insert into Address (addressId, street, city, zip_code) values (33, 'Lawn', 'Pointe-à-Pitre', '97159 CEDEX');
@@ -53,7 +53,7 @@ insert into Address (addressId, street, city, zip_code) values (45, 'Manufacture
 insert into Address (addressId, street, city, zip_code) values (46, 'Daystar', 'Bafang', null);
 insert into Address (addressId, street, city, zip_code) values (47, 'Longview', 'Bergen', '5895');
 insert into Address (addressId, street, city, zip_code) values (48, 'Sutherland', 'Youdian', null);
-insert into Address (addressId, street, city, zip_code) values (49, 'Roth', 'Kuala Lumpur', '423430');
+insert into Address (addressId, street, city, zip_code) values (49, 'Roth', 'Kuala Lumpuur', '423430');
 insert into Address (addressId, street, city, zip_code) values (50, 'Onsgard', 'Lizhuangzi', null);
 insert into Address (addressId, street, city, zip_code) values (51, 'Victoria', 'Lyon', '69907 CEDEX 20');
 insert into Address (addressId, street, city, zip_code) values (52, 'Moulton', 'Gayam', null);
@@ -68,8 +68,8 @@ insert into Address (addressId, street, city, zip_code) values (60, 'Hoard', 'L�
 insert into Address (addressId, street, city, zip_code) values (61, 'Anniversary', 'San Juan', '3611');
 insert into Address (addressId, street, city, zip_code) values (62, 'Johnson', 'Starcevica', null);
 insert into Address (addressId, street, city, zip_code) values (63, 'Luster', 'Atlanta', '30328');
-insert into Address (addressId, street, city, zip_code) values (64, 'Delladonna', 'Kuala Lumpur', null);
-insert into Address (addressId, street, city, zip_code) values (65, 'Merry', 'Belo Blato', null);
+insert into Address (addressId, street, city, zip_code) values (64, 'Delladonna', 'Kuala Lummpur', null);
+insert into Address (addressId, street, city, zip_code) values (65, 'Merri', 'Belo Blato', null);
 insert into Address (addressId, street, city, zip_code) values (66, 'Anzinger', 'Lolak', null);
 insert into Address (addressId, street, city, zip_code) values (67, 'Saint Paul', 'Jishan', null);
 insert into Address (addressId, street, city, zip_code) values (68, 'Debra', 'Buk', '64-320');
