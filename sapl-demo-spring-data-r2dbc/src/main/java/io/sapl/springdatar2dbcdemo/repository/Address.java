@@ -15,15 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.springdatar2dbcdemo.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.*;
+import org.springframework.data.relational.core.mapping.Table;
 
-@SpringBootApplication
-public class SaplSpringDataR2dbcDemoApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class, args);
-    }
+@Data
+@Getter
+@Setter
+@Table("Address")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Address {
+    int    addressId;
+    String street;
+    String city;
+    String zip;
 }

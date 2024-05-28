@@ -15,15 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.springdatamongoreactivedemo.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import lombok.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@SpringBootApplication
-public class SaplSpringDataR2dbcDemoApplication {
+@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "users")
+public class User {
 
-    public static void main(String[] args) {
-        SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class, args);
-    }
+    @Id
+    ObjectId id;
+    String   firstname;
+    String   lastname;
+    Integer  age;
+    Role     role;
+    Boolean  active;
 }
