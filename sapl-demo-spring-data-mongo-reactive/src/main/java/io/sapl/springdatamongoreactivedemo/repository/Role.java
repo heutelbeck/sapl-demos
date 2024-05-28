@@ -15,15 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.springdatamongoreactivedemo.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class SaplSpringDataR2dbcDemoApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class, args);
-    }
+public enum Role {
+    ADMIN, USER
 }

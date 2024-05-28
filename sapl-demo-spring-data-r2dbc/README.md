@@ -1,6 +1,6 @@
 # Introduction of the demo application
 
-This small application is intended to illustrate the use of the R2dbc module. 
+This small application is intended to illustrate the use of the R2DBC module. 
 
 It has been built so that only the software called Docker is required to run it. A test database has been added to this demo and this database is started as a Docker container to communicate with the application. 
 
@@ -24,5 +24,5 @@ The demo is structured in such a way that there are always two versions for a da
 * Link to call the remaining endpoint with a manipulated query	
 * Policy used	
 
-The links already have filled-in parameters for the remaining endpoint, but these can be changed. If, for example, the first parameter with the value ``18`` of the remaining endpoint ``http://localhost:8080/user/findAllByAgeAfterAndActive/18/true`` is set below ``18``, an exception called ``AccessDeniedException`` is thrown. The examples from the demo are only intended to illustrate the new functionalities that the R2dbc module provides. No attention was paid to meaningfulness.   
+The links already have filled-in parameters for the remaining endpoint, but these can be changed. If, for example, the first parameter with the value ``18`` of the remaining endpoint ``http://localhost:8080/user/findAllByAgeAfterAndActive/18/true`` is set below ``18``, an exception called ``AccessDeniedException`` is thrown. The examples from the demo are only intended to illustrate the new functionalities that the R2DBC module provides. No attention was paid to meaningfulness.   
  

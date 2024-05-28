@@ -15,15 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.springdatar2dbcdemo.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Service;
 
-@SpringBootApplication
-public class SaplSpringDataR2dbcDemoApplication {
+@Service
+public class CustomBean {
+	
+	public int getAge() {
+		return 22;
+	}
 
-    public static void main(String[] args) {
-        SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class, args);
-    }
 }
