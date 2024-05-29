@@ -17,6 +17,15 @@
  */
 package io.sapl.benchmark;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -26,24 +35,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.benchmark.util.BenchmarkException;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Class holds the configuration from a benchmark yaml file
  */
-@Slf4j
 public class BenchmarkConfiguration {
     private final ObjectMapper  mapper          = new ObjectMapper();
     private static final String ENABLED         = "enabled";
@@ -168,7 +168,7 @@ public class BenchmarkConfiguration {
     private String  basicClientSecret;
     @Getter
     @Setter
-    private String apiKeySecret;
+    private String  apiKeySecret;
     @Getter
     private boolean oauth2MockServer = true;
     @Getter
@@ -234,36 +234,37 @@ public class BenchmarkConfiguration {
         failOnFurtherMapEntries(map.keySet(), "oauth2");
     }
 
-
     // ---------------------------
     // - Benchmark execution settings
     // ---------------------------
     @Getter
-    public Integer forks = 2;
+    public Integer        forks                 = 2;
     @Getter
-    private List<String> jvmArgs = new ArrayList<>();
+    private List<String>  jvmArgs               = new ArrayList<>();
     @Getter
-    private boolean failOnError = false;
+    private boolean       failOnError           = false;
     @Getter
-    private List<Integer> threadList = List.of(1);
+    private List<Integer> threadList            = List.of(1);
     @Getter
-    private Integer warmupSeconds = 10;
+    private Integer       warmupSeconds         = 10;
     @Getter
-    private Integer warmupIterations = 2;
+    private Integer       warmupIterations      = 2;
     @Getter
-    private Integer measurementSeconds = 10;
+    private Integer       measurementSeconds    = 10;
     @Getter
-    private Integer measurementIterations = 10;
+    private Integer       measurementIterations = 10;
 
     @JsonProperty("execution")
     public void setExecution(Map<String, JsonNode> map) throws JsonProcessingException {
-        this.forks = map.remove("forks").intValue();
-        this.jvmArgs = mapper.readValue(map.remove("jvm_args").toString(), new TypeReference<>() {});
-        this.threadList = mapper.readValue(map.remove("threads").toString(), new TypeReference<>() {});
-        this.failOnError = map.remove("fail_on_error").booleanValue();
-        this.warmupSeconds = map.remove("warmup_seconds").intValue();
-        this.warmupIterations = map.remove("warmup_iterations").intValue();
-        this.measurementSeconds = map.remove("measure_seconds").intValue();
+        this.forks                 = map.remove("forks").intValue();
+        this.jvmArgs               = mapper.readValue(map.remove("jvm_args").toString(), new TypeReference<>() {
+                                   });
+        this.threadList            = mapper.readValue(map.remove("threads").toString(), new TypeReference<>() {
+                                   });
+        this.failOnError           = map.remove("fail_on_error").booleanValue();
+        this.warmupSeconds         = map.remove("warmup_seconds").intValue();
+        this.warmupIterations      = map.remove("warmup_iterations").intValue();
+        this.measurementSeconds    = map.remove("measure_seconds").intValue();
         this.measurementIterations = map.remove("measure_iterations").intValue();
         failOnFurtherMapEntries(map.keySet(), "execution");
     }
@@ -303,8 +304,8 @@ public class BenchmarkConfiguration {
         if (runDecideSubscribeBenchmarks) {
             decisionMethods.add("DecideSubscribe");
         }
-        return "^io.sapl.benchmark.jmh.(" + StringUtils.join(classes, "|") + ").("
-                + StringUtils.join(authMethods, "|") + ")(" + StringUtils.join(decisionMethods, "|") + ")$";
+        return "^io.sapl.benchmark.jmh.(" + StringUtils.join(classes, "|") + ").(" + StringUtils.join(authMethods, "|")
+                + ")(" + StringUtils.join(decisionMethods, "|") + ")$";
     }
 
     /**
@@ -319,7 +320,8 @@ public class BenchmarkConfiguration {
     }
 
     /**
-     * True if this configuration requires a docker environment for benchmark execution
+     * True if this configuration requires a docker environment for benchmark
+     * execution
      */
     public boolean requiredDockerEnvironment() {
         return DOCKER.equals(benchmarkTarget) && (runHttpBenchmarks || runRsocketBenchmarks);

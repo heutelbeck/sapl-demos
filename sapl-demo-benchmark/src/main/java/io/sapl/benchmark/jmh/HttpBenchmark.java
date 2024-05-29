@@ -56,7 +56,8 @@ public class HttpBenchmark {
     private RemoteHttpPolicyDecisionPoint.RemoteHttpPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
         return RemotePolicyDecisionPoint.builder().http().baseUrl(context.getHttpBaseUrl())
                 .withHttpClient(HttpClient.create().responseTimeout(Duration.ofSeconds(10))).withUnsecureSSL()
-                // set SO_LINGER to 0 so that the http sockets are closed immediately -> TIME_WAIT
+                // set SO_LINGER to 0 so that the http sockets are closed immediately ->
+                // TIME_WAIT
                 .option(ChannelOption.SO_LINGER, 0);
     }
 

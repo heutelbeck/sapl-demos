@@ -17,8 +17,17 @@
  */
 package io.sapl.benchmark;
 
-import io.sapl.benchmark.report.ReportGenerator;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.openjdk.jmh.annotations.Mode;
@@ -36,28 +45,20 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import io.sapl.benchmark.report.ReportGenerator;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SaplBenchmark {
     private BenchmarkConfiguration config;
-    private final String cfgFilePath;
-    private GenericContainer<?>          pdpContainer;
-    private GenericContainer<?>          oauth2Container;
-    private final String                 benchmarkFolder;
+    private final String           cfgFilePath;
+    private GenericContainer<?>    pdpContainer;
+    private GenericContainer<?>    oauth2Container;
+    private final String           benchmarkFolder;
 
     public SaplBenchmark(String cfgFilePath, String benchmarkFolder) {
         this.benchmarkFolder = benchmarkFolder;
-        this.cfgFilePath = cfgFilePath;
+        this.cfgFilePath     = cfgFilePath;
     }
 
     private void configureAndStartServerLtContainer(GenericContainer<?> container) {
@@ -72,8 +73,7 @@ public class SaplBenchmark {
         var containerLogLevel = "ERROR";
         container.withClasspathResourceMapping("keystore.p12", dockerKeystoreLocation, BindMode.READ_ONLY)
                 .withClasspathResourceMapping("policies/", "/pdp/data/", BindMode.READ_ONLY)
-                .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data")
-                .withEnv("spring_profiles_active", "local")
+                .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data").withEnv("spring_profiles_active", "local")
                 .withExposedPorts(BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT,
                         BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT)
                 .waitingFor(Wait.forListeningPorts())
@@ -124,17 +124,11 @@ public class SaplBenchmark {
         }
 
         // ensure that http/https is reachable before starting the benchmark
-        if (config.isDockerUseSsl()){
-            container.waitingFor(Wait.forHttps("/")
-                .forPort(8080)
-                .allowInsecure()
-                .forStatusCode(401)
-                .forStatusCode(404));
+        if (config.isDockerUseSsl()) {
+            container
+                    .waitingFor(Wait.forHttps("/").forPort(8080).allowInsecure().forStatusCode(401).forStatusCode(404));
         } else {
-            container.waitingFor(Wait.forHttp("/")
-                .forPort(8080)
-                .forStatusCode(401)
-                .forStatusCode(404));
+            container.waitingFor(Wait.forHttp("/").forPort(8080).forStatusCode(401).forStatusCode(404));
         }
         container.start();
     }
@@ -142,55 +136,44 @@ public class SaplBenchmark {
     /**
      * Estimates the benchmark duration based on the given config and logs this.
      */
-    private void logEstimatedDuration(){
-        try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream(), true,
-                StandardCharsets.UTF_8)) {
-            var tmpOutput = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
-            var matchedBenchmarkList =  BenchmarkList.defaultList()
-                    .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of())
-                    .stream().toList();
+    private void logEstimatedDuration() {
+        try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream(), true, StandardCharsets.UTF_8)) {
+            var tmpOutput                  = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
+            var matchedBenchmarkList       = BenchmarkList.defaultList()
+                    .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of()).stream().toList();
             var estimatedDurationInSeconds = (
-                        // warmup
-                        config.getWarmupIterations() * config.getWarmupSeconds()
-                        // measures
-                        + config.getMeasurementIterations() * config.getMeasurementSeconds()
-                        // benchmark initialization
-                        + 5)
-                    * config.getThreadList().size()
-                    * matchedBenchmarkList.size();
+            // warmup
+            config.getWarmupIterations() * config.getWarmupSeconds()
+                    // measures
+                    + config.getMeasurementIterations() * config.getMeasurementSeconds()
+                    // benchmark initialization
+                    + 5) * config.getThreadList().size() * matchedBenchmarkList.size();
 
-            log.info("Executing " + matchedBenchmarkList.size() + " Benchmarks with "+  config.getThreadList() + " threads ...");
+            log.info("Executing " + matchedBenchmarkList.size() + " Benchmarks with " + config.getThreadList()
+                    + " threads ...");
             int seconds = estimatedDurationInSeconds % 60;
             int minutes = estimatedDurationInSeconds / 60 % 60;
-            int hours = estimatedDurationInSeconds / 60 / 60;
-            log.info("Estimated duration: " + String.format("%02d:%02d:%02d", hours, minutes, seconds) );
+            int hours   = estimatedDurationInSeconds / 60 / 60;
+            log.info("Estimated duration: " + String.format("%02d:%02d:%02d", hours, minutes, seconds));
         }
     }
 
     /**
-     * Executes the JMH Benchmarks based on the given configuration.
-     * The JMH results and output are written to corresponding files in the benchmarkFolder.
+     * Executes the JMH Benchmarks based on the given configuration. The JMH results
+     * and output are written to corresponding files in the benchmarkFolder.
      */
     private void executeJmHBenchmarks() throws RunnerException {
-        var context = BenchmarkExecutionContext.fromBenchmarkConfiguration(config, pdpContainer, oauth2Container);
+        var context       = BenchmarkExecutionContext.fromBenchmarkConfiguration(config, pdpContainer, oauth2Container);
         var timeFormatter = new SimpleDateFormat("HH:mm:ss");
         log.info("Benchmark started at " + timeFormatter.format(new Date()));
         logEstimatedDuration();
 
         // setup builder with base parameters
-        var benchmarkBuilder = new OptionsBuilder()
-                .include(config.getBenchmarkPattern())
-                .param("contextJsonString", context.toJsonString())
-                .jvmArgs(config.getJvmArgs().toArray(new String[0]))
-                .shouldFailOnError(config.isFailOnError())
-                .mode(Mode.Throughput)
-                .timeUnit(TimeUnit.SECONDS)
-                .resultFormat(ResultFormatType.JSON)
-                .shouldDoGC(true)
-                .syncIterations(true)
-                .forks(config.forks)
-                .warmupIterations(config.getWarmupIterations())
-                .warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
+        var benchmarkBuilder = new OptionsBuilder().include(config.getBenchmarkPattern())
+                .param("contextJsonString", context.toJsonString()).jvmArgs(config.getJvmArgs().toArray(new String[0]))
+                .shouldFailOnError(config.isFailOnError()).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
+                .resultFormat(ResultFormatType.JSON).shouldDoGC(true).syncIterations(true).forks(config.forks)
+                .warmupIterations(config.getWarmupIterations()).warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
                 .measurementIterations(config.getMeasurementIterations())
                 .measurementTime(TimeValue.seconds(config.getWarmupSeconds()));
 
@@ -198,14 +181,10 @@ public class SaplBenchmark {
         for (int threads : config.getThreadList()) {
             var resultFile = benchmarkFolder + "/results_" + threads + "threads.json";
             var outputFile = benchmarkFolder + "/results_" + threads + "threads.log";
-            log.info("Starting Benchmark with " + threads +" threads matching pattern: " + config.getBenchmarkPattern());
+            log.info("Starting Benchmark with " + threads + " threads matching pattern: "
+                    + config.getBenchmarkPattern());
             log.info("Writing results to " + resultFile + " and logs to " + outputFile);
-            new Runner(benchmarkBuilder
-                            .threads(threads)
-                            .result(resultFile)
-                            .output(outputFile)
-                            .build()
-            ).run();
+            new Runner(benchmarkBuilder.threads(threads).result(resultFile).output(outputFile).build()).run();
         }
         log.info("Benchmark ended at " + timeFormatter.format(new Date()));
     }
@@ -215,11 +194,11 @@ public class SaplBenchmark {
     }
 
     public void startBenchmark() throws RunnerException, IOException {
-        this.config          = BenchmarkConfiguration.fromFile(cfgFilePath);
+        this.config = BenchmarkConfiguration.fromFile(cfgFilePath);
         Files.createDirectories(Paths.get(benchmarkFolder));
         var sourceFile = new File(cfgFilePath);
         FileUtils.copyFile(sourceFile, new File(benchmarkFolder + File.separator + sourceFile.getName()));
-        
+
         var useOAuthContainer    = config.isUseOauth2() && config.isOauth2MockServer();
         var useServerLTContainer = config.requiredDockerEnvironment();
 
@@ -249,7 +228,7 @@ public class SaplBenchmark {
     private void stopContainersIfRunning(GenericContainer<?>... containers) {
         for (var container : containers) {
             if (container != null) {
-               container.stop();
+                container.stop();
             }
         }
     }

@@ -31,8 +31,9 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 /**
- * This class is holding the benchmark execution context derived from configuration and optional the container
- * environment. The class object is then mapped to json, so that they can be passed via command line parameters
+ * This class is holding the benchmark execution context derived from
+ * configuration and optional the container environment. The class object is
+ * then mapped to json, so that they can be passed via command line parameters
  * to the JMH process executing the actual benchmark.
  */
 @Getter
@@ -71,7 +72,7 @@ public class BenchmarkExecutionContext {
     public static BenchmarkExecutionContext fromBenchmarkConfiguration(BenchmarkConfiguration cfg,
             GenericContainer<?> pdpContainer, GenericContainer<?> oauthContainer) {
 
-        //initialize new context
+        // initialize new context
         var context = new BenchmarkExecutionContext();
 
         // get docker/remote specific settings

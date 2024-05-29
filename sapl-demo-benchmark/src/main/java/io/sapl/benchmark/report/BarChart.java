@@ -17,6 +17,13 @@
  */
 package io.sapl.benchmark.report;
 
+import java.awt.Color;
+import java.awt.Paint;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.text.DecimalFormat;
+
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
@@ -32,17 +39,12 @@ import org.jfree.chart.ui.TextAnchor;
 import org.jfree.chart.util.SortOrder;
 import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.text.DecimalFormat;
-
 public class BarChart {
-    private final JFreeChart             chart;
+    private final JFreeChart                        chart;
     private final DefaultStatisticalCategoryDataset dataset;
 
-    public BarChart(String title, DefaultStatisticalCategoryDataset dataset, String valueAxisLabel, String labelFormat) {
+    public BarChart(String title, DefaultStatisticalCategoryDataset dataset, String valueAxisLabel,
+            String labelFormat) {
         this.dataset = dataset;
         // format axis
         var xAxis = new CategoryAxis();
@@ -52,12 +54,11 @@ public class BarChart {
         yAxis.setUpperMargin(0.15d);
 
         // define the plot
-        var renderer = new BarRenderer();
+        var renderer     = new BarRenderer();
         var categoryPlot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
         categoryPlot.setOrientation(PlotOrientation.HORIZONTAL);
         categoryPlot.setRowRenderingOrder(SortOrder.ASCENDING);
         categoryPlot.setColumnRenderingOrder(SortOrder.ASCENDING);
-
 
         chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, categoryPlot, true);
         new StandardChartTheme("JFree").apply(chart);
@@ -68,23 +69,17 @@ public class BarChart {
 
         // add labels
         renderer.setDefaultItemLabelsVisible(true);
-        renderer.setDefaultItemLabelGenerator(
-                new StandardCategoryItemLabelGenerator("{2}", new DecimalFormat(labelFormat), new DecimalFormat(labelFormat))
-        );
+        renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator("{2}",
+                new DecimalFormat(labelFormat), new DecimalFormat(labelFormat)));
         renderer.setDefaultPositiveItemLabelPosition(
-            new ItemLabelPosition(ItemLabelAnchor.OUTSIDE3, TextAnchor.CENTER_LEFT)
-        );
+                new ItemLabelPosition(ItemLabelAnchor.OUTSIDE3, TextAnchor.CENTER_LEFT));
 
         // set bar colors
         categoryPlot.setBackgroundPaint(new Color(211, 211, 211));
-        Paint[] colorPalette = new Paint[]{
-            new Color(0, 172, 178, 200),
-            new Color(18, 67, 109, 179),
-            new Color(239, 96, 19, 152),
-            new Color(85, 177, 69, 200),
-        };
+        Paint[] colorPalette = new Paint[] { new Color(0, 172, 178, 200), new Color(18, 67, 109, 179),
+                new Color(239, 96, 19, 152), new Color(85, 177, 69, 200), };
         for (int i = 0; i < dataset.getRowCount(); i++) {
-            if ( i < colorPalette.length ) {
+            if (i < colorPalette.length) {
                 renderer.setSeriesPaint(i, colorPalette[i]);
             }
         }

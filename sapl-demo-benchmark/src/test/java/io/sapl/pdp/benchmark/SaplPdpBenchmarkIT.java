@@ -60,10 +60,10 @@ class SaplPdpBenchmarkIT {
                 for (var authMethod : List.of("noAuth", "basicAuth", "apiKey", "oAuth2")) {
                     // embedded supports only noAuth
                     if (!"EmbeddedBenchmark".equals(benchmarkType) || "noAuth".equals(authMethod)) {
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod
-                                + decisionMethod.replace(" ", "") + "_1_threads_rspt.png");
-                        reportFiles.add("img/" + benchmarkType + "." + authMethod
-                                + decisionMethod.replace(" ", "") + "_1_threads_thrpt.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
+                                + "_1_threads_rspt.png");
+                        reportFiles.add("img/" + benchmarkType + "." + authMethod + decisionMethod.replace(" ", "")
+                                + "_1_threads_thrpt.png");
                     }
                 }
             }

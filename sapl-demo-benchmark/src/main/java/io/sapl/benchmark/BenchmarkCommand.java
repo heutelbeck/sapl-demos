@@ -36,13 +36,15 @@ public class BenchmarkCommand implements Callable<Integer> {
     private final LocalDateTime     dateTime  = LocalDateTime.now();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
-    @Option(names = { "-o", "--output" }, required = true, description = "Path to the output directory for benchmark results.")
+    @Option(names = { "-o",
+            "--output" }, required = true, description = "Path to the output directory for benchmark results.")
     private String outputPath;
 
     @Option(names = { "-c", "--cfg" }, required = true, description = "YAML file to read configuration from")
     private String cfgFilePath;
 
-    @Option(names = { "--skipBenchmark" }, description = "Skips the benchmark execution, useful to generate the report based on existing data.")
+    @Option(names = {
+            "--skipBenchmark" }, description = "Skips the benchmark execution, useful to generate the report based on existing data.")
     private boolean skipBenchmark = false;
 
     @Option(names = { "--skipReportGeneration" }, description = "Skips the report generation.")

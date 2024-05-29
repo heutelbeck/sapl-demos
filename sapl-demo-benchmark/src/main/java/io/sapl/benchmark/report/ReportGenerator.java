@@ -17,37 +17,51 @@
  */
 package io.sapl.benchmark.report;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
+
 import com.google.common.collect.Maps;
 import com.hubspot.jinjava.Jinjava;
 import com.nimbusds.jose.shaded.gson.JsonArray;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonParser;
+
 import lombok.experimental.StandardException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.statistics.DefaultStatisticalCategoryDataset;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.*;
 
 @Slf4j
 public class ReportGenerator {
-    static String chartField            = "chart";
+    static String              chartField = "chart";
     private final List<String> resultFiles;
-    private final String benchmarkFolder;
+    private final String       benchmarkFolder;
 
     @StandardException
-    public static class BenchmarkReportException extends RuntimeException {}
+    public static class BenchmarkReportException extends RuntimeException {
+    }
 
     public ReportGenerator(String benchmarkFolder) {
         this.benchmarkFolder = benchmarkFolder;
-        this.resultFiles = getResultFilesFiles();
+        this.resultFiles     = getResultFilesFiles();
 
-        if (resultFiles.isEmpty()){
+        if (resultFiles.isEmpty()) {
             throw new BenchmarkReportException(
                     "No Result files found matching: results_*threads.json in " + benchmarkFolder);
         }
@@ -68,13 +82,10 @@ public class ReportGenerator {
     }
 
     private static void generateThroughputBarChart(String benchmarkFolder, String outputFilename, String title,
-                                                   Iterable<ReportSectionData> tableData) throws IOException {
+            Iterable<ReportSectionData> tableData) throws IOException {
         var dataset = new DefaultStatisticalCategoryDataset();
         for (var row : tableData) {
-            dataset.add(
-                    row.getThroughputAvg(),
-                    row.getThroughputStdDev(),
-                    row.getThreads() + "-threads",
+            dataset.add(row.getThroughputAvg(), row.getThroughputStdDev(), row.getThreads() + "-threads",
                     row.getAuthMethod());
         }
 
@@ -83,43 +94,35 @@ public class ReportGenerator {
     }
 
     private static void generateResponseTimeBarChart(String benchmarkFolder, String outputFilename, String title,
-                                                     Iterable<ReportSectionData> tableData) throws IOException {
+            Iterable<ReportSectionData> tableData) throws IOException {
         var dataset = new DefaultStatisticalCategoryDataset();
         for (var row : tableData) {
-            dataset.add(
-                    row.getResponseTimeAvg(),
-                    row.getResponseTimeStdDev(),
-                    row.getAuthMethod(),
-                    row.getPdpName());
+            dataset.add(row.getResponseTimeAvg(), row.getResponseTimeStdDev(), row.getAuthMethod(), row.getPdpName());
         }
 
         var chart = new BarChart(title, dataset, "ms/op (less is better)", "0.00");
         chart.saveToPNGFile(new File(benchmarkFolder + File.separator + outputFilename));
     }
 
-
     private static void createDetailLineChart(String benchmarkFolder, String filePath, String title,
-                                              List<List<Double>> rawData) throws IOException {
-        var dataset = new DefaultCategoryDataset();
+            List<List<Double>> rawData) throws IOException {
+        var dataset    = new DefaultCategoryDataset();
         var forkNumber = 1;
         for (var forkResults : rawData) {
-            var fork        = "fork " + forkNumber++;
-            var iteration   = 1;
-            for (var result: forkResults) {
+            var fork      = "fork " + forkNumber++;
+            var iteration = 1;
+            for (var result : forkResults) {
                 dataset.addValue(result, fork, String.valueOf(iteration++));
             }
         }
 
         var chart = new LineChart(title, dataset, "ops/s");
-        chart.saveToPNGFile(new File( benchmarkFolder + File.separator + filePath));
+        chart.saveToPNGFile(new File(benchmarkFolder + File.separator + filePath));
     }
 
-
-
     private List<BenchmarkResult> getBenchmarkResultsFromFile(String fileName) throws IOException {
-        JsonArray jsonContent = JsonParser
-                .parseReader(new FileReader(benchmarkFolder + "/" + fileName, StandardCharsets.UTF_8))
-                .getAsJsonArray();
+        JsonArray             jsonContent      = JsonParser
+                .parseReader(new FileReader(benchmarkFolder + "/" + fileName, StandardCharsets.UTF_8)).getAsJsonArray();
         List<BenchmarkResult> benchmarkResults = new ArrayList<>();
         for (JsonElement jsonElement : jsonContent) {
             benchmarkResults.add(new BenchmarkResult(jsonElement));
@@ -128,24 +131,22 @@ public class ReportGenerator {
     }
 
     private Map<String, Object> getSummaryTableContext() throws IOException {
-        List<String>                                          headerFacts = new ArrayList<>(0);
-        Map<String, Map<String, Map<String, List<Object>>>> tableData     = Maps.newHashMap();
+        List<String>                                        headerFacts = new ArrayList<>(0);
+        Map<String, Map<String, Map<String, List<Object>>>> tableData   = Maps.newHashMap();
 
         // use the first file for average response time comparison
         var averageResultFile = resultFiles.get(0);
-        var threads = getThreadCountFromFileName(averageResultFile);
+        var threads           = getThreadCountFromFileName(averageResultFile);
         headerFacts.add("avg ms/op<br>(" + threads + " thread)");
 
         // loop Over Benchmark results in the file
-        for (BenchmarkResult benchmarkResult: getBenchmarkResultsFromFile(averageResultFile)){
+        for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(averageResultFile)) {
             var l1 = benchmarkResult.getDecisionMethod();
             var l2 = benchmarkResult.getPdp();
             var l3 = benchmarkResult.getAuthMethod();
 
-            var rowEntry = tableData
-                    .computeIfAbsent(l1, y -> new HashMap<>())
-                    .computeIfAbsent(l2, y ->  new HashMap<>())
-                    .computeIfAbsent(l3, y ->  new ArrayList<>());
+            var rowEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>()).computeIfAbsent(l2, y -> new HashMap<>())
+                    .computeIfAbsent(l3, y -> new ArrayList<>());
             rowEntry.add(benchmarkResult.getResponseTimeAvg());
         }
 
@@ -155,22 +156,19 @@ public class ReportGenerator {
             headerFacts.add("throughput ops/s<br>(" + threads + " threads)");
 
             // loop over Benchmark results in the file
-            for (BenchmarkResult benchmarkResult: getBenchmarkResultsFromFile(filename)){
+            for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(filename)) {
                 var l1 = benchmarkResult.getDecisionMethod();
                 var l2 = benchmarkResult.getPdp();
                 var l3 = benchmarkResult.getAuthMethod();
 
                 // create emty if not existing
-                var baseEntry = tableData
-                        .computeIfAbsent(l1, y -> new HashMap<>())
-                        .computeIfAbsent(l2, y ->  new HashMap<>())
-                        .computeIfAbsent(l3, y ->  new ArrayList<>());
+                var baseEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>())
+                        .computeIfAbsent(l2, y -> new HashMap<>()).computeIfAbsent(l3, y -> new ArrayList<>());
                 baseEntry.add(benchmarkResult.getThoughputAvg());
             }
         }
         return Map.of("table_header", headerFacts, "table_data", tableData);
     }
-
 
     private Map<String, Map<String, Object>> getResponseTimeContext() throws IOException {
         Map<String, Map<String, Object>> resultMap = new HashMap<>();
@@ -178,95 +176,85 @@ public class ReportGenerator {
         log.info("collecting response time data ...");
         // use the first file for response time reporting
         var fileName = getResultFilesFiles().get(0);
-        if ( fileName != null ) {
+        if (fileName != null) {
 
             Map<String, List<ReportSectionData>> baseData = new HashMap<>();
-            for (BenchmarkResult benchmarkResult: getBenchmarkResultsFromFile(fileName)){
-                var benchmarkName  = benchmarkResult.getBenchmarkShortName();
-                var l1 = benchmarkResult.getDecisionMethod();
-                var threads = benchmarkResult.getThreads();
-                var section = "Average Response Time" + " - " + l1 + " - " + threads + " thread(s)";
+            for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(fileName)) {
+                var benchmarkName = benchmarkResult.getBenchmarkShortName();
+                var l1            = benchmarkResult.getDecisionMethod();
+                var threads       = benchmarkResult.getThreads();
+                var section       = "Average Response Time" + " - " + l1 + " - " + threads + " thread(s)";
 
                 // generate detail chart
-                var chartTitle = benchmarkName + " - " + threads + " threads - average response time";
+                var chartTitle    = benchmarkName + " - " + threads + " threads - average response time";
                 var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_rspt" + ".png";
-                createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle, benchmarkResult.getResponseTimeRawResults());
+                createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle,
+                        benchmarkResult.getResponseTimeRawResults());
 
                 // build entry
-                var resultData = ReportSectionData.builder()
-                        .benchmarkResult(benchmarkResult)
-                        .chartFilePath(chartFilePath)
-                        .build();
+                var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
+                        .chartFilePath(chartFilePath).build();
 
                 // add entry to list of this section
                 baseData.computeIfAbsent(section, y -> new ArrayList<>()).add(resultData);
             }
 
             // build map for html rendering
-            for (var entry: baseData.entrySet()){
-                var section = entry.getKey();
-                var resultDataList = entry.getValue();
-                String chartFileName = "img/" + section + ".png";
+            for (var entry : baseData.entrySet()) {
+                var    section        = entry.getKey();
+                var    resultDataList = entry.getValue();
+                String chartFileName  = "img/" + section + ".png";
                 generateResponseTimeBarChart(benchmarkFolder, chartFileName, section, resultDataList);
                 resultMap.put(section,
-                        Map.of(chartField, chartFileName,
-                                "tableData", resultDataList.stream()
+                        Map.of(chartField, chartFileName, "tableData",
+                                resultDataList.stream()
                                         .sorted(Comparator.comparing(ReportSectionData::getBenchmarkName)
                                                 .thenComparing(ReportSectionData::getAuthMethod))
-                                        .map(ReportSectionData::getMap)
-                                        .toList()
-                        )
-                );
+                                        .map(ReportSectionData::getMap).toList()));
             }
         }
         return resultMap;
     }
 
-
-
     private Map<String, Map<String, Object>> getThroughputContext() throws IOException {
-        Map<String, Map<String, Object>> resultMap = new HashMap<>(0);
-        Map<String, List<ReportSectionData>> baseData = new HashMap<>(0);
+        Map<String, Map<String, Object>>     resultMap = new HashMap<>(0);
+        Map<String, List<ReportSectionData>> baseData  = new HashMap<>(0);
         log.info("collecting throughput data ...");
 
         for (String fileName : getResultFilesFiles()) {
-            for (BenchmarkResult benchmarkResult: getBenchmarkResultsFromFile(fileName)){
-                var benchmarkName  = benchmarkResult.getBenchmarkShortName();
-                var l1 = benchmarkResult.getDecisionMethod();
-                var l2 = benchmarkResult.getPdp();
-                var threads = benchmarkResult.getThreads();
-                var section = "Throughput" + " - " + l1 + " - " + l2;
+            for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(fileName)) {
+                var benchmarkName = benchmarkResult.getBenchmarkShortName();
+                var l1            = benchmarkResult.getDecisionMethod();
+                var l2            = benchmarkResult.getPdp();
+                var threads       = benchmarkResult.getThreads();
+                var section       = "Throughput" + " - " + l1 + " - " + l2;
 
                 // generate detail chart
-                var chartTitle = benchmarkName + " - " + threads + " threads - throughput";
+                var chartTitle    = benchmarkName + " - " + threads + " threads - throughput";
                 var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_thrpt" + ".png";
-                createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle, benchmarkResult.getThroughputRawResults());
+                createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle,
+                        benchmarkResult.getThroughputRawResults());
 
                 // build entry
-                var resultData = ReportSectionData.builder()
-                        .benchmarkResult(benchmarkResult)
-                        .chartFilePath(chartFilePath)
-                        .build();
+                var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
+                        .chartFilePath(chartFilePath).build();
 
                 // add entry to list of this section
                 baseData.computeIfAbsent(section, y -> new ArrayList<>()).add(resultData);
             }
         }
 
-        for (var entry: baseData.entrySet()){
-            var section = entry.getKey();
-            var chartFileName = "img/" + section + ".png";
+        for (var entry : baseData.entrySet()) {
+            var section        = entry.getKey();
+            var chartFileName  = "img/" + section + ".png";
             var resultDataList = entry.getValue();
             generateThroughputBarChart(benchmarkFolder, chartFileName, section, resultDataList);
             resultMap.put(section,
-                    Map.of(chartField, chartFileName,
-                    "tableData", resultDataList.stream()
+                    Map.of(chartField, chartFileName, "tableData",
+                            resultDataList.stream()
                                     .sorted(Comparator.comparing(ReportSectionData::getBenchmarkName)
                                             .thenComparing(ReportSectionData::getThreads))
-                                    .map(ReportSectionData::getMap)
-                                    .toList()
-                    )
-            );
+                                    .map(ReportSectionData::getMap).toList()));
         }
 
         return resultMap;

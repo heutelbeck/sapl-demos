@@ -1,15 +1,14 @@
 package io.sapl.benchmark.report;
 
+import java.util.Map;
+
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Getter
 @Builder
 public class ReportSectionData {
-    private String chartFilePath;
+    private String          chartFilePath;
     private BenchmarkResult benchmarkResult;
 
     public String getBenchmarkName() {
@@ -28,33 +27,26 @@ public class ReportSectionData {
         return benchmarkResult.getThreads();
     }
 
-    public Double getThroughputAvg(){
+    public Double getThroughputAvg() {
         return benchmarkResult.getThoughputAvg();
     }
 
-    public Double getThroughputStdDev(){
+    public Double getThroughputStdDev() {
         return benchmarkResult.getThoughputStdDev();
     }
 
-    public Double getResponseTimeAvg(){
+    public Double getResponseTimeAvg() {
         return benchmarkResult.getResponseTimeAvg();
     }
 
-    public Double getResponseTimeStdDev(){
+    public Double getResponseTimeStdDev() {
         return benchmarkResult.getResponseTimeStdDev();
     }
 
-    public Map<String, Object> getMap(){
-        return java.util.Map.of(
-                "benchmark", getBenchmarkName(),
-                "pdpName", getPdpName(),
-                "threads", getThreads(),
-                "thrpt", getThroughputAvg(),
-                "thrpt_stddev", getThroughputStdDev(),
-                "rspt", getResponseTimeAvg(),
-                "rspt_stddev", getResponseTimeStdDev(),
-                "rspt_min", benchmarkResult.getResponseTimeMin(),
-                "rspt_max", benchmarkResult.getResponseTimeMax(),
-                "chart", chartFilePath);
+    public Map<String, Object> getMap() {
+        return java.util.Map.of("benchmark", getBenchmarkName(), "pdpName", getPdpName(), "threads", getThreads(),
+                "thrpt", getThroughputAvg(), "thrpt_stddev", getThroughputStdDev(), "rspt", getResponseTimeAvg(),
+                "rspt_stddev", getResponseTimeStdDev(), "rspt_min", benchmarkResult.getResponseTimeMin(), "rspt_max",
+                benchmarkResult.getResponseTimeMax(), "chart", chartFilePath);
     }
 }

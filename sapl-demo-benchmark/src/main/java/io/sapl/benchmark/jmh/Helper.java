@@ -44,7 +44,8 @@ public class Helper {
     }
 
     /**
-     * Send AuthorizationSubscription to PDP using the decide-once API and ensure that Decision equals Permit
+     * Send AuthorizationSubscription to PDP using the decide-once API and ensure
+     * that Decision equals Permit
      */
     public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decideOnce(authorizationSubscription).block();

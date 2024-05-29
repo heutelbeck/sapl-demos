@@ -17,6 +17,12 @@
  */
 package io.sapl.benchmark.report;
 
+import static io.sapl.benchmark.report.Utilities.getMaxValue;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -25,21 +31,15 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
-import static io.sapl.benchmark.report.Utilities.getMaxValue;
-
 public class LineChart {
-    private final JFreeChart        chart;
+    private final JFreeChart chart;
 
     public LineChart(String title, DefaultCategoryDataset dataset, String valueAxisLabel) {
-        chart = ChartFactory.createLineChart(title, "iteration", valueAxisLabel, dataset,
-                PlotOrientation.VERTICAL,true, true, false);
+        chart = ChartFactory.createLineChart(title, "iteration", valueAxisLabel, dataset, PlotOrientation.VERTICAL,
+                true, true, false);
 
         // add marks to the data points in the graph
-        var plot = chart.getCategoryPlot();
+        var plot     = chart.getCategoryPlot();
         var renderer = (LineAndShapeRenderer) plot.getRenderer();
         renderer.setDefaultShapesVisible(true);
         plot.setRenderer(renderer);

@@ -23,8 +23,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
-		<springboot.version>3.2.5</springboot.version>
-		<vaadin.version>24.3.9</vaadin.version>
+		<springboot.version>3.3.0</springboot.version>
+		<vaadin.version>24.3.12</vaadin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
