@@ -23,6 +23,7 @@ import static io.sapl.benchmark.jmh.Helper.getClientRegistrationRepository;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Collections;
 
 import javax.net.ssl.SSLException;
 
@@ -40,6 +41,7 @@ import io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import lombok.extern.slf4j.Slf4j;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 @Slf4j
 @State(Scope.Benchmark)
@@ -55,7 +57,12 @@ public class HttpBenchmark {
 
     private RemoteHttpPolicyDecisionPoint.RemoteHttpPolicyDecisionPointBuilder getBaseBuilder() throws SSLException {
         return RemotePolicyDecisionPoint.builder().http().baseUrl(context.getHttpBaseUrl())
-                .withHttpClient(HttpClient.create().responseTimeout(Duration.ofSeconds(10))).withUnsecureSSL()
+                .withHttpClient(HttpClient.create(
+                        ConnectionProvider.builder("custom")
+                                // size connection pool depending on threads
+                                .maxConnections((int) (Collections.max(context.getThreadList()) * 1.5))
+                                .build()
+                ).responseTimeout(Duration.ofSeconds(10))).withUnsecureSSL()
                 // set SO_LINGER to 0 so that the http sockets are closed immediately ->
                 // TIME_WAIT
                 .option(ChannelOption.SO_LINGER, 0);

@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import java.util.List;
 
 /**
  * This class is holding the benchmark execution context derived from
@@ -56,6 +57,7 @@ public class BenchmarkExecutionContext {
     private boolean                   useOauth2;
     private String                    oauth2ClientId;
     private boolean                   useSsl;
+    private List<Integer>             threadList;
     private AuthorizationSubscription authorizationSubscription;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -116,6 +118,8 @@ public class BenchmarkExecutionContext {
         context.useBasicAuth  = cfg.isUseBasicAuth();
         context.useAuthApiKey = cfg.isUseAuthApiKey();
         context.useOauth2     = cfg.isUseOauth2();
+
+        context.threadList = cfg.getThreadList();
         return context;
     }
 
