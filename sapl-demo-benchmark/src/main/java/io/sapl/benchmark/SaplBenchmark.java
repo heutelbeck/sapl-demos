@@ -175,7 +175,7 @@ public class SaplBenchmark {
                 .resultFormat(ResultFormatType.JSON).shouldDoGC(true).syncIterations(true).forks(config.forks)
                 .warmupIterations(config.getWarmupIterations()).warmupTime(TimeValue.seconds(config.getWarmupSeconds()))
                 .measurementIterations(config.getMeasurementIterations())
-                .measurementTime(TimeValue.seconds(config.getWarmupSeconds()));
+                .measurementTime(TimeValue.seconds(config.getMeasurementSeconds()));
 
         // iterate over thread list and start benchmark for each thread parameter
         for (int threads : config.getThreadList()) {
