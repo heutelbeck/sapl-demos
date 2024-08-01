@@ -44,6 +44,7 @@ import com.nimbusds.jose.shaded.gson.JsonArray;
 import com.nimbusds.jose.shaded.gson.JsonElement;
 import com.nimbusds.jose.shaded.gson.JsonParser;
 
+import io.sapl.api.SaplVersion;
 import lombok.experimental.StandardException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,6 +56,7 @@ public class ReportGenerator {
 
     @StandardException
     public static class BenchmarkReportException extends RuntimeException {
+        private static final long serialVersionUID = SaplVersion.VERISION_UID;
     }
 
     public ReportGenerator(String benchmarkFolder) {

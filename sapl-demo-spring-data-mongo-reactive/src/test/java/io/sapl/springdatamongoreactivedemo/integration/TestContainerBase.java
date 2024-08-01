@@ -29,6 +29,7 @@ import org.testcontainers.utility.MountableFile;
 @Tag("integration-test")
 public class TestContainerBase {
 
+    @SuppressWarnings("resource") // Fine for tests which are short lived
     public static final GenericContainer<?> MONGO_DB_CONTAINER = new GenericContainer<>(DockerImageName.parse("mongo:latest"))
             .withExposedPorts(27017)
             .withCopyFileToContainer(MountableFile.forClasspathResource("./mongo-init.js"), "/docker-entrypoint-initdb.d/mongo-init.js")

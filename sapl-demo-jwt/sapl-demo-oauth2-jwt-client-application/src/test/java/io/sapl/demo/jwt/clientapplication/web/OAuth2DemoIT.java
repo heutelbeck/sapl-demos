@@ -103,6 +103,7 @@ class OAuth2DemoIT {
     }
 
     @Container
+    @SuppressWarnings("resource") // Fine for tests which are short lived
     static GenericContainer<?> authServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
             .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
@@ -112,6 +113,7 @@ class OAuth2DemoIT {
             .withCreateContainerCmdModifier(configureContainerStartup(AUTH_SERVER_PORT));
 
     @Container
+    @SuppressWarnings("resource") // Fine for tests which are short lived
     static GenericContainer<?> resourceServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-resource-server" + TAG))
             .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
@@ -152,7 +154,7 @@ class OAuth2DemoIT {
     MockMvc mockMvc;
 
     @BeforeEach
-    void beforeEach() throws Exception {
+    void beforeEach() {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
     }
 
@@ -169,19 +171,17 @@ class OAuth2DemoIT {
     @Test
     @WithMockUser(username = "user1", password = "password")
     void test_codeGrantType_clientRedirect() throws Exception {
-        var request  = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
-        var response = mockMvc.perform(request).andExpect(status().is3xxRedirection()).andExpect(content().string(""))
-                .andExpect(header().exists("Location"))
+        var request      = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
+        var response     = mockMvc.perform(request).andExpect(status().is3xxRedirection())
+                .andExpect(content().string("")).andExpect(header().exists("Location"))
                 .andExpect(header().string("Location",
                         new PredicateMatcher<String>(
                                 str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
                 .andReturn().getResponse();
-        // printResponse(response);
         var redirectURI  = response.getHeader("Location");
         var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
         assertTrue(authResponse.getStatusCode().is3xxRedirection());
         assertTrue(authResponse.getHeaders().containsKey("Location"));
-        // printResponse(authResponse);
     }
 
     @Test
