@@ -42,11 +42,11 @@ import io.sapl.benchmark.util.BenchmarkException;
 import io.sapl.interpreter.InitializationException;
 
 class SaplPdpBenchmarkTest {
-    private static final String tmpReportPath = "tmp_benchmark_test";
+    private static final String TMP_REPORT_PATH = "tmp_benchmark_test";
 
     @BeforeAll
     private static void createEmptyBenchmarkFolder() throws IOException {
-        var tmpReportPathFile = new File(tmpReportPath);
+        var tmpReportPathFile = new File(TMP_REPORT_PATH);
         FileUtils.deleteDirectory(tmpReportPathFile);
         Assertions.assertTrue(tmpReportPathFile.mkdir());
     }
@@ -115,8 +115,8 @@ class SaplPdpBenchmarkTest {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
-                mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
-                mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
+                mockedHelper.when(() -> Helper.decide(any(), any())).then(x -> null);
+                mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(x -> null);
                 // NoAuth
                 assertDoesNotThrow(benchmark::noAuthDecideOnce);
                 assertDoesNotThrow(benchmark::noAuthDecideSubscribe);
@@ -153,8 +153,8 @@ class SaplPdpBenchmarkTest {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             benchmark.setup();
             try (MockedStatic<Helper> mockedHelper = Mockito.mockStatic(Helper.class)) {
-                mockedHelper.when(() -> Helper.decide(any(), any())).then(__ -> null);
-                mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(__ -> null);
+                mockedHelper.when(() -> Helper.decide(any(), any())).then(x -> null);
+                mockedHelper.when(() -> Helper.decideOnce(any(), any())).then(x -> null);
                 // NoAuth
                 assertDoesNotThrow(benchmark::noAuthDecideOnce);
                 assertDoesNotThrow(benchmark::noAuthDecideSubscribe);

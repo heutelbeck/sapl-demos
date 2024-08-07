@@ -33,11 +33,11 @@ import io.sapl.benchmark.BenchmarkCommand;
 import picocli.CommandLine;
 
 class SaplPdpBenchmarkIT {
-    private static final String tmpReportPath = "results/tmp_benchmark_test";
+    private static final String TMP_REPORT_PATH = "results/tmp_benchmark_test";
 
     @BeforeAll
     private static void createEmptyBenchmarkResultFolder() throws IOException {
-        var tmpReportPathFile = new File(tmpReportPath);
+        var tmpReportPathFile = new File(TMP_REPORT_PATH);
         FileUtils.deleteDirectory(tmpReportPathFile);
         assertTrue(tmpReportPathFile.mkdirs());
     }
@@ -46,7 +46,7 @@ class SaplPdpBenchmarkIT {
     void whenExecutingEmbeddedBenchmark_withAllSettings_thenReportsAreCreated() {
         // start benchmark
         var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
-                "src/test/resources/integrationtest_benchmark_config.yaml", "--output", tmpReportPath);
+                "src/test/resources/integrationtest_benchmark_config.yaml", "--output", TMP_REPORT_PATH);
         Assertions.assertEquals(0, returnCode);
 
         // build a list of expected report files
@@ -71,7 +71,7 @@ class SaplPdpBenchmarkIT {
 
         // ensure that all expected report files are present and not empty
         for (String fileName : reportFiles) {
-            File reportFile = new File(tmpReportPath + "/" + fileName);
+            File reportFile = new File(TMP_REPORT_PATH + "/" + fileName);
             assertTrue(reportFile.exists(), reportFile + " does not exist");
             assertTrue(reportFile.length() >= 0, reportFile + " is empty");
 

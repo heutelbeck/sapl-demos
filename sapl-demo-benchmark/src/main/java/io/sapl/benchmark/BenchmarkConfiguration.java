@@ -203,10 +203,10 @@ public class BenchmarkConfiguration {
     @JsonProperty("apikey")
     public void setApiKey(Map<String, String> map) {
         this.useAuthApiKey = Boolean.parseBoolean(map.remove(ENABLED));
+        var secret = map.remove("api_key");
         if (this.useAuthApiKey) {
-            this.apiKeySecret = map.get("api_key");
+            this.apiKeySecret = secret;
         }
-        map.remove("api_key");
         failOnFurtherMapEntries(map.keySet(), "apikey");
     }
 
