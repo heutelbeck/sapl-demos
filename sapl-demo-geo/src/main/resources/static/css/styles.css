@@ -1,0 +1,57 @@
+body {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            grid-template-rows: 1fr auto;
+            gap: 10px;
+            height: 100vh;
+            padding: 10px;
+        }
+        #map {
+            grid-column: 1 / 2;
+            grid-row: 1 / 2;
+            height: 100%;
+            width: 100%;
+            min-height: 700px;
+        }
+        #data {
+            grid-column: 2 / 3;
+            grid-row: 1 / 2;
+            padding: 10px;
+            background-color: #f4f4f4;
+            height: 100%;
+        }
+        #buttons {
+            grid-column: 1 / 2;
+            grid-row: 2 / 3;
+            padding: 10px;
+            background-color: #f4f4f4;
+            display: flex;
+            gap: 10px;
+        }
+        #logs {
+            grid-column: 2 / 3;
+            grid-row: 2 / 3;
+            padding: 10px;
+            background-color: #eaeaea;
+            height: 200px;
+            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #f4f4f4;
+            grid-column: 1 / 3;
+        }
+        .logout-button {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .logout-button:hover {
+            background-color: #ff1a1a;
+        }

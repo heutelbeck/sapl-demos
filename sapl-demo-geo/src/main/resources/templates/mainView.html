@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Administration</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <script th:src="@{/js/scripts.js}"></script>
+</head>
+<body>
+    <div class="header">
+        <p>Administrator</p>
+        <form id="logout-form" action="/logout" method="post">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+    </div>
+
+    <div id="map"></div>
+    <div id="data">
+        <h2>Datenbereich</h2>
+        <p>Hier werden später Daten angezeigt.</p>
+    </div>
+    <div id="buttons">
+        <button id="moveButton">move</button>
+        <button>Button 2</button>
+        <button>Button 3</button>
+    </div>
+    <div id="logs">
+        <h2>Logfenster</h2>
+        <p>Hier werden Log-Daten der Anwendung angezeigt.</p>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
+	<script th:inline="javascript">
+          
+        var geoUser = /*[[${geoUser}]]*/ {};
+            
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById('logout-form').addEventListener('submit', function(event) {
+                console.log("closeStreams");
+                closeStreams();
+                event.preventDefault();
+                this.submit();
+            });
+            
+            var moveFunction;
+                         if (geoUser.geoTracker === 'TRACCAR') {
+                moveFunction = function() {
+                    fetch('/app/moveTraccar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                        	username: '',
+                            deviceId: geoUser.uniqueDeviceId,
+                            lat: geoUser.nextLat, 
+                            lon: geoUser.nextLon  
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Erfolg:', data);
+                    })
+                    .catch(error => {
+                        console.error('Fehler:', error);
+                    });
+                };
+            } else if (geoUser.geoTracker === 'OWNTRACKS') {
+                moveFunction = function() {
+                    fetch('/app/moveOwnTracks', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            username: geoUser.username,
+                            deviceId: geoUser.trackerDeviceId,
+                            lat: geoUser.nextLat, 
+                            lon: geoUser.nextLon   
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Erfolg:', data);
+                    })
+                    .catch(error => {
+                        console.error('Fehler:', error);
+                    });
+                };
+            } else {
+                moveFunction = function() {
+                    console.warn('Unsupported geoTracker type:', geoUser.geoTracker);
+                };
+            }
+
+            document.getElementById('moveButton').addEventListener('click', moveFunction);
+        });
+            
+		
+        /*<![CDATA[*/
+        var map = L.map('map').setView([51.1657, 10.4515], 6);
+        var postgisLayerGroup = L.layerGroup().addTo(map);
+        var traccarPositionsLayerGroup = L.layerGroup().addTo(map);
+        var ownTracksPositionsLayerGroup = L.layerGroup().addTo(map);
+        var geofencesLayerGroup = L.layerGroup().addTo(map);
+        var kmlLayerGroup = L.layerGroup().addTo(map);
+        var positionsFromTraccar, positionsFromOwnTracks, geometriesFromPostGIS, geofencesFromTraccar, featuresFromWeb;
+        
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+
+		if(geoUser.geoTracker === 'TRACCAR'){
+		console.log(geoUser.geoTracker);
+	        positionsFromTraccar = new EventSource('/stream/streamPositionsFromTraccar?id=' + encodeURIComponent(geoUser.trackerDeviceId));
+	        positionsFromTraccar.onmessage = function(event) {
+	            handleGeoJsonPosition(event, traccarPositionsLayerGroup, 'green');
+	        };
+	        
+	        geofencesFromTraccar = new EventSource('/stream/streamGeofencesFromTraccar?id=' + encodeURIComponent(geoUser.trackerDeviceId));
+        	geofencesFromTraccar.onmessage = function(event) {
+            	handleGeoJsonData(event, geofencesLayerGroup, 'area', 'description', 'green');
+        	};
+        }
+        
+        if(geoUser.geoTracker  === 'OWNTRACKS'){
+	        positionsFromOwnTracks = new EventSource('/stream/streamPositionsFromOwnTracks?userName=' + encodeURIComponent(geoUser.username) + '&deviceId=' + encodeURIComponent(geoUser.trackerDeviceId));
+	        positionsFromOwnTracks.onmessage = function(event) {
+	            handleGeoJsonPosition(event, ownTracksPositionsLayerGroup, 'yellow');
+	        };
+		}
+		
+        geometriesFromPostGIS = new EventSource('/stream/streamGeometriesFromPostGIS');
+        geometriesFromPostGIS.onmessage = function(event) {
+            handleGeoJsonData(event, postgisLayerGroup, 'geo', 'name', 'blue');
+        };
+
+        
+
+        featuresFromWeb = new EventSource('/stream/streamFeaturesFromWeb');
+        featuresFromWeb.onmessage = function(event) {
+            handleGeoJsonData(event, kmlLayerGroup, 'Geometry', 'name', 'red');
+        };
+        
+	    function closeStreams() {
+		   if (positionsFromTraccar) positionsFromTraccar.close();
+		   if (positionsFromOwnTracks) positionsFromOwnTracks.close();
+		   if (geometriesFromPostGIS) geometriesFromPostGIS.close();
+		   if (geofencesFromTraccar) geofencesFromTraccar.close();
+		   if (featuresFromWeb) featuresFromWeb.close();
+		 }
+        
+   		 function moveTraccar() {
+            fetch('/app/moveTraccar?uniqueDeviceId=' + encodeURIComponent(uniqueDeviceId) + '&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon), {
+                method: 'POST', // Verwende 'GET', falls POST nicht erforderlich ist
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+          }
+        
+        /*]]>*/
+        
+    </script>
+</body>
+</html>
