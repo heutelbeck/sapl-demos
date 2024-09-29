@@ -26,11 +26,8 @@
         <button>Button 2</button>
         <button>Button 3</button>
     </div>
-    <div id="logs">
-        <h2>Logfenster</h2>
-        <p>Hier werden Log-Daten der Anwendung angezeigt.</p>
-    </div>
-
+    <div id="logs"></div>
+    
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-omnivore@0.3.4/leaflet-omnivore.min.js"></script>
 	<script th:inline="javascript">
@@ -46,7 +43,7 @@
             });
             
             var moveFunction;
-                         if (geoUser.geoTracker === 'TRACCAR') {
+            if (geoUser.geoTracker === 'TRACCAR') {
                 moveFunction = function() {
                     fetch('/app/moveTraccar', {
                         method: 'POST',
@@ -114,11 +111,32 @@
 		    maxZoom: 20,
 		    minZoom: 2.8  
 	   });
+	    
+	    
+	    var coordDisplay = L.control({ position: 'bottomright' });
+	    
+		coordDisplay.onAdd = function() {
+		    this._div = L.DomUtil.create('div', 'info');
+		    this.update();
+		    return this._div;
+		};
+		coordDisplay.update = function(lat, lng) {
+		    if (lat !== undefined && lng !== undefined) {
+		        this._div.innerHTML = 'Koordinaten: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
+		    } else {
+		        this._div.innerHTML = ''; 
+		    }
+		};
+	    
+	         
 	         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
             	noWrap: true
        	}).addTo(map);
+        
+        
+        
         
         var postgisLayerGroup = L.layerGroup().addTo(map);
         var traccarPositionsLayerGroup = L.layerGroup().addTo(map);
@@ -127,20 +145,18 @@
         var kmlLayerGroup = L.layerGroup().addTo(map);
         var positionsFromTraccar, positionsFromOwnTracks, geometriesFromPostGIS, geofencesFromTraccar, featuresFromWeb;
         
-        
-
-
-
 		if(geoUser.geoTracker === 'TRACCAR'){
 		console.log(geoUser.geoTracker);
 	        positionsFromTraccar = new EventSource('/stream/streamPositionsFromTraccar?id=' + encodeURIComponent(geoUser.trackerDeviceId));
 	        positionsFromTraccar.onmessage = function(event) {
 	            handleGeoJsonPosition(event, traccarPositionsLayerGroup, 'green');
+	            updateLogArea('logs', 'TraccarPositions')
 	        };
 	        
 	        geofencesFromTraccar = new EventSource('/stream/streamGeofencesFromTraccar?id=' + encodeURIComponent(geoUser.trackerDeviceId));
         	geofencesFromTraccar.onmessage = function(event) {
             	handleGeoJsonData(event, geofencesLayerGroup, 'area', 'description', 'green');
+            	updateLogArea('logs', 'TraccarGeoFences')
         	};
         }
         
@@ -148,12 +164,14 @@
 	        positionsFromOwnTracks = new EventSource('/stream/streamPositionsFromOwnTracks?userName=' + encodeURIComponent(geoUser.username) + '&deviceId=' + encodeURIComponent(geoUser.trackerDeviceId));
 	        positionsFromOwnTracks.onmessage = function(event) {
 	            handleGeoJsonPosition(event, ownTracksPositionsLayerGroup, 'yellow');
+	            updateLogArea('logs', 'OwnTracks')
 	        };
 		}
 		
         geometriesFromPostGIS = new EventSource('/stream/streamGeometriesFromPostGIS');
         geometriesFromPostGIS.onmessage = function(event) {
-            handleGeoJsonData(event, postgisLayerGroup, 'geo', 'name', 'blue');
+            handleGeoJsonData(event, postgisLayerGroup, 'geo', 'name', 'blue');           
+            updateLogArea('logs', 'PostGis')
         };
 
         
@@ -161,6 +179,7 @@
         featuresFromWeb = new EventSource('/stream/streamFeaturesFromWeb');
         featuresFromWeb.onmessage = function(event) {
             handleGeoJsonData(event, kmlLayerGroup, 'Geometry', 'name', 'red');
+            updateLogArea('logs', 'KML')
         };
         
 	    function closeStreams() {
@@ -170,16 +189,7 @@
 		   if (geofencesFromTraccar) geofencesFromTraccar.close();
 		   if (featuresFromWeb) featuresFromWeb.close();
 		 }
-        
-   		 function moveTraccar() {
-            fetch('/app/moveTraccar?uniqueDeviceId=' + encodeURIComponent(uniqueDeviceId) + '&lat=' + encodeURIComponent(lat) + '&lon=' + encodeURIComponent(lon), {
-                method: 'POST', // Verwende 'GET', falls POST nicht erforderlich ist
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-          }
-        
+
         /*]]>*/
         
     </script>

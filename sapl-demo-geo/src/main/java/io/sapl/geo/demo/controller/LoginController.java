@@ -16,19 +16,6 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping(value="/")
 public class LoginController {
 
-
-
-	
-//	@RequestMapping
-//	public ModelAndView index() {
-//		var mav = new ModelAndView("index");
-//		mav.addObject("message", "Hallo");
-//		
-//		return mav;
-//	}
-
-
-	
 	@RequestMapping(value="/mainView")
     public String login(@AuthenticationPrincipal GeoUser geoUser, Model model) {
         

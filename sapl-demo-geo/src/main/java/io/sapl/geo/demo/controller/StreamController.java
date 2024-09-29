@@ -21,41 +21,31 @@ public class StreamController {
 	@RequestMapping(value="/streamGeometriesFromPostGIS", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<JsonNode> streamGeometriesFromPostGIS(Model model) throws JsonProcessingException {
        
-            return geometryService.getFencesAndLocationsFromPostgis();
-
-        
+            return geometryService.getFencesAndLocationsFromPostgis();  
     }
 	
 	@RequestMapping(value="/streamPositionsFromTraccar", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<JsonNode> streamPositionsFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException {
        
-            return geometryService.getPositionFromTraccar(id);
-
-            
+            return geometryService.getPositionFromTraccar(id);    
     }
 	
 	@RequestMapping(value="/streamGeofencesFromTraccar", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<JsonNode> streamGeofencesFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException {
        
-            return geometryService.getGeofencesFromTraccar(id);
-
-            
+            return geometryService.getGeofencesFromTraccar(id);    
     }
 	
 	@RequestMapping(value="/streamFeaturesFromWeb", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<JsonNode> streamGeofencesFromWeb(Model model) throws JsonProcessingException {
        
-            return geometryService.getGeometriesFromHttp();
-
-            
+            return geometryService.getGeometriesFromHttp();       
     }
 	
 	@RequestMapping(value="/streamPositionsFromOwnTracks", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<JsonNode> streamPositionsFromOwnTracks(@RequestParam String userName, @RequestParam String deviceId, Model model) throws JsonProcessingException {
        
-            return geometryService.getPositionFromOwnTracks(userName, deviceId);
-
-            
+            return geometryService.getPositionFromOwnTracks(userName, deviceId);      
     }
-	
+		
 }

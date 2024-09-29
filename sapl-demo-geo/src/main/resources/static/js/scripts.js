@@ -43,3 +43,11 @@ function handleGeoJsonPosition(event, layerGroup, color) {
     }).addTo(layerGroup);
 }
 
+function updateLogArea(id, source){
+	const logContainer = document.getElementById(id);
+    const logData = JSON.parse(event.data); 
+    const logEntry = document.createElement('p');
+    logEntry.textContent = "Received data from " + source + ": " + JSON.stringify(logData);
+    logContainer.appendChild(logEntry);
+
+}

@@ -59,3 +59,9 @@ body {
         .logout-button:hover {
             background-color: #ff1a1a;
         }
+        .info {
+		    background: white;
+		    padding: 5px;
+		    border-radius: 5px;
+		    box-shadow: 0 0 5px rgba(0, 0, 0, 0.65);
+		}
