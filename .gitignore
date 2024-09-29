@@ -16,6 +16,9 @@ local.properties
 .loadpath
 .recommenders
 
+#sonarlint
+.sonarlint/
+
 # External tool builders
 .externalToolBuilders/
 

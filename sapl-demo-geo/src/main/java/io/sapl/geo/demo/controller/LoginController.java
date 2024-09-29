@@ -7,7 +7,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import io.sapl.geo.demo.domain.GeoUser;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +19,13 @@ public class LoginController {
 
 
 	
-	@RequestMapping
-	public ModelAndView index() {
-		var mav = new ModelAndView("index");
-		mav.addObject("message", "Hallo");
-		
-		return mav;
-	}
+//	@RequestMapping
+//	public ModelAndView index() {
+//		var mav = new ModelAndView("index");
+//		mav.addObject("message", "Hallo");
+//		
+//		return mav;
+//	}
 
 
 	

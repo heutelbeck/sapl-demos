@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Administration</title>
+    <title>Sapl-Geo-Demo</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -10,7 +10,7 @@
 </head>
 <body>
     <div class="header">
-        <p>Administrator</p>
+        <p th:text="${message}">ddd</p>
         <form id="logout-form" action="/logout" method="post">
             <button type="submit" class="logout-button">Logout</button>
         </form>
@@ -101,7 +101,25 @@
             
 		
         /*<![CDATA[*/
-        var map = L.map('map').setView([51.1657, 10.4515], 6);
+        
+       var southWest = L.latLng(-90, -180); 
+	   var northEast = L.latLng(90, 180);   
+	   var bounds = L.latLngBounds(southWest, northEast); 
+       //var map = L.map('map').setView([51.1657, 10.4515], 6); 
+       var map = L.map('map', {
+            center: [51.1657, 10.4515],
+      		zoom: 6,
+		    maxBounds: bounds,   
+		    maxBoundsViscosity: 1.0,  
+		    maxZoom: 20,
+		    minZoom: 2.8  
+	   });
+	         
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            	noWrap: true
+       	}).addTo(map);
+        
         var postgisLayerGroup = L.layerGroup().addTo(map);
         var traccarPositionsLayerGroup = L.layerGroup().addTo(map);
         var ownTracksPositionsLayerGroup = L.layerGroup().addTo(map);
@@ -110,9 +128,7 @@
         var positionsFromTraccar, positionsFromOwnTracks, geometriesFromPostGIS, geofencesFromTraccar, featuresFromWeb;
         
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+
 
 
 		if(geoUser.geoTracker === 'TRACCAR'){
