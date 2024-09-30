@@ -35,9 +35,9 @@ public class TrackerSetup implements CommandLineRunner {
         log.info("traccar container started: {}:{}", traccarContainer.getHost(), traccarContainer.getMappedPort(8082));
         var email = "testuser@example.com";
         var password = "password";   
-        registerUser(email, password);
-        var sessionCookie = establishSession(email, password);
-        var devId = createDevice(sessionCookie);
+        registerTraccarUser(email, password);
+        var traccarSessionCookie = establishTraccarSession(email, password);
+        var devId = createTraccarDevice(traccarSessionCookie);
         
         var body = """
         		{"name":"fence1","description": "description for fence1","area":"POLYGON ((48.25767 11.54370, 48.25767 11.54422, 48.25747 11.54422, 48.25747 11.54370, 48.25767 11.54370))"}
@@ -50,26 +50,20 @@ public class TrackerSetup implements CommandLineRunner {
         
         for(var fence: traccarGeofences){
         	
-        	var fenceId = postTraccarGeofence(sessionCookie, fence).block().get("id").asInt();
-        	linkGeofenceToDevice(devId, fenceId, sessionCookie);
+        	var fenceId = postTraccarGeofence(traccarSessionCookie, fence).block().get("id").asInt();
+        	linkTraccarGeofenceToDevice(devId, fenceId, traccarSessionCookie);
         }
-        
-        
-        
-        addPosition("1234567890", 51.34533, 7.40575);
+
+        addTraccarPosition("1234567890", 51.34533, 7.40575);
         
         log.info("ownTracks container started: {}:{}", ownTracksContainer.getHost(), ownTracksContainer.getMappedPort(8083));
         
-        addOwntracks();
+        addOwntracksPosition("alice", "device1", 48.856613, 2.352222);
         
         log.info("tracker setup completed");
     }
 
-    
-
-    	
-	
-    private void registerUser(String email, String password) {
+    private void registerTraccarUser(String email, String password) {
         String registerUserUrl = String.format("http://%s:%d/api/users", traccarContainer.getHost(), traccarContainer.getMappedPort(8082));
 
         WebClient webClient = webClientBuilder.build();
@@ -94,7 +88,7 @@ public class TrackerSetup implements CommandLineRunner {
                 .block();
     }
     
-    private String establishSession(String email, String password) {
+    private String establishTraccarSession(String email, String password) {
          	
     		var sessionUrl = String.format("http://%s:%d/api/session", traccarContainer.getHost(), traccarContainer.getMappedPort(8082));
 
@@ -123,7 +117,6 @@ public class TrackerSetup implements CommandLineRunner {
             if (response != null) {
                 var setCookieHeader = response.getHeaders().getFirst("Set-Cookie");
                 if (setCookieHeader != null) {
-                    // Extrahiere nur die JSESSIONID
                     return Arrays.stream(setCookieHeader.split(";"))
                                               .filter(s -> s.startsWith("JSESSIONID"))
                                               .findFirst()
@@ -135,7 +128,7 @@ public class TrackerSetup implements CommandLineRunner {
     }
 
     
-    private String createDevice(String sessionCookie) throws Exception {
+    private String createTraccarDevice(String sessionCookie) throws Exception {
         
     	var createDeviceUrl = String.format("http://%s:%d/api/devices", traccarContainer.getHost(), traccarContainer.getMappedPort(8082));
         var webClient = webClientBuilder.build();
@@ -194,7 +187,7 @@ public class TrackerSetup implements CommandLineRunner {
 
     }
     
-    private void linkGeofenceToDevice(String deviceId, int geofenceId, String sessionCookie) {
+    private void linkTraccarGeofenceToDevice(String deviceId, int geofenceId, String sessionCookie) {
     	
     	var linkGeofenceUrl = String.format("http://%s:%d/api/permissions", traccarContainer.getHost(), traccarContainer.getMappedPort(8082));
 
@@ -224,16 +217,16 @@ public class TrackerSetup implements CommandLineRunner {
 
 }
     
-    private void addPosition(String deviceId, Double lat, Double lon) {
+    private void addTraccarPosition(String deviceId, Double lat, Double lon) {
         
 	    geometryService.addTraccarPosition(deviceId, lat, lon)
 	    			.block();
 
     }
 
-    private void addOwntracks() {
+    private void addOwntracksPosition(String user, String deviceId, double lat, double lon) {
     	
-    	geometryService.addOwntracksPosition("alice", "device1", 48.856613, 2.352222)
+    	geometryService.addOwntracksPosition(user, deviceId, lat, lon)
 	    	.then()
 	    	.block();
     	
