@@ -98,7 +98,7 @@ public class SAPLEditorView extends VerticalLayout {
         add(toggleReadOnlyButton);
 
         IntegerField configurationIdField = new IntegerField("Configuration Id");
-        configurationIdField.addValueChangeListener(value -> saplEditor.setConfigurationId(value.toString()));
+        configurationIdField.addValueChangeListener(event -> saplEditor.setConfigurationId(event.getValue().toString()));
         configurationIdField.setStepButtonsVisible(true);
         configurationIdField.setMin(1);
         configurationIdField.setMax(5);

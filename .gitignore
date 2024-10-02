@@ -247,3 +247,7 @@ sapl-demo-embedded/dependency-reduced-pom.xml
 
 ### Benchmark result ###
 sapl-demo-benchmark/results/
+sapl-demo-playground/tsconfig.json
+sapl-demo-playground/types.d.ts
+sapl-demo-web-editor/types.d.ts
+sapl-demo-web-editor/tsconfig.json
