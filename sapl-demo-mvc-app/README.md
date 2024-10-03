@@ -23,7 +23,7 @@ If the developer does not provide any parameters in the annotations, the PEP wil
 
 You can customize the subscription by adding `subject`, `action`, or `resource` to the annotation, which uses Spring Expression Language.
 
-Some examples can be found in the [`PatientRepository`](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-authorizationaspects/src/main/java/io/sapl/sapldemoauthorizationaspects/UIController) of this demo:
+Some examples can be found in the [`PatientRepository`](https://github.com/heutelbeck/sapl-demos/blob/master/sapl-demo-mvc-app/src/main/java/io/sapl/mvc/demo/domain/PatientRepository.java) of this demo:
 
 ```java
 public interface PatientRepository {
