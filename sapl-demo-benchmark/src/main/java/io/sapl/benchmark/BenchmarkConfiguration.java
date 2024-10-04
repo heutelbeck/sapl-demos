@@ -54,7 +54,7 @@ public class BenchmarkConfiguration {
 
     private static void failOnFurtherMapEntries(Set<String> keySet, String parentEntryPath) {
         for (var key : keySet) {
-            if (key != null) {
+            if (null != key) {
                 throw new BenchmarkException("Unknown configuration entry " + parentEntryPath + "." + key);
             }
         }

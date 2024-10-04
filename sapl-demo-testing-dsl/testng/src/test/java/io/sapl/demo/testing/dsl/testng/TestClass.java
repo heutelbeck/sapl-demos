@@ -19,7 +19,7 @@ public class TestClass implements ITest {
 
     @Test
     public void test() {
-        if (runnable != null) {
+        if (null != runnable) {
             runnable.run();
         }
     }

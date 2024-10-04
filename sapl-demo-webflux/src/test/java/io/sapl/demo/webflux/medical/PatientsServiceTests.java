@@ -57,6 +57,6 @@ class PatientsServiceTests {
 
     private boolean icdNotBlackenedAndPresent(Patient patient) {
         return !patient.icd11Code().contains("*") && !patient.icd11Code().contains("█")
-                && !"[DIAGNOSIS HIDDEN]".equals(patient.diagnosis()) && patient.diagnosis() != null;
+                && !"[DIAGNOSIS HIDDEN]".equals(patient.diagnosis()) && null != patient.diagnosis();
     }
 }

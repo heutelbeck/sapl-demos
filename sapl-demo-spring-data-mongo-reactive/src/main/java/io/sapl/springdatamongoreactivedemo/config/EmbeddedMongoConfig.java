@@ -18,6 +18,7 @@
 package io.sapl.springdatamongoreactivedemo.config;
 
 import java.io.IOException;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -28,6 +29,7 @@ import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRep
 import com.mongodb.ConnectionString;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
@@ -76,10 +78,10 @@ public class EmbeddedMongoConfig extends AbstractReactiveMongoConfiguration {
 
     @PreDestroy
     public void close() {
-        if (mongodProcess != null) {
+        if (null != mongodProcess) {
             mongodProcess.stop();
         }
-        if (mongodExecutable != null) {
+        if (null != mongodExecutable) {
             mongodExecutable.stop();
         }
     }

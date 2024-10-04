@@ -218,7 +218,7 @@ public class SaplBenchmark {
 
     void configureAndStartOAuthContainer(GenericContainer<?> container) {
         this.oauth2Container = container;
-        if (container == null) {
+        if (null == container) {
             return;
         }
         container.withExposedPorts(8080).waitingFor(Wait.forListeningPort());
@@ -227,7 +227,7 @@ public class SaplBenchmark {
 
     private void stopContainersIfRunning(GenericContainer<?>... containers) {
         for (var container : containers) {
-            if (container != null) {
+            if (null != container) {
                 container.stop();
             }
         }

@@ -69,7 +69,7 @@ public class EmailConstraintHandlerProvider implements ConsumerConstraintHandler
      */
     @Override
     public boolean isResponsible(JsonNode constraint) {
-        return constraint != null && constraint.has("type") && "sendEmail".equals(constraint.findValue("type").asText())
+        return null != constraint && constraint.has("type") && "sendEmail".equals(constraint.findValue("type").asText())
                 && constraint.has("recipient") && constraint.has("subject") && constraint.has("message");
     }
 

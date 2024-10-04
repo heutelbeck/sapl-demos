@@ -178,7 +178,7 @@ public class ReportGenerator {
         log.info("collecting response time data ...");
         // use the first file for response time reporting
         var fileName = getResultFilesFiles().get(0);
-        if (fileName != null) {
+        if (null != fileName) {
 
             Map<String, List<ReportSectionData>> baseData = new HashMap<>();
             for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(fileName)) {
@@ -266,7 +266,7 @@ public class ReportGenerator {
         // copy static files
         for (var file : new String[] { "custom.css", "favicon.png" }) {
             var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream(file);
-            if (inputStream != null) {
+            if (null != inputStream) {
                 FileUtils.copyInputStreamToFile(inputStream, new File(benchmarkFolder + File.separator + file));
             }
         }
@@ -286,7 +286,7 @@ public class ReportGenerator {
         // build context
         var jnj         = new Jinjava();
         var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream("Report.html");
-        if (inputStream != null) {
+        if (null != inputStream) {
             String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
             String fileContent    = jnj.render(template, context);

@@ -494,7 +494,7 @@ public class PlaygroundView extends VerticalLayout {
         for (var mock : mocks) {
             switch (mock.getType()) {
             case ATTRIBUTE:
-                if (mock.getAlways() != null) {
+                if (null != mock.getAlways()) {
                     attributeCtx.markAttributeMock(mock.getImportName());
                     this.attrReturnValues
                             .add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
@@ -505,7 +505,7 @@ public class PlaygroundView extends VerticalLayout {
                 }
                 break;
             case FUNCTION:
-                if (mock.getAlways() != null) {
+                if (null != mock.getAlways()) {
                     functionCtx.loadFunctionMockAlwaysSameValue(mock.getImportName(), mock.getAlways());
                 } else {
                     functionCtx.loadFunctionMockReturnsSequence(mock.getImportName(),

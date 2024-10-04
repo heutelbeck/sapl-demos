@@ -51,15 +51,15 @@ public class AuthorizationController {
             @RegisteredOAuth2AuthorizedClient("miskatonic-client-authorization-code") OAuth2AuthorizedClient authorizedClient) {
 
         String[] books = fetchWithAttributes("/books", oauth2AuthorizedClient(authorizedClient));
-        if (books != null && books.length > 0)
+        if (null != books && books.length > 0)
             model.addAttribute("books", books);
 
         String[] faculty = fetchWithAttributes("/faculty", oauth2AuthorizedClient(authorizedClient));
-        if (faculty != null && faculty.length > 0)
+        if (null != faculty && faculty.length > 0)
             model.addAttribute("faculty", faculty);
 
         String[] bestiary = fetchWithAttributes("/bestiary", oauth2AuthorizedClient(authorizedClient));
-        if (bestiary != null && bestiary.length > 0)
+        if (null != bestiary && bestiary.length > 0)
             model.addAttribute("bestiary", bestiary);
 
         return "index";
@@ -82,17 +82,17 @@ public class AuthorizationController {
     public String clientCredentialsGrant(Model model) {
 
         String[] books = fetchWithAttributes("/books", clientRegistrationId("miskatonic-client-client-credentials"));
-        if (books != null && books.length > 0)
+        if (null != books && books.length > 0)
             model.addAttribute("books", books);
 
         String[] faculty = fetchWithAttributes("/faculty",
                 clientRegistrationId("miskatonic-client-client-credentials"));
-        if (faculty != null && faculty.length > 0)
+        if (null != faculty && faculty.length > 0)
             model.addAttribute("faculty", faculty);
 
         String[] bestiary = fetchWithAttributes("/bestiary",
                 clientRegistrationId("miskatonic-client-client-credentials"));
-        if (bestiary != null && bestiary.length > 0)
+        if (null != bestiary && bestiary.length > 0)
             model.addAttribute("bestiary", bestiary);
 
         return "index";

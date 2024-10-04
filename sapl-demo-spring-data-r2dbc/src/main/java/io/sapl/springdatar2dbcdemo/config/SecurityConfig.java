@@ -79,7 +79,7 @@ public class SecurityConfig implements WebFilter {
                 .map(session -> session.getAttributeOrDefault(
                         WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME, null))
                 .flatMap(securityContext -> {
-                    if (securityContext != null) {
+                    if (null != securityContext) {
                         SecurityContextHolder.setContext((SecurityContext) securityContext);
                     }
                     return chain.filter(exchange);

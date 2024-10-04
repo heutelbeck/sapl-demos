@@ -45,15 +45,15 @@ import reactor.core.publisher.Mono;
 @EnableReactiveMethodSecurity
 @EnableReactiveSaplMethodSecurity
 public class SecurityConfig implements WebFilter {
-	
-	@Bean
-	SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
 
-		return http
-				.authorizeExchange(
-						exchange -> exchange.pathMatchers("/public/**").permitAll().anyExchange().authenticated())
-				.formLogin(withDefaults()).logout(logout -> logout.logoutUrl("/logout")).build();
-	}
+    @Bean
+    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
+
+        return http
+                .authorizeExchange(
+                        exchange -> exchange.pathMatchers("/public/**").permitAll().anyExchange().authenticated())
+                .formLogin(withDefaults()).logout(logout -> logout.logoutUrl("/logout")).build();
+    }
 
     @Bean
     MapReactiveUserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
@@ -65,23 +65,23 @@ public class SecurityConfig implements WebFilter {
 
         return new MapReactiveUserDetailsService(testUser1, testUser2);
     }
-	
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
 
-	@Override
-	public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-		return exchange.getSession()
-				.map(session -> session.getAttributeOrDefault(
-						WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME, null))
-				.flatMap(securityContext -> {
-					if (securityContext != null) {
-						SecurityContextHolder.setContext((SecurityContext) securityContext);
-					}
-					return chain.filter(exchange);
-				}).switchIfEmpty(Mono.empty());
-	}	
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
+        return exchange.getSession()
+                .map(session -> session.getAttributeOrDefault(
+                        WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME, null))
+                .flatMap(securityContext -> {
+                    if (null != securityContext) {
+                        SecurityContextHolder.setContext((SecurityContext) securityContext);
+                    }
+                    return chain.filter(exchange);
+                }).switchIfEmpty(Mono.empty());
+    }
 
 }

@@ -60,7 +60,7 @@ public class MainLayout extends AppLayout {
             // Use Lumo classnames for various styling
             text.addClassNames(FontWeight.MEDIUM, FontSize.MEDIUM, Whitespace.NOWRAP);
 
-            if (icon != null) {
+            if (null != icon) {
                 link.add(icon);
             }
             link.add(text);

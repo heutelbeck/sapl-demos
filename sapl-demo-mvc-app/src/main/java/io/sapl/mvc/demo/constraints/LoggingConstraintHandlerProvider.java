@@ -68,7 +68,7 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
      */
     @Override
     public boolean isResponsible(JsonNode constraint) {
-        return constraint != null && constraint.has("type")
+        return null != constraint && constraint.has("type")
                 && "logAccess".equals(constraint.findValue("type").asText());
     }
 

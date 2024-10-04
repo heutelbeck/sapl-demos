@@ -24,7 +24,7 @@
 		<java.version>17</java.version>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
 		<springboot.version>3.3.4</springboot.version>
-		<vaadin.version>24.4.12</vaadin.version>
+		<vaadin.version>24.4.13</vaadin.version>
 		<maven-source-plugin.version>3.0.1</maven-source-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>

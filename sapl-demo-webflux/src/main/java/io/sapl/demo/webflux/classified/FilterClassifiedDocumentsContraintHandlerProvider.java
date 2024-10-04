@@ -13,7 +13,7 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
 
     @Override
     public boolean isResponsible(JsonNode constraint) {
-        return constraint != null && constraint.has("type")
+        return null != constraint && constraint.has("type")
                 && "filterClassifiedDocuments".equals(constraint.findValue("type").asText());
     }
 

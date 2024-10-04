@@ -152,9 +152,9 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         LOGGER.info("");
         LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using .blockFirst()");
         final AuthorizationDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
-        LOGGER.info("Decision for action 'read' : {}", readDecision != null ? readDecision.getDecision() : "null");
+        LOGGER.info("Decision for action 'read' : {}", null != readDecision ? readDecision.getDecision() : "null");
         final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
-        LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.getDecision() : "null");
+        LOGGER.info("Decision for action 'write': {}", null != writeDecision ? writeDecision.getDecision() : "null");
         LOGGER.info("");
         LOGGER.info(LINE);
 
