@@ -48,7 +48,7 @@ public class TestAdapter extends BaseTestAdapter<List<TestCase>> {
      * @return a list of {@link TestCase} instances
      */
     private List<TestCase> getDynamicContainersFromTestNode(Collection<? extends TestNode> testNodes) {
-        if (testNodes == null) {
+        if (null == testNodes) {
             return Collections.emptyList();
         }
 

@@ -63,7 +63,7 @@ public class SaplBenchmark {
 
     private void configureAndStartServerLtContainer(GenericContainer<?> container) {
         this.pdpContainer = container;
-        if (container == null) {
+        if (null == container) {
             return;
         }
         var encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();

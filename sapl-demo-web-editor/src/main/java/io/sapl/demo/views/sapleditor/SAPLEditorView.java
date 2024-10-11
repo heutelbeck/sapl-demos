@@ -111,15 +111,15 @@ public class SAPLEditorView extends VerticalLayout {
     }
 
     public void onDocumentChanged(DocumentChangedEvent event) {
-        log.info("value changed: {}", event.getNewValue());
+//        log.info("value changed: {}", event.getNewValue());
     }
 
     public void onValidationFinished(ValidationFinishedEvent event) {
-        Issue[] issues = event.getIssues();
-        log.info("validation finished, number of issues: {}", issues.length);
-        for (Issue issue : issues) {
-            log.info(" - {} " + issue.getDescription());
-        }
+//        Issue[] issues = event.getIssues();
+//        log.info("validation finished, number of issues: {}", issues.length);
+//        for (Issue issue : issues) {
+//            log.info(" - {} " + issue.getDescription());
+//        }
     }
 
 }

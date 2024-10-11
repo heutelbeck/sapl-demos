@@ -38,7 +38,7 @@ public class Helper {
      */
     public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decide(authorizationSubscription).blockFirst();
-        if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
+        if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }
@@ -49,7 +49,7 @@ public class Helper {
      */
     public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         var decision = pdp.decideOnce(authorizationSubscription).block();
-        if (decision == null || decision.getDecision() == null || decision.getDecision() != Decision.PERMIT) {
+        if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }

@@ -121,7 +121,7 @@ public class PlaygroundView extends VerticalLayout {
         this.objectMapper             = new ObjectMapper();
         this.pdpConfigurationProvider = pdpConfigurationProvider;
 
-        var horizontalSplitLayout = new SplitLayout(policyEditor(), createRightSide());
+        final var horizontalSplitLayout = new SplitLayout(policyEditor(), createRightSide());
         horizontalSplitLayout.setOrientation(SplitLayout.Orientation.HORIZONTAL);
         horizontalSplitLayout.setSizeFull();
         horizontalSplitLayout.setSplitterPosition(50);
@@ -139,7 +139,7 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private Component policyEditor() {
-        var saplConfig = new SaplEditorConfiguration();
+        final var saplConfig = new SaplEditorConfiguration();
         saplConfig.setHasLineNumbers(true);
         saplConfig.setTextUpdateDelay(500);
         saplConfig.setDarkTheme(true);
@@ -150,7 +150,7 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private Component createRightSide() {
-        var rightSideSplit = new SplitLayout(createRightUpperSide(), resultsDisplay());
+        final var rightSideSplit = new SplitLayout(createRightUpperSide(), resultsDisplay());
         rightSideSplit.setOrientation(SplitLayout.Orientation.VERTICAL);
         rightSideSplit.setSizeFull();
         rightSideSplit.setSplitterPosition(50);
@@ -158,7 +158,7 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private Component createRightUpperSide() {
-        var tabSheet = new TabSheet();
+        final var tabSheet = new TabSheet();
         tabSheet.add("Authorization Subscription", createAuthorizationSubscriptionEditor());
         tabSheet.add("Mocks", mocksEditorAndError());
         tabSheet.add("Mock Help", mockingInformation());
@@ -194,10 +194,10 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private Component mocksEditorAndError() {
-        var mockInput = new VerticalLayout();
+        final var mockInput = new VerticalLayout();
         mockInput.setClassName(LumoUtility.Padding.NONE);
 
-        var mockJsonEditorConfig = new JsonEditorConfiguration();
+        final var mockJsonEditorConfig = new JsonEditorConfiguration();
         mockJsonEditorConfig.setTextUpdateDelay(500);
         mockJsonEditorConfig.setDarkTheme(true);
         this.mockDefinitionEditor = new JsonEditor(mockJsonEditorConfig);
@@ -214,10 +214,10 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private Component createAuthorizationSubscriptionEditor() {
-        var authzSubscriptionEditor = new VerticalLayout();
+        final var authzSubscriptionEditor = new VerticalLayout();
         authzSubscriptionEditor.setClassName(LumoUtility.Padding.NONE);
 
-        var authzSubEditorConfig = new JsonEditorConfiguration();
+        final var authzSubEditorConfig = new JsonEditorConfiguration();
         authzSubEditorConfig.setTextUpdateDelay(500);
         authzSubEditorConfig.setDarkTheme(true);
         this.authzSubEditor = new JsonEditor(authzSubEditorConfig);
@@ -322,8 +322,8 @@ public class PlaygroundView extends VerticalLayout {
 
         this.evaluationError.setVisible(false);
 
-        var saplString = event.getNewValue();
-        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
+        final var saplString = event.getNewValue();
+        if (null == saplString || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return;
         }
@@ -334,23 +334,23 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private boolean isPolicyMatchingAuthzSub() {
-        if (pdpConfigurationProvider == null) {
+        if (null == pdpConfigurationProvider) {
             return false;
         }
-        var configs = pdpConfigurationProvider.pdpConfiguration();
-        if (configs == null) {
+        final var configs = pdpConfigurationProvider.pdpConfiguration();
+        if (null == configs) {
             return false;
         }
-        var config = configs.blockFirst();
-        if (config == null) {
+        final var config = configs.blockFirst();
+        if (null == config) {
             return false;
         }
-        var attributeCtx  = new MockingAttributeContext(config.attributeContext());
-        var matchesResult = this.currentPolicy.matches().contextWrite(
+        final var attributeCtx  = new MockingAttributeContext(config.attributeContext());
+        final var matchesResult = this.currentPolicy.matches().contextWrite(
                 ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel, this.currentAuthzSub))
                 .block();
 
-        if (matchesResult == null || !matchesResult.isBoolean()) {
+        if (null == matchesResult || !matchesResult.isBoolean()) {
             updateErrorParagraph(this.evaluationError, String.valueOf(matchesResult), true);
             return false;
         }
@@ -371,18 +371,18 @@ public class PlaygroundView extends VerticalLayout {
             StepVerifier.create(Flux.just(AuthorizationDecision.NOT_APPLICABLE))
                     .consumeNextWith(consumeAuthDecision(aggregatedResult)).thenCancel().verify(Duration.ofSeconds(10));
         } else {
-            if (pdpConfigurationProvider == null) {
+            if (null == pdpConfigurationProvider) {
                 return;
             }
-            var configs = pdpConfigurationProvider.pdpConfiguration();
-            if (configs == null) {
+            final var configs = pdpConfigurationProvider.pdpConfiguration();
+            if (null == configs) {
                 return;
             }
-            var config = configs.blockFirst();
-            if (config == null) {
+            final var config = configs.blockFirst();
+            if (null == config) {
                 return;
             }
-            var attributeCtx = new MockingAttributeContext(config.attributeContext());
+            final var attributeCtx = new MockingAttributeContext(config.attributeContext());
 
             Step<AuthorizationDecision> steps = StepVerifier
                     .create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision)
@@ -442,13 +442,13 @@ public class PlaygroundView extends VerticalLayout {
     }
 
     private void checkEvaluationDataNotNull() {
-        if (this.currentAuthzSub == null || this.currentMockingModel == null || this.currentPolicy == null) {
+        if (null == this.currentAuthzSub || null == this.currentMockingModel || null == this.currentPolicy) {
             throw new IllegalStateException("Invalid internal state: Some evaluation data is null");
         }
     }
 
     private SAPL getSAPLDocument(String saplString) {
-        if (saplString == null || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
+        if (null == saplString || saplString.isEmpty() || this.saplInterpreter.parseDocument(saplString).isInvalid()) {
             updateErrorParagraph(this.evaluationError, "Policy isn't valid!", true);
             return null;
         } else {
@@ -476,22 +476,22 @@ public class PlaygroundView extends VerticalLayout {
 
     private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
-        if (pdpConfigurationProvider == null) {
+        if (null == pdpConfigurationProvider) {
             throw new IllegalStateException("pdpConfigurationProvider == null");
         }
-        var configs = pdpConfigurationProvider.pdpConfiguration();
-        if (configs == null) {
+        final var configs = pdpConfigurationProvider.pdpConfiguration();
+        if (null == configs) {
             throw new IllegalStateException("pdpConfigurationProvider.pdpConfiguration() == null");
         }
-        var config = configs.blockFirst();
-        if (config == null) {
+        final var config = configs.blockFirst();
+        if (null == config) {
             throw new IllegalStateException("config == null");
         }
-        var functionCtx = new MockingFunctionContext(config.functionContext());
-        var variables   = new HashMap<String, Val>(1);
+        final var functionCtx = new MockingFunctionContext(config.functionContext());
+        final var variables   = new HashMap<String, Val>(1);
         this.attrReturnValues = new LinkedList<>();
 
-        for (var mock : mocks) {
+        for (final var mock : mocks) {
             switch (mock.getType()) {
             case ATTRIBUTE:
                 if (null != mock.getAlways()) {
@@ -525,7 +525,7 @@ public class PlaygroundView extends VerticalLayout {
 
     private AuthorizationSubscription getAuthzSubForJsonString(String jsonInputString) {
         JsonNode jsonInput;
-        if (jsonInputString == null) {
+        if (null == jsonInputString) {
             return null;
         }
         try {

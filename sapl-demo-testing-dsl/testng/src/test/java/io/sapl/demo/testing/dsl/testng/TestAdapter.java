@@ -49,7 +49,7 @@ public class TestAdapter extends BaseTestAdapter<Stream<TestClass>> {
      * @return stream of TestClass instances
      */
     private Stream<TestClass> getDynamicContainersFromTestNode(Collection<? extends TestNode> testNodes) {
-        if (testNodes == null) {
+        if (null == testNodes) {
             return Stream.empty();
         }
 
@@ -67,9 +67,9 @@ public class TestAdapter extends BaseTestAdapter<Stream<TestClass>> {
      * override that is called by the {@link BaseTestAdapter} to convert
      * TestContainer into a list of {@link TestClass} instances.
      * 
-     * @param testContainer          the TestContainer instance
+     * @param testContainer the TestContainer instance
      * @param shouldSetTestSourceUri not used for TestNG since there is no
-     *                               testSourceUri
+     * testSourceUri
      * @return stream of the converted TestClass instances
      */
     @Override
@@ -95,7 +95,7 @@ public class TestAdapter extends BaseTestAdapter<Stream<TestClass>> {
      * src/test/resources/unit
      * 
      * @return the complete Map of fixtureRegistrations to be used in tests executed
-     *         with this TestAdapter.
+     * with this TestAdapter.
      */
     @Override
     protected Map<ImportType, Map<String, Object>> getFixtureRegistrations() {

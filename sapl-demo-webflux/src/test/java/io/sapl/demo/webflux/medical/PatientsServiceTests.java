@@ -32,7 +32,7 @@ class PatientsServiceTests {
     }
 
     private boolean icdBlackenedAndDiagnosisRemoved(Patient patient) {
-        return patient.icd11Code().contains("█") && patient.diagnosis() == null;
+        return patient.icd11Code().contains("█") && null == patient.diagnosis();
     }
 
     @Test

@@ -9,6 +9,9 @@ import java.util.function.UnaryOperator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import io.sapl.api.interpreter.Val;
 import io.sapl.functions.FilterFunctionLibrary;
 import io.sapl.functions.SchemaValidationLibrary;
 import io.sapl.functions.StandardFunctionLibrary;
@@ -30,7 +33,7 @@ import reactor.core.publisher.Mono;
 public class SaplConfiguration {
 
     @Bean
-    PDPConfigurationProvider pdpConfiguration() throws InitializationException {
+    PDPConfigurationProvider pdpConfiguration() throws InitializationException, JsonProcessingException {
         var attributeContext = new AnnotationAttributeContext();
         attributeContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
         var functionContext = new AnnotationFunctionContext();
@@ -58,7 +61,15 @@ public class SaplConfiguration {
         };
 
         var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
-                Map.of(), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
+                Map.of("abba", Val.ofJson("""
+                        {
+                            "a": {
+                                "x": 0,
+                                "y": 1
+                            },
+                            "b": "y"
+                        }                        
+                        """)), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
                 UnaryOperator.identity(), dummyPrp);
 
         return () -> Flux.just(staticPlaygroundConfiguration);

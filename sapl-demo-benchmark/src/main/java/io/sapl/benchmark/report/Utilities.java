@@ -30,7 +30,7 @@ public class Utilities {
         for (var r = 0; r < dataset.getRowCount(); r++) {
             for (var c = 0; c < dataset.getColumnCount(); c++) {
                 var number = dataset.getValue(r, c);
-                var value  = number == null ? Double.NaN : number.doubleValue();
+                var value  = null == number ? Double.NaN : number.doubleValue();
                 if (value > max) {
                     max = value;
                 }
