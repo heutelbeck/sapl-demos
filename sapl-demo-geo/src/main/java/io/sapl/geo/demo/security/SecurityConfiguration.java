@@ -11,14 +11,20 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.geo.demo.domain.GeoUserRepository;
+import io.sapl.geo.functionlibraries.GeoFunctions;
+import io.sapl.server.*;
+import io.sapl.spring.config.EnableSaplMethodSecurity;
 
 
 @Configuration
 @EnableWebSecurity
+@EnableSaplMethodSecurity
 public class SecurityConfiguration {
 
+	private ObjectMapper mapper = new ObjectMapper();
+	
 	@Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         var clearSiteData = new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(Directive.ALL));
@@ -40,6 +46,30 @@ public class SecurityConfiguration {
         
     }
 
+	@Bean
+	GeoFunctions geoFunctions() {
+		
+		return new GeoFunctions();
+	}
+	
+	@Bean
+	TraccarPolicyInformationPoint traccarPolicyInformationPoint() {
+		
+		return new TraccarPolicyInformationPoint(mapper);
+	}
+	
+	@Bean
+	OwnTracksPolicyInformationPoint ownTracksPolicyInformationPoint() {
+		
+		return new OwnTracksPolicyInformationPoint(mapper);
+	}
+	
+	@Bean
+	PostGisPolicyInformationPoint postGisPolicyInformationPoint() {
+		
+		return new PostGisPolicyInformationPoint(mapper);
+	}
+	
     @Bean
     static PasswordEncoder passwordEncoder() {
         return Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();

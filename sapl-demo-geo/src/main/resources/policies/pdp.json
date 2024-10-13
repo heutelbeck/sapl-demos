@@ -1,0 +1,27 @@
+         {
+          "algorithm": "DENY_OVERRIDES",
+          "variables":
+              {
+                 "TRACCAR_DEFAULT_CONFIG":
+                 {
+     	"user":"testuser@example.com",
+                     "password":"password",
+                     "server":"localhost:63673",
+                     "protocol": "http"
+                 },
+                  "OWNTRACKS_DEFAULT_CONFIG":
+{
+         			"server":"localhost:63690",
+         			"protocol": "http"
+         		},
+         		"POSTGIS_DEFAULT_CONFIG":
+           		{
+           			"user":"test",
+           			"password":"test",
+           			"server":"localhost",
+           			"port": 63660,
+           			"dataBase":"test",
+           			"dataBaseType" : "POSTGIS"
+           		}
+              }
+          }

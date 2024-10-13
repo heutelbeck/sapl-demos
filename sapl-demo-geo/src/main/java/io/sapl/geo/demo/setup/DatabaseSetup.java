@@ -10,6 +10,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.Result;
+import io.sapl.geo.demo.domain.Data;
+import io.sapl.geo.demo.domain.DataRepository;
 import io.sapl.geo.demo.domain.GeoTracker;
 import io.sapl.geo.demo.domain.GeoUser;
 import io.sapl.geo.demo.domain.GeoUserRepository;
@@ -27,6 +29,7 @@ public class DatabaseSetup implements CommandLineRunner {
 	private final ConnectionFactory connectionFactory;
     private final PostgreSQLContainer<?> postgisContainer;
 	private final GeoUserRepository geoUserRepository;
+	private final DataRepository dataRepository;
     private final PasswordEncoder passwordEncoder;
     
 	@Override
@@ -35,6 +38,8 @@ public class DatabaseSetup implements CommandLineRunner {
 		log.info("PostGIS container started: {}:{}", postgisContainer.getHost(), postgisContainer.getMappedPort(5432));     
 		createGeoTable()
         .then(insertGeometries())
+        .then(createDataTable())
+        .thenMany(dataRepository.saveAll(data())) 
         .then(createUserTable())
         .thenMany(geoUserRepository.saveAll(users(passwordEncoder))) 
         .doOnComplete(() -> log.info("Database setup completed"))
@@ -51,6 +56,27 @@ public class DatabaseSetup implements CommandLineRunner {
         return users;
     }
 	
+    private Collection<Data> data() {
+        var data = new LinkedList<Data>();      
+        data.add(new Data(0, "unclassified Data" ));
+        data.add(new Data(1, "confidential Data"));
+        data.add(new Data(2, "secret Data"));
+        return data;
+    }
+    
+    private Mono<? extends Result> createDataTable() {
+    	
+    	var createTableQuery = "CREATE TABLE Data (Id SERIAL PRIMARY KEY, Classified SMALLINT, Content CHARACTER VARYING(25));";
+    	
+    	return Mono.usingWhen(
+                connectionFactory.create(),
+                connection -> Mono.from(connection.createStatement(createTableQuery).execute()),
+                connection -> Mono.from(connection.close())
+        )
+        .doOnSuccess(unused -> log.info("Table created successfully with query: {}", createTableQuery))
+        .doOnError(error -> log.error("Error creating table with query: {}", createTableQuery, error));
+    }
+    
     private Mono<? extends Result> createGeoTable() {
         
     	var createTableQuery = "CREATE TABLE geometries (id SERIAL PRIMARY KEY, geom GEOMETRY, name CHARACTER VARYING(25), country CHARACTER VARYING(25), text CHARACTER VARYING(25));";

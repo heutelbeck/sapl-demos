@@ -1,0 +1,6 @@
+policy "permit traccar" 
+permit
+where
+  var position = <traccar.position({"responseFormat":"GEOJSON", "deviceId":1})>.position;
+  var fernuni = <postGis.geometry({"table":"geometries", "geoColumn":"geom", "defaultCRS": 3857, "where":"name='Hagen'"})>;
+  geoFunctions.withinposition(position, fernuni);
