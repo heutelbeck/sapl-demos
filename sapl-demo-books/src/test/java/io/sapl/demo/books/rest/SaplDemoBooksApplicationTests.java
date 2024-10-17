@@ -42,8 +42,8 @@ class SaplDemoBooksApplicationTests {
     BookController controller;
 
     private static Collection<UserAndAccessibleBooks> userSourcePermit() {
-        var users          = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
-        var permittedUsers = new UserAndAccessibleBooks[] {
+        final var users          = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+        final var permittedUsers = new UserAndAccessibleBooks[] {
                 new UserAndAccessibleBooks(users[0], List.of(ALL_CATEGORIES)),
                 new UserAndAccessibleBooks(users[1], List.of(CATEGORIES_1_TO_3)),
                 new UserAndAccessibleBooks(users[2], List.of(CATEGORIES_1_TO_2)) };
@@ -51,25 +51,25 @@ class SaplDemoBooksApplicationTests {
     }
 
     private static Collection<LibraryUser> userSourceDeny() {
-        var users = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+        final var users = DemoData.users(Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
         return List.of(users[3]);
     }
 
     @ParameterizedTest
     @MethodSource("userSourcePermit")
     void findAllPermitTest(UserAndAccessibleBooks userAndAccessibleBooks) {
-        var user           = userAndAccessibleBooks.user;
-        var expectedBooks  = userAndAccessibleBooks.books;
-        var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+        final var user           = userAndAccessibleBooks.user;
+        final var expectedBooks  = userAndAccessibleBooks.books;
+        final var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        var actualBooks = assertDoesNotThrow(() -> controller.findAll());
+        final var actualBooks = assertDoesNotThrow(() -> controller.findAll());
         assertEquals(expectedBooks, actualBooks);
     }
 
     @ParameterizedTest
     @MethodSource("userSourceDeny")
     void findAllDenyTest(LibraryUser user) {
-        var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
+        final var authentication = new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         assertThrows(AccessDeniedException.class, () -> controller.findAll());
     }

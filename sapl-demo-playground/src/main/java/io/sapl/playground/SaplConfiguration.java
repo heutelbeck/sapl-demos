@@ -31,14 +31,14 @@ public class SaplConfiguration {
 
     @Bean
     PDPConfigurationProvider pdpConfiguration() throws InitializationException {
-        var attributeContext = new AnnotationAttributeContext();
+        final var attributeContext = new AnnotationAttributeContext();
         attributeContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        var functionContext = new AnnotationFunctionContext();
+        final var functionContext = new AnnotationFunctionContext();
         functionContext.loadLibrary(FilterFunctionLibrary.class);
         functionContext.loadLibrary(StandardFunctionLibrary.class);
         functionContext.loadLibrary(TemporalFunctionLibrary.class);
         functionContext.loadLibrary(SchemaValidationLibrary.class);
-        var dummyPrp = new PolicyRetrievalPoint() {
+        final var dummyPrp = new PolicyRetrievalPoint() {
 
             @Override
             public Mono<PolicyRetrievalResult> retrievePolicies() {
@@ -57,7 +57,7 @@ public class SaplConfiguration {
 
         };
 
-        var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
+        final var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
                 Map.of(), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
                 UnaryOperator.identity(), dummyPrp);
 

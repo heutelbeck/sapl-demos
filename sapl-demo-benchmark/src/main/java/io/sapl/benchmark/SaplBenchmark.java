@@ -66,11 +66,11 @@ public class SaplBenchmark {
         if (null == container) {
             return;
         }
-        var encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
+        final var encoder = Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
-        var dockerKeystoreLocation = "/pdp/keystore.p12";
+        final var dockerKeystoreLocation = "/pdp/keystore.p12";
 
-        var containerLogLevel = "ERROR";
+        final var containerLogLevel = "ERROR";
         container.withClasspathResourceMapping("keystore.p12", dockerKeystoreLocation, BindMode.READ_ONLY)
                 .withClasspathResourceMapping("policies/", "/pdp/data/", BindMode.READ_ONLY)
                 .withEnv("io_sapl_pdp_embedded_policies-path", "/pdp/data").withEnv("spring_profiles_active", "local")
@@ -138,10 +138,10 @@ public class SaplBenchmark {
      */
     private void logEstimatedDuration() {
         try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream(), true, StandardCharsets.UTF_8)) {
-            var tmpOutput                  = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
-            var matchedBenchmarkList       = BenchmarkList.defaultList()
+            final var tmpOutput                  = OutputFormatFactory.createFormatInstance(printStream, VerboseMode.SILENT);
+            final var matchedBenchmarkList       = BenchmarkList.defaultList()
                     .find(tmpOutput, List.of(config.getBenchmarkPattern()), List.of()).stream().toList();
-            var estimatedDurationInSeconds = (
+            final var estimatedDurationInSeconds = (
             // warmup
             config.getWarmupIterations() * config.getWarmupSeconds()
                     // measures
@@ -163,13 +163,13 @@ public class SaplBenchmark {
      * and output are written to corresponding files in the benchmarkFolder.
      */
     private void executeJmHBenchmarks() throws RunnerException {
-        var context       = BenchmarkExecutionContext.fromBenchmarkConfiguration(config, pdpContainer, oauth2Container);
-        var timeFormatter = new SimpleDateFormat("HH:mm:ss");
+        final var context       = BenchmarkExecutionContext.fromBenchmarkConfiguration(config, pdpContainer, oauth2Container);
+        final var timeFormatter = new SimpleDateFormat("HH:mm:ss");
         log.info("Benchmark started at " + timeFormatter.format(new Date()));
         logEstimatedDuration();
 
         // setup builder with base parameters
-        var benchmarkBuilder = new OptionsBuilder().include(config.getBenchmarkPattern())
+        final var benchmarkBuilder = new OptionsBuilder().include(config.getBenchmarkPattern())
                 .param("contextJsonString", context.toJsonString()).jvmArgs(config.getJvmArgs().toArray(new String[0]))
                 .shouldFailOnError(config.isFailOnError()).mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS)
                 .resultFormat(ResultFormatType.JSON).shouldDoGC(true).syncIterations(true).forks(config.forks)
@@ -179,8 +179,8 @@ public class SaplBenchmark {
 
         // iterate over thread list and start benchmark for each thread parameter
         for (int threads : config.getThreadList()) {
-            var resultFile = benchmarkFolder + "/results_" + threads + "threads.json";
-            var outputFile = benchmarkFolder + "/results_" + threads + "threads.log";
+            final var resultFile = benchmarkFolder + "/results_" + threads + "threads.json";
+            final var outputFile = benchmarkFolder + "/results_" + threads + "threads.log";
             log.info("Starting Benchmark with " + threads + " threads matching pattern: "
                     + config.getBenchmarkPattern());
             log.info("Writing results to " + resultFile + " and logs to " + outputFile);
@@ -196,16 +196,16 @@ public class SaplBenchmark {
     public void startBenchmark() throws RunnerException, IOException {
         this.config = BenchmarkConfiguration.fromFile(cfgFilePath);
         Files.createDirectories(Paths.get(benchmarkFolder));
-        var sourceFile = new File(cfgFilePath);
+        final var sourceFile = new File(cfgFilePath);
         FileUtils.copyFile(sourceFile, new File(benchmarkFolder + File.separator + sourceFile.getName()));
 
-        var useOAuthContainer    = config.isUseOauth2() && config.isOauth2MockServer();
-        var useServerLTContainer = config.requiredDockerEnvironment();
+        final var useOAuthContainer    = config.isUseOauth2() && config.isOauth2MockServer();
+        final var useServerLTContainer = config.requiredDockerEnvironment();
 
         try (var oauth2Cont = useOAuthContainer
                 ? new GenericContainer<>(DockerImageName.parse(config.getOauth2MockImage()))
                 : null;
-                var pdpCont = useServerLTContainer
+                final var pdpCont = useServerLTContainer
                         ? new GenericContainer<>(DockerImageName.parse(config.getDockerPdpImage()))
                         : null) {
             configureAndStartOAuthContainer(oauth2Cont);

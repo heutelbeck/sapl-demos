@@ -203,7 +203,7 @@ public class BenchmarkConfiguration {
     @JsonProperty("apikey")
     public void setApiKey(Map<String, String> map) {
         this.useAuthApiKey = Boolean.parseBoolean(map.remove(ENABLED));
-        var secret = map.remove("api_key");
+        final var secret = map.remove("api_key");
         if (this.useAuthApiKey) {
             this.apiKeySecret = secret;
         }
@@ -312,8 +312,8 @@ public class BenchmarkConfiguration {
      * Load Benchmark configuration from file to BenchmarkConfiguration object.
      */
     public static BenchmarkConfiguration fromFile(String filePath) throws IOException {
-        var file   = new File(filePath);
-        var mapper = new ObjectMapper(new YAMLFactory());
+        final var file   = new File(filePath);
+        final var mapper = new ObjectMapper(new YAMLFactory());
         mapper.configure(DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         return mapper.readValue(file, BenchmarkConfiguration.class);

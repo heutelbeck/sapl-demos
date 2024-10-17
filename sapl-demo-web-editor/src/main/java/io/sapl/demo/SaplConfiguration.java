@@ -34,14 +34,16 @@ public class SaplConfiguration {
 
     @Bean
     PDPConfigurationProvider pdpConfiguration() throws InitializationException, JsonProcessingException {
-        var attributeContext = new AnnotationAttributeContext();
+        final var attributeContext = new AnnotationAttributeContext();
         attributeContext.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        var functionContext = new AnnotationFunctionContext();
+        attributeContext.loadPolicyInformationPoint(DemoPip.class);
+        final var functionContext = new AnnotationFunctionContext();
         functionContext.loadLibrary(FilterFunctionLibrary.class);
         functionContext.loadLibrary(StandardFunctionLibrary.class);
         functionContext.loadLibrary(TemporalFunctionLibrary.class);
         functionContext.loadLibrary(SchemaValidationLibrary.class);
-        var dummyPrp = new PolicyRetrievalPoint() {
+        functionContext.loadLibrary(DemoLib.class);
+        final var dummyPrp = new PolicyRetrievalPoint() {
 
             @Override
             public Mono<PolicyRetrievalResult> retrievePolicies() {
@@ -60,7 +62,7 @@ public class SaplConfiguration {
 
         };
 
-        var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
+        final var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeContext, functionContext,
                 Map.of("abba", Val.ofJson("""
                         {
                             "a": {
@@ -68,7 +70,7 @@ public class SaplConfiguration {
                                 "y": 1
                             },
                             "b": "y"
-                        }                        
+                        }
                         """)), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
                 UnaryOperator.identity(), dummyPrp);
 

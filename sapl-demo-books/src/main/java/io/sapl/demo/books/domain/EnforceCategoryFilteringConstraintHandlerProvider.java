@@ -25,8 +25,8 @@ public class EnforceCategoryFilteringConstraintHandlerProvider implements Method
     public Consumer<ReflectiveMethodInvocation> getHandler(JsonNode constraint) {
         return methodInvocation -> {
 
-            var constraintCategories = constraint.get(LIMIT_CATEGORIES);
-            var categories           = new ArrayList<Integer>();
+            final var constraintCategories = constraint.get(LIMIT_CATEGORIES);
+            final var categories           = new ArrayList<Integer>();
 
             if (constraintCategories.size() == 0) {
                 methodInvocation.setArguments(Optional.empty());

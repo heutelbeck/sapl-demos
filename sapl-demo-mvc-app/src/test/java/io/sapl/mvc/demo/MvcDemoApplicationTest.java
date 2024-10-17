@@ -52,8 +52,7 @@ import lombok.SneakyThrows;
 @SpringBootTest(classes = MvcDemoApplication.class)
 class MvcDemoApplicationTest {
 
-    static record IntegerAndString(int integer, String string) {
-    }
+    static record IntegerAndString(int integer, String string) {}
 
     static Collection<String> userNameSource() {
         return DemoData.USER_NAMES;
@@ -69,13 +68,13 @@ class MvcDemoApplicationTest {
 
     static void assertPatientsList(HtmlPage page, IntegerAndString... idsAndNames) {
 
-        var tableRows = page.<HtmlTableRow>getByXPath("//table/tbody/tr");
+        final var tableRows = page.<HtmlTableRow>getByXPath("//table/tbody/tr");
         assertThat(tableRows).hasSize(idsAndNames.length + 1);
         assertThat(tableRows.get(0).getCells()).hasSize(2);
         assertThat(tableRows.get(0).getCell(0).getVisibleText()).isEqualTo("ID");
         assertThat(tableRows.get(0).getCell(1).getVisibleText()).isEqualTo("NAME");
 
-        var patientLinks = page.<HtmlAnchor>getByXPath("//table/tbody/tr/td[last()]/a");
+        final var patientLinks = page.<HtmlAnchor>getByXPath("//table/tbody/tr/td[last()]/a");
         assertThat(patientLinks).hasSize(idsAndNames.length);
 
         var index = 0;
@@ -118,21 +117,21 @@ class MvcDemoApplicationTest {
         setAuthentication(username);
         HtmlPage page = mockClient.getPage(url);
 
-        var header = page.<HtmlHeading1>getByXPath("//h1");
+        final var header = page.<HtmlHeading1>getByXPath("//h1");
         assertThat(header).hasSize(1);
         assertThat(header.get(0).getVisibleText()).isEqualTo("Hello " + username + "!");
 
-        var patientLink = page.<HtmlAnchor>getByXPath("//h3/a");
+        final var patientLink = page.<HtmlAnchor>getByXPath("//h3/a");
         assertThat(patientLink).hasSize(1);
         assertThat(patientLink.get(0).getVisibleText()).isEqualTo("Patient List");
         assertThat(patientLink.get(0).getHrefAttribute()).isEqualTo("/patients");
 
-        var logoutForm = page.<HtmlForm>getByXPath("//form");
+        final var logoutForm = page.<HtmlForm>getByXPath("//form");
         assertThat(logoutForm).hasSize(1);
         assertThat(logoutForm.get(0).getActionAttribute()).isEqualTo("/logout");
         assertThat(logoutForm.get(0).getMethodAttribute()).isEqualTo("post");
 
-        var logoutSubmit = page.<HtmlInput>getByXPath("//form/input[@type='submit']");
+        final var logoutSubmit = page.<HtmlInput>getByXPath("//form/input[@type='submit']");
         assertThat(logoutSubmit).hasSize(1);
         assertThat(logoutSubmit.get(0).getValueAttribute()).isEqualTo("Sign Out");
 
@@ -146,27 +145,27 @@ class MvcDemoApplicationTest {
         setAuthentication(username);
         HtmlPage page = mockClient.getPage(url);
 
-        var header = page.<HtmlHeading3>getByXPath("//h3");
+        final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
         assertThat(header.get(0).getVisibleText()).isEqualTo("List of Patients");
 
         assertPatientsList(page, new IntegerAndString(1, "Lenny"), new IntegerAndString(2, "Karl"));
 
-        var forms = page.<HtmlForm>getByXPath("//form");
+        final var forms = page.<HtmlForm>getByXPath("//form");
         assertThat(forms).hasSize(2);
 
-        var newPatientForm = page.<HtmlForm>getByXPath("//form[1]");
+        final var newPatientForm = page.<HtmlForm>getByXPath("//form[1]");
         assertThat(newPatientForm).hasSize(1);
         assertThat(newPatientForm.get(0).getActionAttribute()).isEqualTo("/patients/new");
-        var newPatientFormInput = page.<HtmlInput>getByXPath("//form[1]/input");
+        final var newPatientFormInput = page.<HtmlInput>getByXPath("//form[1]/input");
         assertThat(newPatientFormInput).hasSize(1);
         assertThat(newPatientFormInput.get(0).getTypeAttribute()).isEqualTo("submit");
         assertThat(newPatientFormInput.get(0).getValueAttribute()).isEqualTo("Register new patient...");
 
-        var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
+        final var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
         assertThat(homeForm).hasSize(1);
         assertThat(homeForm.get(0).getActionAttribute()).isEqualTo("/");
-        var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
+        final var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
         assertThat(homeFormInput).hasSize(1);
         assertThat(homeFormInput.get(0).getTypeAttribute()).isEqualTo("submit");
         assertThat(homeFormInput.get(0).getValueAttribute()).isEqualTo("Home");
@@ -180,19 +179,19 @@ class MvcDemoApplicationTest {
         setAuthentication(username);
         HtmlPage page = mockClient.getPage(url);
 
-        var header = page.<HtmlHeading3>getByXPath("//h3");
+        final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
         assertThat(header.get(0).getVisibleText()).isEqualTo("List of Patients");
 
         assertPatientsList(page, new IntegerAndString(1, "Lenny"), new IntegerAndString(2, "Karl"));
 
-        var forms = page.<HtmlForm>getByXPath("//form");
+        final var forms = page.<HtmlForm>getByXPath("//form");
         assertThat(forms).hasSize(1);
 
-        var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
+        final var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
         assertThat(homeForm).hasSize(1);
         assertThat(homeForm.get(0).getActionAttribute()).isEqualTo("/");
-        var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
+        final var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
         assertThat(homeFormInput).hasSize(1);
         assertThat(homeFormInput.get(0).getTypeAttribute()).isEqualTo("submit");
         assertThat(homeFormInput.get(0).getValueAttribute()).isEqualTo("Home");
@@ -206,28 +205,29 @@ class MvcDemoApplicationTest {
         setAuthentication(username);
         HtmlPage page = mockClient.getPage(url);
 
-        var header = page.<HtmlHeading3>getByXPath("//h3");
+        final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
         assertThat(header.get(0).getVisibleText()).isEqualTo("Create a new patient");
 
-        var forms = page.<HtmlForm>getByXPath("//form");
+        final var forms = page.<HtmlForm>getByXPath("//form");
         assertThat(forms).hasSize(2);
 
-        var newPatientForm = page.<HtmlForm>getByXPath("//form[1]");
+        final var newPatientForm = page.<HtmlForm>getByXPath("//form[1]");
         assertThat(newPatientForm).hasSize(1);
 
-        var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
+        final var homeForm = page.<HtmlForm>getByXPath("//form[last()]");
         assertThat(homeForm).hasSize(1);
         assertThat(homeForm.get(0).getActionAttribute()).isEqualTo("/");
-        var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
+        final var homeFormInput = page.<HtmlInput>getByXPath("//form[last()]/input");
         assertThat(homeFormInput).hasSize(1);
         assertThat(homeFormInput.get(0).getTypeAttribute()).isEqualTo("submit");
         assertThat(homeFormInput.get(0).getValueAttribute()).isEqualTo("Back to Home");
     }
 
     private void setAuthentication(String username) {
-        var user  = userDetailsService.loadUserByUsername(username);
-        var authn = new UsernamePasswordAuthenticationToken(user, DemoData.DEFAULT_RAW_PASSWORD, user.getAuthorities());
+        final var user  = userDetailsService.loadUserByUsername(username);
+        final var authn = new UsernamePasswordAuthenticationToken(user, DemoData.DEFAULT_RAW_PASSWORD,
+                user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authn);
     }
 

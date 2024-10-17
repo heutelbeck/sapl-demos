@@ -50,7 +50,7 @@ public class PolicyStorage {
               resource == "bar"
             where
               subject == "WILLI";
-              var interval = 2;
+              final var interval = 2;
               time.secondOf(<time.now(interval)>) >= 4;
             """;
 

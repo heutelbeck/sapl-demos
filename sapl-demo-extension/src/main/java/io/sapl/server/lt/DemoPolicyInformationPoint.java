@@ -119,9 +119,9 @@ public class DemoPolicyInformationPoint {
     @Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable(5000,6000)> checks if the address returns a package within 5000ms and repeats this pinging action every 6000ms. The timeout must be smaller than the repetition interval.")
     public Flux<Val> reachable(@Text Val leftHandHostnameParameter, Val pollingIntervalParameter,
             Val timeoutMsParameter) {
-        var hostname          = leftHandHostnameParameter.getText();
-        var timeoutMs         = timeoutMsParameter.get().asInt();
-        var pollingIntervalMs = pollingIntervalParameter.get().asLong();
+        final var hostname          = leftHandHostnameParameter.getText();
+        final var timeoutMs         = timeoutMsParameter.get().asInt();
+        final var pollingIntervalMs = pollingIntervalParameter.get().asLong();
         if (pollingIntervalMs < timeoutMs)
             return Flux.error(new PolicyEvaluationException(
                     "When checking for reachability of a host, the timeout must be smaller than the polling interval. The timout was %dms and the polling interval was set to %dms",
@@ -140,7 +140,7 @@ public class DemoPolicyInformationPoint {
      */
     @Attribute(name = "reachable", docs = "Checks if the internet address is reachable within a given timout. Usage: \"example.com\".<demo.reachable> checks if the address returns a package within 1000ms and repeats this pinging action every 2000ms. The timeout must be smaller than the repetition interval.")
     public Flux<Val> reachable(@Text Val leftHandHostnameParameter) {
-        var hostname = leftHandHostnameParameter.getText();
+        final var hostname = leftHandHostnameParameter.getText();
         return reachable(hostname, DEFAULT_POLLING_INTERVAL_MS, DEFAULT_TIMEOUT_MS).map(Val::of);
     }
 

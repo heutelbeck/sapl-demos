@@ -161,8 +161,8 @@ class OAuth2DemoIT {
     @Test
     @WithMockUser(username = "user1", password = "password")
     void test_index() throws Exception {
-        var request  = request(HttpMethod.GET, INDEX_URL);
-        var response = mockMvc.perform(request).andExpect(status().isOk())
+        final var request  = request(HttpMethod.GET, INDEX_URL);
+        final var response = mockMvc.perform(request).andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
         assertThat(Input.fromString(response.getContentAsString())).and(Input.fromFile(INDEX_RESULT_PATH))
                 .areIdentical();
@@ -171,15 +171,15 @@ class OAuth2DemoIT {
     @Test
     @WithMockUser(username = "user1", password = "password")
     void test_codeGrantType_clientRedirect() throws Exception {
-        var request      = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
-        var response     = mockMvc.perform(request).andExpect(status().is3xxRedirection())
+        final var request      = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
+        final var response     = mockMvc.perform(request).andExpect(status().is3xxRedirection())
                 .andExpect(content().string("")).andExpect(header().exists("Location"))
                 .andExpect(header().string("Location",
                         new PredicateMatcher<String>(
                                 str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
                 .andReturn().getResponse();
-        var redirectURI  = response.getHeader("Location");
-        var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
+        final var redirectURI  = response.getHeader("Location");
+        final var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
         assertTrue(authResponse.getStatusCode().is3xxRedirection());
         assertTrue(authResponse.getHeaders().containsKey("Location"));
     }
@@ -187,8 +187,8 @@ class OAuth2DemoIT {
     @Test
     @WithMockUser(username = "user1", password = "password")
     void test_credectialsGrantType_accessToRessources() throws Exception {
-        var request  = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
-        var response = mockMvc.perform(request).andExpect(status().isOk())
+        final var request  = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
+        final var response = mockMvc.perform(request).andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
         assertThat(Input.fromString(response.getContentAsString()))
                 .and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();

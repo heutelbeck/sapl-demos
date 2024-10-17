@@ -46,7 +46,7 @@ class SaplPdpBenchmarkTest {
 
     @BeforeAll
     private static void createEmptyBenchmarkFolder() throws IOException {
-        var tmpReportPathFile = new File(TMP_REPORT_PATH);
+        final var tmpReportPathFile = new File(TMP_REPORT_PATH);
         FileUtils.deleteDirectory(tmpReportPathFile);
         Assertions.assertTrue(tmpReportPathFile.mkdir());
     }
@@ -54,13 +54,13 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingEmbeddedBenchmark_withValidSubscription_thenDecisionIsAccepted()
             throws InitializationException, IOException {
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
+        final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig
                 .setSubscription("{\"subject\": \"Willi\", \"action\": \"requests\", \"resource\": \"information\"}");
-        var embeddedBenchmark = new EmbeddedBenchmark();
-        var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
+        final var embeddedBenchmark = new EmbeddedBenchmark();
+        final var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
@@ -74,13 +74,13 @@ class SaplPdpBenchmarkTest {
     @Test
     void whenExecutingEmbeddedBenchmark_withInvalidSubscription_thenExceptionIsThrown()
             throws InitializationException, IOException {
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
+        final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);
         benchmarkConfig.setSubscription(
                 "{\"subject\": \"Willi\", \"action\": \"invalid action\", \"resource\": \"information\"}");
-        var embeddedBenchmark = new EmbeddedBenchmark();
-        var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
+        final var embeddedBenchmark = new EmbeddedBenchmark();
+        final var benchmarkContext  = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
             embeddedBenchmark.setup();
@@ -96,8 +96,8 @@ class SaplPdpBenchmarkTest {
 
     @Test
     void whenExecutingHttpBenchmark_thenDecisionIsAccepted() throws IOException {
-        var mockedContainer = Mockito.mock(GenericContainer.class);
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
+        final var mockedContainer = Mockito.mock(GenericContainer.class);
+        final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunEmbeddedBenchmarks(true);
         benchmarkConfig.setRunHttpBenchmarks(true);
         benchmarkConfig.setRunHttpBenchmarks(true);
@@ -108,8 +108,8 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setUseAuthApiKey(true);
         benchmarkConfig.setApiKeySecret("123");
         benchmarkConfig.setUseOauth2(true);
-        var benchmark        = new HttpBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
+        final var benchmark        = new HttpBenchmark();
+        final var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
                 mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);
@@ -135,9 +135,9 @@ class SaplPdpBenchmarkTest {
 
     @Test
     void whenExecutingRsocketBenchmark_thenDecisionIsAccepted() throws IOException {
-        var mockedContainer = Mockito.mock(GenericContainer.class);
+        final var mockedContainer = Mockito.mock(GenericContainer.class);
         Mockito.when(mockedContainer.getHost()).thenReturn("localhost");
-        var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
+        final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunEmbeddedBenchmarks(false);
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(true);
@@ -146,8 +146,8 @@ class SaplPdpBenchmarkTest {
         benchmarkConfig.setBasicClientSecret("123");
         benchmarkConfig.setUseAuthApiKey(true);
         benchmarkConfig.setApiKeySecret("123");
-        var benchmark        = new RsocketBenchmark();
-        var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
+        final var benchmark        = new RsocketBenchmark();
+        final var benchmarkContext = BenchmarkExecutionContext.fromBenchmarkConfiguration(benchmarkConfig, mockedContainer,
                 mockedContainer);
         try (MockedStatic<BenchmarkExecutionContext> utilities = Mockito.mockStatic(BenchmarkExecutionContext.class)) {
             utilities.when(() -> BenchmarkExecutionContext.fromString(any())).thenReturn(benchmarkContext);

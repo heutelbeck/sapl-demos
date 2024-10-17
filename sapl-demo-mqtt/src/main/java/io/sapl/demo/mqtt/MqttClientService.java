@@ -29,7 +29,7 @@ public class MqttClientService implements DisposableBean {
         mqttClient = Mqtt5Client.builder().identifier("demoClient").serverHost("localhost").serverPort(1883)
                 .buildAsync();
         log.debug("Connect MQTT client... ");
-        var connAckMessage = mqttClient.connect().get(); // Block for Demo
+        final var connAckMessage = mqttClient.connect().get(); // Block for Demo
         if (connAckMessage.getReasonCode() != Mqtt5ConnAckReasonCode.SUCCESS) {
             throw new IllegalStateException(
                     "Connection to the mqtt broker couldn't be established:" + connAckMessage.getReasonCode());

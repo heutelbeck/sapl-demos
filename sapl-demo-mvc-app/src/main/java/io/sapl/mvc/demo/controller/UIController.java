@@ -169,7 +169,7 @@ public class UIController {
     }
 
     private boolean isPermitted(Object subject, Object action, Object resource) {
-        var permitted = pdp.decide(AuthorizationSubscription.of(subject, action, resource))
+        final var permitted = pdp.decide(AuthorizationSubscription.of(subject, action, resource))
                 .map(d -> d.getDecision() == Decision.PERMIT).blockFirst();
         if (null == permitted) {
             return false;

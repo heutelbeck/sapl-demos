@@ -58,7 +58,7 @@ public class XtextServletConfiguration {
 
     @Bean
     FunctionContext functionContext() throws InitializationException {
-        var staticLibraries = List.of(FilterFunctionLibrary.class, StandardFunctionLibrary.class,
+        final var staticLibraries = List.of(FilterFunctionLibrary.class, StandardFunctionLibrary.class,
                 TemporalFunctionLibrary.class);
         return new AnnotationFunctionContext(List::of, () -> staticLibraries);
     }

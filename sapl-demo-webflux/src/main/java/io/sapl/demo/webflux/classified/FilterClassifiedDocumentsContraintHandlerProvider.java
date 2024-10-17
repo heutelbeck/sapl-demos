@@ -29,7 +29,7 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
             }
         }
 
-        var clearance = clearanceAux;
+        final var clearance = clearanceAux;
 
         return document -> clearanceMatchesOrIsHigherThanClassification(clearance,
                 ((Document) document).classification());

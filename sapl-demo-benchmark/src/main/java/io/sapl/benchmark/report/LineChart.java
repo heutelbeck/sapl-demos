@@ -39,14 +39,14 @@ public class LineChart {
                 true, true, false);
 
         // add marks to the data points in the graph
-        var plot     = chart.getCategoryPlot();
-        var renderer = (LineAndShapeRenderer) plot.getRenderer();
+        final var plot     = chart.getCategoryPlot();
+        final var renderer = (LineAndShapeRenderer) plot.getRenderer();
         renderer.setDefaultShapesVisible(true);
         plot.setRenderer(renderer);
 
         // format axis
-        var maxValue = getMaxValue(dataset);
-        var yAxis    = (NumberAxis) plot.getRangeAxis();
+        final var maxValue = getMaxValue(dataset);
+        final var yAxis    = (NumberAxis) plot.getRangeAxis();
         yAxis.setAutoRange(false);
         yAxis.setUpperBound(maxValue * 1.05);
         yAxis.setLowerBound(0);
@@ -58,7 +58,7 @@ public class LineChart {
     }
 
     public void saveToPNGFile(File file, int width, int height) throws IOException {
-        var fos = Files.newOutputStream(file.toPath());
+        final var fos = Files.newOutputStream(file.toPath());
         ChartUtils.writeScaledChartAsPNG(fos, chart, width, height, 3, 3);
         fos.close();
     }

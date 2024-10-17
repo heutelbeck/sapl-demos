@@ -75,7 +75,7 @@ public class BenchmarkExecutionContext {
             GenericContainer<?> pdpContainer, GenericContainer<?> oauthContainer) {
 
         // initialize new context
-        var context = new BenchmarkExecutionContext();
+        final var context = new BenchmarkExecutionContext();
 
         // get docker/remote specific settings
         context.authorizationSubscription = cfg.getAuthorizationSubscription();

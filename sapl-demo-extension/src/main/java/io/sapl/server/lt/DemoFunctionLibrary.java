@@ -84,7 +84,7 @@ public class DemoFunctionLibrary {
      */
     @Function
     public Val append(@Text @Number Val... parameters) {
-        var builder = new StringBuilder();
+        final var builder = new StringBuilder();
         for (var parameter : parameters) {
             if (parameter.isTextual()) {
                 builder.append(parameter.get().asText());

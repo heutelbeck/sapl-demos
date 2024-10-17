@@ -54,7 +54,7 @@ public class BenchmarkCommand implements Callable<Integer> {
     @Override
     public Integer call() throws Exception {
         log.info("Reading configuration from cfgFilePath={}", cfgFilePath);
-        var benchmark = new SaplBenchmark(cfgFilePath, outputPath);
+        final var benchmark = new SaplBenchmark(cfgFilePath, outputPath);
         if (!skipBenchmark) {
             log.info("Writing results to outputPath={}", outputPath);
             benchmark.startBenchmark();

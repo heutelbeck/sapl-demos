@@ -42,7 +42,7 @@ public class PublicKeyController {
     }
 
     private String publicKey(String keyId) throws JOSEException {
-        var key = keyRepo.findById(keyId);
+        final var key = keyRepo.findById(keyId);
         if (key.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find key with ID " + keyId);
         return ENCODER.encodeToString(key.get().toRSAKey().toRSAPublicKey().getEncoded());

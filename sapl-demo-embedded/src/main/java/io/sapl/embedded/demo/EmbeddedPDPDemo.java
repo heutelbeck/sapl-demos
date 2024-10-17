@@ -184,7 +184,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
-        var runs = getRuns();
+        final var runs = getRuns();
         LOGGER.info("");
         LOGGER.info("Demo Part 3: Perform a small benchmark for blocking decisions.");
 
@@ -205,7 +205,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
-        var runs = getRuns();
+        final var runs = getRuns();
         LOGGER.info("");
         LOGGER.info("Demo Part 4: Perform a small benchmark for sequential .take(1) decisions.");
 

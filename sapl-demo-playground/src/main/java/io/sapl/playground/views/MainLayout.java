@@ -41,17 +41,17 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createHeaderContent() {
-        var header = new Header();
+        final var header = new Header();
         header.addClassNames(BoxSizing.BORDER, Display.FLEX, FlexDirection.COLUMN, Width.FULL);
 
-        var layout = new HorizontalLayout();
+        final var layout = new HorizontalLayout();
         layout.addClassNames(Display.FLEX, AlignItems.CENTER, Padding.Horizontal.SMALL);
         layout.getStyle().set("max-height", "55px");
 
-        var appName = new H1("SAPL Playground");
+        final var appName = new H1("SAPL Playground");
         appName.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.XLARGE, Margin.AUTO);
 
-        var linkToDocs = new Anchor("https://sapl.io", "SAPL Homepage");
+        final var linkToDocs = new Anchor("https://sapl.io", "SAPL Homepage");
 
         layout.add(logo(), appName, linkToDocs, exampleSelector());
 
@@ -60,7 +60,7 @@ public class MainLayout extends AppLayout {
     }
 
     private Component logo() {
-        var logo = new Image("images/logo-header.png", "SAPL Logo");
+        final var logo = new Image("images/logo-header.png", "SAPL Logo");
         logo.addClassNames(Margin.LARGE);
         logo.setHeight(44, Unit.PIXELS);
         return logo;

@@ -135,7 +135,7 @@ public class DemoData implements CommandLineRunner {
      * @return collection of demo users.
      */
     public static Collection<UserDetails> users(PasswordEncoder encoder) {
-        var users = new LinkedList<UserDetails>();
+        final var users = new LinkedList<UserDetails>();
         users.add(User.builder().username(NAME_DOMINIC).password(encoder.encode(DEFAULT_RAW_PASSWORD))
                 .roles(ROLE_VISITOR).build());
         users.add(User.builder().username(NAME_JULIA).password(encoder.encode(DEFAULT_RAW_PASSWORD)).roles(ROLE_DOCTOR)

@@ -51,10 +51,10 @@ class DemoRestControllerIT extends TestContainerBase {
 	@Test
 	void when_findAll_then_getDataWithManipulationByPDP() {
 		// GIVEN
-        var inputStream = new ByteArrayInputStream(usersAsJsonString.getBytes(StandardCharsets.UTF_8));
-        var users = new ArrayList<User>();
+        final var inputStream = new ByteArrayInputStream(usersAsJsonString.getBytes(StandardCharsets.UTF_8));
+        final var users = new ArrayList<User>();
 
-        var objectMapper = new ObjectMapper();
+        final var objectMapper = new ObjectMapper();
         try {
             users.addAll(objectMapper.readValue(inputStream, new TypeReference<List<User>>() {}));
         } catch (IOException e) {

@@ -29,8 +29,8 @@ class DocumentsControllerTests {
 
     @Test
     void whenGetPatients_thenPatientsServiceCalled() {
-        var document  = new Document(NatoSecurityClassification.NATO_RESTRICTED, "name", "contents");
-        var documents = Flux.just(document);
+        final var document  = new Document(NatoSecurityClassification.NATO_RESTRICTED, "name", "contents");
+        final var documents = Flux.just(document);
         when(documentsService.getDocuments()).thenReturn(documents);
         webTestClient.get().uri("/documents").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
                 .expectBodyList(Document.class).value(Function.identity(), hasItem(document));

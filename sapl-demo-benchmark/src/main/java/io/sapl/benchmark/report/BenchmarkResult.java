@@ -34,7 +34,7 @@ public class BenchmarkResult {
 
     BenchmarkResult(JsonElement resultJsonElement) {
         this.benchmarkResultJson = resultJsonElement.getAsJsonObject();
-        var benchmarkName = benchmarkResultJson.get("benchmark").getAsString();
+        final var benchmarkName = benchmarkResultJson.get("benchmark").getAsString();
         this.benchmarkFullName     = benchmarkName;
         this.benchmarkNameElements = benchmarkName.split("\\.");
         this.threads               = benchmarkResultJson.get("threads").getAsInt();
@@ -45,13 +45,13 @@ public class BenchmarkResult {
     }
 
     private static String getPdpFromBenchmarkName(String benchmarkName) {
-        var benchmarkNames = benchmarkName.split("\\.");
+        final var benchmarkNames = benchmarkName.split("\\.");
         return benchmarkNames[benchmarkNames.length - 2].replaceAll("Benchmark$", "").toLowerCase();
     }
 
     private static String getDecisionMethodFromBenchmarkName(String benchmarkName) {
-        var benchmarkNames = benchmarkName.split("\\.");
-        var methodName     = benchmarkNames[benchmarkNames.length - 1];
+        final var benchmarkNames = benchmarkName.split("\\.");
+        final var methodName     = benchmarkNames[benchmarkNames.length - 1];
         if (methodName.endsWith("DecideOnce")) {
             return "Decide Once";
         } else if (methodName.endsWith("DecideSubscribe") || methodName.endsWith("Decide")) {
@@ -62,13 +62,13 @@ public class BenchmarkResult {
     }
 
     private static String getAuthMethodFromBenchmarkName(String benchmarkName) {
-        var benchmarkNames = benchmarkName.split("\\.");
-        var methodName     = benchmarkNames[benchmarkNames.length - 1];
+        final var benchmarkNames = benchmarkName.split("\\.");
+        final var methodName     = benchmarkNames[benchmarkNames.length - 1];
         return methodName.replaceAll("Decide(Once|Subscribe)?$", "");
     }
 
     private Integer getThroughputInSeconds() {
-        var measureTimeStr = benchmarkResultJson.get("measurementTime").getAsString();
+        final var measureTimeStr = benchmarkResultJson.get("measurementTime").getAsString();
         return Integer.valueOf(measureTimeStr.replaceAll(" s$", ""));
     }
 
@@ -86,7 +86,7 @@ public class BenchmarkResult {
 
     public List<List<Double>> getThroughputRawResults() {
         List<List<Double>> resultArray = new ArrayList<>();
-        var                jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData")
+        final var                jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData")
                 .getAsJsonArray();
         for (JsonElement forkData : jsonRawData) {
             List<Double> forkResultArray = new ArrayList<>();
@@ -100,7 +100,7 @@ public class BenchmarkResult {
 
     public List<List<Double>> getResponseTimeRawResults() {
         List<List<Double>> resultArray = new ArrayList<>();
-        var                jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData")
+        final var                jsonRawData = benchmarkResultJson.get(PRIMARY_METRIC_FIELD).getAsJsonObject().get("rawData")
                 .getAsJsonArray();
         for (JsonElement forkData : jsonRawData) {
             List<Double> forkResultArray = new ArrayList<>();
@@ -129,12 +129,12 @@ public class BenchmarkResult {
     }
 
     public Double getThoughputStdDev() {
-        var rawResults = getThroughputAllRawResults();
+        final var rawResults = getThroughputAllRawResults();
         return new StandardDeviation().evaluate(rawResults.stream().mapToDouble(d -> d).toArray());
     }
 
     public Double getResponseTimeStdDev() {
-        var rawResults = getResponseTimeAllRawResults();
+        final var rawResults = getResponseTimeAllRawResults();
         return new StandardDeviation().evaluate(rawResults.stream().mapToDouble(d -> d).toArray());
     }
 

@@ -41,7 +41,7 @@ public class MqttBrokerLifecycleService implements DisposableBean {
     }
 
     private static EmbeddedHiveMQ buildBroker(Path configDir, Path dataDir, Path extensionsDir) {
-        var broker = EmbeddedHiveMQ.builder().withConfigurationFolder(configDir).withDataFolder(dataDir)
+        final var broker = EmbeddedHiveMQ.builder().withConfigurationFolder(configDir).withDataFolder(dataDir)
                 .withExtensionsFolder(extensionsDir).build();
         InternalConfigurations.PAYLOAD_PERSISTENCE_TYPE.set(PersistenceType.FILE);
         InternalConfigurations.RETAINED_MESSAGE_PERSISTENCE_TYPE.set(PersistenceType.FILE);

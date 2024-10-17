@@ -47,15 +47,15 @@ public class BarChart {
             String labelFormat) {
         this.dataset = dataset;
         // format axis
-        var xAxis = new CategoryAxis();
-        var yAxis = new NumberAxis(valueAxisLabel);
+        final var xAxis = new CategoryAxis();
+        final var yAxis = new NumberAxis(valueAxisLabel);
         xAxis.setLowerMargin(0.015d);
         xAxis.setUpperMargin(0.015d);
         yAxis.setUpperMargin(0.15d);
 
         // define the plot
-        var renderer     = new BarRenderer();
-        var categoryPlot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
+        final var renderer     = new BarRenderer();
+        final var categoryPlot = new CategoryPlot(dataset, xAxis, yAxis, renderer);
         categoryPlot.setOrientation(PlotOrientation.HORIZONTAL);
         categoryPlot.setRowRenderingOrder(SortOrder.ASCENDING);
         categoryPlot.setColumnRenderingOrder(SortOrder.ASCENDING);
@@ -86,12 +86,12 @@ public class BarChart {
     }
 
     public void saveToPNGFile(File file) throws IOException {
-        var height = 100 + dataset.getColumnCount() * dataset.getRowCount() * 22;
+        final var height = 100 + dataset.getColumnCount() * dataset.getRowCount() * 22;
         saveToPNGFile(file, 900, height);
     }
 
     public void saveToPNGFile(File file, int width, int height) throws IOException {
-        var fos = Files.newOutputStream(file.toPath());
+        final var fos = Files.newOutputStream(file.toPath());
         ChartUtils.writeScaledChartAsPNG(fos, chart, width, height, 3, 3);
         fos.close();
     }

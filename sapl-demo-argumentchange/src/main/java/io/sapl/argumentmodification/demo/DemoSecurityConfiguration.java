@@ -28,7 +28,7 @@ public class DemoSecurityConfiguration {
     @Bean
     @Primary
     UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
+        final var testUser = new User(DEMO_USER, passwordEncoder.encode(DEMO_PASSWORD),
                 List.of(new SimpleGrantedAuthority(DEMO_AUTHORITY)));
         log.info("");
         log.info("Generating demo user: {}", testUser);

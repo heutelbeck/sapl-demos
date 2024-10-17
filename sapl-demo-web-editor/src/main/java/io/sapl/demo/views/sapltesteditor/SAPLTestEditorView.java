@@ -43,7 +43,7 @@ public class SAPLTestEditorView extends VerticalLayout {
     private Button removeValidationChangedListenerButton;
 
     public SAPLTestEditorView() {
-        var saplConfig = new SaplTestEditorConfiguration();
+        final var saplConfig = new SaplTestEditorConfiguration();
         saplConfig.setHasLineNumbers(true);
         saplConfig.setTextUpdateDelay(500);
         saplConfig.setDarkTheme(true);

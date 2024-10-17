@@ -47,7 +47,7 @@ public class JSONEditorView extends VerticalLayout {
     private Button removeDocumentChangedListenerButton;
 
     public JSONEditorView() {
-        var jsonConfig = new JsonEditorConfiguration();
+        final var jsonConfig = new JsonEditorConfiguration();
         jsonConfig.setDarkTheme(true);
 
         jsonEditor = new JsonEditor(jsonConfig);

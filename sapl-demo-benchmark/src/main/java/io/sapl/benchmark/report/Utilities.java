@@ -29,8 +29,8 @@ public class Utilities {
         var max = Double.MIN_VALUE;
         for (var r = 0; r < dataset.getRowCount(); r++) {
             for (var c = 0; c < dataset.getColumnCount(); c++) {
-                var number = dataset.getValue(r, c);
-                var value  = null == number ? Double.NaN : number.doubleValue();
+                final var number = dataset.getValue(r, c);
+                final var value  = null == number ? Double.NaN : number.doubleValue();
                 if (value > max) {
                     max = value;
                 }

@@ -55,11 +55,11 @@ public class DataLoader implements ApplicationRunner {
 	Flux<User> getTestData() {
 		var users = new ArrayList<User>();
 		
-        var objectMapper = new ObjectMapper();
+        final var objectMapper = new ObjectMapper();
         try {
             InputStream inputStream = DemoRestController.class.getResourceAsStream("/users.json");
             
-           var usersFromFile = objectMapper.readValue(inputStream, new TypeReference<List<User>>() {});
+           final var usersFromFile = objectMapper.readValue(inputStream, new TypeReference<List<User>>() {});
            users.addAll(usersFromFile);
         } catch (IOException e) {
         	LOGGER.error("Error: ", e);

@@ -82,14 +82,14 @@ public class MockingModel {
     private static void parseMockValuesField(JsonNode mockElement, MockingModel mockModel)
             throws MockDefinitionParsingException {
         if (mockElement.has(KEY_VALUE_RETURN_SEQUENCE_VALUES)) {
-            var values = mockElement.get(KEY_VALUE_RETURN_SEQUENCE_VALUES);
+            final var values = mockElement.get(KEY_VALUE_RETURN_SEQUENCE_VALUES);
             if (!values.isArray()) {
                 throw new MockDefinitionParsingException(
                         "Expecting an array for field \"" + KEY_VALUE_RETURN_SEQUENCE_VALUES + "\""
                                 + " for importName \"" + mockModel.getImportName() + "\"!");
 
             }
-            var       valuesArray = (ArrayNode) values;
+            final var       valuesArray = (ArrayNode) values;
             List<Val> valList     = new LinkedList<>();
             for (var specifiedValue : valuesArray) {
                 valList.add(Val.of(specifiedValue));

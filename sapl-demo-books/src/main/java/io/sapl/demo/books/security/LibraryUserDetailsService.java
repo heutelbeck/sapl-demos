@@ -22,7 +22,7 @@ public class LibraryUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var user = users.get(username);
+        final var user = users.get(username);
         if (null == user) {
             throw new UsernameNotFoundException("User not found");
         }

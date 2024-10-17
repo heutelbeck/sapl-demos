@@ -33,7 +33,7 @@ public class TestAdapter extends BaseTestAdapter<Stream<TestClass>> {
     @Factory
     public Object[] buildTests() {
         // find all sapltest files below src/test/resources
-        var dir = FileUtils.getFile("src/test/resources");
+        final var dir = FileUtils.getFile("src/test/resources");
 
         final var paths = FileUtils.listFiles(dir, Arrays.array("sapltest"), true).stream()
                 .map(file -> dir.toPath().relativize(file.toPath()).toString()).toList();

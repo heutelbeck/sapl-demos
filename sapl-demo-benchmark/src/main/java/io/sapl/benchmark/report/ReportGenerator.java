@@ -78,47 +78,47 @@ public class ReportGenerator {
      */
     private java.util.List<String> getResultFilesFiles() {
         FilenameFilter filenameFilter   = (d, s) -> s.matches("results_\\d+threads.json");
-        var            treadResultFiles = new File(benchmarkFolder).list(filenameFilter);
+        final var      treadResultFiles = new File(benchmarkFolder).list(filenameFilter);
         return Arrays.stream(Optional.ofNullable(treadResultFiles).orElse(new String[0]))
                 .sorted(Comparator.comparing(ReportGenerator::getThreadCountFromFileName)).toList();
     }
 
     private static void generateThroughputBarChart(String benchmarkFolder, String outputFilename, String title,
             Iterable<ReportSectionData> tableData) throws IOException {
-        var dataset = new DefaultStatisticalCategoryDataset();
+        final var dataset = new DefaultStatisticalCategoryDataset();
         for (var row : tableData) {
             dataset.add(row.getThroughputAvg(), row.getThroughputStdDev(), row.getThreads() + "-threads",
                     row.getAuthMethod());
         }
 
-        var chart = new BarChart(title, dataset, "ops/s (more is better)", "#");
+        final var chart = new BarChart(title, dataset, "ops/s (more is better)", "#");
         chart.saveToPNGFile(new File(benchmarkFolder + File.separator + outputFilename));
     }
 
     private static void generateResponseTimeBarChart(String benchmarkFolder, String outputFilename, String title,
             Iterable<ReportSectionData> tableData) throws IOException {
-        var dataset = new DefaultStatisticalCategoryDataset();
+        final var dataset = new DefaultStatisticalCategoryDataset();
         for (var row : tableData) {
             dataset.add(row.getResponseTimeAvg(), row.getResponseTimeStdDev(), row.getAuthMethod(), row.getPdpName());
         }
 
-        var chart = new BarChart(title, dataset, "ms/op (less is better)", "0.00");
+        final var chart = new BarChart(title, dataset, "ms/op (less is better)", "0.00");
         chart.saveToPNGFile(new File(benchmarkFolder + File.separator + outputFilename));
     }
 
     private static void createDetailLineChart(String benchmarkFolder, String filePath, String title,
             List<List<Double>> rawData) throws IOException {
-        var dataset    = new DefaultCategoryDataset();
-        var forkNumber = 1;
+        final var dataset    = new DefaultCategoryDataset();
+        var       forkNumber = 1;
         for (var forkResults : rawData) {
-            var fork      = "fork " + forkNumber++;
-            var iteration = 1;
+            final var fork      = "fork " + forkNumber++;
+            var       iteration = 1;
             for (var result : forkResults) {
                 dataset.addValue(result, fork, String.valueOf(iteration++));
             }
         }
 
-        var chart = new LineChart(title, dataset, "ops/s");
+        final var chart = new LineChart(title, dataset, "ops/s");
         chart.saveToPNGFile(new File(benchmarkFolder + File.separator + filePath));
     }
 
@@ -137,18 +137,18 @@ public class ReportGenerator {
         Map<String, Map<String, Map<String, List<Object>>>> tableData   = Maps.newHashMap();
 
         // use the first file for average response time comparison
-        var averageResultFile = resultFiles.get(0);
-        var threads           = getThreadCountFromFileName(averageResultFile);
+        final var averageResultFile = resultFiles.get(0);
+        var       threads           = getThreadCountFromFileName(averageResultFile);
         headerFacts.add("avg ms/op<br>(" + threads + " thread)");
 
         // loop Over Benchmark results in the file
         for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(averageResultFile)) {
-            var l1 = benchmarkResult.getDecisionMethod();
-            var l2 = benchmarkResult.getPdp();
-            var l3 = benchmarkResult.getAuthMethod();
+            final var l1 = benchmarkResult.getDecisionMethod();
+            final var l2 = benchmarkResult.getPdp();
+            final var l3 = benchmarkResult.getAuthMethod();
 
-            var rowEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>()).computeIfAbsent(l2, y -> new HashMap<>())
-                    .computeIfAbsent(l3, y -> new ArrayList<>());
+            final var rowEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>())
+                    .computeIfAbsent(l2, y -> new HashMap<>()).computeIfAbsent(l3, y -> new ArrayList<>());
             rowEntry.add(benchmarkResult.getResponseTimeAvg());
         }
 
@@ -159,12 +159,12 @@ public class ReportGenerator {
 
             // loop over Benchmark results in the file
             for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(filename)) {
-                var l1 = benchmarkResult.getDecisionMethod();
-                var l2 = benchmarkResult.getPdp();
-                var l3 = benchmarkResult.getAuthMethod();
+                final var l1 = benchmarkResult.getDecisionMethod();
+                final var l2 = benchmarkResult.getPdp();
+                final var l3 = benchmarkResult.getAuthMethod();
 
                 // create emty if not existing
-                var baseEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>())
+                final var baseEntry = tableData.computeIfAbsent(l1, y -> new HashMap<>())
                         .computeIfAbsent(l2, y -> new HashMap<>()).computeIfAbsent(l3, y -> new ArrayList<>());
                 baseEntry.add(benchmarkResult.getThoughputAvg());
             }
@@ -177,24 +177,24 @@ public class ReportGenerator {
 
         log.info("collecting response time data ...");
         // use the first file for response time reporting
-        var fileName = getResultFilesFiles().get(0);
+        final var fileName = getResultFilesFiles().get(0);
         if (null != fileName) {
 
             Map<String, List<ReportSectionData>> baseData = new HashMap<>();
             for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(fileName)) {
-                var benchmarkName = benchmarkResult.getBenchmarkShortName();
-                var l1            = benchmarkResult.getDecisionMethod();
-                var threads       = benchmarkResult.getThreads();
-                var section       = "Average Response Time" + " - " + l1 + " - " + threads + " thread(s)";
+                final var benchmarkName = benchmarkResult.getBenchmarkShortName();
+                final var l1            = benchmarkResult.getDecisionMethod();
+                final var threads       = benchmarkResult.getThreads();
+                final var section       = "Average Response Time" + " - " + l1 + " - " + threads + " thread(s)";
 
                 // generate detail chart
-                var chartTitle    = benchmarkName + " - " + threads + " threads - average response time";
-                var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_rspt" + ".png";
+                final var chartTitle    = benchmarkName + " - " + threads + " threads - average response time";
+                final var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_rspt" + ".png";
                 createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle,
                         benchmarkResult.getResponseTimeRawResults());
 
                 // build entry
-                var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
+                final var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
                         .chartFilePath(chartFilePath).build();
 
                 // add entry to list of this section
@@ -203,9 +203,9 @@ public class ReportGenerator {
 
             // build map for html rendering
             for (var entry : baseData.entrySet()) {
-                var    section        = entry.getKey();
-                var    resultDataList = entry.getValue();
-                String chartFileName  = "img/" + section + ".png";
+                final var section        = entry.getKey();
+                final var resultDataList = entry.getValue();
+                String    chartFileName  = "img/" + section + ".png";
                 generateResponseTimeBarChart(benchmarkFolder, chartFileName, section, resultDataList);
                 resultMap.put(section,
                         Map.of(chartField, chartFileName, "tableData",
@@ -225,20 +225,20 @@ public class ReportGenerator {
 
         for (String fileName : getResultFilesFiles()) {
             for (BenchmarkResult benchmarkResult : getBenchmarkResultsFromFile(fileName)) {
-                var benchmarkName = benchmarkResult.getBenchmarkShortName();
-                var l1            = benchmarkResult.getDecisionMethod();
-                var l2            = benchmarkResult.getPdp();
-                var threads       = benchmarkResult.getThreads();
-                var section       = "Throughput" + " - " + l1 + " - " + l2;
+                final var benchmarkName = benchmarkResult.getBenchmarkShortName();
+                final var l1            = benchmarkResult.getDecisionMethod();
+                final var l2            = benchmarkResult.getPdp();
+                final var threads       = benchmarkResult.getThreads();
+                final var section       = "Throughput" + " - " + l1 + " - " + l2;
 
                 // generate detail chart
-                var chartTitle    = benchmarkName + " - " + threads + " threads - throughput";
-                var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_thrpt" + ".png";
+                final var chartTitle    = benchmarkName + " - " + threads + " threads - throughput";
+                final var chartFilePath = "img/" + benchmarkName + "_" + threads + "_threads_thrpt" + ".png";
                 createDetailLineChart(benchmarkFolder, chartFilePath, chartTitle,
                         benchmarkResult.getThroughputRawResults());
 
                 // build entry
-                var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
+                final var resultData = ReportSectionData.builder().benchmarkResult(benchmarkResult)
                         .chartFilePath(chartFilePath).build();
 
                 // add entry to list of this section
@@ -247,9 +247,9 @@ public class ReportGenerator {
         }
 
         for (var entry : baseData.entrySet()) {
-            var section        = entry.getKey();
-            var chartFileName  = "img/" + section + ".png";
-            var resultDataList = entry.getValue();
+            final var section        = entry.getKey();
+            final var chartFileName  = "img/" + section + ".png";
+            final var resultDataList = entry.getValue();
             generateThroughputBarChart(benchmarkFolder, chartFileName, section, resultDataList);
             resultMap.put(section,
                     Map.of(chartField, chartFileName, "tableData",
@@ -265,7 +265,7 @@ public class ReportGenerator {
     private void loadStaticFilesIntoReport() throws IOException {
         // copy static files
         for (var file : new String[] { "custom.css", "favicon.png" }) {
-            var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream(file);
+            final var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream(file);
             if (null != inputStream) {
                 FileUtils.copyInputStreamToFile(inputStream, new File(benchmarkFolder + File.separator + file));
             }
@@ -284,13 +284,13 @@ public class ReportGenerator {
         context.put("resultFiles", getResultFilesFiles());
 
         // build context
-        var jnj         = new Jinjava();
-        var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream("Report.html");
+        final var jnj         = new Jinjava();
+        final var inputStream = ReportGenerator.class.getClassLoader().getResourceAsStream("Report.html");
         if (null != inputStream) {
             String template = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-            String fileContent    = jnj.render(template, context);
-            var    reportFilePath = benchmarkFolder + "/Report.html";
+            String    fileContent    = jnj.render(template, context);
+            final var reportFilePath = benchmarkFolder + "/Report.html";
             log.info("generating report: {}", reportFilePath);
             BufferedWriter writer = new BufferedWriter(new FileWriter(reportFilePath, StandardCharsets.UTF_8));
             writer.write(fileContent);

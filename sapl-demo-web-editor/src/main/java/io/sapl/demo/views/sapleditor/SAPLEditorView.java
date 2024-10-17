@@ -21,7 +21,7 @@ public class SAPLEditorView extends VerticalLayout {
 
     private static final long serialVersionUID = 8813800405531649047L;
 
-    private static final String DEFAULT_POLICY = "policy \"set by Vaadin View after instantiation ->\\u2588<-\" permit";
+    private static final String DEFAULT_POLICY = "policy \"x\" permit ";
 
     private final Button     addDocumentChangedListenerButton;
     private final Button     addValidationChangedListenerButton;
@@ -31,7 +31,7 @@ public class SAPLEditorView extends VerticalLayout {
     private Button removeValidationChangedListenerButton;
 
     public SAPLEditorView() {
-        var saplConfig = new SaplEditorConfiguration();
+        final var saplConfig = new SaplEditorConfiguration();
         saplConfig.setHasLineNumbers(true);
         saplConfig.setTextUpdateDelay(500);
         saplConfig.setDarkTheme(true);

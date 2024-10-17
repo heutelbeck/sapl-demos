@@ -37,7 +37,7 @@ public class Helper {
      * Send AuthorizationSubscription to PDP and ensure that Decision equals Permit
      */
     public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
-        var decision = pdp.decide(authorizationSubscription).blockFirst();
+        final var decision = pdp.decide(authorizationSubscription).blockFirst();
         if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
@@ -48,7 +48,7 @@ public class Helper {
      * that Decision equals Permit
      */
     public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
-        var decision = pdp.decideOnce(authorizationSubscription).block();
+        final var decision = pdp.decideOnce(authorizationSubscription).block();
         if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }

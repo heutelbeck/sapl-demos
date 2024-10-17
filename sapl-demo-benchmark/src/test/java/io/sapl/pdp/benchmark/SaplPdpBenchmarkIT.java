@@ -37,7 +37,7 @@ class SaplPdpBenchmarkIT {
 
     @BeforeAll
     private static void createEmptyBenchmarkResultFolder() throws IOException {
-        var tmpReportPathFile = new File(TMP_REPORT_PATH);
+        final var tmpReportPathFile = new File(TMP_REPORT_PATH);
         FileUtils.deleteDirectory(tmpReportPathFile);
         assertTrue(tmpReportPathFile.mkdirs());
     }
@@ -45,7 +45,7 @@ class SaplPdpBenchmarkIT {
     @Test
     void whenExecutingEmbeddedBenchmark_withAllSettings_thenReportsAreCreated() {
         // start benchmark
-        var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
+        final var returnCode = new CommandLine(new BenchmarkCommand()).execute("--cfg",
                 "src/test/resources/integrationtest_benchmark_config.yaml", "--output", TMP_REPORT_PATH);
         Assertions.assertEquals(0, returnCode);
 

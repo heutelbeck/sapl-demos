@@ -29,8 +29,8 @@ class PatientsControllerTests {
 
     @Test
     void whenGetPatients_thenPatientsServiceCalled() {
-        var patientZero = new Patient("name", "icd", "diag");
-        var patients    = Flux.just(patientZero);
+        final var patientZero = new Patient("name", "icd", "diag");
+        final var patients    = Flux.just(patientZero);
         when(patientsService.getPatients()).thenReturn(patients);
         webTestClient.get().uri("/patients").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
                 .expectBodyList(Patient.class).value(Function.identity(), hasItem(patientZero));
