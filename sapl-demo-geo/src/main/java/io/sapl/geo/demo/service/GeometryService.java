@@ -1,6 +1,7 @@
 package io.sapl.geo.demo.service;
 
 
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -78,7 +79,7 @@ public class GeometryService {
 
 	}
 	
-	public Flux<JsonNode> getPositionFromTraccar(String deviceId) throws JsonProcessingException{
+	public Flux<JsonNode> getPositionFromTraccar(String deviceId) throws JsonProcessingException, URISyntaxException{
 		var authenticationTemplate = """
                 {
                 "user":"testuser@example.com",
@@ -109,7 +110,7 @@ public class GeometryService {
 		
 	}
 	
-	public Flux<JsonNode> getGeofencesFromTraccar(String deviceId) throws JsonProcessingException{
+	public Flux<JsonNode> getGeofencesFromTraccar(String deviceId) throws JsonProcessingException, URISyntaxException{
 		var authenticationTemplate = """
                 {
                 "user":"testuser@example.com",
@@ -206,7 +207,7 @@ public class GeometryService {
 		
 		var val          = Val.ofJson(requestTemplate);
 		var authVal		 = Val.ofJson(authenticationTemplate);
-        return new OwnTracks(authVal.get(), new ObjectMapper()).connect(val.get()).map(Val::get);
+        return new OwnTracks(authVal.get(), new ObjectMapper()).getPositionWithInregions(val.get()).map(Val::get);
                 
 	}
 	

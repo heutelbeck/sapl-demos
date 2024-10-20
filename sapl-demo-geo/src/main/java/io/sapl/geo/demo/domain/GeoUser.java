@@ -2,12 +2,17 @@ package io.sapl.geo.demo.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.springframework.security.core.GrantedAuthority;
@@ -40,12 +45,13 @@ public class GeoUser implements UserDetails{
 	
 	@Column("UniqueDeviceId")
 	private final String uniqueDeviceId;
+		
+	@Setter
+	@Transient
+	private Coordinate[] positions = new Coordinate[] {};
 	
-	@Column("NextLat")
-	private final Double nextLat;
-	
-	@Column("NextLon")
-	private final Double nextLon;
+	@Transient
+	private int currentPositionIndex = -1; //getNextCoordinate() ist called by webUi automatically
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -53,5 +59,16 @@ public class GeoUser implements UserDetails{
         authorities.add(new SimpleGrantedAuthority("demouser"));
         return authorities;
 	}
+	
+	public Coordinate getNextCoordinate() {
 
+		if (currentPositionIndex == -1) {
+			currentPositionIndex = 0; 
+			return null;//getNextCoordinate() ist called by webUi automatically
+		} else {
+			var currentPosition = currentPositionIndex;
+			currentPositionIndex = (currentPositionIndex + 1) % positions.length; 
+			return positions[currentPosition]; 
+		}		
+	}
 }

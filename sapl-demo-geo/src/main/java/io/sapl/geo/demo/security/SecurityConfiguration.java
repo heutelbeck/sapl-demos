@@ -36,7 +36,11 @@ public class SecurityConfiguration {
         				.anyRequest().authenticated()
         		)
 
-                   .formLogin(login -> login.defaultSuccessUrl("/mainView", true))
+                   .formLogin(login -> login
+                		   .defaultSuccessUrl("/mainView", true)
+                		   .successHandler(new UserAuthenticationSuccessHandler())
+                		   )
+                  
                    .logout(logout -> logout.permitAll()
                 		   .logoutUrl("/logout")
                            .logoutSuccessUrl("/login")

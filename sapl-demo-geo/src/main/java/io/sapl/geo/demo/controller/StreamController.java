@@ -1,5 +1,7 @@
 package io.sapl.geo.demo.controller;
 
+import java.net.URISyntaxException;
+
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,13 +27,13 @@ public class StreamController {
     }
 	
 	@RequestMapping(value="/streamPositionsFromTraccar", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<JsonNode> streamPositionsFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException {
+    public Flux<JsonNode> streamPositionsFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException, URISyntaxException {
        
             return geometryService.getPositionFromTraccar(id);    
     }
 	
 	@RequestMapping(value="/streamGeofencesFromTraccar", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<JsonNode> streamGeofencesFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException {
+    public Flux<JsonNode> streamGeofencesFromTraccar(@RequestParam String id, Model model) throws JsonProcessingException, URISyntaxException {
        
             return geometryService.getGeofencesFromTraccar(id);    
     }

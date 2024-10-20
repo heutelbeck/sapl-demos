@@ -27,7 +27,7 @@ public class GeoUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return geoUserRepository.findByUsername(username)
-                .map(geoUser -> new GeoUser(geoUser.getUsername(), geoUser.getPassword(), geoUser.getGeoTracker(), geoUser.getTrackerDeviceId(), geoUser.getUniqueDeviceId(), geoUser.getNextLat(), geoUser.getNextLon()))
+                .map(geoUser -> new GeoUser(geoUser.getUsername(), geoUser.getPassword(), geoUser.getGeoTracker(), geoUser.getTrackerDeviceId(), geoUser.getUniqueDeviceId()))//, geoUser.getNextLat(), geoUser.getNextLon()))
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("User not found")))
                 .block();
         

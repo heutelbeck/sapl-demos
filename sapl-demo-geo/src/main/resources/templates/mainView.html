@@ -33,7 +33,7 @@
 	<script th:inline="javascript">
           
         var geoUser = /*[[${geoUser}]]*/ {};
-            
+        move();   
         document.addEventListener("DOMContentLoaded", function() {
             document.getElementById('logout-form').addEventListener('submit', function(event) {
                 console.log("closeStreams");
@@ -60,60 +60,8 @@
             .catch(error => {
                 console.error('Fehler:', error);
             });
-            });
-            
-            var moveFunction;
-            if (geoUser.geoTracker === 'TRACCAR') {
-                moveFunction = function() {
-                    fetch('/app/moveTraccar', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                        	username: '',
-                            deviceId: geoUser.uniqueDeviceId,
-                            lat: geoUser.nextLat, 
-                            lon: geoUser.nextLon  
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Erfolg:', data);
-                    })
-                    .catch(error => {
-                        console.error('Fehler:', error);
-                    });
-                };
-            } else if (geoUser.geoTracker === 'OWNTRACKS') {
-                moveFunction = function() {
-                    fetch('/app/moveOwnTracks', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            username: geoUser.username,
-                            deviceId: geoUser.trackerDeviceId,
-                            lat: geoUser.nextLat, 
-                            lon: geoUser.nextLon   
-                        })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Erfolg:', data);
-                    })
-                    .catch(error => {
-                        console.error('Fehler:', error);
-                    });
-                };
-            } else {
-                moveFunction = function() {
-                    console.warn('Unsupported geoTracker type:', geoUser.geoTracker);
-                };
-            }
-
-            document.getElementById('moveButton').addEventListener('click', moveFunction);
+            });            
+            document.getElementById('moveButton').addEventListener('click', move);
         });
             
 		

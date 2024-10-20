@@ -1,13 +1,13 @@
 package io.sapl.geo.demo.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import io.sapl.geo.demo.domain.Data;
 import io.sapl.geo.demo.domain.DataRepository;
+import io.sapl.geo.demo.domain.GeoTracker;
+import io.sapl.geo.demo.domain.GeoUser;
 import io.sapl.geo.demo.service.GeometryService;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -22,23 +22,22 @@ public class AppController {
 	private final DataRepository dataRepository;
     
 	
-	@PostMapping(value="/moveTraccar")
-	public String moveTraccar(@RequestBody MoveRequest request) {
-
-    	geometryService.addTraccarPosition(request.getDeviceId(), request.getLat(), request.getLon()).block();
-    	return "Move action received";	
+	@GetMapping(value="/move")
+	public String moveOwnTracks(@AuthenticationPrincipal GeoUser userDetails) {
 		
-	}
-	
-	@PostMapping(value="/moveOwnTracks")
-	public String moveOwnTracks(@RequestBody MoveRequest request) {
-
-    	geometryService.addOwntracksPosition(request.getUsername(), request.getDeviceId(), request.getLat(), request.getLon())
-    	.then()
-    	.block();
-    	return "Move action received";		
+		var coordinate = userDetails.getNextCoordinate();
+		var tracker = userDetails.getGeoTracker();
+		if (tracker == GeoTracker.OWNTRACKS) {
+			geometryService.addOwntracksPosition(userDetails.getUsername(), userDetails.getTrackerDeviceId(), coordinate.x, coordinate.y)
+	    	.then()
+	    	.block();	
+		}else if (tracker == GeoTracker.TRACCAR) {
+			
+			geometryService.addTraccarPosition(userDetails.getUniqueDeviceId(), coordinate.x, coordinate.y).block();
+		}
 		
-	}
+    	return "Move action received";				
+	}	
 	
 	@GetMapping(value="/getData")
 	public Flux<Data> getData() {

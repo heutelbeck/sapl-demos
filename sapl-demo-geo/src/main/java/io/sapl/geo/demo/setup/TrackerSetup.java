@@ -10,7 +10,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import io.sapl.geo.demo.service.GeometryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -24,8 +23,6 @@ public class TrackerSetup implements CommandLineRunner {
 
     private final GenericContainer<?> traccarContainer;
     private final WebClient.Builder webClientBuilder;
-    private final GeometryService geometryService;
-
     private static final String COOKIE = "Cookie";
 
     @Override
@@ -52,8 +49,6 @@ public class TrackerSetup implements CommandLineRunner {
                     })
                 )
             )
-            .then(addTraccarPosition("1234567890", 51.34533, 7.40575))
-            .then(addOwntracksPosition("alice", "device1", 48.856613, 2.352222))
             .doOnTerminate(() -> log.info("tracker setup completed"))
             .doOnError(error -> log.error("Error during tracker setup", error))
             .subscribe();
@@ -190,14 +185,6 @@ public class TrackerSetup implements CommandLineRunner {
                 .doOnSuccess(response -> log.info("Geofence linked successfully: {}", response))
                 .doOnError(error -> log.error("Error linking geofence", error))
                 .then(); 
-    }
-
-    private Mono<String> addTraccarPosition(String deviceId, Double lat, Double lon) {
-        return geometryService.addTraccarPosition(deviceId, lat, lon);
-    }
-
-    private Mono<String> addOwntracksPosition(String user, String deviceId, double lat, double lon) {
-        return geometryService.addOwntracksPosition(user, deviceId, lat, lon);
     }
 
     private String createGeofenceJson(String name, String description) {

@@ -50,9 +50,9 @@ public class DatabaseSetup implements CommandLineRunner {
 	}
 
     private Collection<GeoUser> users(PasswordEncoder encoder) {
-        var users = new LinkedList<GeoUser>();      
-        users.add(new GeoUser("bob", encoder.encode(DEFAULT_RAW_PASSWORD), GeoTracker.TRACCAR,  "1", "1234567890", 51.37442, 7.49254));
-        users.add(new GeoUser("alice", encoder.encode(DEFAULT_RAW_PASSWORD), GeoTracker.OWNTRACKS, "device1", "", 51.37442, 7.49254));
+        var users = new LinkedList<GeoUser>();      		
+        users.add(new GeoUser("bob", encoder.encode(DEFAULT_RAW_PASSWORD), GeoTracker.TRACCAR,  "1", "1234567890")); //, 51.37442, 7.49254
+        users.add(new GeoUser("alice", encoder.encode(DEFAULT_RAW_PASSWORD), GeoTracker.OWNTRACKS, "device1", "")); // , 49.051864, 2.657535 next 49.283110, 4.009421
         return users;
     }
 	

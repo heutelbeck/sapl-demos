@@ -51,3 +51,14 @@ function updateLogArea(id, source){
     logContainer.appendChild(logEntry);
 
 }
+
+function move(){
+	const url = `/app/move`; 
+			
+    fetch(url, {
+    	method: 'GET',
+	    headers: {
+	        'Content-Type': 'application/json'
+	    }
+	});
+}
