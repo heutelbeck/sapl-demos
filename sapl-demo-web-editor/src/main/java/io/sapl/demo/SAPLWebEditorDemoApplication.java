@@ -8,7 +8,7 @@ import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
 
 @SpringBootApplication
-@Theme(value = "sapldemowebeditor", variant = Lumo.DARK)
+@Theme(value = "sapl", variant = Lumo.DARK)
 public class SAPLWebEditorDemoApplication implements AppShellConfigurator {
 
     private static final long serialVersionUID = -8117421629399543738L;

@@ -98,7 +98,8 @@ public class SAPLEditorView extends VerticalLayout {
         add(toggleReadOnlyButton);
 
         IntegerField configurationIdField = new IntegerField("Configuration Id");
-        configurationIdField.addValueChangeListener(event -> saplEditor.setConfigurationId(event.getValue().toString()));
+        configurationIdField
+                .addValueChangeListener(event -> saplEditor.setConfigurationId(event.getValue().toString()));
         configurationIdField.setStepButtonsVisible(true);
         configurationIdField.setMin(1);
         configurationIdField.setMax(5);
@@ -111,15 +112,15 @@ public class SAPLEditorView extends VerticalLayout {
     }
 
     public void onDocumentChanged(DocumentChangedEvent event) {
-//        log.info("value changed: {}", event.getNewValue());
+        log.info("value changed: {}", event.getNewValue());
     }
 
     public void onValidationFinished(ValidationFinishedEvent event) {
-//        Issue[] issues = event.getIssues();
-//        log.info("validation finished, number of issues: {}", issues.length);
-//        for (Issue issue : issues) {
-//            log.info(" - {} " + issue.getDescription());
-//        }
+        Issue[] issues = event.getIssues();
+        log.info("validation finished, number of issues: {}", issues.length);
+        for (Issue issue : issues) {
+            log.info(" - {} " + issue.getDescription());
+        }
     }
 
 }

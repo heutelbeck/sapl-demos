@@ -140,6 +140,21 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>3.4.0</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>.</directory>
+							<includes>
+								<include>src/main/bundles/**</include>
+								<include>src/main/frontend/generated/**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -166,7 +181,8 @@
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
 						<configuration>
-							<mainClass>io.sapl.playground.SAPLPlaygroundApplication</mainClass>
+							<mainClass>
+								io.sapl.playground.SAPLPlaygroundApplication</mainClass>
 							<layout>JAR</layout>
 							<jvmArguments>
 								-Xdebug
@@ -179,7 +195,8 @@
 							<excludes>
 								<exclude>
 									<groupId>org.springframework.boot</groupId>
-									<artifactId>spring-boot-configuration-processor</artifactId>
+									<artifactId>
+										spring-boot-configuration-processor</artifactId>
 								</exclude>
 								<exclude>
 									<groupId>org.projectlombok</groupId>
@@ -188,10 +205,12 @@
 							</excludes>
 							<image>
 								<builder>paketobuildpacks/builder-jammy-tiny</builder>
-								<name>${docker-registry-url}/${project.artifactId}:${project.version}</name>
+								<name>
+									${docker-registry-url}/${project.artifactId}:${project.version}</name>
 								<createdDate>now</createdDate>
 								<tags>
-									<tag>${docker-registry-url}/${project.artifactId}:${project.version}</tag>
+									<tag>
+										${docker-registry-url}/${project.artifactId}:${project.version}</tag>
 								</tags>
 								<buildCache>
 									<volume>
