@@ -20,6 +20,8 @@ package io.sapl.benchmark;
 import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_HTTP_PORT;
 import static io.sapl.benchmark.BenchmarkConfiguration.DOCKER_DEFAULT_RSOCKET_PORT;
 
+import java.util.List;
+
 import org.testcontainers.containers.GenericContainer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +31,6 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import java.util.List;
 
 /**
  * This class is holding the benchmark execution context derived from

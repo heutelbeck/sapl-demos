@@ -33,7 +33,7 @@
 	<description>Demo of a OAuth2 Cient Application with a JWT/SAPL secured Resource Server.</description>
 	
 	<properties>
-		<version.testcontainers>1.18.0</version.testcontainers>
+		<version.testcontainers>1.20.4</version.testcontainers>
 	</properties>
 
 	<dependencyManagement>

@@ -32,14 +32,18 @@
 	<packaging>jar</packaging>
 
 	<name>SAPL Demo Spring MVC Application</name>
-	<description>A complete Spring Boot MVC application, demonstrating SAPL in aspect oriented programming, manual enforcement, using external data sources for policy decisions, content filtering and how to handle constraints, i.e. obligations and advice.</description>
+	<description>A complete Spring Boot MVC application, demonstrating SAPL in
+		aspect oriented programming, manual enforcement, using external data
+		sources for policy decisions, content filtering and how to handle
+		constraints, i.e. obligations and advice.</description>
 
 	<dependencies>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-security</artifactId>
 		</dependency>
-		<!-- For testing the application against a SAPL Server replace the sapl-spring-pdp-embedded 
+		<!-- For testing the application against a SAPL Server replace the
+		sapl-spring-pdp-embedded 
 			with sapl-spring-pdp-remote. The application.yml does contain all settings 
 			to connect to a sapl-server-lt which as been started locally from source 
 			using mvn spring-boot:run. However, remember that the application will require 
@@ -107,11 +111,11 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
-        <dependency>
-		    <groupId>net.sourceforge.htmlunit</groupId>
-		    <artifactId>htmlunit</artifactId>
-		    <scope>test</scope>
+
+		<dependency>
+			<groupId>org.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Devtools for convenience -->
@@ -129,22 +133,22 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<executions>
-        			<execution>
-            			<goals>
- 			            	<goal>repackage</goal>
-            			</goals>
-         			</execution>
-    			</executions>
-				<configuration>    
-                	<mainClass>io.sapl.mvc.demo.MvcDemoApplication</mainClass>
-		            <layout>JAR</layout>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>io.sapl.mvc.demo.MvcDemoApplication</mainClass>
+					<layout>JAR</layout>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-					</excludes>                	
-            	</configuration>
+					</excludes>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

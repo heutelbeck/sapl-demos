@@ -91,7 +91,7 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.htmlunit</groupId>
+			<groupId>org.htmlunit</groupId>
 			<artifactId>htmlunit</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -140,10 +140,12 @@
 				<configuration>
 					<image>
 						<builder>paketobuildpacks/builder-jammy-tiny</builder>
-						<name>${docker-registry-url}/${project.artifactId}:${project.version}</name>
+						<name>
+							${docker-registry-url}/${project.artifactId}:${project.version}</name>
 						<createdDate>now</createdDate>
 						<tags>
-							<tag>${docker-registry-url}/${project.artifactId}:${project.version}</tag>
+							<tag>
+								${docker-registry-url}/${project.artifactId}:${project.version}</tag>
 						</tags>
 						<buildCache>
 							<volume>

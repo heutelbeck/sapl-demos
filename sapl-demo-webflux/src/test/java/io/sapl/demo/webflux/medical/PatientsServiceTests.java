@@ -9,8 +9,8 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import reactor.test.StepVerifier;
 
@@ -20,7 +20,7 @@ class PatientsServiceTests {
     @Autowired
     PatientsService patientsController;
 
-    @MockBean
+    @MockitoBean
     Clock mockClock;
 
     @Test

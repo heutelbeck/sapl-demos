@@ -17,13 +17,13 @@
  */
 package io.sapl.springdatar2dbcdemo.repository;
 
-import io.sapl.spring.method.metadata.QueryEnforce;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
+
+import io.sapl.spring.method.metadata.QueryEnforce;
 import reactor.core.publisher.Flux;
 
 @Repository
