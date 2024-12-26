@@ -12,7 +12,7 @@
 
 	<name>SAPL Demo Parent</name>
 
-	<inceptionYear>2020-2024</inceptionYear>
+	<inceptionYear>2020-2025</inceptionYear>
 
 	<organization>
 		<name>Dominic Heutelbeck</name>
@@ -30,7 +30,7 @@
 		<vaadin.version>24.5.7</vaadin.version>
 		<version.lombok>1.18.36</version.lombok>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
-		<springboot.version>3.4.0</springboot.version>
+		<springboot.version>3.4.1</springboot.version>
 
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>

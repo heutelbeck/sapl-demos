@@ -34,7 +34,7 @@ import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
 import io.sapl.interpreter.pip.AttributeContext;
-import io.sapl.pip.TimePolicyInformationPoint;
+import io.sapl.pip.time.TimePolicyInformationPoint;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")

@@ -57,7 +57,7 @@
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-jwt</artifactId>
+			<artifactId>jwt</artifactId>
 			<exclusions>
 				<exclusion>
 					<groupId>com.google.guava</groupId>
