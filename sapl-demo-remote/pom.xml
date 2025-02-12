@@ -37,8 +37,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- The Version of the SAPL Dependencies -->
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
-		<spotbugs.version>4.7.3.6</spotbugs.version>
-		<sbcontrib.version>7.6.0</sbcontrib.version>
+		<spotbugs.version>4.8.6.6</spotbugs.version>
+		<sbcontrib.version>7.6.9</sbcontrib.version>
 	</properties>
 
 	<dependencyManagement>
@@ -71,15 +71,14 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>2.0.9</version>
-			<scope>runtime</scope>
+			<version>2.0.16</version>
 		</dependency>
 
 		<!-- A library for parsing command-line parameters -->
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.6.1</version>
+			<version>4.7.6</version>
 		</dependency>
 	</dependencies>
 
@@ -91,7 +90,7 @@
 				Java application directly runnable via 'java -jar'. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.6.0</version>		
+				<version>3.7.1</version>		
 				<configuration>
 					<archive>
 						<manifest>
@@ -113,7 +112,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>com.github.spotbugs</groupId>
+		 	<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
 				<version>${spotbugs.version}</version>
 				<configuration>

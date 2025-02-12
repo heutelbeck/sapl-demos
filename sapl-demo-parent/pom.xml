@@ -30,7 +30,7 @@
 		<vaadin.version>24.5.7</vaadin.version>
 		<version.lombok>1.18.36</version.lombok>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
-		<springboot.version>3.4.1</springboot.version>
+		<springboot.version>3.4.2</springboot.version>
 
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
@@ -225,7 +225,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.4.0</version>
+					<version>3.4.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
