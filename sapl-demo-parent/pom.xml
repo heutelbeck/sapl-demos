@@ -27,7 +27,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<vaadin.version>24.5.7</vaadin.version>
+		<vaadin.version>24.6.4</vaadin.version>
 		<version.lombok>1.18.36</version.lombok>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
 		<springboot.version>3.4.2</springboot.version>
