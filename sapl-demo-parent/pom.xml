@@ -27,10 +27,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<vaadin.version>24.6.4</vaadin.version>
-		<version.lombok>1.18.36</version.lombok>
+		<vaadin.version>24.6.12</vaadin.version>
+		<version.lombok>1.18.38</version.lombok>
 		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
-		<springboot.version>3.4.2</springboot.version>
+		<springboot.version>3.4.7</springboot.version>
 
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
@@ -100,11 +100,14 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</repository>
 		<repository>
@@ -134,11 +137,14 @@
 
 	<pluginRepositories>
 		<pluginRepository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+			<name>Central Portal Snapshots</name>
+			<id>central-portal-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
 			<snapshots>
 				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
 			</snapshots>
 		</pluginRepository>
 		<pluginRepository>
@@ -185,7 +191,6 @@
 						com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
 					<properties>
 						<owner>Dominic Heutelbeck</owner>
-						<email>dominic@heutelbeck.com</email>
 					</properties>
 					<excludes>
 						<exclude>**/README</exclude>

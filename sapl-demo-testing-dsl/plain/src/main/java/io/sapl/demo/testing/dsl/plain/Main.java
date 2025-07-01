@@ -12,8 +12,6 @@ import io.sapl.demo.testing.dsl.plain.resolvers.CustomIntegrationTestPolicyResol
 import io.sapl.demo.testing.dsl.plain.resolvers.CustomUnitTestPolicyResolver;
 import io.sapl.demo.testing.dsl.plain.storage.TestStorage;
 import io.sapl.test.coverage.api.CoverageAPIFactory;
-import io.sapl.test.dsl.interfaces.IntegrationTestPolicyResolver;
-import io.sapl.test.dsl.interfaces.UnitTestPolicyResolver;
 
 public class Main {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
