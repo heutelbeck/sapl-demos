@@ -48,11 +48,11 @@ public class RemotePDPDemo implements Callable<Integer> {
 
     @Option(names = { "-k",
             "-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
-    private String clientKey = "xwuUaRD65G";
+    private String clientKey = "mybdpernDvaQHHzSn5VGsg";
 
     @Option(names = { "-s",
             "-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-    private String clientSecret = "3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_";
+    private String clientSecret = "lHZ83Uv/8l6BtthixMyeyvzaTbAxe14rF50cvtzRNFY=";
 
     public static void main(String... args) {
         System.exit(new CommandLine(new RemotePDPDemo()).execute(args));

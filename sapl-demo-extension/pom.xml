@@ -22,7 +22,7 @@
 		
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-extension</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.0</version>
 
 	<name>SAPL Demo Custom Extensions (PIPs and functions)</name>
 	<properties>
@@ -31,7 +31,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- The Version of the SAPL Dependencies -->
-		<sapl.version>3.0.0-SNAPSHOT</sapl.version>
+		<sapl.version>3.0.0</sapl.version>
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
 	</properties>
@@ -114,8 +114,8 @@
 		<plugins>
 			<!-- The maven-assembly-plugin is responsible to create the side-loadable 
 				fat JAR of your extensions. Once the build process concluded, you will find 
-				two artifacts in your target folder: a) sapl-demo-extension-3.0.0-SNAPSHOT.jar 
-				b) sapl-demo-extension-3.0.0-SNAPSHOT-jar-with-dependencies.jar a) is the 
+				two artifacts in your target folder: a) sapl-demo-extension-3.0.0.jar 
+				b) sapl-demo-extension-3.0.0-jar-with-dependencies.jar a) is the 
 				normal JAR only containing the classfiles and resources of your extension 
 				module. b) is the far JAR, which can be used to side-load the extension as 
 				a plugin to an existing PDP server. -->
