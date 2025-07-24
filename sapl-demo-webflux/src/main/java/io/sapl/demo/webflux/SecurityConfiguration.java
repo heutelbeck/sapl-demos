@@ -15,10 +15,15 @@
  */
 package io.sapl.demo.webflux;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 
@@ -41,6 +46,12 @@ public class SecurityConfiguration {
             .httpBasic(basic -> basic.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
 		return http.build();
 		// @formatter:on
+    }
+
+    @Bean
+    MapReactiveUserDetailsService userDetailsService() {
+        final var userDetails = User.withUsername("admin").password("admin").roles("ADMIN").build();
+        return new MapReactiveUserDetailsService(List.of(userDetails));
     }
 
 }

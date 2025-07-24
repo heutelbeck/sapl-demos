@@ -35,6 +35,7 @@ io.sapl.pdp:
 # To do so, replace the dependency to sapl-spring-pdp-embedded with sapl-spring-pdp-remote
 # The following settings are select that it will connect to a sapl-server-lt you started locally with mvn spring-boot:run
   remote:
+    type: http
     host: https://localhost:8443
     # These are the default credentials configured for the sapl-server-lt when running with the 'local' profile
     key: xwuUaRD65G
