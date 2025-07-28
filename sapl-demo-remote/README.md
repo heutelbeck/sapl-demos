@@ -22,7 +22,7 @@ After the build completes, the `target` folder contains the executable JAR.
 Change into this folder and execute the following command to run the demo:
 
 ```
-java -jar sapl-demo-remote-2.1.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar sapl-demo-remote-3.0.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
 By default, the demo attempts so connect to `127.0.0.1:8443` and uses the default client 
