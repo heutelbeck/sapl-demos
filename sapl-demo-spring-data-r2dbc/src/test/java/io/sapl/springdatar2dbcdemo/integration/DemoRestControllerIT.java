@@ -92,7 +92,7 @@ class DemoRestControllerIT extends TestContainerBase {
 		var result = r2dbcPersonController.fetchingByQueryMethod("ll").collectList();
 
 		// THEN
-		StepVerifier.create(result).expectErrorMatches(error -> error instanceof BadSqlGrammarException).verify();
+		StepVerifier.create(result).expectErrorMatches(BadSqlGrammarException.class::isInstance).verify();
 	}
 	
 	private final String personsJsonString = """
