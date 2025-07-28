@@ -22,7 +22,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-embedded</artifactId>
-	<version>3.0.0</version>
+	<version>3.1.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -36,7 +36,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- The Version of the SAPL Dependencies -->
-		<sapl.version>3.0.0</sapl.version>
+		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
 	</properties>

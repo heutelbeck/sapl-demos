@@ -26,7 +26,7 @@
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
-		<version>3.0.0</version>
+		<version>3.1.0-SNAPSHOT</version>
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 
@@ -38,7 +38,7 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<sapl.version>3.0.0</sapl.version>
+		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -67,7 +67,7 @@
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-spring-data-mongo-reactive</artifactId>
-			<version>3.0.0</version>
+			<version>3.1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>io.sapl</groupId>
