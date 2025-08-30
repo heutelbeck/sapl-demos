@@ -1,5 +1,6 @@
-import filter.*
-import simple.*
+import filter.blacken
+import simple.append
+import simple.length
 
 policy "policy read"
 permit
