@@ -25,6 +25,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.sapl.attributes.broker.api.AttributeStreamBroker;
+import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
+import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
+import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
+import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
 import io.sapl.functions.FilterFunctionLibrary;
 import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
@@ -32,10 +39,8 @@ import io.sapl.grammar.web.SAPLServlet;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.functions.FunctionContext;
-import io.sapl.interpreter.pip.AnnotationAttributeContext;
-import io.sapl.interpreter.pip.AttributeContext;
-import io.sapl.pip.time.TimePolicyInformationPoint;
 import io.sapl.test.grammar.web.SAPLTestServlet;
+import io.sapl.validation.ValidatorFactory;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")
@@ -74,10 +79,15 @@ public class XtextServletConfiguration {
     }
 
     @Bean
-    AttributeContext attributeContext() throws InitializationException {
-        AnnotationAttributeContext context = new AnnotationAttributeContext();
-        context.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        return context;
+    AttributeStreamBroker attributeStreamBroker() {
+        final var mapper                = new ObjectMapper();
+        final var validatorFactory      = new ValidatorFactory(mapper);
+        final var attributeStreamBroker = new CachingAttributeStreamBroker();
+        final var docsProvider          = new InMemoryPolicyInformationPointDocumentationProvider();
+        final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
+                docsProvider, validatorFactory);
+        pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
+        return attributeStreamBroker;
     }
-
+    
 }

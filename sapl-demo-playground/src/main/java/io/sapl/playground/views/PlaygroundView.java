@@ -42,18 +42,18 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.sapl.api.interpreter.Val;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.attributes.broker.api.AttributeStreamBroker;
 import io.sapl.grammar.sapl.SAPL;
 import io.sapl.interpreter.DefaultSAPLInterpreter;
 import io.sapl.interpreter.DocumentEvaluationResult;
 import io.sapl.interpreter.SAPLInterpreter;
 import io.sapl.interpreter.context.AuthorizationContext;
-import io.sapl.interpreter.pip.AttributeContext;
 import io.sapl.pdp.config.PDPConfigurationProvider;
 import io.sapl.playground.examples.BasicExample;
 import io.sapl.playground.examples.Example;
 import io.sapl.playground.models.MockDefinitionParsingException;
 import io.sapl.playground.models.MockingModel;
-import io.sapl.test.mocking.attribute.MockingAttributeContext;
+import io.sapl.test.mocking.attribute.MockingAttributeStreamBroker;
 import io.sapl.test.mocking.function.MockingFunctionContext;
 import io.sapl.test.steps.AttributeMockReturnValues;
 import io.sapl.vaadin.DocumentChangedEvent;
@@ -345,9 +345,9 @@ public class PlaygroundView extends VerticalLayout {
         if (null == config) {
             return false;
         }
-        final var attributeCtx  = new MockingAttributeContext(config.attributeContext());
+        final var attributeStreamBroker  = new MockingAttributeStreamBroker(config.attributeStreamBroker());
         final var matchesResult = this.currentPolicy.matches().contextWrite(
-                ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel, this.currentAuthzSub))
+                ctx -> getEvalContextForMockJson(ctx, attributeStreamBroker, this.currentMockingModel, this.currentAuthzSub))
                 .block();
 
         if (null == matchesResult || !matchesResult.isBoolean()) {
@@ -382,14 +382,14 @@ public class PlaygroundView extends VerticalLayout {
             if (null == config) {
                 return;
             }
-            final var attributeCtx = new MockingAttributeContext(config.attributeContext());
+            final var attributeStreamBroker = new MockingAttributeStreamBroker(config.attributeStreamBroker());
 
             Step<AuthorizationDecision> steps = StepVerifier
                     .create(this.currentPolicy.evaluate().map(DocumentEvaluationResult::getAuthorizationDecision)
-                            .contextWrite(ctx -> getEvalContextForMockJson(ctx, attributeCtx, this.currentMockingModel,
+                            .contextWrite(ctx -> getEvalContextForMockJson(ctx, attributeStreamBroker, this.currentMockingModel,
                                     this.currentAuthzSub)));
 
-            steps = emitTestPublishersInStepVerifier(attributeCtx, steps);
+            steps = emitTestPublishersInStepVerifier(attributeStreamBroker, steps);
 
             steps = consumeDecisionsFromStepVerifier(aggregatedResult, steps);
 
@@ -430,12 +430,12 @@ public class PlaygroundView extends VerticalLayout {
         return steps;
     }
 
-    private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(AttributeContext attributeCtx,
+    private Step<AuthorizationDecision> emitTestPublishersInStepVerifier(AttributeStreamBroker attributeStreamBroker,
             Step<AuthorizationDecision> steps) {
         for (AttributeMockReturnValues mock : this.attrReturnValues) {
             String fullName = mock.getFullName();
             for (Val val : mock.getMockReturnValues()) {
-                steps = steps.then(() -> ((MockingAttributeContext) attributeCtx).mockEmit(fullName, val));
+                steps = steps.then(() -> ((MockingAttributeStreamBroker) attributeStreamBroker).mockEmit(fullName, val));
             }
         }
         return steps;
@@ -474,7 +474,7 @@ public class PlaygroundView extends VerticalLayout {
         return mocks;
     }
 
-    private Context getEvalContextForMockJson(Context ctx, MockingAttributeContext attributeCtx,
+    private Context getEvalContextForMockJson(Context ctx, MockingAttributeStreamBroker attributeStreamBroker,
             List<MockingModel> mocks, AuthorizationSubscription authzSubscription) {
         if (null == pdpConfigurationProvider) {
             throw new IllegalStateException("pdpConfigurationProvider == null");
@@ -495,11 +495,11 @@ public class PlaygroundView extends VerticalLayout {
             switch (mock.getType()) {
             case ATTRIBUTE:
                 if (null != mock.getAlways()) {
-                    attributeCtx.markAttributeMock(mock.getImportName());
+                    attributeStreamBroker.markAttributeMock(mock.getImportName());
                     this.attrReturnValues
                             .add(AttributeMockReturnValues.of(mock.getImportName(), List.of(mock.getAlways())));
                 } else {
-                    attributeCtx.markAttributeMock(mock.getImportName());
+                    attributeStreamBroker.markAttributeMock(mock.getImportName());
                     this.attrReturnValues.add(
                             AttributeMockReturnValues.of(mock.getImportName(), new LinkedList<>(mock.getSequence())));
                 }
@@ -516,7 +516,7 @@ public class PlaygroundView extends VerticalLayout {
                 break;
             }
         }
-        ctx = AuthorizationContext.setAttributeContext(ctx, attributeCtx);
+        ctx = AuthorizationContext.setAttributeStreamBroker(ctx, attributeStreamBroker);
         ctx = AuthorizationContext.setFunctionContext(ctx, functionCtx);
         ctx = AuthorizationContext.setVariables(ctx, variables);
         ctx = AuthorizationContext.setSubscriptionVariables(ctx, authzSubscription);

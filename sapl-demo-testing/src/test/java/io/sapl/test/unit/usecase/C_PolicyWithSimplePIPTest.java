@@ -16,7 +16,7 @@
 package io.sapl.test.unit.usecase;
 
 import static io.sapl.hamcrest.Matchers.val;
-import static io.sapl.test.Imports.whenParentValue;
+import static io.sapl.test.Imports.whenEntityValue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class C_PolicyWithSimplePIPTest {
     void test_policyWithSimplePIP_mockedWhenParameters() {
 
         fixture.constructTestCaseWithMocks()
-                .givenAttribute("test.upper", whenParentValue(val("willi")), Val.of("WILLI"))
+                .givenAttribute("test.upper", whenEntityValue(val("willi")), Val.of("WILLI"))
                 .when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
 
     }

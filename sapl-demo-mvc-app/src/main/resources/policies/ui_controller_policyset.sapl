@@ -1,4 +1,4 @@
-import filter.*
+import filter.blacken
 
 set "UIController"
 first-applicable
