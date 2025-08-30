@@ -18,6 +18,8 @@ package io.sapl.playground;
 import java.time.Clock;
 import java.util.List;
 
+import javax.swing.text.AbstractDocument.AttributeContext;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
@@ -25,6 +27,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
+import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
 import io.sapl.functions.FilterFunctionLibrary;
 import io.sapl.functions.StandardFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
@@ -33,8 +36,6 @@ import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
 import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.interpreter.pip.AnnotationAttributeContext;
-import io.sapl.interpreter.pip.AttributeContext;
-import io.sapl.pip.time.TimePolicyInformationPoint;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")
