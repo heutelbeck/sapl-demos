@@ -44,9 +44,8 @@ public class SaplConfiguration {
         final var docsProvider          = new InMemoryPolicyInformationPointDocumentationProvider();
         final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
                 docsProvider, validatorFactory);
-
         pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        pipLoader.loadPolicyInformationPoint(DemoPip.class);
+        pipLoader.loadStaticPolicyInformationPoint(DemoPip.class);
         final var functionContext = new AnnotationFunctionContext();
         functionContext.loadLibrary(FilterFunctionLibrary.class);
         functionContext.loadLibrary(StandardFunctionLibrary.class);
