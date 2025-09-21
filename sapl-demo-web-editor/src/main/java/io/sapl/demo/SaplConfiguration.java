@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
+import io.sapl.attributes.documentation.api.PolicyInformationPointDocumentationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,11 +38,15 @@ import reactor.core.publisher.Mono;
 public class SaplConfiguration {
 
     @Bean
-    PDPConfigurationProvider pdpConfiguration() throws InitializationException, JsonProcessingException {
+    PolicyInformationPointDocumentationProvider docsProvider() {
+        return new InMemoryPolicyInformationPointDocumentationProvider();
+    }
+
+    @Bean
+    PDPConfigurationProvider pdpConfiguration(PolicyInformationPointDocumentationProvider docsProvider) throws InitializationException, JsonProcessingException {
         final var mapper                = new ObjectMapper();
         final var validatorFactory      = new ValidatorFactory(mapper);
         final var attributeStreamBroker = new CachingAttributeStreamBroker();
-        final var docsProvider          = new InMemoryPolicyInformationPointDocumentationProvider();
         final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
                 docsProvider, validatorFactory);
         pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));

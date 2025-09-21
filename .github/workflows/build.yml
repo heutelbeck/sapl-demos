@@ -41,7 +41,7 @@ jobs:
   build:
     strategy:
       matrix:
-        java: [ '17', '21' ]
+        java: [ '21', '25' ]
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     name: Build (JDK ${{ matrix.java }} on ${{ matrix.os }})
@@ -51,8 +51,8 @@ jobs:
     timeout-minutes: 45
 
     env:
-      # Run Sonar, Integration Tests, and JaCoCo only for Ubuntu JDK 17. All other platforms, just do quick unit tests.
-      RUN_ANALYSIS: ${{ (matrix.os == 'ubuntu-latest') && (matrix.java == '17') }}
+      # Run Sonar, Integration Tests, and JaCoCo only for Ubuntu JDK 21. All other platforms, just do quick unit tests.
+      RUN_ANALYSIS: ${{ (matrix.os == 'ubuntu-latest') && (matrix.java == '21') }}
       # PRs from Dependabot are treated the same as those from forks since secrets are not accessible
       # (see: https://github.com/dependabot/dependabot-core/issues/3253#issuecomment-852541544).
       IS_FORK: ${{ github.event.pull_request.head.repo.fork || (github.actor == 'dependabot[bot]') }}
@@ -193,11 +193,11 @@ jobs:
         lfs: true
         fetch-depth: 0
 
-    - name: Set up JDK 17
+    - name: Set up JDK 21
       uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
         cache: 'maven'
 
     - name: Setup Maven

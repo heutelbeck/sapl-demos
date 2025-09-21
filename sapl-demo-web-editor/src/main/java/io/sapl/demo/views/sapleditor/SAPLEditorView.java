@@ -1,6 +1,11 @@
 package io.sapl.demo.views.sapleditor;
 
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
@@ -21,106 +26,152 @@ public class SAPLEditorView extends VerticalLayout {
 
     private static final long serialVersionUID = 8813800405531649047L;
 
-    private static final String DEFAULT_POLICY = "policy \"x\" permit ";
+    private static final String DEFAULT_LEFT = """
+            policy "x"
+            permit
+            where
+              subject == {"role":"author"};
+            obligation
+              {
+                "log":"access-granted"
+              }
+            """;
 
-    private final Button     addDocumentChangedListenerButton;
-    private final Button     addValidationChangedListenerButton;
+    private static final String DEFAULT_RIGHT = """
+            policy "x"
+            deny
+            where
+              subject == {"role":"manager"};
+            obligation
+              {
+                "log":"access-granted"
+              }
+            obligation
+              {
+                "log":"manager access-granted"
+              }
+            """;
+
     private final SaplEditor saplEditor;
+    private Button toggleMerge;
 
-    private Button removeDocumentChangedListenerButton;
-    private Button removeValidationChangedListenerButton;
+    // NEW: track toggle state
+    private boolean mergeEnabled = true;
 
     public SAPLEditorView() {
-        final var saplConfig = new SaplEditorConfiguration();
-        saplConfig.setHasLineNumbers(true);
-        saplConfig.setTextUpdateDelay(500);
-        saplConfig.setDarkTheme(true);
+        setSizeFull();
+        setPadding(false);
+        setSpacing(false);
 
-        saplEditor = new SaplEditor(saplConfig);
+        final var cfg = new SaplEditorConfiguration();
+        cfg.setHasLineNumbers(true);
+        cfg.setTextUpdateDelay(400);
+        cfg.setDarkTheme(true);
+
+        saplEditor = new SaplEditor(cfg);
+        saplEditor.setWidthFull();
+        saplEditor.setHeight("70vh");
+
         saplEditor.addDocumentChangedListener(this::onDocumentChanged);
         saplEditor.addValidationFinishedListener(this::onValidationFinished);
-        add(saplEditor);
 
-        addDocumentChangedListenerButton = new Button();
-        addDocumentChangedListenerButton.setText("Add Change Listener");
-        addDocumentChangedListenerButton.addClickListener(e -> {
-            saplEditor.addDocumentChangedListener(this::onDocumentChanged);
-            addDocumentChangedListenerButton.setEnabled(false);
-            removeDocumentChangedListenerButton.setEnabled(true);
-        });
-        addDocumentChangedListenerButton.setEnabled(false);
-        add(addDocumentChangedListenerButton);
+        final var controls = buildControls();
+        add(saplEditor, controls);
 
-        removeDocumentChangedListenerButton = new Button();
-        removeDocumentChangedListenerButton.setText("Remove Change Listener");
-        removeDocumentChangedListenerButton.addClickListener(e -> {
-            saplEditor.removeDocumentChangedListener(this::onDocumentChanged);
-            addDocumentChangedListenerButton.setEnabled(true);
-            removeDocumentChangedListenerButton.setEnabled(false);
-        });
-        add(removeDocumentChangedListenerButton);
-
-        addValidationChangedListenerButton = new Button();
-        addValidationChangedListenerButton.setText("Add Validation Listener");
-        addValidationChangedListenerButton.addClickListener(e -> {
-            saplEditor.addValidationFinishedListener(this::onValidationFinished);
-            addValidationChangedListenerButton.setEnabled(false);
-            removeValidationChangedListenerButton.setEnabled(true);
-        });
-        addValidationChangedListenerButton.setEnabled(false);
-        add(addValidationChangedListenerButton);
-
-        removeValidationChangedListenerButton = new Button();
-        removeValidationChangedListenerButton.setText("Remove Validation Listener");
-        removeValidationChangedListenerButton.addClickListener(e -> {
-            saplEditor.removeValidationFinishedListener(this::onValidationFinished);
-            addValidationChangedListenerButton.setEnabled(true);
-            removeValidationChangedListenerButton.setEnabled(false);
-        });
-        add(removeValidationChangedListenerButton);
-
-        Button setDocumentToDefaultButton = new Button();
-        setDocumentToDefaultButton.setText("Set Document to Default");
-        setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DEFAULT_POLICY));
-        add(setDocumentToDefaultButton);
-
-        Button showSaplDocumentButton = new Button();
-        showSaplDocumentButton.setText("Show Document in Console");
-        showSaplDocumentButton.addClickListener(e -> {
-            String document = saplEditor.getDocument();
-            log.info("Current SAPL value: {}", document);
-        });
-        add(showSaplDocumentButton);
-
-        Button toggleReadOnlyButton = new Button();
-        toggleReadOnlyButton.setText("Toggle ReadOnly");
-        toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
-        add(toggleReadOnlyButton);
-
-        IntegerField configurationIdField = new IntegerField("Configuration Id");
-        configurationIdField
-                .addValueChangeListener(event -> saplEditor.setConfigurationId(event.getValue().toString()));
-        configurationIdField.setStepButtonsVisible(true);
-        configurationIdField.setMin(1);
-        configurationIdField.setMax(5);
-        configurationIdField.setValue(1);
-        add(configurationIdField);
-
-        saplEditor.setDocument(DEFAULT_POLICY);
-        saplEditor.setConfigurationId(configurationIdField.getValue().toString());
-        setSizeFull();
+        saplEditor.setDocument(DEFAULT_LEFT);
+        saplEditor.setConfigurationId("1");          // first
+        saplEditor.setDocument(DEFAULT_LEFT);        // then left
+        saplEditor.setMergeRightContent(DEFAULT_RIGHT);
+        saplEditor.setMergeOption("showDifferences", true);
+        saplEditor.setMergeOption("revertButtons", true);
+        saplEditor.setMergeOption("connect", null);
+        saplEditor.setMergeOption("collapseIdentical", false);
+        saplEditor.setMergeOption("allowEditingOriginals", false);
+        saplEditor.setMergeOption("ignoreWhitespace", false);
+        // optional markers/prev/next only if the client supports them
+        // initial state matches 'mergeEnabled = true'
+        saplEditor.setMergeModeEnabled(mergeEnabled); // last
     }
 
-    public void onDocumentChanged(DocumentChangedEvent event) {
-        log.info("value changed: {}", event.getNewValue());
+    private HorizontalLayout buildControls() {
+        final var bar = new HorizontalLayout();
+        bar.setWidthFull();
+        bar.setAlignItems(Alignment.CENTER);
+        bar.setSpacing(true);
+        bar.getStyle().set("padding", "0.5rem 1rem");
+
+        this.toggleMerge = new Button(mergeEnabled ? "Disable Merge" : "Enable Merge", this::toggleMerge);
+
+        final var setRight = new Button("Set Right Sample", e -> saplEditor.setMergeRightContent(DEFAULT_RIGHT));
+        final var clearRight = new Button("Clear Right", e -> saplEditor.setMergeRightContent(""));
+
+        final var prev = new Button("Prev Change", e -> saplEditor.goToPreviousChange());
+        final var next = new Button("Next Change", e -> saplEditor.goToNextChange());
+
+        final var markers = new Checkbox("Change markers", true);
+        markers.addValueChangeListener(e -> saplEditor.setChangeMarkersEnabled(Boolean.TRUE.equals(e.getValue())));
+
+        final var showDiff = new Checkbox("Show differences", true);
+        showDiff.addValueChangeListener(e -> saplEditor.setMergeOption("showDifferences", Boolean.TRUE.equals(e.getValue())));
+
+        final var revertBtns = new Checkbox("Revert buttons", true);
+        revertBtns.addValueChangeListener(e -> saplEditor.setMergeOption("revertButtons", Boolean.TRUE.equals(e.getValue())));
+
+        final var connect = new ComboBox<String>("Connectors");
+        connect.setItems("none", "align");
+        connect.setValue("none");
+        connect.addValueChangeListener(e -> saplEditor.setMergeOption("connect", "align".equals(e.getValue()) ? "align" : null));
+
+        final var collapse = new Checkbox("Collapse identical", false);
+        collapse.addValueChangeListener(e -> saplEditor.setMergeOption("collapseIdentical", Boolean.TRUE.equals(e.getValue())));
+
+        final var allowEditOrig = new Checkbox("Allow editing right", false);
+        allowEditOrig.addValueChangeListener(e -> saplEditor.setMergeOption("allowEditingOriginals", Boolean.TRUE.equals(e.getValue())));
+
+        final var ignoreWs = new Checkbox("Ignore whitespace", false);
+        ignoreWs.addValueChangeListener(e -> saplEditor.setMergeOption("ignoreWhitespace", Boolean.TRUE.equals(e.getValue())));
+
+        final var readOnly = new Checkbox("Read-only left", false);
+        readOnly.addValueChangeListener(e -> saplEditor.setReadOnly(Boolean.TRUE.equals(e.getValue())));
+
+        final var dark = new Checkbox("Dark theme", true);
+        dark.addValueChangeListener(e -> saplEditor.setDarkTheme(Boolean.TRUE.equals(e.getValue())));
+
+        final var configId = new IntegerField("Configuration Id");
+        configId.setStepButtonsVisible(true);
+        configId.setMin(1);
+        configId.setMax(5);
+        configId.setValue(1);
+        configId.addValueChangeListener(e -> {
+            if (e.getValue() != null) saplEditor.setConfigurationId(e.getValue().toString());
+        });
+
+        final var setDefault = new Button("Set Doc Default", e -> saplEditor.setDocument(DEFAULT_LEFT));
+        final var showDoc = new Button("Show Doc in Console", e -> log.info("SAPL: {}", saplEditor.getDocument()));
+
+        final var filler = new FlexLayout();
+        filler.setFlexGrow(1, filler);
+
+        bar.add(toggleMerge, setRight, clearRight, prev, next,
+                markers, showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
+                readOnly, dark, configId, setDefault, showDoc, filler);
+        return bar;
     }
 
-    public void onValidationFinished(ValidationFinishedEvent event) {
-        Issue[] issues = event.getIssues();
+    private void toggleMerge(ClickEvent<Button> e) {
+        mergeEnabled = !mergeEnabled;
+        saplEditor.setMergeModeEnabled(mergeEnabled);
+        toggleMerge.setText(mergeEnabled ? "Disable Merge" : "Enable Merge");
+    }
+    private void onDocumentChanged(DocumentChangedEvent event) {
+        log.info("SAPL value changed: {}", event.getNewValue());
+    }
+
+    private void onValidationFinished(ValidationFinishedEvent event) {
+        final Issue[] issues = event.getIssues();
         log.info("validation finished, number of issues: {}", issues.length);
         for (Issue issue : issues) {
-            log.info(" - {} " + issue.getDescription());
+            log.info(" - {}", issue.getDescription());
         }
     }
-
 }

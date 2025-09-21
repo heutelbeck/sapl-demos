@@ -19,7 +19,7 @@
 	</organization>
 
 	<properties>
-		<java.version>17</java.version>
+		<java.version>21</java.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
@@ -27,10 +27,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-		<vaadin.version>24.6.12</vaadin.version>
-		<version.lombok>1.18.38</version.lombok>
+		<vaadin.version>24.8.8</vaadin.version>
+		<version.lombok>1.18.40</version.lombok>
 		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
-		<springboot.version>3.5.5</springboot.version>
+		<springboot.version>3.5.6</springboot.version>
 
 		<spotbugs.version>4.7.3.6</spotbugs.version>
 		<sbcontrib.version>7.6.0</sbcontrib.version>
