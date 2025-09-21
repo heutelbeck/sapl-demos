@@ -1,16 +1,16 @@
 package io.sapl.demo.views.sapltesteditor;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import io.sapl.demo.views.MainLayout;
-import io.sapl.vaadin.DocumentChangedEvent;
-import io.sapl.vaadin.Issue;
-import io.sapl.vaadin.SaplTestEditor;
-import io.sapl.vaadin.SaplTestEditorConfiguration;
-import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.*;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -22,106 +22,140 @@ public class SAPLTestEditorView extends VerticalLayout {
 
     private static final String DEFAULT_TEST = """
             requirement "Policy Simple should grant read access for willi on something" {
-                scenario "willi tries to read something" //define a scenario with a specific name. This scenario represents a single isolated test case within the requirment. A requirment can contain 1:n scenario definitions. The scenario name needs to be unique within a requirement.
-                given //marks the start of the "given" section which is used to define the policy under test (and a lot more which is shown in the other examples)
-                    - policy "policySimple" //define the name of the policy to test, has to be located in src/main/resources (or in a folder structure below this folder)
-                when subject "willi" attempts action "read" on resource "something" //defines the AuthorizationSubscription that should be used for the test
-                expect permit; // defines the expected AuthorizationDecision to compare against the actual outcome. scenario is finished with an ";"
-
-                scenario "not_willi tries to read something" //second scenario for negative test
+                scenario "willi tries to read something"
                 given
                     - policy "policySimple"
-                when "not_willi" attempts "read" on "something" //short form to define the AuthorizationSubscription omitting the keywords "subject", "action" and "resource"
-                expect deny; // expect deny here since the policy only permits read access for "willi" and not for "not_willi"
+                when subject "willi" attempts action "read" on resource "something"
+                expect permit;
+
+                scenario "not_willi tries to read something"
+                given
+                    - policy "policySimple"
+                when "not_willi" attempts "read" on "something"
+                expect deny;
             }""";
 
-    private final Button         addDocumentChangedListenerButton;
-    private final Button         addValidationChangedListenerButton;
-    private final SaplTestEditor saplEditor;
+    private static final String DEFAULT_RIGHT = """
+            requirement "Policy Simple should grant read access for willi on something" {
+                scenario "willi tries to read something"
+                given
+                    - policy "policySimple"
+                when subject "willi" attempts action "read" on resource "something"
+                expect permit;
 
-    private Button removeDocumentChangedListenerButton;
-    private Button removeValidationChangedListenerButton;
+                scenario "manager tries to read something"
+                given
+                    - policy "policySimple"
+                when "manager" attempts "read" on "something"
+                expect deny;
+            }""";
+
+    private final SaplTestEditor editor;
+    private Button toggleMergeBtn;
+    private boolean mergeEnabled = false;
 
     public SAPLTestEditorView() {
-        final var saplConfig = new SaplTestEditorConfiguration();
-        saplConfig.setHasLineNumbers(true);
-        saplConfig.setTextUpdateDelay(500);
-        saplConfig.setDarkTheme(true);
-
-        saplEditor = new SaplTestEditor(saplConfig);
-        saplEditor.addDocumentChangedListener(this::onDocumentChanged);
-        saplEditor.addValidationFinishedListener(this::onValidationFinished);
-        add(saplEditor);
-
-        addDocumentChangedListenerButton = new Button();
-        addDocumentChangedListenerButton.setText("Add Change Listener");
-        addDocumentChangedListenerButton.addClickListener(e -> {
-            saplEditor.addDocumentChangedListener(this::onDocumentChanged);
-            addDocumentChangedListenerButton.setEnabled(false);
-            removeDocumentChangedListenerButton.setEnabled(true);
-        });
-        addDocumentChangedListenerButton.setEnabled(false);
-        add(addDocumentChangedListenerButton);
-
-        removeDocumentChangedListenerButton = new Button();
-        removeDocumentChangedListenerButton.setText("Remove Change Listener");
-        removeDocumentChangedListenerButton.addClickListener(e -> {
-            saplEditor.removeDocumentChangedListener(this::onDocumentChanged);
-            addDocumentChangedListenerButton.setEnabled(true);
-            removeDocumentChangedListenerButton.setEnabled(false);
-        });
-        add(removeDocumentChangedListenerButton);
-
-        addValidationChangedListenerButton = new Button();
-        addValidationChangedListenerButton.setText("Add Validation Listener");
-        addValidationChangedListenerButton.addClickListener(e -> {
-            saplEditor.addValidationFinishedListener(this::onValidationFinished);
-            addValidationChangedListenerButton.setEnabled(false);
-            removeValidationChangedListenerButton.setEnabled(true);
-        });
-        addValidationChangedListenerButton.setEnabled(false);
-        add(addValidationChangedListenerButton);
-
-        removeValidationChangedListenerButton = new Button();
-        removeValidationChangedListenerButton.setText("Remove Validation Listener");
-        removeValidationChangedListenerButton.addClickListener(e -> {
-            saplEditor.removeValidationFinishedListener(this::onValidationFinished);
-            addValidationChangedListenerButton.setEnabled(true);
-            removeValidationChangedListenerButton.setEnabled(false);
-        });
-        add(removeValidationChangedListenerButton);
-
-        Button setDocumentToDefaultButton = new Button();
-        setDocumentToDefaultButton.setText("Set Document to Default");
-        setDocumentToDefaultButton.addClickListener(e -> saplEditor.setDocument(DEFAULT_TEST));
-        add(setDocumentToDefaultButton);
-
-        Button showSaplDocumentButton = new Button();
-        showSaplDocumentButton.setText("Show Document in Console");
-        showSaplDocumentButton.addClickListener(e -> {
-            String document = saplEditor.getDocument();
-            log.info("Current SAPL value: {}", document);
-        });
-        add(showSaplDocumentButton);
-
-        Button toggleReadOnlyButton = new Button();
-        toggleReadOnlyButton.setText("Toggle ReadOnly");
-        toggleReadOnlyButton.addClickListener(e -> saplEditor.setReadOnly(!saplEditor.isReadOnly()));
-        add(toggleReadOnlyButton);
-
-        saplEditor.setDocument(DEFAULT_TEST);
         setSizeFull();
+        setPadding(true);
+        setSpacing(true);
+
+        var cfg = new SaplTestEditorConfiguration();
+        cfg.setHasLineNumbers(true);
+        cfg.setTextUpdateDelay(500);
+        cfg.setDarkTheme(true);
+
+        editor = new SaplTestEditor(cfg);
+        editor.setWidthFull();
+        editor.setHeight("70vh");
+
+        editor.addDocumentChangedListener(this::onDocumentChanged);
+        editor.addValidationFinishedListener(this::onValidationFinished);
+
+        add(editor, buildControls());
+
+        // initial content + merge setup
+        editor.setDocument(DEFAULT_TEST);
+        editor.setMergeRightContent(DEFAULT_RIGHT);
+        editor.setMergeOption("showDifferences", true);
+        editor.setMergeOption("revertButtons", true);
+        editor.setMergeOption("connect", null);
+        editor.setMergeOption("collapseIdentical", false);
+        editor.setMergeOption("allowEditingOriginals", false);
+        editor.setMergeOption("ignoreWhitespace", false);
+        editor.setMergeModeEnabled(mergeEnabled);
     }
 
-    public void onDocumentChanged(DocumentChangedEvent event) {
-        log.info("value changed: {}", event.getNewValue());
+    private HorizontalLayout buildControls() {
+        var bar = new HorizontalLayout();
+        bar.setWidthFull();
+        bar.setAlignItems(Alignment.CENTER);
+        bar.setSpacing(true);
+
+        toggleMergeBtn = new Button(mergeEnabled ? "Disable Merge" : "Enable Merge", e -> toggleMerge());
+
+        var setRight = new Button("Set Right Sample", e -> editor.setMergeRightContent(DEFAULT_RIGHT));
+        var clearRight = new Button("Clear Right", e -> editor.setMergeRightContent(""));
+
+        var prev = new Button("Prev Change", e -> editor.goToPreviousChange());
+        var next = new Button("Next Change", e -> editor.goToNextChange());
+
+        var showDiff = new Checkbox("Show differences", true);
+        showDiff.addValueChangeListener(e -> editor.setMergeOption("showDifferences", Boolean.TRUE.equals(e.getValue())));
+
+        var revertBtns = new Checkbox("Revert buttons", true);
+        revertBtns.addValueChangeListener(e -> editor.setMergeOption("revertButtons", Boolean.TRUE.equals(e.getValue())));
+
+        var connect = new ComboBox<String>("Connectors");
+        connect.setItems("none", "align");
+        connect.setValue("none");
+        connect.addValueChangeListener(e -> editor.setMergeOption("connect", "align".equals(e.getValue()) ? "align" : null));
+
+        var collapse = new Checkbox("Collapse identical", false);
+        collapse.addValueChangeListener(e -> editor.setMergeOption("collapseIdentical", Boolean.TRUE.equals(e.getValue())));
+
+        var allowEditOrig = new Checkbox("Allow editing right", false);
+        allowEditOrig.addValueChangeListener(e -> editor.setMergeOption("allowEditingOriginals", Boolean.TRUE.equals(e.getValue())));
+
+        var ignoreWs = new Checkbox("Ignore whitespace", false);
+        ignoreWs.addValueChangeListener(e -> editor.setMergeOption("ignoreWhitespace", Boolean.TRUE.equals(e.getValue())));
+
+        var readOnly = new Checkbox("Read-only (left)", false);
+        readOnly.addValueChangeListener(e -> editor.setReadOnly(Boolean.TRUE.equals(e.getValue())));
+
+        var dark = new Checkbox("Dark theme", true);
+        dark.addValueChangeListener(e -> editor.setDarkTheme(Boolean.TRUE.equals(e.getValue())));
+
+        var setDefault = new Button("Set Doc Default", e -> editor.setDocument(DEFAULT_TEST));
+        var showDoc = new Button("Show Doc in Console", e -> log.info("SAPL-TEST: {}", editor.getDocument()));
+
+        var filler = new FlexLayout();
+        filler.setFlexGrow(1, filler);
+
+        bar.add(
+                toggleMergeBtn, setRight, clearRight,
+                prev, next,
+                showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
+                readOnly, dark, setDefault, showDoc,
+                filler
+        );
+        return bar;
     }
 
-    public void onValidationFinished(ValidationFinishedEvent event) {
+    private void toggleMerge() {
+        mergeEnabled = !mergeEnabled;
+        editor.setMergeModeEnabled(mergeEnabled);
+        toggleMergeBtn.setText(mergeEnabled ? "Disable Merge" : "Enable Merge");
+    }
+
+    private void onDocumentChanged(DocumentChangedEvent event) {
+        log.info("SAPL-TEST value changed: {}", event.getNewValue());
+    }
+
+    private void onValidationFinished(ValidationFinishedEvent event) {
         Issue[] issues = event.getIssues();
         log.info("validation finished, number of issues: {}", issues.length);
         for (Issue issue : issues) {
-            log.info(" - {} " + issue.getDescription());
+            log.info(" - {}", issue.getDescription());
         }
     }
 }
