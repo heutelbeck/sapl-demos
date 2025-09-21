@@ -10,7 +10,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
+import elemental.json.Json;
+import elemental.json.JsonArray;
+import elemental.json.JsonObject;
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.Issue;
@@ -55,7 +57,7 @@ public class SAPLEditorView extends VerticalLayout {
     private final SaplEditor saplEditor;
     private Button toggleMerge;
 
-    // NEW: track toggle state
+    // track toggle state
     private boolean mergeEnabled = true;
 
     public SAPLEditorView() {
@@ -75,12 +77,15 @@ public class SAPLEditorView extends VerticalLayout {
         saplEditor.addDocumentChangedListener(this::onDocumentChanged);
         saplEditor.addValidationFinishedListener(this::onValidationFinished);
 
-        final var controls = buildControls();
-        add(saplEditor, controls);
+        final var mergeControls = buildMergeControls();
+        final var coverageControls = buildCoverageControls();
 
+        add(saplEditor, mergeControls, coverageControls);
+
+        // Editor initialization
         saplEditor.setDocument(DEFAULT_LEFT);
-        saplEditor.setConfigurationId("1");          // first
-        saplEditor.setDocument(DEFAULT_LEFT);        // then left
+        saplEditor.setConfigurationId("1");
+        saplEditor.setDocument(DEFAULT_LEFT);
         saplEditor.setMergeRightContent(DEFAULT_RIGHT);
         saplEditor.setMergeOption("showDifferences", true);
         saplEditor.setMergeOption("revertButtons", true);
@@ -88,12 +93,13 @@ public class SAPLEditorView extends VerticalLayout {
         saplEditor.setMergeOption("collapseIdentical", false);
         saplEditor.setMergeOption("allowEditingOriginals", false);
         saplEditor.setMergeOption("ignoreWhitespace", false);
-        // optional markers/prev/next only if the client supports them
-        // initial state matches 'mergeEnabled = true'
+
         saplEditor.setMergeModeEnabled(mergeEnabled); // last
     }
 
-    private HorizontalLayout buildControls() {
+    // -------------------- MERGE CONTROLS --------------------
+
+    private HorizontalLayout buildMergeControls() {
         final var bar = new HorizontalLayout();
         bar.setWidthFull();
         bar.setAlignItems(Alignment.CENTER);
@@ -107,9 +113,6 @@ public class SAPLEditorView extends VerticalLayout {
 
         final var prev = new Button("Prev Change", e -> saplEditor.goToPreviousChange());
         final var next = new Button("Next Change", e -> saplEditor.goToNextChange());
-
-        final var markers = new Checkbox("Change markers", true);
-        markers.addValueChangeListener(e -> saplEditor.setChangeMarkersEnabled(Boolean.TRUE.equals(e.getValue())));
 
         final var showDiff = new Checkbox("Show differences", true);
         showDiff.addValueChangeListener(e -> saplEditor.setMergeOption("showDifferences", Boolean.TRUE.equals(e.getValue())));
@@ -153,7 +156,7 @@ public class SAPLEditorView extends VerticalLayout {
         filler.setFlexGrow(1, filler);
 
         bar.add(toggleMerge, setRight, clearRight, prev, next,
-                markers, showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
+                showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
                 readOnly, dark, configId, setDefault, showDoc, filler);
         return bar;
     }
@@ -163,6 +166,104 @@ public class SAPLEditorView extends VerticalLayout {
         saplEditor.setMergeModeEnabled(mergeEnabled);
         toggleMerge.setText(mergeEnabled ? "Disable Merge" : "Enable Merge");
     }
+
+    // -------------------- COVERAGE CONTROLS --------------------
+
+    private HorizontalLayout buildCoverageControls() {
+        final var bar = new HorizontalLayout();
+        bar.setWidthFull();
+        bar.setAlignItems(Alignment.CENTER);
+        bar.setSpacing(true);
+        bar.getStyle().set("padding", "0.25rem 1rem");
+
+        // Apply demo coverage: show all states on distinct lines
+        final var applyAll = new Button("Apply Coverage (All States)", e -> applyAllStatesCoverage());
+
+        // Apply a sample “branch counts” style like your report (adds tooltips)
+        final var applySample = new Button("Apply Sample Coverage", e -> applySampleCoverage());
+
+        // Toggle: auto-clear on edit (default true in JS)
+        final var autoClear = new Checkbox("Auto-clear on edit", true);
+        autoClear.addValueChangeListener(e ->
+                saplEditor.getElement().callJsFunction("setCoverageAutoClear", Boolean.TRUE.equals(e.getValue())));
+
+        // Toggle: show ignored (gray) lines
+        final var showIgnored = new Checkbox("Show ignored", false);
+        showIgnored.addValueChangeListener(e ->
+                saplEditor.getElement().callJsFunction("setCoverageShowIgnored", Boolean.TRUE.equals(e.getValue())));
+
+        // Clear coverage
+        final var clear = new Button("Clear Coverage", e ->
+                saplEditor.getElement().callJsFunction("clearCoverage"));
+
+        final var filler = new FlexLayout();
+        filler.setFlexGrow(1, filler);
+
+        bar.add(applyAll, applySample, autoClear, showIgnored, clear, filler);
+        return bar;
+    }
+
+    // -------------------- COVERAGE PAYLOADS --------------------
+
+    /** Small demo that exercises COVERED, PARTIAL, UNCOVERED, IGNORED on visible lines. */
+    private void applyAllStatesCoverage() {
+        // Choose lines that exist in DEFAULT_LEFT (1-based)
+        // 1: policy "x"
+        // 2: permit
+        // 3: where
+        // 4:   subject == ...
+        // 5: obligation
+        // 6: {
+        // 7:   "log":"access-granted"
+        // 8: }
+        // 9: (empty)
+        JsonObject payload = Json.createObject();
+        JsonArray lines = Json.createArray();
+
+        int i = 0;
+
+        // green
+        lines.set(i++, lineEntry(1, "COVERED", "Covered by tests"));
+        // yellow
+        lines.set(i++, lineEntry(4, "PARTIAL", "1 of 2 branches covered"));
+        // red
+        lines.set(i++, lineEntry(2, "UNCOVERED", "0 of 1 branches covered"));
+        // ignored (only visible if 'Show ignored' is checked)
+        lines.set(i++, lineEntry(7, "IGNORED", "No tests target this line"));
+
+        payload.put("lines", lines);
+
+        saplEditor.getElement().callJsFunction("setCoverageData", payload);
+    }
+
+    /** Example resembling the report-style tooltips (branch info). */
+    private void applySampleCoverage() {
+        JsonObject payload = Json.createObject();
+        JsonArray lines = Json.createArray();
+        int i = 0;
+
+        lines.set(i++, lineEntry(1, "COVERED", null)); // policy "x"
+        lines.set(i++, lineEntry(2, "COVERED", null)); // permit
+        lines.set(i++, lineEntry(4, "PARTIAL", "1 of 2 branches covered")); // subject == ...
+        lines.set(i++, lineEntry(5, "IGNORED", "No decision impact"));      // obligation
+        lines.set(i++, lineEntry(7, "COVERED", null));                      // "log": ...
+        lines.set(i++, lineEntry(3, "UNCOVERED", "0 of 1 branches covered"));// where
+
+        payload.put("lines", lines);
+
+        saplEditor.getElement().callJsFunction("setCoverageData", payload);
+    }
+
+    private static JsonObject lineEntry(int oneBasedLine, String status, String info) {
+        JsonObject o = Json.createObject();
+        o.put("line", oneBasedLine);
+        o.put("status", status);
+        if (info != null) o.put("info", info);
+        return o;
+    }
+
+    // -------------------- EVENTS --------------------
+
     private void onDocumentChanged(DocumentChangedEvent event) {
         log.info("SAPL value changed: {}", event.getNewValue());
     }
