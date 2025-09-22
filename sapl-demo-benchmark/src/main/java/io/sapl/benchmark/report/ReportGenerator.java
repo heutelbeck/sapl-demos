@@ -17,12 +17,7 @@
  */
 package io.sapl.benchmark.report;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -56,6 +51,7 @@ public class ReportGenerator {
 
     @StandardException
     public static class BenchmarkReportException extends RuntimeException {
+        @Serial
         private static final long serialVersionUID = SaplVersion.VERISION_UID;
     }
 
@@ -137,7 +133,7 @@ public class ReportGenerator {
         Map<String, Map<String, Map<String, List<Object>>>> tableData   = Maps.newHashMap();
 
         // use the first file for average response time comparison
-        final var averageResultFile = resultFiles.get(0);
+        final var averageResultFile = resultFiles.getFirst();
         var       threads           = getThreadCountFromFileName(averageResultFile);
         headerFacts.add("avg ms/op<br>(" + threads + " thread)");
 
@@ -177,7 +173,7 @@ public class ReportGenerator {
 
         log.info("collecting response time data ...");
         // use the first file for response time reporting
-        final var fileName = getResultFilesFiles().get(0);
+        final var fileName = getResultFilesFiles().getFirst();
         if (null != fileName) {
 
             Map<String, List<ReportSectionData>> baseData = new HashMap<>();
@@ -219,8 +215,8 @@ public class ReportGenerator {
     }
 
     private Map<String, Map<String, Object>> getThroughputContext() throws IOException {
-        Map<String, Map<String, Object>>     resultMap = new HashMap<>(0);
-        Map<String, List<ReportSectionData>> baseData  = new HashMap<>(0);
+        var resultMap = HashMap.<String, Map<String, Object>>newHashMap(0);
+        var baseData = HashMap.<String, List<ReportSectionData>>newHashMap(0);
         log.info("collecting throughput data ...");
 
         for (String fileName : getResultFilesFiles()) {

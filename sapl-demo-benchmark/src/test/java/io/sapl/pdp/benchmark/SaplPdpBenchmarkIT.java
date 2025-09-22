@@ -36,7 +36,7 @@ class SaplPdpBenchmarkIT {
     private static final String TMP_REPORT_PATH = "results/tmp_benchmark_test";
 
     @BeforeAll
-    private static void createEmptyBenchmarkResultFolder() throws IOException {
+    static void createEmptyBenchmarkResultFolder() throws IOException {
         final var tmpReportPathFile = new File(TMP_REPORT_PATH);
         FileUtils.deleteDirectory(tmpReportPathFile);
         assertTrue(tmpReportPathFile.mkdirs());

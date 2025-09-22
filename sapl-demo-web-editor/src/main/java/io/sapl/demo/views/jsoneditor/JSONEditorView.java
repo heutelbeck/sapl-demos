@@ -16,11 +16,14 @@ import io.sapl.vaadin.JsonEditor;
 import io.sapl.vaadin.JsonEditorConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serial;
+
 @Slf4j
 @PageTitle("JSON Editor")
 @Route(value = "json", layout = MainLayout.class)
 public class JSONEditorView extends VerticalLayout {
 
+    @Serial
     private static final long serialVersionUID = -1749356040098438225L;
 
 

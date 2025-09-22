@@ -15,6 +15,7 @@
  */
 package io.sapl.playground.views;
 
+import java.io.Serial;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ import reactor.util.context.Context;
 @Route(value = "", layout = MainLayout.class)
 public class PlaygroundView extends VerticalLayout {
 
+    @Serial
     private static final long serialVersionUID = -4566788729267935131L;
 
     private static final String INPUT_JSON_IS_NOT_VALID = "Input JSON is not valid";
@@ -488,7 +490,7 @@ public class PlaygroundView extends VerticalLayout {
             throw new IllegalStateException("config == null");
         }
         final var functionCtx = new MockingFunctionContext(config.functionContext());
-        final var variables   = new HashMap<String, Val>(1);
+        final var variables   = HashMap.<String, Val>newHashMap(1);
         this.attrReturnValues = new LinkedList<>();
 
         for (final var mock : mocks) {

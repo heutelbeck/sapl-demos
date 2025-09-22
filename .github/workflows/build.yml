@@ -41,7 +41,7 @@ jobs:
   build:
     strategy:
       matrix:
-        java: [ '21', '25' ]
+        java: [ '21' ] # , '25' ] wait for temurin release
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     name: Build (JDK ${{ matrix.java }} on ${{ matrix.os }})

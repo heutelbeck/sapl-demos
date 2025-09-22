@@ -69,7 +69,7 @@ class G_PolicyWithComplexExpectStepTest {
     private final Object resource = new ResourceDTO();
 
     @BeforeEach
-    public void setUp() throws InitializationException {
+    void setUp() throws InitializationException {
         fixture = new SaplUnitTestFixture("policyWithObligationAndResource.sapl")
                 .registerFunctionLibrary(FilterFunctionLibrary.class);
         mapper  = new ObjectMapper();
@@ -85,8 +85,8 @@ class G_PolicyWithComplexExpectStepTest {
 
         ObjectNode aResource = mapper.createObjectNode();
         aResource.put("id", "56");
-        aResource.put("diagnosisText", "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
-        aResource.put("icd11Code", "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588");
+        aResource.put("diagnosisText", "█████████████");
+        aResource.put("icd11Code", "ic███████");
 
         AuthorizationDecision decision = new AuthorizationDecision(Decision.PERMIT).withObligations(obligations)
                 .withResource(aResource);
@@ -123,9 +123,9 @@ class G_PolicyWithComplexExpectStepTest {
                     boolean containsExpectedResource = false;
                     JsonNode aResource         = dec.getResource().get();
                     if (aResource.has("id") && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
-                            && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                            && "█████████████"
                                     .equals(aResource.get("diagnosisText").asText())
-                            && aResource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                            && aResource.has("icd11Code") && "ic███████"
                                     .equals(aResource.get("icd11Code").asText())) {
                         containsExpectedResource = true;
                     }
@@ -142,7 +142,7 @@ class G_PolicyWithComplexExpectStepTest {
 
                         // check Obligations
                         // via .equals()
-                        //// hasObligation(mapper.createObjectNode().put("foo", "bar")),
+                        //  hasObligation(mapper.createObjectNode().put("foo", "bar")),
                         // or Predicate
                         hasObligationMatching((JsonNode obligation) -> {
                             return obligation.has("type") && "logAccess".equals(obligation.get("type").asText())
@@ -155,22 +155,22 @@ class G_PolicyWithComplexExpectStepTest {
 
                         // check advice
                         // via .equals()
-                        //// hasAdvice(mapper.createObjectNode().put("foo", "bar")),
+                        //   hasAdvice(mapper.createObjectNode().put("foo", "bar")),
                         // or Predicate
-                        //// hasAdviceMatching((JsonNode advice) -> {
-                        //// return advice.has("sendEmail");
-                        //// }),
+                        //   hasAdviceMatching((JsonNode advice) -> {
+                        //   return advice.has("sendEmail");
+                        //   }),
 
                         // check Resource
                         // via .equals()
-                        //// isResourceEquals(new
+                        //   isResourceEquals(new
                         // ObjectMapper().createObjectNode().put("foo", "bar")),
                         // or Predicate
                         hasResourceMatching((JsonNode aResource) -> aResource.has("id")
                                 && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
-                                && "\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                && "█████████████"
                                         .equals(aResource.get("diagnosisText").asText())
-                                && aResource.has("icd11Code") && "ic\u2588\u2588\u2588\u2588\u2588\u2588\u2588"
+                                && aResource.has("icd11Code") && "ic███████"
                                         .equals(aResource.get("icd11Code").asText()))))
                 .verify();
 

@@ -229,7 +229,7 @@ public class SAPLEditorView extends VerticalLayout {
         // red
         lines.set(i++, lineEntry(2, "UNCOVERED", "0 of 1 branches covered"));
         // ignored (only visible if 'Show ignored' is checked)
-        lines.set(i++, lineEntry(7, "IGNORED", "No tests target this line"));
+        lines.set(i, lineEntry(7, "IGNORED", "No tests target this line"));
 
         payload.put("lines", lines);
 
@@ -247,7 +247,7 @@ public class SAPLEditorView extends VerticalLayout {
         lines.set(i++, lineEntry(4, "PARTIAL", "1 of 2 branches covered")); // subject == ...
         lines.set(i++, lineEntry(5, "IGNORED", "No decision impact"));      // obligation
         lines.set(i++, lineEntry(7, "COVERED", null));                      // "log": ...
-        lines.set(i++, lineEntry(3, "UNCOVERED", "0 of 1 branches covered"));// where
+        lines.set(i, lineEntry(3, "UNCOVERED", "0 of 1 branches covered"));// where
 
         payload.put("lines", lines);
 
