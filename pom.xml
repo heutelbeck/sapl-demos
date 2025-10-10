@@ -84,7 +84,6 @@ working where the demo parent is used)
 		<module>sapl-demo-argumentchange</module>
 		<module>sapl-demo-books</module>
 		<module>sapl-demo-web-editor</module>
-		<module>sapl-demo-playground</module>
 		<module>sapl-demo-mqtt</module>
 		<module>sapl-demo-spring-data-r2dbc</module>
 		<module>sapl-demo-spring-data-mongo-reactive</module>

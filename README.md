@@ -34,8 +34,6 @@ After that pick a demo that matches your interest.
 
 * [sapl-demo-web-editor](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-web-editor): Demonstrates the Vaadin-based SAPL policy editor component.
 
-* [sapl-demo-playground](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-playground): An integrated policy testing and learning application. Also see <https://playground.sapl.io/> for a deployed version ready to use.
-
 * [sapl-demo-testing](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-testing): Demonstrates how to test SAPL policies with unit tests, including test code coverage reports.
 
 * [sapl-demo-mqtt-pip](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pip): Demonstrates how to evaluate MQTT messages with a Policy Information Point.
