@@ -15,9 +15,19 @@
  */
 package io.sapl.demo;
 
-import java.time.Clock;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.sapl.attributes.broker.api.AttributeStreamBroker;
+import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
+import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
+import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
+import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
+import io.sapl.functions.DefaultLibraries;
+import io.sapl.grammar.web.SAPLServlet;
+import io.sapl.interpreter.InitializationException;
+import io.sapl.interpreter.functions.AnnotationFunctionContext;
+import io.sapl.interpreter.functions.FunctionContext;
+import io.sapl.test.grammar.web.SAPLTestServlet;
+import io.sapl.validation.ValidatorFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
@@ -25,22 +35,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.sapl.attributes.broker.api.AttributeStreamBroker;
-import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
-import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
-import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
-import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
-import io.sapl.functions.FilterFunctionLibrary;
-import io.sapl.functions.StandardFunctionLibrary;
-import io.sapl.functions.TemporalFunctionLibrary;
-import io.sapl.grammar.web.SAPLServlet;
-import io.sapl.interpreter.InitializationException;
-import io.sapl.interpreter.functions.AnnotationFunctionContext;
-import io.sapl.interpreter.functions.FunctionContext;
-import io.sapl.test.grammar.web.SAPLTestServlet;
-import io.sapl.validation.ValidatorFactory;
+import java.time.Clock;
+import java.util.List;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")
@@ -73,9 +69,7 @@ public class XtextServletConfiguration {
 
     @Bean
     FunctionContext functionContext() throws InitializationException {
-        final var staticLibraries = List.of(FilterFunctionLibrary.class, StandardFunctionLibrary.class,
-                TemporalFunctionLibrary.class);
-        return new AnnotationFunctionContext(List::of, () -> staticLibraries);
+        return new AnnotationFunctionContext(List::of, () -> DefaultLibraries.STATIC_LIBRARIES);
     }
 
     @Bean

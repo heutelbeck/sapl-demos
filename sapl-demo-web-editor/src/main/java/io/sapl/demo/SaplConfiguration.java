@@ -1,27 +1,14 @@
 package io.sapl.demo;
 
-import java.time.Clock;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.UnaryOperator;
-
-import io.sapl.attributes.documentation.api.PolicyInformationPointDocumentationProvider;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.sapl.api.interpreter.Val;
 import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
 import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
 import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
+import io.sapl.attributes.documentation.api.PolicyInformationPointDocumentationProvider;
 import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
-import io.sapl.functions.FilterFunctionLibrary;
-import io.sapl.functions.SchemaValidationLibrary;
-import io.sapl.functions.StandardFunctionLibrary;
-import io.sapl.functions.TemporalFunctionLibrary;
+import io.sapl.functions.DefaultLibraries;
 import io.sapl.interpreter.InitializationException;
 import io.sapl.interpreter.combinators.PolicyDocumentCombiningAlgorithm;
 import io.sapl.interpreter.functions.AnnotationFunctionContext;
@@ -31,8 +18,16 @@ import io.sapl.prp.Document;
 import io.sapl.prp.PolicyRetrievalPoint;
 import io.sapl.prp.PolicyRetrievalResult;
 import io.sapl.validation.ValidatorFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.Clock;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.UnaryOperator;
 
 @Configuration
 public class SaplConfiguration {
@@ -52,10 +47,7 @@ public class SaplConfiguration {
         pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
         pipLoader.loadStaticPolicyInformationPoint(DemoPip.class);
         final var functionContext = new AnnotationFunctionContext();
-        functionContext.loadLibrary(FilterFunctionLibrary.class);
-        functionContext.loadLibrary(StandardFunctionLibrary.class);
-        functionContext.loadLibrary(TemporalFunctionLibrary.class);
-        functionContext.loadLibrary(SchemaValidationLibrary.class);
+        functionContext.loadLibraries(()->DefaultLibraries.STATIC_LIBRARIES);
         functionContext.loadLibrary(DemoLib.class);
         final var dummyPrp = new PolicyRetrievalPoint() {
 
