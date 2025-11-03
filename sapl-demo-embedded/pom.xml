@@ -37,8 +37,8 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<!-- The Version of the SAPL Dependencies -->
 		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
-		<spotbugs.version>4.7.3.6</spotbugs.version>
-		<sbcontrib.version>7.6.0</sbcontrib.version>
+		<spotbugs.version>4.9.8.1</spotbugs.version>
+		<sbcontrib.version>7.6.15</sbcontrib.version>
 	</properties>
 
 	<dependencyManagement>
