@@ -147,7 +147,7 @@
 					<target>${java.version}</target>
 					<compilerArgs>
 						<!-- 
-						     This compile time parameter ensures that the 
+						     This compile-time parameter ensures that the
 						     binary retains the names of the parameter of 
 						     methods. Enables concrete parameter name usage
 						     in runtime documentation generation.

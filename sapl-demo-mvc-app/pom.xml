@@ -47,7 +47,7 @@
 			with sapl-spring-pdp-remote. The application.yml does contain all settings 
 			to connect to a sapl-server-lt which as been started locally from source 
 			using mvn spring-boot:run. However, remember that the application will require 
-			the matching PDP configuration an policy deployed on the server. I.e., copy 
+			the matching PDP configuration a policy deployed on the server. I.e., copy
 			the contents of the src/main/resources/policies folder to the policies folder 
 			of the server. By default, the sapl-server-lt uses ~/sapl/policies or the 
 			equivalent under windows. -->

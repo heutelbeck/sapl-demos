@@ -145,7 +145,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     /**
      * If traditional blocking behavior is required, use .blockFirst() this is not
-     * applicable in multi-threaded environments, e.g. web application. The reactor
+     * applicable in multithreaded environments, e.g. web application. The reactor
      * runtime will likely complain, that this behavior is not permitted.
      */
     private static void blockingUsageDemo(PolicyDecisionPoint pdp) {

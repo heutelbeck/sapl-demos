@@ -40,7 +40,7 @@ import reactor.core.publisher.Flux;
  * This PIP is registered under the name 'patient'.
  *
  * As it is registered as a Spring @Service, the embedded Spring SAPL PDP will
- * pick it up automatically during the auto-configuration process.
+ * pick it up automatically during the autoconfiguration process.
  */
 @Service
 @RequiredArgsConstructor

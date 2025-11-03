@@ -31,7 +31,7 @@ public interface PersonRepository extends R2dbcRepository<Person, Integer> {
 
 	/**
 	 * This method retrieves all persons stored in the database. Excludes persons
-	 * with the 'ADMIN' role over the query and it excludes the column 'firstname'
+	 * with the 'ADMIN' role over the query, and it excludes the column 'firstname'
 	 * by the policy with 'excludeAdminsAndFirstname' action enforced by the
 	 * {@link QueryEnforce} annotation. Only persons with the 'ROLE_ADMIN' role in
 	 * spring security authentication can access this method.

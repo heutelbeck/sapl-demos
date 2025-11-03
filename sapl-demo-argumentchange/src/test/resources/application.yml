@@ -34,7 +34,7 @@ io.sapl.pdp:
 # The following settings are select that it will connect to a sapl-server-lt you started locally with mvn spring-boot:run
   remote:
     host: https://localhost:8443
-    # These are the default cre7dentials configured for the sapl-server-lt when running with the 'local' profile
+    # These are the default credentials configured for the sapl-server-lt when running with the 'local' profile
     key: xwuUaRD65G
     secret: 3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_
     # Do not add this parameter in production! This is only for testing with self-signed localhost certificates during development

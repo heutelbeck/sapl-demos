@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.attributes.broker.api.AttributeStreamBroker;
 import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
 import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
+import io.sapl.attributes.broker.impl.InMemoryAttributeRepository;
 import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
 import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
 import io.sapl.functions.DefaultLibraries;
@@ -76,7 +77,8 @@ public class XtextServletConfiguration {
     AttributeStreamBroker attributeStreamBroker() {
         final var mapper                = new ObjectMapper();
         final var validatorFactory      = new ValidatorFactory(mapper);
-        final var attributeStreamBroker = new CachingAttributeStreamBroker();
+        final var attributeRepository   = new InMemoryAttributeRepository(Clock.systemUTC());
+        final var attributeStreamBroker = new CachingAttributeStreamBroker(attributeRepository);
         final var docsProvider          = new InMemoryPolicyInformationPointDocumentationProvider();
         final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
                 docsProvider, validatorFactory);

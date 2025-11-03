@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.interpreter.Val;
 import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
 import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
+import io.sapl.attributes.broker.impl.InMemoryAttributeRepository;
 import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
 import io.sapl.attributes.documentation.api.PolicyInformationPointDocumentationProvider;
 import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
@@ -41,7 +42,7 @@ public class SaplConfiguration {
     PDPConfigurationProvider pdpConfiguration(PolicyInformationPointDocumentationProvider docsProvider) throws InitializationException, JsonProcessingException {
         final var mapper                = new ObjectMapper();
         final var validatorFactory      = new ValidatorFactory(mapper);
-        final var attributeStreamBroker = new CachingAttributeStreamBroker();
+        final var attributeStreamBroker = new CachingAttributeStreamBroker(new InMemoryAttributeRepository(Clock.systemUTC()));
         final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
                 docsProvider, validatorFactory);
         pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));

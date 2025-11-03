@@ -39,7 +39,7 @@ import io.sapl.api.validation.Text;
  * infrastructure. The 'name' field is optional. If left empty, the name will be
  * the class name. The name determines how the functions can be addressed in
  * policies. The semantics are similar to Java packages. In policies the
- * 'import' statement can be used to provide short-hand access to functions.
+ * 'import' statement can be used to provide shorthand access to functions.
  *
  * The 'description' field can be used to add some documentation. This is used
  * to automatically generate documentation pages in the PDP servers with a
