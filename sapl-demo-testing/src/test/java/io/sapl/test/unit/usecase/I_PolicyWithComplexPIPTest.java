@@ -15,46 +15,60 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.hamcrest.Matchers.val;
-import static io.sapl.test.Imports.arguments;
-import static io.sapl.test.Imports.thenReturn;
-import static io.sapl.test.Imports.whenAttributeParams;
-import static io.sapl.test.Imports.whenEntityValue;
+import static io.sapl.test.Matchers.args;
+import static io.sapl.test.Matchers.eq;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
+/**
+ * Tests for complex PIP with attribute having entity value and arguments.
+ * The policy uses: parentValue.<pip.attributeWithParams(<pip.attribute1>,
+ * <pip.attribute2>)> This means pip.attributeWithParams takes the result of
+ * pip.attribute1 and pip.attribute2 as arguments, and uses parentValue (true)
+ * as the entity.
+ */
 class I_PolicyWithComplexPIPTest {
 
-    private SaplTestFixture fixture;
+    private static final String POLICY = "/policies/policyWithComplexPIP.sapl";
 
-    @BeforeEach
-    void setUp() {
-        fixture = new SaplUnitTestFixture("policyWithComplexPIP.sapl");
-    }
-
+    /**
+     * Tests complex PIP where attributeWithParams depends on attribute1 and
+     * attribute2. The policy permits when attributeWithParams returns true. The
+     * attribute is called with entity=true and the current values of attribute1 and
+     * attribute2 as arguments.
+     */
     @Test
-    void test_policyWithSimpleMockedPIP() {
-
-        fixture.constructTestCaseWithMocks().givenAttribute("pip.attribute1").givenAttribute("pip.attribute2")
-                .givenAttribute("pip.attributeWithParams",
-                        whenAttributeParams(whenEntityValue(val(true)), arguments(val(2), val(2))),
-                        thenReturn(Val.of(true)))
-                .givenAttribute("pip.attributeWithParams",
-                        whenAttributeParams(whenEntityValue(val(true)), arguments(val(2), val(1))),
-                        thenReturn(Val.of(false)))
-                .givenAttribute("pip.attributeWithParams",
-                        whenAttributeParams(whenEntityValue(val(true)), arguments(val(1), val(2))),
-                        thenReturn(Val.of(false)))
-                .when(AuthorizationSubscription.of("willi", "read", "something"))
-                .thenAttribute("pip.attribute1", Val.of(1)).thenAttribute("pip.attribute2", Val.of(2))
-                .expectNextNotApplicable().thenAttribute("pip.attribute1", Val.of(2)).expectNextPermit()
-                .thenAttribute("pip.attribute2", Val.of(1)).expectNextNotApplicable().verify();
+    void whenAttributeWithParamsReturnsTrue_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                // pip.attribute1 and pip.attribute2 are environment attributes
+                .givenEnvironmentAttribute("attr1Mock", "pip.attribute1", args())
+                .givenEnvironmentAttribute("attr2Mock", "pip.attribute2", args())
+                // pip.attributeWithParams with entity=true and args (2, 2) returns true
+                .givenAttribute("attrParamsMock22", "pip.attributeWithParams", eq(Value.TRUE),
+                        args(eq(Value.of(2)), eq(Value.of(2))), Value.TRUE)
+                // pip.attributeWithParams with entity=true and args (2, 1) returns false
+                .givenAttribute("attrParamsMock21", "pip.attributeWithParams", eq(Value.TRUE),
+                        args(eq(Value.of(2)), eq(Value.of(1))), Value.FALSE)
+                // pip.attributeWithParams with entity=true and args (1, 2) returns false
+                .givenAttribute("attrParamsMock12", "pip.attributeWithParams", eq(Value.TRUE),
+                        args(eq(Value.of(1)), eq(Value.of(2))), Value.FALSE)
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                // Emit attr1=1, attr2=2 -> attributeWithParams(true, 1, 2) = false -> not applicable
+                .thenEmit("attr1Mock", Value.of(1))
+                .thenEmit("attr2Mock", Value.of(2))
+                .expectNotApplicable()
+                // Emit attr1=2 -> attributeWithParams(true, 2, 2) = true -> permit
+                .thenEmit("attr1Mock", Value.of(2))
+                .expectPermit()
+                // Emit attr2=1 -> attributeWithParams(true, 2, 1) = false -> not applicable
+                .thenEmit("attr2Mock", Value.of(1))
+                .expectNotApplicable()
+                .verify();
     }
 
 }

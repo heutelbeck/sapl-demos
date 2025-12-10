@@ -15,61 +15,91 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.hamcrest.Matchers.hasObligation;
-import static io.sapl.hamcrest.Matchers.isPermit;
-import static io.sapl.hamcrest.Matchers.val;
-import static io.sapl.test.Imports.whenFunctionParams;
-import static org.hamcrest.CoreMatchers.allOf;
+import static io.sapl.test.DecisionMatchers.isPermit;
+import static io.sapl.test.Matchers.args;
+import static io.sapl.test.Matchers.eq;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
+/**
+ * Tests for policy documents that call the same attribute multiple times.
+ * Uses the thenEmit pattern to control attribute emissions and function
+ * mocking to control secondOf results.
+ */
 class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
 
-    private SaplTestFixture fixture;
+    private static final String POLICY = "/policies/policyDocumentWithMultipleCallsToSameAttribute.sapl";
 
-    @BeforeEach
-    void setUp() {
-        fixture = new SaplUnitTestFixture("policyDocumentWithMultipleCallsToSameAttribute.sapl");
+    /**
+     * Tests streaming attribute with parameter-specific function mocks.
+     * Each emission of time.now triggers re-evaluation with the mocked secondOf result.
+     */
+    @Test
+    void whenTimeNowEmitsValues_thenObligationDependsOnSecond() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of(1))
+                // second < 20 -> policy 1 (obligation A)
+                .givenFunction("time.secondOf", args(eq(Value.of(1))), Value.of(1))
+                .givenFunction("time.secondOf", args(eq(Value.of(2))), Value.of(15))
+                // second < 40 -> policy 2 (obligation B)
+                .givenFunction("time.secondOf", args(eq(Value.of(3))), Value.of(25))
+                .givenFunction("time.secondOf", args(eq(Value.of(4))), Value.of(35))
+                // second < 60 -> policy 3 (obligation C)
+                .givenFunction("time.secondOf", args(eq(Value.of(5))), Value.of(45))
+                .givenFunction("time.secondOf", args(eq(Value.of(6))), Value.of(55))
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "something"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("A")))
+                .thenEmit("timeMock", Value.of(2))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("A")))
+                .thenEmit("timeMock", Value.of(3))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("B")))
+                .thenEmit("timeMock", Value.of(4))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("B")))
+                .thenEmit("timeMock", Value.of(5))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("C")))
+                .thenEmit("timeMock", Value.of(6))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("C")))
+                .verify();
     }
 
+    /**
+     * Tests streaming with parameter-specific function mocks.
+     * Each emission value maps to a specific secondOf result, ensuring consistent
+     * behavior regardless of how many policies evaluate the function.
+     */
     @Test
-    void test_withFunctionSequenceMock() {
-
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
-                .givenFunctionOnce("time.secondOf", Val.of(1), Val.of(15), Val.of(25), Val.of(25), Val.of(35),
-                        Val.of(35), Val.of(45), Val.of(45), Val.of(45), Val.of(55), Val.of(55), Val.of(55))
-                .when(AuthorizationSubscription.of("WILLI", "read", "something"))
-                .expectNext(allOf(isPermit(), hasObligation("A"))).expectNext(allOf(isPermit(), hasObligation("A")))
-                .expectNext(allOf(isPermit(), hasObligation("B"))).expectNext(allOf(isPermit(), hasObligation("B")))
-                .expectNext(allOf(isPermit(), hasObligation("C"))).expectNext(allOf(isPermit(), hasObligation("C")))
+    void whenFunctionReturnsSequence_thenObligationChanges() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of("t1"))
+                // Mock by parameter value - each emission maps to a specific second
+                // t1, t2 -> second < 20 -> policy 1 (obligation A)
+                .givenFunction("time.secondOf", args(eq(Value.of("t1"))), Value.of(1))
+                .givenFunction("time.secondOf", args(eq(Value.of("t2"))), Value.of(15))
+                // t3, t4 -> second 20-39 -> policy 2 (obligation B)
+                .givenFunction("time.secondOf", args(eq(Value.of("t3"))), Value.of(25))
+                .givenFunction("time.secondOf", args(eq(Value.of("t4"))), Value.of(35))
+                // t5, t6 -> second 40-59 -> policy 3 (obligation C)
+                .givenFunction("time.secondOf", args(eq(Value.of("t5"))), Value.of(45))
+                .givenFunction("time.secondOf", args(eq(Value.of("t6"))), Value.of(55))
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "something"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("A")))
+                .thenEmit("timeMock", Value.of("t2"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("A")))
+                .thenEmit("timeMock", Value.of("t3"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("B")))
+                .thenEmit("timeMock", Value.of("t4"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("B")))
+                .thenEmit("timeMock", Value.of("t5"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("C")))
+                .thenEmit("timeMock", Value.of("t6"))
+                .expectDecisionMatches(isPermit().containsObligation(Value.of("C")))
                 .verify();
-
-    }
-
-    @Test
-    void test_withFunctionForParametersMock() {
-
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", Val.of(1), Val.of(2), Val.of(3), Val.of(4), Val.of(5), Val.of(6))
-                .givenFunction("time.secondOf", whenFunctionParams(val(1)), Val.of(1))
-                .givenFunction("time.secondOf", whenFunctionParams(val(2)), Val.of(15))
-                .givenFunction("time.secondOf", whenFunctionParams(val(3)), Val.of(25))
-                .givenFunction("time.secondOf", whenFunctionParams(val(4)), Val.of(35))
-                .givenFunction("time.secondOf", whenFunctionParams(val(5)), Val.of(45))
-                .givenFunction("time.secondOf", whenFunctionParams(val(6)), Val.of(55))
-                .when(AuthorizationSubscription.of("WILLI", "read", "something"))
-                .expectNext(allOf(isPermit(), hasObligation("A"))).expectNext(allOf(isPermit(), hasObligation("A")))
-                .expectNext(allOf(isPermit(), hasObligation("B"))).expectNext(allOf(isPermit(), hasObligation("B")))
-                .expectNext(allOf(isPermit(), hasObligation("C"))).expectNext(allOf(isPermit(), hasObligation("C")))
-                .verify();
-
     }
 
 }

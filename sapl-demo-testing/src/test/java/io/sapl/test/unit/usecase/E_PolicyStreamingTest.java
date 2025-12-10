@@ -15,121 +15,89 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.test.Imports.times;
+import static io.sapl.test.Matchers.any;
+import static io.sapl.test.Matchers.args;
 
-import java.time.Duration;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.functions.TemporalFunctionLibrary;
-import io.sapl.interpreter.InitializationException;
-import io.sapl.test.SaplTestException;
+import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
+/**
+ * Tests for streaming policy evaluation using the thenEmit pattern.
+ * The new fixture gives fine-grained control over attribute emissions,
+ * eliminating the need for virtual time and duration-based mocking.
+ */
 class E_PolicyStreamingTest {
 
-    private SaplTestFixture fixture;
+    private static final String POLICY = "/policies/policyStreaming.sapl";
 
-    @BeforeEach
-    void setUp() throws InitializationException {
-        fixture = new SaplUnitTestFixture("policyStreaming").registerFunctionLibrary(TemporalFunctionLibrary.class);
-    }
-
+    /**
+     * Tests streaming attribute emissions using thenEmit pattern.
+     * Each emission triggers policy re-evaluation.
+     */
     @Test
-    void test_streamingPolicy() {
-        final var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
-        final var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
-        final var timestamp2 = Val.of("2021-02-08T16:16:03.000Z");
-        final var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
-        final var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
-        final var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
+    void whenStreamingAttributeChanges_thenDecisionUpdates() {
+        var timestamp1 = Value.of("2021-02-08T16:16:01.000Z"); // second = 1
+        var timestamp2 = Value.of("2021-02-08T16:16:02.000Z"); // second = 2
+        var timestamp3 = Value.of("2021-02-08T16:16:03.000Z"); // second = 3
+        var timestamp4 = Value.of("2021-02-08T16:16:04.000Z"); // second = 4
+        var timestamp5 = Value.of("2021-02-08T16:16:05.000Z"); // second = 5
+        var timestamp6 = Value.of("2021-02-08T16:16:06.000Z"); // second = 6
 
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", timestamp0, timestamp1, timestamp2, timestamp3, timestamp4, timestamp5)
-                .when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
-                .expectNextNotApplicable().expectNextNotApplicable().expectNextNotApplicable().expectNextPermit()
-                .expectNextPermit().verify();
-    }
-
-    @Test
-    void test_streamingPolicy_TimingAttributeMock() {
-        final var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
-        final var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
-        final var timestamp2 = Val.of("2021-02-08T16:16:03.000Z");
-        final var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
-        final var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
-        final var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
-
-        fixture.constructTestCaseWithMocks().withVirtualTime()
-                .givenAttribute("time.now", Duration.ofSeconds(1), timestamp0, timestamp1, timestamp2, timestamp3,
-                        timestamp4, timestamp5)
-                .when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
-                .thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable().thenAwait(Duration.ofSeconds(1))
-                .expectNextNotApplicable().thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable()
-                .thenAwait(Duration.ofSeconds(1)).expectNextNotApplicable().thenAwait(Duration.ofSeconds(1))
-                .expectNextPermit().thenAwait(Duration.ofSeconds(1)).expectNextPermit().thenAwait(Duration.ofSeconds(1))
+        SaplTestFixture.createSingleTest()
+                .withFunctionLibrary(TemporalFunctionLibrary.class)
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), timestamp1)
+                .whenDecide(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
+                .expectNotApplicable()
+                .thenEmit("timeMock", timestamp2)
+                .expectNotApplicable()
+                .thenEmit("timeMock", timestamp3)
+                .expectNotApplicable()
+                .thenEmit("timeMock", timestamp4)
+                .expectNotApplicable()
+                .thenEmit("timeMock", timestamp5) // second > 4, now permits
+                .expectPermit()
+                .thenEmit("timeMock", timestamp6)
+                .expectPermit()
                 .verify();
     }
 
+    /**
+     * Tests function mock that returns different values on consecutive calls.
+     */
     @Test
-    void test_streamingPolicy_TimingAttributeMock_WithoutVirtualTime() {
-        final var timestamp0    = Val.of("2021-02-08T16:16:01.000Z");
-        final var timestamp1    = Val.of("2021-02-08T16:16:02.000Z");
-        final var timestamp2    = Val.of("2021-02-08T16:16:03.000Z");
-        final var timestamp3    = Val.of("2021-02-08T16:16:04.000Z");
-        final var timestamp4    = Val.of("2021-02-08T16:16:05.000Z");
-        final var timestamp5    = Val.of("2021-02-08T16:16:06.000Z");
-        final var tenSeconds    = Duration.ofSeconds(10);
-        final var testWithMocks = fixture.constructTestCaseWithMocks();
-        Assertions.assertThatExceptionOfType(SaplTestException.class)
-                .isThrownBy(() -> testWithMocks.givenAttribute("time.now", tenSeconds, timestamp0, timestamp1,
-                        timestamp2, timestamp3, timestamp4, timestamp5));
-
+    void whenFunctionReturnsSequence_thenDecisionUpdates() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of("initial"))
+                .givenFunction("time.secondOf", args(any()), Value.of(4), Value.of(5))
+                .whenDecide(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
+                .expectNotApplicable() // secondOf returns 4, not > 4
+                .thenEmit("timeMock", Value.of("updated"))
+                .expectPermit() // secondOf returns 5, which is > 4
+                .verify();
     }
 
+    /**
+     * Tests streaming with multiple values using thenEmit pattern.
+     */
     @Test
-    void test_streamingPolicyWithSimpleMockedFunction_ConsecutiveCalls() {
-
-        final var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
-        final var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
-
-        fixture.constructTestCaseWithMocks().givenAttribute("time.now", timestamp0, timestamp1)
-                .givenFunctionOnce("time.secondOf", Val.of(4)).givenFunctionOnce("time.secondOf", Val.of(5))
-                .when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
-                .expectNextPermit().verify(); // two times mock of function -> verify two
-                                              // times called
-
-    }
-
-    @Test
-    void test_streamingPolicyWithSimpleMockedFunction_ArrayOfReturnValues() {
-
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-                .givenFunctionOnce("time.secondOf", Val.of(3), Val.of(4), Val.of(5))
-                .when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextNotApplicable()
-                .expectNextNotApplicable().expectNextPermit().verify(); // three times
-                                                                        // mock of
-                                                                        // function ->
-                                                                        // verify two
-                                                                        // times called
-
-    }
-
-    @Test
-    void test_streamingPolicyWithSimpleMockedFunction_AlwaysReturn_VerifyTimesCalled() {
-
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-                .givenFunction("time.secondOf", Val.of(5), times(3))
-                .when(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData")).expectNextPermit(3)
-                .verify(); // three times mock of function -> three times called
-
+    void whenMultipleEmissions_thenMultipleDecisions() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of("t1"))
+                .givenFunction("time.secondOf", args(any()), Value.of(3), Value.of(4), Value.of(5))
+                .whenDecide(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))
+                .expectNotApplicable() // 3 <= 4
+                .thenEmit("timeMock", Value.of("t2"))
+                .expectNotApplicable() // 4 <= 4
+                .thenEmit("timeMock", Value.of("t3"))
+                .expectPermit() // 5 > 4
+                .verify();
     }
 
 }

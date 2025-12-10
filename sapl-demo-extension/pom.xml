@@ -22,7 +22,7 @@
 		
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-extension</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 
 	<name>SAPL Demo Custom Extensions (PIPs and functions)</name>
 	<properties>
@@ -31,7 +31,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- The Version of the SAPL Dependencies -->
-		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 		<spotbugs.version>4.9.8.1</spotbugs.version>
 		<sbcontrib.version>7.6.15</sbcontrib.version>
 	</properties>
@@ -58,11 +58,9 @@
 
 	<dependencies>
 		<dependency>
-			<!-- The sapl-extionsion-api module provides the basic APIs which can 
-				be implemented by custom Policy Information Point or Function libraries. -->
 			<groupId>io.sapl</groupId>
-			<artifactId>sapl-extensions-api</artifactId>
-			<!-- Please not, that extensions are always deployed alongside a full 
+			<artifactId>sapl-api</artifactId>
+			<!-- Please note, that extensions are always deployed alongside a full
 				PDP implementation. I.e., an embedded PDP. Thus, this dependency and its 
 				transitive dependencies are always present in the classpath of the target 
 				environment. Declaring the 'provided' scope is not necessary, if you are 

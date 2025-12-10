@@ -15,49 +15,70 @@
  */
 package io.sapl.test.integration.usecase;
 
-import java.time.Duration;
+import static io.sapl.test.Matchers.any;
+import static io.sapl.test.Matchers.args;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.functions.TemporalFunctionLibrary;
-import io.sapl.interpreter.InitializationException;
+import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.integration.SaplIntegrationTestFixture;
 
+/**
+ * Streaming tests with the new fixture using thenEmit pattern.
+ * The new fixture provides fine-grained control over attribute emissions,
+ * eliminating the need for virtual time and duration-based mocking.
+ */
 class B_StreamingVirtualTimeTest {
 
-    private SaplTestFixture fixture;
+    /**
+     * Tests streaming with explicit attribute emissions using thenEmit.
+     * The policy permits when time.secondOf(time.now) >= 4.
+     */
+    @Test
+    void whenTimeNowEmitsSequence_thenDecisionUpdatesAccordingly() {
+        var timestamp1 = Value.of("2021-02-08T16:16:01.000Z"); // second = 1
+        var timestamp2 = Value.of("2021-02-08T16:16:02.000Z"); // second = 2
+        var timestamp3 = Value.of("2021-02-08T16:16:03.000Z"); // second = 3
+        var timestamp4 = Value.of("2021-02-08T16:16:04.000Z"); // second = 4
+        var timestamp5 = Value.of("2021-02-08T16:16:05.000Z"); // second = 5
+        var timestamp6 = Value.of("2021-02-08T16:16:06.000Z"); // second = 6
 
-    @BeforeEach
-    void setUp() throws InitializationException {
-        fixture = new SaplIntegrationTestFixture("policiesIT").registerFunctionLibrary(TemporalFunctionLibrary.class);
+        SaplTestFixture.createIntegrationTest()
+                .withFunctionLibrary(TemporalFunctionLibrary.class)
+                .withConfigurationFromResources("policiesIT")
+                .givenEnvironmentAttribute("timeMock", "time.now", args(any()), timestamp1)
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "bar"))
+                .expectDeny()                                // second 1 < 4, policy_C not applicable, default deny
+                .thenEmit("timeMock", timestamp2)
+                .expectDeny()                                // second 2 < 4
+                .thenEmit("timeMock", timestamp3)
+                .expectDeny()                                // second 3 < 4
+                .thenEmit("timeMock", timestamp4)
+                .expectPermit()                              // second 4 >= 4, permit!
+                .thenEmit("timeMock", timestamp5)
+                .expectPermit()                              // second 5 >= 4
+                .thenEmit("timeMock", timestamp6)
+                .expectPermit()                              // second 6 >= 4
+                .verify();
     }
 
+    /**
+     * Tests streaming with mocked function returning a sequence of values.
+     * Each emission of time.now triggers re-evaluation with the next function result.
+     */
     @Test
-    void test() {
-        final var timestamp0 = Val.of("2021-02-08T16:16:01.000Z");
-        final var timestamp1 = Val.of("2021-02-08T16:16:02.000Z");
-        final var timestamp2 = Val.of("2021-02-08T16:16:03.000Z");
-        final var timestamp3 = Val.of("2021-02-08T16:16:04.000Z");
-        final var timestamp4 = Val.of("2021-02-08T16:16:05.000Z");
-        final var timestamp5 = Val.of("2021-02-08T16:16:06.000Z");
-
-        fixture.constructTestCaseWithMocks().withVirtualTime()
-                .givenAttribute("time.now", Duration.ofSeconds(1), timestamp0, timestamp1, timestamp2, timestamp3,
-                        timestamp4, timestamp5)
-                .when(AuthorizationSubscription.of("WILLI", "read", "bar")).thenAwait(Duration.ofSeconds(10))
-                .expectNextDeny().expectNextPermit().expectNoEvent(Duration.ofSeconds(2)).verify();
-    }
-
-    @Test
-    void test_mockedFunctionAndAttribute_ArrayOfReturnValues() {
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("time.now", Val.of("value"), Val.of("doesn't"), Val.of("matter"))
-                .givenFunctionOnce("time.secondOf", Val.of(3), Val.of(4))
-                .when(AuthorizationSubscription.of("WILLI", "read", "bar")).expectNextDeny().expectNextPermit()
+    void whenFunctionReturnsSequence_thenDecisionUpdates() {
+        SaplTestFixture.createIntegrationTest()
+                .withConfigurationFromResources("policiesIT")
+                .givenEnvironmentAttribute("timeMock", "time.now", args(any()), Value.of("t1"))
+                // time.secondOf returns sequence: 3, 4
+                .givenFunction("time.secondOf", args(any()), Value.of(3), Value.of(4))
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "bar"))
+                .expectDeny()                                // 3 < 4, not applicable, default deny
+                .thenEmit("timeMock", Value.of("t2"))
+                .expectPermit()                              // 4 >= 4, permit
                 .verify();
     }
 

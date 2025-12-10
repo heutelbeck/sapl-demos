@@ -15,30 +15,29 @@
  */
 package io.sapl.test.unit.usecase;
 
-import org.junit.jupiter.api.BeforeEach;
+import static io.sapl.test.Matchers.any;
+import static io.sapl.test.Matchers.args;
+
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
 class D_PolicyWithMultipleFunctionsOrPIPsTest {
 
-    private SaplTestFixture fixture;
-
-    @BeforeEach
-    void setUp() {
-        fixture = new SaplUnitTestFixture("policyWithMultipleFunctionsOrPIPs");
-    }
+    private static final String POLICY = "/policies/policyWithMultipleFunctionsOrPIPs.sapl";
 
     @Test
-    void test_policyWithMultipleMocks() {
-
-        fixture.constructTestCaseWithMocks().givenAttribute("test.upper", Val.of("WILLI"))
-                .givenFunction("time.dayOfWeekFrom", Val.of("SATURDAY"))
-                .when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
-
+    void whenMockingMultipleFunctionsAndAttributes_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenAttribute("upperMock", "test.upper", any(), args(), Value.of("WILLI"))
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of("2021-02-08T16:16:33.616Z"))
+                .givenFunction("time.dayOfWeekFrom", args(any()), Value.of("SATURDAY"))
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
+                .verify();
     }
 
 }

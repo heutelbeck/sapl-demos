@@ -7,7 +7,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-parent</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>SAPL Demo Parent</name>
@@ -29,7 +29,7 @@
 
 		<vaadin.version>24.9.4</vaadin.version>
 		<version.lombok>1.18.42</version.lombok>
-		<sapl.version>3.1.0-SNAPSHOT</sapl.version>
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 		<springboot.version>3.5.7</springboot.version>
 
 		<spotbugs.version>4.9.8.1</spotbugs.version>

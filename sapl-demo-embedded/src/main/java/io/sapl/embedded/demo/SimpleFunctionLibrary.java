@@ -17,10 +17,10 @@ package io.sapl.embedded.demo;
 
 import io.sapl.api.functions.Function;
 import io.sapl.api.functions.FunctionLibrary;
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.validation.Number;
-import io.sapl.api.validation.Text;
+import io.sapl.api.model.ArrayValue;
+import io.sapl.api.model.NumberValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 
 @FunctionLibrary(name = "simple", description = "some simple functions")
 public class SimpleFunctionLibrary {
@@ -30,28 +30,25 @@ public class SimpleFunctionLibrary {
     }
 
     @Function
-    public static Val length(Val parameter) {
-        if (parameter.isArray()) {
-            return Val.of(parameter.get().size());
-        } else if (parameter.isTextual()) {
-            return Val.of(parameter.get().asText().length());
-        } else {
-            throw new PolicyEvaluationException("length() parameter must be a string or an array, found "
-                    + (parameter.isUndefined() ? "undefined" : parameter.get().getNodeType()) + ".");
-        }
+    public static Value length(Value parameter) {
+        return switch (parameter) {
+            case ArrayValue array -> Value.of(array.size());
+            case TextValue text ->  Value.of(text.value().length());
+            default -> Value.error("length() parameter must be a string or an array, found: %s.".formatted(parameter));
+        };
     }
 
     @Function
-    public static Val append(@Text @Number Val... parameters) {
+    public static Value append(Value... parameters) {
         final var builder = new StringBuilder();
         for (var parameter : parameters) {
-            if (parameter.isTextual()) {
-                builder.append(parameter.get().asText());
-            } else if (parameter.isNumber()) {
-                builder.append(parameter.get().asInt());
+            switch(parameter) {
+                case TextValue text -> builder.append(text.value());
+                case NumberValue number -> builder.append(number.value());
+                default -> {/*NOOP*/}
             }
         }
-        return Val.of(builder.toString());
+        return Value.of(builder.toString());
     }
 
 }

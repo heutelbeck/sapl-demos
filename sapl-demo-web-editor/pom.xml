@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
-		<version>3.1.0-SNAPSHOT</version>
+		<version>4.0.0-SNAPSHOT</version>
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 

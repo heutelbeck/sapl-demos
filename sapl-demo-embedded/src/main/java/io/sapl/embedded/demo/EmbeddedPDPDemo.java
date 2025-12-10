@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+ * Copyright © 2019-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package io.sapl.embedded.demo;
 
+import java.nio.file.Path;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.concurrent.Callable;
 
 import org.slf4j.Logger;
@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
-import io.sapl.pdp.EmbeddedPolicyDecisionPoint;
-import io.sapl.pdp.PolicyDecisionPointFactory;
+import io.sapl.pdp.PolicyDecisionPointBuilder;
+import io.sapl.pdp.PolicyDecisionPointBuilder.PDPComponents;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -37,21 +37,22 @@ import picocli.CommandLine.Option;
  * the PDP. The demo runs a few performance tests and illustrates different ways
  * of invoking the PDP.
  */
-@Command(name = "sapl-demo-embedded", version = "3.0.0-SNAPSHOT", mixinStandardHelpOptions = true, description = "This demo shows how to manually construct a PDP without infrastructure support. "
-        + "A Custom Policy Information Point and Function Library are bound to the PDP. "
-        + "The demo runs a few performance tests and illustrates different ways of invoking the PDP. " + "By default, ")
+@Command(name = "sapl-demo-embedded", version = "4.0.0-SNAPSHOT", mixinStandardHelpOptions = true,
+        description = "This demo shows how to manually construct a PDP without infrastructure support. "
+                + "A Custom Policy Information Point and Function Library are bound to the PDP. "
+                + "The demo runs a few performance tests and illustrates different ways of invoking the PDP.")
 public class EmbeddedPDPDemo implements Callable<Integer> {
 
     private static final String LINE = "------------------------------------------------------------------------";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedPDPDemo.class);
 
-    @Option(names = { "-p",
-            "--path" }, description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
+    @Option(names = { "-p", "--path" },
+            description = "Sets the path for looking up policies and PDP configuration if the -f parameter is set. Defaults to '~/sapl/policies'")
     String path = "~/sapl/policies";
 
-    @Option(names = { "-f",
-            "--filesystem" }, description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")
+    @Option(names = { "-f", "--filesystem" },
+            description = "If set, policies and PDP configuration are loaded from the filesystem instead of the bundled resources. Set path with -p.")
     boolean filesystem;
 
     private static final String SUBJECT = "willi";
@@ -62,9 +63,8 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     private static final String RESOURCE = "something";
 
-    private static final AuthorizationSubscription READ_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
+    private static final AuthorizationSubscription READ_SUBSCRIPTION  = AuthorizationSubscription.of(SUBJECT,
             ACTION_READ, RESOURCE);
-
     private static final AuthorizationSubscription WRITE_SUBSCRIPTION = AuthorizationSubscription.of(SUBJECT,
             ACTION_WRITE, RESOURCE);
 
@@ -76,7 +76,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     private static final double MILLION = 1_000_000.0D;
 
-    private static final DecimalFormat decFormat = new DecimalFormat("#.####");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.####");
 
     private static boolean useTestRuns = false;
 
@@ -94,70 +94,61 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        EmbeddedPolicyDecisionPoint pdp;
-        if (filesystem) {
-            /*
-             * The factory method PolicyDecisionPointFactory.filesystemPolicyDecisionPoint
-             * creates a PDP witch is retrieving the policies and its configuration form the
-             * file system.
-             *
-             * It takes a parameter with the path and lists of extensions to load.
-             *
-             * The first list contains policy information points. The second list contains
-             * function libraries.
-             *
-             * The PDP will monitor the path at runtime for any changes made to the policies
-             * an update any subscribed PEPs accordingly.
-             */
-            pdp = PolicyDecisionPointFactory.filesystemPolicyDecisionPoint(path, List::of, () -> List.of(EchoPIP.class),
-                    List::of, () -> List.of(SimpleFunctionLibrary.class));
-        } else {
-            /*
-             * The factory method PolicyDecisionPointFactory.resourcesPolicyDecisionPoint
-             * creates a PDP witch is retrieving the policies from the resources bundled
-             * with the application.
-             *
-             * In a typical project structure, policies are then located in the folder
-             * 'src/main/resources/policies'.
-             *
-             * The first list contains policy information points. The second list contains
-             * function libraries.
-             *
-             * The PDP will monitor the path at runtime for any changes made to the policies
-             * an update any subscribed PEPs accordingly.
-             */
-            pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class),
-                    List::of, () -> List.of(SimpleFunctionLibrary.class));
-        }
+        var components = buildPdpComponents();
+        var pdp        = components.pdp();
 
         blockingUsageDemo(pdp);
-
         reactiveUsageDemo(pdp);
-
         runPerformanceDemoSingleBlocking(pdp);
-
         runPerformanceDemoSingleSequentialReactive(pdp);
 
         LOGGER.info("End of demo.");
-        pdp.destroy();
+        components.dispose();
         return 0;
     }
 
+    private PDPComponents buildPdpComponents() {
+        var builder = PolicyDecisionPointBuilder.withDefaults()
+                .withPolicyInformationPoint(new EchoPIP())
+                .withFunctionLibrary(SimpleFunctionLibrary.class);
+
+        if (filesystem) {
+            /*
+             * withDirectorySource() creates a PDP that retrieves policies and configuration
+             * from the file system.
+             *
+             * The PDP will monitor the path at runtime for any changes made to the policies
+             * and update any subscribed PEPs accordingly.
+             */
+            builder.withDirectorySource(Path.of(path));
+        } else {
+            /*
+             * withResourcesSource() creates a PDP that retrieves policies from the
+             * resources bundled with the application.
+             *
+             * In a typical project structure, policies are located in the folder
+             * 'src/main/resources/policies'.
+             */
+            builder.withResourcesSource();
+        }
+
+        return builder.build();
+    }
+
     /**
-     * If traditional blocking behavior is required, use .blockFirst() this is not
-     * applicable in multithreaded environments, e.g. web application. The reactor
-     * runtime will likely complain, that this behavior is not permitted.
+     * If traditional blocking behavior is required, use .blockFirst(). This is not
+     * applicable in multithreaded environments, e.g., web applications. The Reactor
+     * runtime will likely complain that this behavior is not permitted.
      */
     private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
         LOGGER.info("");
         LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using .blockFirst()");
-        final AuthorizationDecision readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
-        LOGGER.info("Decision for action 'read' : {}", null != readDecision ? readDecision.getDecision() : "null");
-        final AuthorizationDecision writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
-        LOGGER.info("Decision for action 'write': {}", null != writeDecision ? writeDecision.getDecision() : "null");
+        var readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+        LOGGER.info("Decision for action 'read' : {}", readDecision != null ? readDecision.decision() : "null");
+        var writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
+        LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.decision() : "null");
         LOGGER.info("");
         LOGGER.info(LINE);
-
     }
 
     /**
@@ -180,24 +171,24 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     private static void handleAuthorizationDecision(String action, AuthorizationDecision authzDecision) {
-        LOGGER.info("Decision for action '{}': {}", action, authzDecision.getDecision());
+        LOGGER.info("Decision for action '{}': {}", action, authzDecision.decision());
     }
 
     private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
-        final var runs = getRuns();
+        var runs = getRuns();
         LOGGER.info("");
         LOGGER.info("Demo Part 3: Perform a small benchmark for blocking decisions.");
 
         LOGGER.info("Warming up for {} runs...", runs);
-        for (int i = 0; i < runs; i++) {
+        for (var i = 0; i < runs; i++) {
             pdp.decide(READ_SUBSCRIPTION).blockFirst();
         }
         LOGGER.info("Measure time for {} runs...", runs);
-        long start = System.nanoTime();
-        for (int i = 0; i < runs; i++) {
+        var start = System.nanoTime();
+        for (var i = 0; i < runs; i++) {
             pdp.decide(READ_SUBSCRIPTION).blockFirst();
         }
-        long end = System.nanoTime();
+        var end = System.nanoTime();
         LOGGER.info("");
         logResults("Benchmark results for blocking PDP access:", runs, start, end);
         LOGGER.info("");
@@ -205,21 +196,21 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
-        final var runs = getRuns();
+        var runs = getRuns();
         LOGGER.info("");
         LOGGER.info("Demo Part 4: Perform a small benchmark for sequential .take(1) decisions.");
 
         LOGGER.info("Warming up for {} runs...", runs);
-        for (int i = 0; i < runs; i++) {
+        for (var i = 0; i < runs; i++) {
             pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
         }
         LOGGER.info("Measure time for {} runs...", runs);
 
-        long start = System.nanoTime();
-        for (int i = 0; i < runs; i++) {
+        var start = System.nanoTime();
+        for (var i = 0; i < runs; i++) {
             pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
         }
-        long end = System.nanoTime();
+        var end = System.nanoTime();
         LOGGER.info("");
         logResults("Benchmark results for .take(1) access:", runs, start, end);
         LOGGER.info("");
@@ -238,8 +229,8 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(title);
             LOGGER.info("Runs  : {}", runs);
-            LOGGER.info("Total : {} s", decFormat.format(nanoToS((double) end - start)));
-            LOGGER.info("Avg.  : {} ms", decFormat.format(nanoToMs(((double) end - start) / runs)));
+            LOGGER.info("Total : {} s", DECIMAL_FORMAT.format(nanoToS((double) end - start)));
+            LOGGER.info("Avg.  : {} ms", DECIMAL_FORMAT.format(nanoToMs(((double) end - start) / runs)));
         }
     }
 

@@ -15,46 +15,53 @@
  */
 package io.sapl.test.integration.usecase;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.integration.SaplIntegrationTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
+/**
+ * Integration tests that verify combined policy evaluation and single policy
+ * behavior. Demonstrates using both integration and single test modes with the
+ * new fixture.
+ */
 class A_SimplePDPTest {
 
-    private SaplTestFixture fixture;
-
-    @BeforeEach
-    void setUp() {
-        fixture = new SaplIntegrationTestFixture("policiesIT");
-    }
-
+    /**
+     * Tests the combined decision from all policies in the policiesIT directory.
+     * With permit-overrides combining algorithm, policy_B's PERMIT overrides policy_A's DENY.
+     */
     @Test
-    void test_simpleIT_verifyCombined() {
-
-        fixture.constructTestCase().when(AuthorizationSubscription.of("WILLI", "read", "foo")).expectPermit().verify();
-
-    }
-
-    @Test
-    void test_simpleIT_testSinglePolicyA() {
-
-        SaplTestFixture unitFixture = new SaplUnitTestFixture("policiesIT/policy_A");
-        unitFixture.constructTestCase().when(AuthorizationSubscription.of("WILLI", "read", "foo")).expectDeny()
+    void whenEvaluatingCombinedPolicies_thenPermit() {
+        SaplTestFixture.createIntegrationTest()
+                .withConfigurationFromResources("policiesIT")
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "foo"))
+                .expectPermit()
                 .verify();
-
     }
 
+    /**
+     * Tests policy_A in isolation - it should DENY for the given subscription.
+     */
     @Test
-    void test_simpleIT_testSinglePolicyB() {
-
-        SaplTestFixture unitFixture = new SaplUnitTestFixture("policiesIT/policy_B");
-        unitFixture.constructTestCase().when(AuthorizationSubscription.of("WILLI", "read", "foo")).expectPermit()
+    void whenEvaluatingSinglePolicyA_thenDeny() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource("/policiesIT/policy_A.sapl")
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "foo"))
+                .expectDeny()
                 .verify();
+    }
 
+    /**
+     * Tests policy_B in isolation - it should PERMIT for the given subscription.
+     */
+    @Test
+    void whenEvaluatingSinglePolicyB_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource("/policiesIT/policy_B.sapl")
+                .whenDecide(AuthorizationSubscription.of("WILLI", "read", "foo"))
+                .expectPermit()
+                .verify();
     }
 
 }

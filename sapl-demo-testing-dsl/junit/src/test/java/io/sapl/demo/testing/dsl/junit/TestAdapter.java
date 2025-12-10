@@ -2,8 +2,8 @@ package io.sapl.demo.testing.dsl.junit;
 
 import java.util.Map;
 
-import io.sapl.functions.FilterFunctionLibrary;
-import io.sapl.functions.TemporalFunctionLibrary;
+import io.sapl.functions.libraries.FilterFunctionLibrary;
+import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.grammar.sapltest.ImportType;
 import io.sapl.test.junit.JUnitTestAdapter;
 

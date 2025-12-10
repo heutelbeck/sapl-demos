@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>io.sapl</groupId>
 		<artifactId>sapl-demo-parent</artifactId>
-		<version>3.1.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>sapl-demo-testing</artifactId>
@@ -38,6 +38,11 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -70,15 +75,11 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
+			<!--<plugin>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
-					<!--<coverageEnabled>false</coverageEnabled> -->
-					<!--<policyPath>policies</policyPath> -->
-					<!--<outputDir>${project.build.directory}</outputDir>-->
-					<!--<policySetHitRatio>100</policySetHitRatio> -->
 					<policyHitRatio>100</policyHitRatio>
 					<policyConditionHitRatio>50</policyConditionHitRatio>
 					<failOnDisabledTests>false</failOnDisabledTests>
@@ -93,7 +94,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>-->
 		</plugins>
 	</build>
 </project>

@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import io.sapl.functions.FilterFunctionLibrary;
 import io.sapl.functions.TemporalFunctionLibrary;
-import io.sapl.test.SaplTestException;
+import io.sapl.test.deprecated.SaplTestException;
 import io.sapl.test.dsl.interfaces.IntegrationTestPolicyResolver;
 import io.sapl.test.dsl.interfaces.TestNode;
 import io.sapl.test.dsl.interfaces.UnitTestPolicyResolver;

@@ -15,51 +15,49 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.hamcrest.Matchers.val;
-import static io.sapl.test.Imports.whenEntityValue;
+import static io.sapl.test.Matchers.any;
+import static io.sapl.test.Matchers.args;
+import static io.sapl.test.Matchers.eq;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.interpreter.InitializationException;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 import io.sapl.test.unit.TestPIP;
 
 class C_PolicyWithSimplePIPTest {
 
-    private SaplTestFixture fixture;
+    private static final String POLICY = "/policies/policyWithSimplePIP.sapl";
 
-    @BeforeEach
-    void setUp() {
-        fixture = new SaplUnitTestFixture("policyWithSimplePIP");
+    @Test
+    void whenMockingAttributeWithAnyEntity_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenAttribute("upperMock", "test.upper", any(), args(), Value.of("WILLI"))
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
+                .verify();
     }
 
     @Test
-    void test_policyWithSimpleMockedPIP() {
-
-        fixture.constructTestCaseWithMocks().givenAttribute("test.upper", Val.of("WILLI"))
-                .when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
-
+    void whenUsingRealPIP_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyInformationPoint(new TestPIP())
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
+                .verify();
     }
 
     @Test
-    void test_policyWithSimplePIP() throws InitializationException {
-
-        fixture.registerPIP(new TestPIP()).constructTestCase()
-                .when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
-
-    }
-
-    @Test
-    void test_policyWithSimplePIP_mockedWhenParameters() {
-
-        fixture.constructTestCaseWithMocks()
-                .givenAttribute("test.upper", whenEntityValue(val("willi")), Val.of("WILLI"))
-                .when(AuthorizationSubscription.of("willi", "read", "something")).expectPermit().verify();
-
+    void whenMockingAttributeWithSpecificEntity_thenPermit() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenAttribute("upperMock", "test.upper", eq(Value.of("willi")), args(), Value.of("WILLI"))
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
+                .verify();
     }
 
 }

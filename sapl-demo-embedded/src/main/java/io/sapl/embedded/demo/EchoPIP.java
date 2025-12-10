@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+ * Copyright © 2019-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,20 @@
  */
 package io.sapl.embedded.demo;
 
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Text;
+import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.PolicyInformationPoint;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import reactor.core.publisher.Flux;
 
 /**
- * A simple non-streaming PIP echoing its input. *
+ * A simple non-streaming PIP echoing its input.
  */
 @PolicyInformationPoint(name = "echo", description = "PIP echoing the input value")
 public class EchoPIP {
 
-    private EchoPIP() {
-        // Utility Class
-    }
-
     @Attribute(name = "echo")
-    public static Flux<Val> echo(@Text Val value) {
+    public static Flux<Value> echo(TextValue value) {
         return Flux.just(value);
     }
 

@@ -17,10 +17,12 @@ package io.sapl.demo.testing.dsl.junit;
 
 import java.util.Map;
 
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Text;
+import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.PolicyInformationPoint;
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.UndefinedValue;
+import io.sapl.api.model.Value;
 import reactor.core.publisher.Flux;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
@@ -31,21 +33,25 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Flux<Val> upper(@Text Val leftHandValue, Map<String, Val> variables) {
-        return Flux.just(Val.of(leftHandValue.get().asText().toUpperCase()));
+    public Flux<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
+        return Flux.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 
     @Attribute
-    public Flux<Val> hasEnvVar(@Text Val leftHandValue, Map<String, Val> variables) {
-        return Flux.just(variables.getOrDefault(leftHandValue.get().asText(), Val.of("something")));
+    public Flux<Value> hasEnvVar(TextValue leftHandValue, Map<String, Value> variables) {
+        return Flux.just(variables.getOrDefault(leftHandValue.value(), Value.of("something")));
     }
 
     @Attribute
-    public Flux<Val> hasAuthzSubVar(@Text Val leftHandValue, Map<String, Val> variables) {
+    public Flux<Value> hasAuthzSubVar(TextValue leftHandValue, Map<String, Value> variables) {
         final var env = variables.get("environment");
-        if (env.isUndefined()) {
-            return Flux.just(Val.of("no environment"));
+        if (env instanceof UndefinedValue) {
+            return Flux.just(Value.of("no environment"));
         }
-        return Flux.just(Val.of(env.getObjectNode().get(leftHandValue.getText()).asText("something else")));
+        if (!(env instanceof ObjectValue objectValue)) {
+            return Flux.just(Value.of("no object"));
+        }
+        var v = objectValue.get(leftHandValue.value());
+        return Flux.just(Value.of(v==null?"something else":v.toString()));
     }
 }

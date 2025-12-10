@@ -17,10 +17,10 @@ package io.sapl.test.unit;
 
 import java.util.Map;
 
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Text;
+import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.PolicyInformationPoint;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import reactor.core.publisher.Flux;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
@@ -31,8 +31,8 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Flux<Val> upper(@Text Val leftHandValue, Map<String, Val> variables) {
-        return Flux.just(Val.of(leftHandValue.get().asText().toUpperCase()));
+    public Flux<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
+        return Flux.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 
 }

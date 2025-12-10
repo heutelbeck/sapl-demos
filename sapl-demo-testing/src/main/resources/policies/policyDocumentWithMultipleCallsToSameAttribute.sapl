@@ -2,22 +2,22 @@ set "experiment"
 first-applicable
 
 policy "policy 1"
-permit
-     action == "read"
+permit action == "read"
 where
-     subject == "WILLI";
-     time.secondOf(<time.now>) < 20; obligation "A"
+  subject == "WILLI";
+  time.secondOf(<time.now>) < 20;
+obligation "A"
 
 policy "policy 2"
-permit
-     action == "read"
+permit action == "read"
 where
-     subject == "WILLI";
-     time.secondOf(<time.now>) < 40; obligation "B"
+  subject == "WILLI";
+  time.secondOf(<time.now>) < 40;
+obligation "B"
 
 policy "policy 3"
-permit
-     action == "read"
+permit action == "read"
 where
-     subject == "WILLI";
-     time.secondOf(<time.now>) < 60; obligation "C"
+  subject == "WILLI";
+  time.secondOf(<time.now>) < 60;
+obligation "C"

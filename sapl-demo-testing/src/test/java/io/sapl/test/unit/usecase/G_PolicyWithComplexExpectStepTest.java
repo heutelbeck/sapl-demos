@@ -15,33 +15,27 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.hamcrest.Matchers.hasObligationContainingKeyValue;
-import static io.sapl.hamcrest.Matchers.hasObligationMatching;
-import static io.sapl.hamcrest.Matchers.hasResourceMatching;
-import static io.sapl.hamcrest.Matchers.isPermit;
-import static org.hamcrest.CoreMatchers.allOf;
+import static io.sapl.test.DecisionMatchers.isPermit;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Map;
+
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.Decision;
-import io.sapl.functions.FilterFunctionLibrary;
-import io.sapl.interpreter.InitializationException;
+import io.sapl.functions.libraries.FilterFunctionLibrary;
 import io.sapl.test.SaplTestFixture;
-import io.sapl.test.unit.SaplUnitTestFixture;
 
+/**
+ * Tests for complex authorization decision expectations with obligations and
+ * transformed resources. Demonstrates the new fixture's fluent API for decision
+ * matching.
+ */
 class G_PolicyWithComplexExpectStepTest {
 
-    private SaplTestFixture fixture;
-
-    private ObjectMapper mapper;
+    private static final String POLICY = "/policies/policyWithObligationAndResource.sapl";
 
     static class SubjectDTO {
         public String name      = "Willi";
@@ -68,112 +62,68 @@ class G_PolicyWithComplexExpectStepTest {
 
     private final Object resource = new ResourceDTO();
 
-    @BeforeEach
-    void setUp() throws InitializationException {
-        fixture = new SaplUnitTestFixture("policyWithObligationAndResource.sapl")
-                .registerFunctionLibrary(FilterFunctionLibrary.class);
-        mapper  = new ObjectMapper();
-    }
-
+    /**
+     * Tests exact match of authorization decision with obligation and transformed resource.
+     */
     @Test
-    void test_equals() {
-        ObjectNode obligation = mapper.createObjectNode();
-        obligation.put("type", "logAccess");
-        obligation.put("message", "Willi has accessed patient data (id=56) as an administrator.");
-        ArrayNode obligations = mapper.createArrayNode();
-        obligations.add(obligation);
+    void whenAdminAccessesPatientData_thenPermitWithObligationAndBlackenedResource() {
+        var obligation = Value.ofObject(Map.of(
+                "type", Value.of("logAccess"),
+                "message", Value.of("Willi has accessed patient data (id=56) as an administrator.")));
 
-        ObjectNode aResource = mapper.createObjectNode();
-        aResource.put("id", "56");
-        aResource.put("diagnosisText", "█████████████");
-        aResource.put("icd11Code", "ic███████");
+        var expectedResource = Value.ofObject(Map.of(
+                "id", Value.of("56"),
+                "diagnosisText", Value.of("█████████████"),
+                "icd11Code", Value.of("ic███████")));
 
-        AuthorizationDecision decision = new AuthorizationDecision(Decision.PERMIT).withObligations(obligations)
-                .withResource(aResource);
-
-        fixture.constructTestCase().when(AuthorizationSubscription.of(subject, action, aResource)).expect(decision)
+        SaplTestFixture.createSingleTest()
+                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of(subject, action, resource))
+                .expectDecisionMatches(isPermit()
+                        .containsObligation(obligation)
+                        .withResource(expectedResource))
                 .verify();
-
     }
 
+    /**
+     * Tests using containsObligationMatching with a custom predicate for more
+     * flexible validation.
+     */
     @Test
-    void test_equalsPredicate() {
-        fixture.constructTestCase().when(AuthorizationSubscription.of(subject, action, resource))
-                .expect((AuthorizationDecision dec) -> {
-
-                    if (dec.getDecision() != Decision.PERMIT) {
-                        return false;
-                    }
-
-                    if (dec.getObligations().isEmpty() || dec.getResource().isEmpty()) {
-                        return false;
-                    }
-
-                    // check obligation
-                    boolean containsExpectedObligation = false;
-                    for (JsonNode node : dec.getObligations().get()) {
-                        if (node.has("type") && "logAccess".equals(node.get("type").asText()) && node.has("message")
-                                && "Willi has accessed patient data (id=56) as an administrator."
-                                        .equals(node.get("message").asText())) {
-                            containsExpectedObligation = true;
-                        }
-                    }
-
-                    // check resource
-                    boolean containsExpectedResource = false;
-                    JsonNode aResource         = dec.getResource().get();
-                    if (aResource.has("id") && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
-                            && "█████████████"
-                                    .equals(aResource.get("diagnosisText").asText())
-                            && aResource.has("icd11Code") && "ic███████"
-                                    .equals(aResource.get("icd11Code").asText())) {
-                        containsExpectedResource = true;
-                    }
-
-                    return containsExpectedObligation && containsExpectedResource;
-                }).verify();
-
-    }
-
-    @Test
-    void test_equalsMatcher() {
-        fixture.constructTestCase().when(AuthorizationSubscription.of(subject, action, resource))
-                .expect(allOf(isPermit(),
-
-                        // check Obligations
-                        // via .equals()
-                        //  hasObligation(mapper.createObjectNode().put("foo", "bar")),
-                        // or Predicate
-                        hasObligationMatching((JsonNode obligation) -> {
-                            return obligation.has("type") && "logAccess".equals(obligation.get("type").asText())
-                                    && obligation.has("message")
-                                    && "Willi has accessed patient data (id=56) as an administrator."
-                                            .equals(obligation.get("message").asText());
-                        }),
-
-                        hasObligationContainingKeyValue("type", "logAccess"),
-
-                        // check advice
-                        // via .equals()
-                        //   hasAdvice(mapper.createObjectNode().put("foo", "bar")),
-                        // or Predicate
-                        //   hasAdviceMatching((JsonNode advice) -> {
-                        //   return advice.has("sendEmail");
-                        //   }),
-
-                        // check Resource
-                        // via .equals()
-                        //   isResourceEquals(new
-                        // ObjectMapper().createObjectNode().put("foo", "bar")),
-                        // or Predicate
-                        hasResourceMatching((JsonNode aResource) -> aResource.has("id")
-                                && "56".equals(aResource.get("id").asText()) && aResource.has("diagnosisText")
-                                && "█████████████"
-                                        .equals(aResource.get("diagnosisText").asText())
-                                && aResource.has("icd11Code") && "ic███████"
-                                        .equals(aResource.get("icd11Code").asText()))))
+    void whenAdminAccessesPatientData_thenObligationContainsLogAccessType() {
+        SaplTestFixture.createSingleTest()
+                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of(subject, action, resource))
+                .expectDecisionMatches(isPermit()
+                        .containsObligationMatching(obligationValue -> {
+                            if (obligationValue instanceof ObjectValue obj) {
+                                var typeField = obj.get("type");
+                                return typeField instanceof TextValue typeText
+                                        && "logAccess".equals(typeText.value());
+                            }
+                            return false;
+                        }))
                 .verify();
+    }
 
+    /**
+     * Tests combined obligation and resource verification using the fluent matcher API.
+     */
+    @Test
+    void whenAdminAccessesPatientData_thenResourceIsBlackened() {
+        var expectedResource = Value.ofObject(Map.of(
+                "id", Value.of("56"),
+                "diagnosisText", Value.of("█████████████"),
+                "icd11Code", Value.of("ic███████")));
+
+        SaplTestFixture.createSingleTest()
+                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of(subject, action, resource))
+                .expectDecisionMatches(isPermit().withResource(expectedResource))
+                .verify();
     }
 
 }
