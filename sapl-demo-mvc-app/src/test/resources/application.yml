@@ -3,3 +3,4 @@ logging.level:
   root: ERROR
   io.sapl: WARN
   org.springframework.security: WARN
+io.sapl.pdp.embedded.enabled: true

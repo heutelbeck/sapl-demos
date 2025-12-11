@@ -19,8 +19,9 @@ import java.util.function.Consumer;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -67,9 +68,12 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
      * leads to a clean behavior in case of obligations.
      */
     @Override
-    public boolean isResponsible(JsonNode constraint) {
-        return null != constraint && constraint.has("type")
-                && "logAccess".equals(constraint.findValue("type").asText());
+    public boolean isResponsible(Value constraint) {
+        if (!(constraint instanceof ObjectValue objectValue)) {
+            return false;
+        }
+        var type = objectValue.get("type");
+        return type instanceof TextValue textValue && "logAccess".equals(textValue.value());
     }
 
     /**
@@ -77,8 +81,10 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
      * implied behavior of the application.
      */
     @Override
-    public Consumer<Object> getHandler(JsonNode constraint) {
-        return value -> log.info(constraint.findValue("message").asText());
+    public Consumer<Object> getHandler(Value constraint) {
+        var message = ((ObjectValue) constraint).get("message");
+        var messageText = message instanceof TextValue textValue ? textValue.value() : "Access logged";
+        return value -> log.info(messageText);
     }
 
 }

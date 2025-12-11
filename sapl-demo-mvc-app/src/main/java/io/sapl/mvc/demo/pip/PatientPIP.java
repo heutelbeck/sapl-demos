@@ -18,16 +18,15 @@ package io.sapl.mvc.demo.pip;
 import java.util.List;
 import java.util.Map;
 
+import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.PolicyInformationPoint;
+import io.sapl.api.model.*;
+import lombok.val;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.sapl.api.interpreter.PolicyEvaluationException;
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Number;
 import io.sapl.mvc.demo.domain.Patient;
 import io.sapl.mvc.demo.domain.Relation;
 import lombok.RequiredArgsConstructor;
@@ -67,18 +66,18 @@ public class PatientPIP {
      * This implementation does not track changes in the repository, i.e. this is a
      * non-streaming PIP.
      * 
-     * @param value     the id of the patient. This parameter must be a number, as
+     * @param leftHandValue     the id of the patient. This parameter must be a number, as
      *                  defined by the @Number annotation.
      * @param variables the variables in the current evaluation context
      * @return the relatives of the patient as registered in the relationRepo.
      *
      */
     @Attribute(name = "relatives")
-    public Flux<Val> getRelations(@Number Val leftHandValue, Map<String, Val> variables) {
-        final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.get().asLong());
-        final List<String>   relationNames = relations.stream().map(Relation::getUsername).toList();
-        final JsonNode       jsonNode      = mapper.convertValue(relationNames, JsonNode.class);
-        return Flux.just(Val.of(jsonNode));
+    public Flux<Value> getRelations(NumberValue leftHandValue, Map<String, Value> variables) {
+        final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.value().longValue());
+        final List<TextValue>   relationNames = relations.stream().map(Relation::getUsername).map(Value::of).toList();
+        final ArrayValue     jsonNode      = ArrayValue.builder().addAll(relationNames).build();
+        return Flux.just(jsonNode);
     }
 
     /**
@@ -102,14 +101,16 @@ public class PatientPIP {
      *
      */
     @Attribute(name = "patientRecord")
-    public Flux<Val> getPatientRecord(@Number Val patientId, Map<String, Val> variables) {
+    public Flux<Value> getPatientRecord(NumberValue patientId, Map<String, Value> variables) {
         try {
-            final Patient  patient  = patientRepo.findById(patientId.get().asLong())
-                    .orElseThrow(PolicyEvaluationException::new);
-            final JsonNode jsonNode = mapper.convertValue(patient, JsonNode.class);
-            return Flux.just(Val.of(jsonNode));
-        } catch (IllegalArgumentException | PolicyEvaluationException e) {
-            return Flux.just(Val.NULL);
+            val maybePatient  = patientRepo.findById(patientId.value().longValue());
+            if(maybePatient.isEmpty()) {
+                return Flux.just(Value.NULL);
+            }
+            final JsonNode jsonNode = mapper.convertValue(maybePatient.get(), JsonNode.class);
+            return Flux.just(ValueJsonMarshaller.fromJsonNode(jsonNode));
+        } catch (IllegalArgumentException  e) {
+            return Flux.just(Value.NULL);
         }
     }
 

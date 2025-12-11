@@ -34,16 +34,14 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-security</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-pdp-embedded</artifactId>
-		</dependency>
-
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-spring-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-pdp</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>

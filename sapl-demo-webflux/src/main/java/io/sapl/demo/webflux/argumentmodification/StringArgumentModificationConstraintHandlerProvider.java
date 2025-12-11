@@ -6,8 +6,9 @@ import java.util.function.Consumer;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
 
 @Service
@@ -16,19 +17,23 @@ public class StringArgumentModificationConstraintHandlerProvider implements Meth
     private static final String SUFFIX = "suffix";
 
     @Override
-    public boolean isResponsible(JsonNode constraint) {
-        return constraint.has(SUFFIX) && constraint.get(SUFFIX).isTextual();
+    public boolean isResponsible(Value constraint) {
+        if (!(constraint instanceof ObjectValue objectValue)) {
+            return false;
+        }
+        return objectValue.containsKey(SUFFIX) && objectValue.get(SUFFIX) instanceof TextValue;
     }
 
     @Override
-    public Consumer<ReflectiveMethodInvocation> getHandler(JsonNode constraint) {
+    public Consumer<ReflectiveMethodInvocation> getHandler(Value constraint) {
+        var suffix = ((TextValue) ((ObjectValue) constraint).get(SUFFIX)).value();
         return methodInvocation -> {
             Object[] originalArguments = methodInvocation.getArguments();
             Object[] newArguments      = Arrays.copyOf(originalArguments, originalArguments.length);
 
             for (int i = 0; i < newArguments.length; i++)
                 if (newArguments[i] instanceof String)
-                    newArguments[i] += constraint.get(SUFFIX).textValue();
+                    newArguments[i] = (String) newArguments[i] + suffix;
 
             methodInvocation.setArguments(newArguments);
         };

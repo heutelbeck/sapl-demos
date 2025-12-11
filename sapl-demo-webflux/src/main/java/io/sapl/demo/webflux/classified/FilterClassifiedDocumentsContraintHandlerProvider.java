@@ -4,28 +4,35 @@ import java.util.function.Predicate;
 
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.FilterPredicateConstraintHandlerProvider;
 
 @Service
 public class FilterClassifiedDocumentsContraintHandlerProvider implements FilterPredicateConstraintHandlerProvider {
 
     @Override
-    public boolean isResponsible(JsonNode constraint) {
-        return null != constraint && constraint.has("type")
-                && "filterClassifiedDocuments".equals(constraint.findValue("type").asText());
+    public boolean isResponsible(Value constraint) {
+        if (!(constraint instanceof ObjectValue objectValue)) {
+            return false;
+        }
+        var type = objectValue.get("type");
+        return type instanceof TextValue textValue && "filterClassifiedDocuments".equals(textValue.value());
     }
 
     @Override
-    public Predicate<Object> getHandler(JsonNode constraint) {
+    public Predicate<Object> getHandler(Value constraint) {
         var clearanceAux = NatoSecurityClassification.NATO_UNCLASSIFIED;
 
-        if (constraint.has("clearance")) {
-            try {
-                clearanceAux = NatoSecurityClassification.valueOf(constraint.findValue("clearance").asText());
-            } catch (IllegalArgumentException e) {
-                // NOOP
+        if (constraint instanceof ObjectValue objectValue && objectValue.containsKey("clearance")) {
+            var clearanceValue = objectValue.get("clearance");
+            if (clearanceValue instanceof TextValue textValue) {
+                try {
+                    clearanceAux = NatoSecurityClassification.valueOf(textValue.value());
+                } catch (IllegalArgumentException e) {
+                    // NOOP
+                }
             }
         }
 

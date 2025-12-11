@@ -45,11 +45,12 @@
 	</parent>
 
 	<dependencies>
-		<!-- Spring boot-->
+		<!-- SAPL -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-r2dbc</artifactId>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-security</artifactId>
 		</dependency>
+		<!-- Spring Boot -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
@@ -58,22 +59,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		<!-- Lombok-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-r2dbc</artifactId>
+		</dependency>
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		<!-- Streaming Attribute Policy Language-->
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-data-r2dbc</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-pdp</artifactId>
-		</dependency>
-
+		<!-- H2 Database -->
 		<dependency>
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-h2</artifactId>

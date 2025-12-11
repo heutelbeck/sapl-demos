@@ -45,15 +45,14 @@ specific language governing permissions and
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-security</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>io.sapl</groupId>
-			<artifactId>sapl-spring-pdp-embedded</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-spring-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-pdp</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>

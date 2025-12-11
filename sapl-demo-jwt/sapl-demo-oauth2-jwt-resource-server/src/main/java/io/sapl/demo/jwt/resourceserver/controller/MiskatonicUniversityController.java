@@ -57,7 +57,7 @@ public class MiskatonicUniversityController {
 
     public void doATimeoutDemoTest(Principal principal) {
         final var authzSub            = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
-        final var decisions           = pdp.decide(authzSub).map(AuthorizationDecision::getDecision);
+        final var decisions           = pdp.decide(authzSub).map(AuthorizationDecision::decision);
         final var ticktock            = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
         final var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
         decisionsWithTicker.subscribe();

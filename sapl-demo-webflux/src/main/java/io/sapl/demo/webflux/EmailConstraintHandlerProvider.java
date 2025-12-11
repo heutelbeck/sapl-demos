@@ -19,8 +19,9 @@ import java.util.function.Consumer;
 
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,9 +69,15 @@ public class EmailConstraintHandlerProvider implements ConsumerConstraintHandler
      * does not check for a valid email address, which should be done.
      */
     @Override
-    public boolean isResponsible(JsonNode constraint) {
-        return null != constraint && constraint.has("type") && "sendEmail".equals(constraint.findValue("type").asText())
-                && constraint.has("recipient") && constraint.has("subject") && constraint.has("message");
+    public boolean isResponsible(Value constraint) {
+        if (!(constraint instanceof ObjectValue objectValue)) {
+            return false;
+        }
+        var type = objectValue.get("type");
+        return type instanceof TextValue textValue && "sendEmail".equals(textValue.value())
+                && objectValue.containsKey("recipient")
+                && objectValue.containsKey("subject")
+                && objectValue.containsKey("message");
     }
 
     /**
@@ -78,15 +85,18 @@ public class EmailConstraintHandlerProvider implements ConsumerConstraintHandler
      * implied behavior of the application.
      */
     @Override
-    public Consumer<Object> getHandler(JsonNode constraint) {
-        return value -> sendEmail(constraint.findValue("recipient").asText(), constraint.findValue("subject").asText(),
-                constraint.findValue("message").asText());
+    public Consumer<Object> getHandler(Value constraint) {
+        var objectValue = (ObjectValue) constraint;
+        var recipient = ((TextValue) objectValue.get("recipient")).value();
+        var subject = ((TextValue) objectValue.get("subject")).value();
+        var message = ((TextValue) objectValue.get("message")).value();
+        return value -> sendEmail(recipient, subject, message);
     }
 
     /**
      * This method sends an email. For the demo purposes this is only printing a log
      * message. For a real application use a matching mail sender implementation.
-     * 
+     *
      * @param recipient the recipient email address
      * @param subject   the subject of the mail
      * @param message   the message

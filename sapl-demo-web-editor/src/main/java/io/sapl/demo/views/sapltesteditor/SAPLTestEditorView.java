@@ -13,11 +13,14 @@ import io.sapl.vaadin.*;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serial;
+
 @Slf4j
 @PageTitle("SAPL Test Editor")
 @Route(value = "sapltesteditor", layout = MainLayout.class)
 public class SAPLTestEditorView extends VerticalLayout {
 
+    @Serial
     private static final long serialVersionUID = -2637310974422530266L;
 
     private static final String DEFAULT_TEST = """

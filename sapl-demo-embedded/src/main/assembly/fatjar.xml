@@ -11,11 +11,6 @@ xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assemb
             <outputDirectory>/</outputDirectory>
             <useProjectArtifact>false</useProjectArtifact>
             <unpack>true</unpack>
-            <unpackOptions>
-                <excludes>
-                    <exclude>plugin.properties</exclude>
-                </excludes>
-            </unpackOptions>
             <scope>runtime</scope>
         </dependencySet>
     </dependencySets>

@@ -1,86 +1,108 @@
+/*
+ * Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.sapl.demo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sapl.api.interpreter.Val;
-import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
-import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
-import io.sapl.attributes.broker.impl.InMemoryAttributeRepository;
-import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
-import io.sapl.attributes.documentation.api.PolicyInformationPointDocumentationProvider;
-import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
+import io.sapl.api.attributes.AttributeBroker;
+import io.sapl.api.documentation.DocumentationBundle;
+import io.sapl.api.documentation.LibraryDocumentation;
+import io.sapl.api.functions.FunctionBroker;
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.Value;
+import io.sapl.attributes.libraries.TimePolicyInformationPoint;
+import io.sapl.documentation.LibraryDocumentationExtractor;
 import io.sapl.functions.DefaultLibraries;
-import io.sapl.interpreter.InitializationException;
-import io.sapl.interpreter.combinators.PolicyDocumentCombiningAlgorithm;
-import io.sapl.interpreter.functions.AnnotationFunctionContext;
-import io.sapl.pdp.config.PDPConfiguration;
-import io.sapl.pdp.config.PDPConfigurationProvider;
-import io.sapl.prp.Document;
-import io.sapl.prp.PolicyRetrievalPoint;
-import io.sapl.prp.PolicyRetrievalResult;
-import io.sapl.validation.ValidatorFactory;
+import io.sapl.grammar.ide.contentassist.ContentAssistConfigurationSource;
+import io.sapl.grammar.ide.contentassist.ContentAssistPDPConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import java.time.Clock;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
+import java.util.Optional;
 
 @Configuration
 public class SaplConfiguration {
 
     @Bean
-    PolicyInformationPointDocumentationProvider docsProvider() {
-        return new InMemoryPolicyInformationPointDocumentationProvider();
+    ContentAssistConfigurationSource contentAssistConfigurationSource(
+            FunctionBroker functionBroker, AttributeBroker attributeBroker) {
+
+        var functionDocs = extractFunctionLibraryDocumentation();
+        var pipDocs = extractPolicyInformationPointDocumentation();
+
+        var allDocs = new ArrayList<LibraryDocumentation>();
+        allDocs.addAll(functionDocs);
+        allDocs.addAll(pipDocs);
+
+        var documentationBundle = new DocumentationBundle(List.copyOf(allDocs));
+
+        var innerA = ObjectValue.builder()
+                .put("x", Value.of(0))
+                .put("y", Value.of(1))
+                .build();
+        var abbaValue = ObjectValue.builder()
+                .put("a", innerA)
+                .put("b", Value.of("y"))
+                .build();
+
+        Map<String, Value> variables = Map.of("abba", abbaValue);
+
+        var configuration = new ContentAssistPDPConfiguration(
+                "demoConfig",
+                "1",
+                variables,
+                documentationBundle,
+                functionBroker,
+                attributeBroker
+        );
+
+        return configId -> Optional.of(configuration);
     }
 
-    @Bean
-    PDPConfigurationProvider pdpConfiguration(PolicyInformationPointDocumentationProvider docsProvider) throws InitializationException, JsonProcessingException {
-        final var mapper                = new ObjectMapper();
-        final var validatorFactory      = new ValidatorFactory(mapper);
-        final var attributeStreamBroker = new CachingAttributeStreamBroker(new InMemoryAttributeRepository(Clock.systemUTC()));
-        final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
-                docsProvider, validatorFactory);
-        pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        pipLoader.loadStaticPolicyInformationPoint(DemoPip.class);
-        final var functionContext = new AnnotationFunctionContext();
-        functionContext.loadLibraries(()->DefaultLibraries.STATIC_LIBRARIES);
-        functionContext.loadLibrary(DemoLib.class);
-        final var dummyPrp = new PolicyRetrievalPoint() {
-
-            @Override
-            public Mono<PolicyRetrievalResult> retrievePolicies() {
-                return Mono.empty();
+    private List<LibraryDocumentation> extractFunctionLibraryDocumentation() {
+        var docs = new ArrayList<LibraryDocumentation>();
+        for (var libraryClass : DefaultLibraries.STATIC_LIBRARIES) {
+            try {
+                docs.add(LibraryDocumentationExtractor.extractFunctionLibrary(libraryClass));
+            } catch (Exception exception) {
+                // Skip libraries that fail to extract
             }
-
-            @Override
-            public Collection<Document> allDocuments() {
-                return List.of();
-            }
-
-            @Override
-            public boolean isConsistent() {
-                return true;
-            }
-
-        };
-
-        final var staticPlaygroundConfiguration = new PDPConfiguration("demoConfig", attributeStreamBroker,
-                functionContext, Map.of("abba", Val.ofJson("""
-                        {
-                            "a": {
-                                "x": 0,
-                                "y": 1
-                            },
-                            "b": "y"
-                        }
-                        """)), PolicyDocumentCombiningAlgorithm.DENY_OVERRIDES, UnaryOperator.identity(),
-                UnaryOperator.identity(), dummyPrp);
-
-        return () -> Flux.just(staticPlaygroundConfiguration);
+        }
+        try {
+            docs.add(LibraryDocumentationExtractor.extractFunctionLibrary(DemoLib.class));
+        } catch (Exception exception) {
+            // Skip if extraction fails
+        }
+        return docs;
     }
+
+    private List<LibraryDocumentation> extractPolicyInformationPointDocumentation() {
+        var docs = new ArrayList<LibraryDocumentation>();
+        try {
+            docs.add(LibraryDocumentationExtractor.extractPolicyInformationPoint(TimePolicyInformationPoint.class));
+        } catch (Exception exception) {
+            // Skip if extraction fails
+        }
+        try {
+            docs.add(LibraryDocumentationExtractor.extractPolicyInformationPoint(DemoPip.class));
+        } catch (Exception exception) {
+            // Skip if extraction fails
+        }
+        return docs;
+    }
+
 }

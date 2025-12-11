@@ -15,20 +15,15 @@
  */
 package io.sapl.demo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.sapl.attributes.broker.api.AttributeStreamBroker;
-import io.sapl.attributes.broker.impl.AnnotationPolicyInformationPointLoader;
-import io.sapl.attributes.broker.impl.CachingAttributeStreamBroker;
-import io.sapl.attributes.broker.impl.InMemoryAttributeRepository;
-import io.sapl.attributes.broker.impl.InMemoryPolicyInformationPointDocumentationProvider;
-import io.sapl.attributes.pips.time.TimePolicyInformationPoint;
+import io.sapl.api.attributes.AttributeBroker;
+import io.sapl.api.functions.FunctionBroker;
+import io.sapl.attributes.CachingAttributeBroker;
+import io.sapl.attributes.InMemoryAttributeRepository;
+import io.sapl.attributes.libraries.TimePolicyInformationPoint;
+import io.sapl.functions.DefaultFunctionBroker;
 import io.sapl.functions.DefaultLibraries;
 import io.sapl.grammar.web.SAPLServlet;
-import io.sapl.interpreter.InitializationException;
-import io.sapl.interpreter.functions.AnnotationFunctionContext;
-import io.sapl.interpreter.functions.FunctionContext;
 import io.sapl.test.grammar.web.SAPLTestServlet;
-import io.sapl.validation.ValidatorFactory;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedFormContentFilter;
@@ -37,7 +32,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
-import java.util.List;
 
 @Configuration
 @ComponentScan("io.sapl.grammar.ide.contentassist")
@@ -45,8 +39,7 @@ public class XtextServletConfiguration {
 
     @Bean
     ServletRegistrationBean<SAPLServlet> xTextRegistrationBean() {
-        ServletRegistrationBean<SAPLServlet> registration = new ServletRegistrationBean<>(new SAPLServlet(),
-                "/xtext-service/*");
+        var registration = new ServletRegistrationBean<>(new SAPLServlet(), "/xtext-service/*");
         registration.setName("XtextServices");
         registration.setAsyncSupported(true);
         return registration;
@@ -54,8 +47,7 @@ public class XtextServletConfiguration {
 
     @Bean
     ServletRegistrationBean<SAPLTestServlet> xTextTestRegistrationBean() {
-        ServletRegistrationBean<SAPLTestServlet> registration = new ServletRegistrationBean<>(new SAPLTestServlet(),
-                "/sapl-test/xtext-service/*");
+        var registration = new ServletRegistrationBean<>(new SAPLTestServlet(), "/sapl-test/xtext-service/*");
         registration.setName("SaplTestXtextServices");
         registration.setAsyncSupported(true);
         return registration;
@@ -63,27 +55,28 @@ public class XtextServletConfiguration {
 
     @Bean
     FilterRegistrationBean<OrderedFormContentFilter> registration1(OrderedFormContentFilter filter) {
-        FilterRegistrationBean<OrderedFormContentFilter> registration = new FilterRegistrationBean<>(filter);
+        var registration = new FilterRegistrationBean<>(filter);
         registration.setEnabled(false);
         return registration;
     }
 
     @Bean
-    FunctionContext functionContext() throws InitializationException {
-        return new AnnotationFunctionContext(List::of, () -> DefaultLibraries.STATIC_LIBRARIES);
+    FunctionBroker functionBroker() {
+        var broker = new DefaultFunctionBroker();
+        for (var libraryClass : DefaultLibraries.STATIC_LIBRARIES) {
+            broker.loadStaticFunctionLibrary(libraryClass);
+        }
+        broker.loadStaticFunctionLibrary(DemoLib.class);
+        return broker;
     }
 
     @Bean
-    AttributeStreamBroker attributeStreamBroker() {
-        final var mapper                = new ObjectMapper();
-        final var validatorFactory      = new ValidatorFactory(mapper);
-        final var attributeRepository   = new InMemoryAttributeRepository(Clock.systemUTC());
-        final var attributeStreamBroker = new CachingAttributeStreamBroker(attributeRepository);
-        final var docsProvider          = new InMemoryPolicyInformationPointDocumentationProvider();
-        final var pipLoader             = new AnnotationPolicyInformationPointLoader(attributeStreamBroker,
-                docsProvider, validatorFactory);
-        pipLoader.loadPolicyInformationPoint(new TimePolicyInformationPoint(Clock.systemUTC()));
-        return attributeStreamBroker;
+    AttributeBroker attributeBroker() {
+        var repository = new InMemoryAttributeRepository(Clock.systemUTC());
+        var broker = new CachingAttributeBroker(repository);
+        broker.loadPolicyInformationPointLibrary(new TimePolicyInformationPoint(Clock.systemUTC()));
+        broker.loadPolicyInformationPointLibrary(new DemoPip());
+        return broker;
     }
-    
+
 }

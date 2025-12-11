@@ -2,7 +2,7 @@ package io.sapl.demo;
 
 import io.sapl.api.functions.Function;
 import io.sapl.api.functions.FunctionLibrary;
-import io.sapl.api.interpreter.Val;
+import io.sapl.api.model.Value;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ public class DemoLib {
                 }
             }
             """)
-    public static Val prod(Val source) {
+    public static Value prod(Value source) {
         return source;
     }
 }

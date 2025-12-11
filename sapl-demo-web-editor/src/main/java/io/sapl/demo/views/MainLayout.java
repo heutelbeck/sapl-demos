@@ -1,5 +1,6 @@
 package io.sapl.demo.views;
 
+import io.sapl.api.SaplVersion;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.vaadin.flow.component.Component;
@@ -32,19 +33,23 @@ import io.sapl.demo.views.jsoneditor.JSONEditorView;
 import io.sapl.demo.views.sapleditor.SAPLEditorView;
 import io.sapl.demo.views.sapltesteditor.SAPLTestEditorView;
 
+import java.io.Serial;
+
 /**
  * The main view is a top-level placeholder for other views.
  */
 public class MainLayout extends AppLayout {
 
-    private static final long serialVersionUID = -6536520143745082768L;
+    @Serial
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     /**
      * A simple navigation item component, based on ListItem element.
      */
     public static class MenuItemInfo extends ListItem {
 
-        private static final long serialVersionUID = -902293824094793592L;
+        @Serial
+        private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
         private final Class<? extends Component> view;
 
