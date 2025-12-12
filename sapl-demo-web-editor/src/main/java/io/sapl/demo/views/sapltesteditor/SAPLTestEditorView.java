@@ -9,7 +9,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.demo.views.MainLayout;
-import io.sapl.vaadin.*;
+import io.sapl.vaadin.DocumentChangedEvent;
+import io.sapl.vaadin.Issue;
+import io.sapl.vaadin.SaplTestEditor;
+import io.sapl.vaadin.SaplTestEditorConfiguration;
+import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.ValidationStatusDisplay;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,9 +58,12 @@ public class SAPLTestEditorView extends VerticalLayout {
                 expect deny;
             }""";
 
-    private final SaplTestEditor editor;
-    private Button toggleMergeBtn;
-    private boolean mergeEnabled = false;
+    private final SaplTestEditor         editor;
+    private final ValidationStatusDisplay validationStatusDisplay;
+    private Button                         toggleMergeBtn;
+    private Button                         toggleValidationDisplay;
+    private boolean                        mergeEnabled             = false;
+    private boolean                        validationDisplayVisible = true;
 
     public SAPLTestEditorView() {
         setSizeFull();
@@ -74,7 +82,10 @@ public class SAPLTestEditorView extends VerticalLayout {
         editor.addDocumentChangedListener(this::onDocumentChanged);
         editor.addValidationFinishedListener(this::onValidationFinished);
 
-        add(editor, buildControls());
+        validationStatusDisplay = new ValidationStatusDisplay();
+        validationStatusDisplay.setWidthFull();
+
+        add(editor, validationStatusDisplay, buildControls());
 
         // initial content + merge setup
         editor.setDocument(DEFAULT_TEST);
@@ -95,6 +106,7 @@ public class SAPLTestEditorView extends VerticalLayout {
         bar.setSpacing(true);
 
         toggleMergeBtn = new Button(mergeEnabled ? "Disable Merge" : "Enable Merge", e -> toggleMerge());
+        toggleValidationDisplay = new Button("Hide Errors", e -> toggleValidationDisplay());
 
         var setRight = new Button("Set Right Sample", e -> editor.setMergeRightContent(DEFAULT_RIGHT));
         var clearRight = new Button("Clear Right", e -> editor.setMergeRightContent(""));
@@ -135,7 +147,7 @@ public class SAPLTestEditorView extends VerticalLayout {
         filler.setFlexGrow(1, filler);
 
         bar.add(
-                toggleMergeBtn, setRight, clearRight,
+                toggleMergeBtn, toggleValidationDisplay, setRight, clearRight,
                 prev, next,
                 showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
                 readOnly, dark, setDefault, showDoc,
@@ -150,15 +162,22 @@ public class SAPLTestEditorView extends VerticalLayout {
         toggleMergeBtn.setText(mergeEnabled ? "Disable Merge" : "Enable Merge");
     }
 
+    private void toggleValidationDisplay() {
+        validationDisplayVisible = !validationDisplayVisible;
+        validationStatusDisplay.setVisible(validationDisplayVisible);
+        toggleValidationDisplay.setText(validationDisplayVisible ? "Hide Errors" : "Show Errors");
+    }
+
     private void onDocumentChanged(DocumentChangedEvent event) {
         log.info("SAPL-TEST value changed: {}", event.getNewValue());
     }
 
     private void onValidationFinished(ValidationFinishedEvent event) {
-        Issue[] issues = event.getIssues();
+        var issues = event.getIssues();
         log.info("validation finished, number of issues: {}", issues.length);
-        for (Issue issue : issues) {
+        for (var issue : issues) {
             log.info(" - {}", issue.getDescription());
         }
+        validationStatusDisplay.setIssues(issues);
     }
 }

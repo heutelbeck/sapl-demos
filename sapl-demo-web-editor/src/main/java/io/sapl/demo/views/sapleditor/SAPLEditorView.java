@@ -10,6 +10,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.spring.annotation.SpringComponent;
+import com.vaadin.flow.spring.annotation.UIScope;
 import elemental.json.Json;
 import elemental.json.JsonArray;
 import elemental.json.JsonObject;
@@ -19,11 +21,16 @@ import io.sapl.vaadin.Issue;
 import io.sapl.vaadin.SaplEditor;
 import io.sapl.vaadin.SaplEditorConfiguration;
 import io.sapl.vaadin.ValidationFinishedEvent;
+import io.sapl.vaadin.ValidationStatusDisplay;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serial;
+import java.util.List;
+import java.util.function.BiFunction;
 
 @Slf4j
+@UIScope
+@SpringComponent
 @PageTitle("SAPL Editor")
 @Route(value = "", layout = MainLayout.class)
 public class SAPLEditorView extends VerticalLayout {
@@ -57,13 +64,16 @@ public class SAPLEditorView extends VerticalLayout {
               }
             """;
 
-    private final SaplEditor saplEditor;
-    private Button toggleMerge;
+    private final SaplEditor              saplEditor;
+    private final ValidationStatusDisplay validationStatusDisplay;
+    private Button                         toggleMerge;
+    private Button                         toggleValidationDisplay;
 
     // track toggle state
-    private boolean mergeEnabled = true;
+    private boolean mergeEnabled             = true;
+    private boolean validationDisplayVisible = true;
 
-    public SAPLEditorView() {
+    public SAPLEditorView(BiFunction<String, String, List<Issue>> saplCompileValidator) {
         setSizeFull();
         setPadding(false);
         setSpacing(false);
@@ -79,11 +89,15 @@ public class SAPLEditorView extends VerticalLayout {
 
         saplEditor.addDocumentChangedListener(this::onDocumentChanged);
         saplEditor.addValidationFinishedListener(this::onValidationFinished);
+        saplEditor.setCompileValidator(saplCompileValidator);
+
+        validationStatusDisplay = new ValidationStatusDisplay();
+        validationStatusDisplay.setWidthFull();
 
         final var mergeControls = buildMergeControls();
         final var coverageControls = buildCoverageControls();
 
-        add(saplEditor, mergeControls, coverageControls);
+        add(saplEditor, validationStatusDisplay, mergeControls, coverageControls);
 
         // Editor initialization
         saplEditor.setDocument(DEFAULT_LEFT);
@@ -110,6 +124,7 @@ public class SAPLEditorView extends VerticalLayout {
         bar.getStyle().set("padding", "0.5rem 1rem");
 
         this.toggleMerge = new Button(mergeEnabled ? "Disable Merge" : "Enable Merge", this::toggleMerge);
+        this.toggleValidationDisplay = new Button("Hide Errors", e -> toggleValidationDisplay());
 
         final var setRight = new Button("Set Right Sample", e -> saplEditor.setMergeRightContent(DEFAULT_RIGHT));
         final var clearRight = new Button("Clear Right", e -> saplEditor.setMergeRightContent(""));
@@ -158,7 +173,7 @@ public class SAPLEditorView extends VerticalLayout {
         final var filler = new FlexLayout();
         filler.setFlexGrow(1, filler);
 
-        bar.add(toggleMerge, setRight, clearRight, prev, next,
+        bar.add(toggleMerge, toggleValidationDisplay, setRight, clearRight, prev, next,
                 showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs,
                 readOnly, dark, configId, setDefault, showDoc, filler);
         return bar;
@@ -168,6 +183,12 @@ public class SAPLEditorView extends VerticalLayout {
         mergeEnabled = !mergeEnabled;
         saplEditor.setMergeModeEnabled(mergeEnabled);
         toggleMerge.setText(mergeEnabled ? "Disable Merge" : "Enable Merge");
+    }
+
+    private void toggleValidationDisplay() {
+        validationDisplayVisible = !validationDisplayVisible;
+        validationStatusDisplay.setVisible(validationDisplayVisible);
+        toggleValidationDisplay.setText(validationDisplayVisible ? "Hide Errors" : "Show Errors");
     }
 
     // -------------------- COVERAGE CONTROLS --------------------
@@ -272,10 +293,11 @@ public class SAPLEditorView extends VerticalLayout {
     }
 
     private void onValidationFinished(ValidationFinishedEvent event) {
-        final Issue[] issues = event.getIssues();
+        final var issues = event.getIssues();
         log.info("validation finished, number of issues: {}", issues.length);
-        for (Issue issue : issues) {
+        for (var issue : issues) {
             log.info(" - {}", issue.getDescription());
         }
+        validationStatusDisplay.setIssues(issues);
     }
 }

@@ -20,12 +20,18 @@ import io.sapl.api.documentation.DocumentationBundle;
 import io.sapl.api.documentation.LibraryDocumentation;
 import io.sapl.api.functions.FunctionBroker;
 import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.SourceLocation;
 import io.sapl.api.model.Value;
 import io.sapl.attributes.libraries.TimePolicyInformationPoint;
+import io.sapl.compiler.CompilationContext;
+import io.sapl.compiler.SaplCompiler;
+import io.sapl.compiler.SaplCompilerException;
 import io.sapl.documentation.LibraryDocumentationExtractor;
 import io.sapl.functions.DefaultLibraries;
 import io.sapl.grammar.ide.contentassist.ContentAssistConfigurationSource;
 import io.sapl.grammar.ide.contentassist.ContentAssistPDPConfiguration;
+import io.sapl.vaadin.Issue;
+import org.eclipse.xtext.diagnostics.Severity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiFunction;
 
 @Configuration
 public class SaplConfiguration {
@@ -103,6 +110,37 @@ public class SaplConfiguration {
             // Skip if extraction fails
         }
         return docs;
+    }
+
+    /**
+     * Provides a compile validator for the SAPL editor that detects semantic errors
+     * beyond what Xtext parsing catches (e.g., division by zero in constant expressions).
+     *
+     * @param functionBroker  broker for resolving functions during compilation
+     * @param attributeBroker broker for resolving attributes during compilation
+     * @return a function that validates SAPL source and returns any compile errors as Issues
+     */
+    @Bean
+    BiFunction<String, String, List<Issue>> saplCompileValidator(
+            FunctionBroker functionBroker, AttributeBroker attributeBroker) {
+        return (configId, source) -> {
+            var compilationContext = new CompilationContext(functionBroker, attributeBroker);
+            try {
+                compilationContext.resetForNextDocument();
+                SaplCompiler.compile(source, compilationContext);
+                return List.of();
+            } catch (SaplCompilerException exception) {
+                return List.of(convertExceptionToIssue(exception));
+            }
+        };
+    }
+
+    private static Issue convertExceptionToIssue(SaplCompilerException exception) {
+        SourceLocation location = exception.getLocation();
+        Integer line = location != null ? location.line() : null;
+        Integer offset = location != null ? location.start() : null;
+        Integer length = location != null ? location.end() - location.start() : null;
+        return new Issue(exception.getMessage(), Severity.ERROR, line, null, offset, length);
     }
 
 }

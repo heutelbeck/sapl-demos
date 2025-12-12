@@ -14,6 +14,7 @@ import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.JsonEditor;
 import io.sapl.vaadin.JsonEditorConfiguration;
+import io.sapl.vaadin.ValidationStatusDisplay;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.Serial;
@@ -400,7 +401,10 @@ public class JSONEditorView extends VerticalLayout {
 }
 """;
 
-    private final JsonEditor jsonEditor;
+    private final JsonEditor              jsonEditor;
+    private final ValidationStatusDisplay validationStatusDisplay;
+    private Button                         toggleValidationDisplay;
+    private boolean                        validationDisplayVisible = true;
 
     public JSONEditorView() {
         setSizeFull();
@@ -416,9 +420,12 @@ public class JSONEditorView extends VerticalLayout {
         jsonEditor.setWidthFull();
         jsonEditor.setHeight("70vh");
 
+        validationStatusDisplay = new ValidationStatusDisplay();
+        validationStatusDisplay.setWidthFull();
+
         final var controls = buildControls();
 
-        add(jsonEditor, controls);
+        add(jsonEditor, validationStatusDisplay, controls);
 
         jsonEditor.setDocument(LEFT_JSON_DEMO);
         jsonEditor.setMergeRightContent(RIGHT_JSON_DEMO);
@@ -443,6 +450,7 @@ public class JSONEditorView extends VerticalLayout {
         bar.getStyle().set("padding", "0.5rem 1rem");
 
         final var toggleMerge = new Button("Toggle Merge", e -> jsonEditor.setMergeModeEnabled(!jsonEditor.isMergeModeEnabled()));
+        toggleValidationDisplay = new Button("Hide Errors", e -> toggleValidationDisplay());
 
         final var setRight = new Button("Set Right to Sample", e -> jsonEditor.setMergeRightContent(RIGHT_JSON_DEMO));
         final var clearRight = new Button("Clear Right", e -> jsonEditor.setMergeRightContent("{}"));
@@ -482,11 +490,17 @@ public class JSONEditorView extends VerticalLayout {
         final var filler = new FlexLayout();
         filler.setFlexGrow(1, filler);
 
-        bar.add(toggleMerge, setRight, clearRight, prev, next, markers, showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs, readOnly, dark, filler);
+        bar.add(toggleMerge, toggleValidationDisplay, setRight, clearRight, prev, next, markers, showDiff, revertBtns, connect, collapse, allowEditOrig, ignoreWs, readOnly, dark, filler);
         return bar;
     }
 
     private void onDocumentChanged(DocumentChangedEvent event) {
         log.info("JSON value changed: {}", event.getNewValue());
+    }
+
+    private void toggleValidationDisplay() {
+        validationDisplayVisible = !validationDisplayVisible;
+        validationStatusDisplay.setVisible(validationDisplayVisible);
+        toggleValidationDisplay.setText(validationDisplayVisible ? "Hide Errors" : "Show Errors");
     }
 }

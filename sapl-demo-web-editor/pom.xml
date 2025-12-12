@@ -30,6 +30,11 @@
 			<artifactId>sapl-vaadin-editor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sapl-pdp</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
