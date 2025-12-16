@@ -75,15 +75,16 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!--<plugin>
+			<plugin>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${project.version}</version>
 				<configuration>
 					<policyHitRatio>100</policyHitRatio>
-					<policyConditionHitRatio>50</policyConditionHitRatio>
+					<policyConditionHitRatio>25</policyConditionHitRatio>
 					<failOnDisabledTests>false</failOnDisabledTests>
 					<enableSonarReport>true</enableSonarReport>
+					<enableHtmlReport>true</enableHtmlReport>
 				</configuration>
 				<executions>
 					<execution>
@@ -94,7 +95,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>-->
+			</plugin>
 		</plugins>
 	</build>
 </project>

@@ -25,7 +25,7 @@ import io.sapl.test.SaplTestFixture;
  * behavior. Demonstrates using both integration and single test modes with the
  * new fixture.
  */
-class A_SimplePDPTest {
+class ASimplePDPTest {
 
     /**
      * Tests the combined decision from all policies in the policiesIT directory.

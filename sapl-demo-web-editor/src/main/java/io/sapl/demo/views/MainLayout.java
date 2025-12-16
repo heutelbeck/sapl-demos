@@ -1,9 +1,9 @@
 package io.sapl.demo.views;
 
 import io.sapl.api.SaplVersion;
-import org.vaadin.lineawesome.LineAwesomeIcon;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
@@ -29,9 +29,10 @@ import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
 import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
 import com.vaadin.flow.theme.lumo.LumoUtility.Width;
 
-import io.sapl.demo.views.jsoneditor.JSONEditorView;
-import io.sapl.demo.views.sapleditor.SAPLEditorView;
-import io.sapl.demo.views.sapltesteditor.SAPLTestEditorView;
+import io.sapl.demo.views.graph.GraphVisualizationView;
+import io.sapl.demo.views.jsoneditor.JsonEditorView;
+import io.sapl.demo.views.lsp.SaplLspEditorView;
+import io.sapl.demo.views.sapltesteditor.SaplTestLspEditorView;
 
 import java.io.Serial;
 
@@ -111,10 +112,12 @@ public class MainLayout extends AppLayout {
     }
 
     private MenuItemInfo[] createMenuItems() {
-        return new MenuItemInfo[] { //
-                new MenuItemInfo("SAPL Editor", LineAwesomeIcon.EDIT.create(), SAPLEditorView.class),
-                new MenuItemInfo("SAPL Test Editor", LineAwesomeIcon.EDIT.create(), SAPLTestEditorView.class),
-                new MenuItemInfo("JSON Editor", LineAwesomeIcon.EDIT.create(), JSONEditorView.class), };
+        return new MenuItemInfo[] {
+                new MenuItemInfo("SAPL Editor", VaadinIcon.EDIT.create(), SaplLspEditorView.class),
+                new MenuItemInfo("SAPL Test Editor", VaadinIcon.FILE_CODE.create(), SaplTestLspEditorView.class),
+                new MenuItemInfo("JSON Editor", VaadinIcon.CURLY_BRACKETS.create(), JsonEditorView.class),
+                new MenuItemInfo("Graph Visualization", VaadinIcon.CLUSTER.create(), GraphVisualizationView.class),
+        };
     }
 
 }

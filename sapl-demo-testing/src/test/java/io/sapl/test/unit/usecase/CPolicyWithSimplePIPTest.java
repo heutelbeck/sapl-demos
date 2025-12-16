@@ -15,37 +15,48 @@
  */
 package io.sapl.test.unit.usecase;
 
+import static io.sapl.test.Matchers.any;
+import static io.sapl.test.Matchers.args;
+import static io.sapl.test.Matchers.eq;
+
 import org.junit.jupiter.api.Test;
 
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
+import io.sapl.test.unit.TestPIP;
 
-class A_PolicySimpleTest {
+class CPolicyWithSimplePIPTest {
+
+    private static final String POLICY = "/policies/policyWithSimplePIP.sapl";
 
     @Test
-    void whenSubjectIsWilliAndActionIsRead_thenPermit() {
+    void whenMockingAttributeWithAnyEntity_thenPermit() {
         SaplTestFixture.createSingleTest()
-                .withPolicyFromResource("/policies/policySimple.sapl")
+                .withPolicyFromResource(POLICY)
+                .givenAttribute("upperMock", "test.upper", any(), args(), Value.of("WILLI"))
                 .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
                 .expectPermit()
                 .verify();
     }
 
     @Test
-    void whenSubjectIsNotWilli_thenDeny() {
+    void whenUsingRealPIP_thenPermit() {
         SaplTestFixture.createSingleTest()
-                .withPolicyFromResource("/policies/policySimple.sapl")
-                .whenDecide(AuthorizationSubscription.of("notWilli", "read", "something"))
-                .expectDeny()
+                .withPolicyInformationPoint(new TestPIP())
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
                 .verify();
     }
 
     @Test
-    void whenActionIsNotRead_thenDeny() {
+    void whenMockingAttributeWithSpecificEntity_thenPermit() {
         SaplTestFixture.createSingleTest()
-                .withPolicyFromResource("/policies/policySimple.sapl")
-                .whenDecide(AuthorizationSubscription.of("willi", "write", "something"))
-                .expectDeny()
+                .withPolicyFromResource(POLICY)
+                .givenAttribute("upperMock", "test.upper", eq(Value.of("willi")), args(), Value.of("WILLI"))
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .expectPermit()
                 .verify();
     }
 

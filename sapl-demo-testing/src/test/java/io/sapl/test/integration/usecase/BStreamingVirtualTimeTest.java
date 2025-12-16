@@ -30,7 +30,7 @@ import io.sapl.test.SaplTestFixture;
  * The new fixture provides fine-grained control over attribute emissions,
  * eliminating the need for virtual time and duration-based mocking.
  */
-class B_StreamingVirtualTimeTest {
+class BStreamingVirtualTimeTest {
 
     /**
      * Tests streaming with explicit attribute emissions using thenEmit.

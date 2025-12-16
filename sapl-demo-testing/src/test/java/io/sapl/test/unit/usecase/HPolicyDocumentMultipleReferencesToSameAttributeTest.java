@@ -30,7 +30,7 @@ import io.sapl.test.SaplTestFixture;
  * Uses the thenEmit pattern to control attribute emissions and function
  * mocking to control secondOf results.
  */
-class H_PolicyDocumentMultipleReferencesToSameAttributeTest {
+class HPolicyDocumentMultipleReferencesToSameAttributeTest {
 
     private static final String POLICY = "/policies/policyDocumentWithMultipleCallsToSameAttribute.sapl";
 

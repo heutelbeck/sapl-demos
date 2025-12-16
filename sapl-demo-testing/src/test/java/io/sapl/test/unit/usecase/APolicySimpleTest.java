@@ -15,46 +15,47 @@
  */
 package io.sapl.test.unit.usecase;
 
-import static io.sapl.test.Matchers.any;
-import static io.sapl.test.Matchers.args;
-
 import org.junit.jupiter.api.Test;
 
-import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.SaplTestFixture;
 
-class B_PolicyWithSimpleFunctionTest {
+class APolicySimpleTest {
 
-    private static final String POLICY = "/policies/policyWithSimpleFunction.sapl";
+    private static final String POLICY = "/policies/policySimple.sapl";
 
     @Test
-    void whenUsingRealFunctionLibrary_thenPermit() {
+    void whenForClauseMatchesAndSubjectIsWilliAndActionIsRead_thenPermit() {
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(TemporalFunctionLibrary.class)
                 .withPolicyFromResource(POLICY)
-                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "document"))
                 .expectPermit()
                 .verify();
     }
 
     @Test
-    void whenMockingDayOfWeekFunction_thenPermit() {
+    void whenForClauseMatchesButSubjectIsNotWilli_thenDeny() {
         SaplTestFixture.createSingleTest()
                 .withPolicyFromResource(POLICY)
-                .givenFunction("time.dayOfWeek", args(any()), Value.of("SATURDAY"))
-                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
-                .expectPermit()
+                .whenDecide(AuthorizationSubscription.of("notWilli", "read", "document"))
+                .expectDeny()
                 .verify();
     }
 
     @Test
-    void whenMockingDayOfWeekFunctionReturnsInvalidDay_thenNotApplicable() {
+    void whenForClauseMatchesButActionIsNotRead_thenDeny() {
         SaplTestFixture.createSingleTest()
                 .withPolicyFromResource(POLICY)
-                .givenFunction("time.dayOfWeek", args(any()), Value.of("INVALID_DAY"))
-                .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
+                .whenDecide(AuthorizationSubscription.of("willi", "write", "document"))
+                .expectDeny()
+                .verify();
+    }
+
+    @Test
+    void whenForClauseDoesNotMatch_thenNotApplicable() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .whenDecide(AuthorizationSubscription.of("willi", "read", "other-resource"))
                 .expectNotApplicable()
                 .verify();
     }

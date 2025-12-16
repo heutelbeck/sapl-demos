@@ -30,7 +30,7 @@ import io.sapl.test.SaplTestFixture;
  * The new fixture gives fine-grained control over attribute emissions,
  * eliminating the need for virtual time and duration-based mocking.
  */
-class E_PolicyStreamingTest {
+class EPolicyStreamingTest {
 
     private static final String POLICY = "/policies/policyStreaming.sapl";
 
@@ -99,5 +99,14 @@ class E_PolicyStreamingTest {
                 .expectPermit() // 5 > 4
                 .verify();
     }
-
+    @Test
+    void whenTargetDoesNotMatch_thenNotApplicable() {
+        SaplTestFixture.createSingleTest()
+                .withPolicyFromResource(POLICY)
+                .givenEnvironmentAttribute("timeMock", "time.now", args(), Value.of("t1"))
+                .givenFunction("time.secondOf", args(any()), Value.of(5))
+                .whenDecide(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "XXXX"))
+                .expectNotApplicable()
+                .verify();
+    }
 }

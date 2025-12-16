@@ -29,7 +29,7 @@ import io.sapl.test.SaplTestFixture;
  * Tests for complex function mocking with parameter-specific return values
  * and dynamic attribute emissions.
  */
-class F_PolicyWithComplexFunctionTest {
+class FPolicyWithComplexFunctionTest {
 
     private static final String POLICY = "/policies/policyWithComplexFunction.sapl";
 

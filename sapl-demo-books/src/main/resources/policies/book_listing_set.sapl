@@ -6,11 +6,11 @@ for action.java.name == "findAll"
 
 policy "deny if scope null"
 deny
-where 
+where
   subject.principal.dataScope in [null, undefined];
 
 policy "empty scope means no limit"
-permit
+permit 
 where
   subject.principal.dataScope == [];
 

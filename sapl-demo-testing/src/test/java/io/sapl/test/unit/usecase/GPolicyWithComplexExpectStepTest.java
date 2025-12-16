@@ -33,7 +33,7 @@ import io.sapl.test.SaplTestFixture;
  * transformed resources. Demonstrates the new fixture's fluent API for decision
  * matching.
  */
-class G_PolicyWithComplexExpectStepTest {
+class GPolicyWithComplexExpectStepTest {
 
     private static final String POLICY = "/policies/policyWithObligationAndResource.sapl";
 

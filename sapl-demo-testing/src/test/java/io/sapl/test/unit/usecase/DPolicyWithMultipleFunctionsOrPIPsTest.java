@@ -24,7 +24,7 @@ import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.test.SaplTestFixture;
 
-class D_PolicyWithMultipleFunctionsOrPIPsTest {
+class DPolicyWithMultipleFunctionsOrPIPsTest {
 
     private static final String POLICY = "/policies/policyWithMultipleFunctionsOrPIPs.sapl";
 

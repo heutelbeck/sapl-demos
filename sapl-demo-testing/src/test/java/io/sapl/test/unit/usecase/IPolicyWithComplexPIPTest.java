@@ -31,7 +31,7 @@ import io.sapl.test.SaplTestFixture;
  * pip.attribute1 and pip.attribute2 as arguments, and uses parentValue (true)
  * as the entity.
  */
-class I_PolicyWithComplexPIPTest {
+class IPolicyWithComplexPIPTest {
 
     private static final String POLICY = "/policies/policyWithComplexPIP.sapl";
 
