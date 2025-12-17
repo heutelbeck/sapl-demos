@@ -27,7 +27,7 @@
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>sapl-vaadin-editor-lsp</artifactId>
+			<artifactId>sapl-vaadin-editor</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
