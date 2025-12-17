@@ -4,7 +4,7 @@ import java.util.Map;
 
 import io.sapl.functions.libraries.FilterFunctionLibrary;
 import io.sapl.functions.libraries.TemporalFunctionLibrary;
-import io.sapl.test.grammar.sapltest.ImportType;
+import io.sapl.test.junit.ImportType;
 import io.sapl.test.junit.JUnitTestAdapter;
 
 /**

@@ -38,7 +38,7 @@ public class TestStorage {
                 when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
                 // expect block is a list of expected AuthorizationDecision in order
                 expect
-                - notApplicable 4 times
+                - not-applicable 4 times
                 - permit 2 times;
 
                 scenario "subject ROLE_DOCTOR can access 2 times with attribute timing"
@@ -52,19 +52,19 @@ public class TestStorage {
                 then
                     - wait "PT1S"
                 expect
-                    - notApplicable once
+                    - not-applicable once
                 then
                     - wait "PT1S"
                 expect
-                    - notApplicable once
+                    - not-applicable once
                 then
                     - wait "PT1S"
                 expect
-                    - notApplicable once
+                    - not-applicable once
                 then
                     - wait "PT1S"
                 expect
-                    - notApplicable once
+                    - not-applicable once
                 then
                     - wait "PT1S"
                 expect
@@ -82,7 +82,7 @@ public class TestStorage {
                     - function "time.secondOf" maps to stream 5
                 when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
                 expect
-                    - notApplicable once
+                    - not-applicable once
                     - permit once;
 
                 scenario "subject ROLE_DOCTOR can access once without attribute timing and with time.secondOf mocking with multiple values"
@@ -92,8 +92,8 @@ public class TestStorage {
                     - function "time.secondOf" maps to stream 3, 4, 5
                 when subject "ROLE_DOCTOR" attempts action "read" on resource "heartBeatData"
                 expect
-                    - notApplicable once
-                    - notApplicable once
+                    - not-applicable once
+                    - not-applicable once
                     - permit once;
 
                 scenario "subject ROLE_DOCTOR can access 3 times without attribute timing and with time.secondOf mocking mocking with times called verification"

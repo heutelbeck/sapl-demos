@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.sapl.api.model.jackson.SaplJacksonModule;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,6 +52,10 @@ public class BenchmarkConfiguration {
     private static final String DOCKER          = "docker";
     private static final String REMOTE          = "remote";
     private String              benchmarkTarget = DOCKER;
+
+    public BenchmarkConfiguration() {
+        mapper.registerModule(new SaplJacksonModule());
+    }
 
     private static void failOnFurtherMapEntries(Set<String> keySet, String parentEntryPath) {
         for (var key : keySet) {

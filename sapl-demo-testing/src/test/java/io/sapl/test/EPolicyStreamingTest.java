@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.test.unit.usecase;
+package io.sapl.test;
 
 import static io.sapl.test.Matchers.any;
 import static io.sapl.test.Matchers.args;
@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Test;
 import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.libraries.TemporalFunctionLibrary;
-import io.sapl.test.SaplTestFixture;
 
 /**
  * Tests for streaming policy evaluation using the thenEmit pattern.

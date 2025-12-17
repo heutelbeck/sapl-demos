@@ -20,20 +20,17 @@ package io.sapl.benchmark.jmh;
 import static io.sapl.benchmark.jmh.Helper.decide;
 import static io.sapl.benchmark.jmh.Helper.decideOnce;
 
-import java.util.List;
-
+import io.sapl.benchmark.util.EchoPIP;
+import io.sapl.pdp.PolicyDecisionPointBuilder;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.annotations.State;
 
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.benchmark.BenchmarkExecutionContext;
-import io.sapl.benchmark.util.EchoPIP;
-import io.sapl.interpreter.InitializationException;
-import io.sapl.pdp.PolicyDecisionPointFactory;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,13 +41,21 @@ public class EmbeddedBenchmark {
     String                            contextJsonString;
     private PolicyDecisionPoint       pdp;
     private BenchmarkExecutionContext context;
+    private PolicyDecisionPointBuilder.PDPComponents components;
 
     @Setup(Level.Trial)
-    public void setup() throws InitializationException {
+    public void setup() {
         context = BenchmarkExecutionContext.fromString(contextJsonString);
-        log.info("initializing PDP and starting Benchmark ...");
-        pdp = PolicyDecisionPointFactory.resourcesPolicyDecisionPoint(List::of, () -> List.of(EchoPIP.class), List::of,
-                List::of);
+        log.info("Initializing PDP and starting benchmark ...");
+        components = PolicyDecisionPointBuilder.withDefaults().withResourcesSource().withPolicyInformationPoint(new EchoPIP()).build();
+        pdp = components.pdp();
+    }
+
+
+    @TearDown(Level.Trial)
+    public void tearDown() {
+        log.info("Shutdown benchmark ...");
+        components.dispose();
     }
 
     @Benchmark

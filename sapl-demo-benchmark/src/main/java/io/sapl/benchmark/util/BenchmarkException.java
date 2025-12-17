@@ -1,8 +1,12 @@
 package io.sapl.benchmark.util;
 
+import io.sapl.api.SaplVersion;
 import lombok.experimental.StandardException;
+
+import java.io.Serial;
 
 @StandardException
 public class BenchmarkException extends RuntimeException {
-    private static final long serialVersionUID = 7051097065234409104L;
+    @Serial
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 }

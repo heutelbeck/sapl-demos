@@ -39,7 +39,6 @@ import io.sapl.benchmark.jmh.Helper;
 import io.sapl.benchmark.jmh.HttpBenchmark;
 import io.sapl.benchmark.jmh.RsocketBenchmark;
 import io.sapl.benchmark.util.BenchmarkException;
-import io.sapl.interpreter.InitializationException;
 
 class SaplPdpBenchmarkTest {
     private static final String TMP_REPORT_PATH = "tmp_benchmark_test";
@@ -53,7 +52,7 @@ class SaplPdpBenchmarkTest {
 
     @Test
     void whenExecutingEmbeddedBenchmark_withValidSubscription_thenDecisionIsAccepted()
-            throws InitializationException, IOException {
+            throws IOException {
         final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);
@@ -73,7 +72,7 @@ class SaplPdpBenchmarkTest {
 
     @Test
     void whenExecutingEmbeddedBenchmark_withInvalidSubscription_thenExceptionIsThrown()
-            throws InitializationException, IOException {
+            throws  IOException {
         final var benchmarkConfig = BenchmarkConfiguration.fromFile("src/test/resources/unittest_benchmark_config.yaml");
         benchmarkConfig.setRunHttpBenchmarks(false);
         benchmarkConfig.setRunRsocketBenchmarks(false);

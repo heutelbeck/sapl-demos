@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.test.integration.usecase;
+package io.sapl.test;
 
 import static io.sapl.test.Matchers.any;
 import static io.sapl.test.Matchers.args;
@@ -23,14 +23,13 @@ import org.junit.jupiter.api.Test;
 import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.libraries.TemporalFunctionLibrary;
-import io.sapl.test.SaplTestFixture;
 
 /**
  * Streaming tests with the new fixture using thenEmit pattern.
  * The new fixture provides fine-grained control over attribute emissions,
  * eliminating the need for virtual time and duration-based mocking.
  */
-class BStreamingVirtualTimeTest {
+class KStreamingVirtualTimeTest {
 
     /**
      * Tests streaming with explicit attribute emissions using thenEmit.

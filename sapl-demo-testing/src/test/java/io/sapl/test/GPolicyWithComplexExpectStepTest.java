@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.test.unit.usecase;
+package io.sapl.test;
 
 import static io.sapl.test.DecisionMatchers.isPermit;
 
@@ -26,7 +26,6 @@ import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.libraries.FilterFunctionLibrary;
-import io.sapl.test.SaplTestFixture;
 
 /**
  * Tests for complex authorization decision expectations with obligations and

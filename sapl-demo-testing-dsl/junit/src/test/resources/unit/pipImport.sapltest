@@ -12,7 +12,7 @@ requirement "uses uppercase PIP to decide" {
     given
         - pip "upper"
     when "klaus" attempts "read" on "something"
-    expect notApplicable;
+    expect not-applicable;
 
     scenario "klaus can read if there is a BAR value with subject as key in environment"
     given

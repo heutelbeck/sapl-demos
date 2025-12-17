@@ -13,19 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.test.integration.usecase;
+package io.sapl.test;
 
 import org.junit.jupiter.api.Test;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.test.SaplTestFixture;
 
 /**
  * Integration tests that verify combined policy evaluation and single policy
  * behavior. Demonstrates using both integration and single test modes with the
  * new fixture.
  */
-class ASimplePDPTest {
+class JSimplePDPTest {
 
     /**
      * Tests the combined decision from all policies in the policiesIT directory.

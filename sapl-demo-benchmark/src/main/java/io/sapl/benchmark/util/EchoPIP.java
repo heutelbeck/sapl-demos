@@ -19,21 +19,17 @@ package io.sapl.benchmark.util;
 
 import java.time.Duration;
 
-import io.sapl.api.interpreter.Val;
-import io.sapl.api.pip.Attribute;
-import io.sapl.api.pip.PolicyInformationPoint;
-import io.sapl.api.validation.Text;
+import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.PolicyInformationPoint;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
 import reactor.core.publisher.Flux;
 
 @PolicyInformationPoint(name = "echo", description = "PIP echoing the input value after 0,5 seconds")
 public class EchoPIP {
-    private EchoPIP() {
-        throw new IllegalStateException("Utility class");
-    }
-
     @Attribute(name = "delayed")
-    public static Flux<Val> delayed(@Text Val value) {
-        return Flux.just(value).delayElements(Duration.ofMillis(500));
+    public Flux<Value> delayed(TextValue value) {
+        return Flux.just((Value) value).delayElements(Duration.ofMillis(500));
     }
 
 }

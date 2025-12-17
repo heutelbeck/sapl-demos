@@ -38,7 +38,7 @@ public class Helper {
      */
     public static void decide(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         final var decision = pdp.decide(authorizationSubscription).blockFirst();
-        if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
+        if (null == decision || decision.decision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }
@@ -49,13 +49,13 @@ public class Helper {
      */
     public static void decideOnce(PolicyDecisionPoint pdp, AuthorizationSubscription authorizationSubscription) {
         final var decision = pdp.decideOnce(authorizationSubscription).block();
-        if (null == decision || null == decision.getDecision() || decision.getDecision() != Decision.PERMIT) {
+        if (null == decision || decision.decision() != Decision.PERMIT) {
             throw new BenchmarkException("Invalid decision: " + decision);
         }
     }
 
     /**
-     * Retrieve Oauth2 client registry from benchmakr context
+     * Retrieve Oauth2 client registry from benchmark context
      */
     public static ReactiveClientRegistrationRepository getClientRegistrationRepository(
             BenchmarkExecutionContext context) {
