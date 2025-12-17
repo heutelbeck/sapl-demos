@@ -73,7 +73,6 @@ working where the demo parent is used)
 		<module>sapl-demo-webflux</module>
 		<module>sapl-demo-webflux-authorizationmanager</module>
 		<module>sapl-demo-remote</module>
-		<module>sapl-demo-extension</module>
 		<module>sapl-demo-testing</module>
 		<module>sapl-demo-testing-dsl/plain</module>
 		<module>sapl-demo-testing-dsl/junit</module>

@@ -27,11 +27,11 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
+import io.sapl.api.coverage.PolicyCoverageData;
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.ValidationFinishedEvent;
 import io.sapl.vaadin.ValidationStatusDisplay;
-import io.sapl.test.coverage.PolicyCoverageData;
 import io.sapl.vaadin.lsp.SaplEditorLsp;
 import io.sapl.vaadin.lsp.SaplEditorLspConfiguration;
 import io.sapl.vaadin.lsp.SaplEditorLspConfiguration.AutocompleteTrigger;
