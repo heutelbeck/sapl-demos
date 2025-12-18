@@ -49,7 +49,7 @@ public class DemoController {
     }
 
     @GetMapping(value = "/publishMqttEvent")
-    public Mono<String> publichMqttEvent() {
+    public Mono<String> publishMqttEvent() {
         return mqttClient.publish("demoTopic", "aMessage", true).map(Object::toString);
     }
 

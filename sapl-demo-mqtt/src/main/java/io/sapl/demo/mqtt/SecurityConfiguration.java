@@ -16,11 +16,9 @@
 package io.sapl.demo.mqtt;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 
@@ -37,8 +35,8 @@ public class SecurityConfiguration {
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         // @formatter:off
 		http.authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
-            .formLogin(form-> form.disable())
-            .httpBasic(basic -> basic.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
+            .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
+            .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable);
 		return http.build();
 		// @formatter:on
     }
