@@ -1,49 +1,194 @@
-//structure follow exactly the available structure for unit tests.
-//the only difference is, how the used policies are defined
-//see unit tests for details/explanations of allowed syntax besides policy definition
+/*
+ * Integration Test Demo
+ *
+ * This file demonstrates integration testing with the SAPL test language:
+ * - Integration tests with multiple documents
+ * - Combining algorithm specification
+ * - Variables definition
+ * - Environment configuration
+ * - All documents loading (omitting document specification)
+ *
+ * Integration tests evaluate policies against a PDP configuration
+ * rather than a single document unit test.
+ */
+
 requirement "should grant read access for WILLI on foo depending on policy set and PDP Config" {
-	scenario "WILLI tries to read foo using single identifier"
-    given
-    	- set "policiesIT" //without special setup this identifier refers to the folder where all polices (and the pdp.json containing the PDP Configuration) are located. Has to be located in src/main/resources (or in a folder structure below this folder)
-    when "WILLI" attempts "read" on "foo" //defines the AuthorizationSubscription that should be used for the test
-    expect permit;
 
-    scenario "WILLI tries to read foo using concrete policies definition with default pdp configuration"
-    given
-    	// if the pdp Configuration path is ommited, the default Strategy DENY_OVERRIDES is used
-    	- policies "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C" //list of policies to use. Has to be located in src/main/resources (or in a folder structure below this folder)
-    when "WILLI" attempts "read" on "foo"
-    expect deny;
+    scenario "WILLI tries to read foo using explicit document list"
+        given
+            // List specific documents for integration test
+            - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+            // Specify combining algorithm explicitly
+            - permit-overrides
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
 
-    scenario "WILLI tries to read foo using concrete policies definition with concrete pdp configuration"
-    given
-    	- policies "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C" with pdp configuration "policiesIT" //search policiesIT folder for a pdp.json file to load configuration from in this case same behavior as first scenario
-    when "WILLI" attempts "read" on "foo"
-    expect permit;
+    scenario "WILLI tries to read foo with deny-overrides"
+        given
+            // Same documents but different algorithm
+            - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+            - deny-overrides
+        when "WILLI" attempts "read" on "foo"
+        expect deny;
 
-    scenario "WILLI tries to read foo using single identifier and variable override"
-    given
-    	- set "policiesIT" //without special setup this identifier refers to the folder where all polices (and the pdp.json containing the PDP Configuration) are located. Has to be located in src/main/resources (or in a folder structure below this folder)
-        // additionally you can specify the used pdp variables manually, there overwriting the ones defined in pdp.json
-        - pdp variables {}
-    when "WILLI" attempts "read" on "foo" //defines the AuthorizationSubscription that should be used for the test
-    expect permit;
+    scenario "WILLI tries to read foo with only-one-applicable"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+            - only-one-applicable
+        when "WILLI" attempts "read" on "foo"
+        // Multiple policies may apply, so indeterminate
+        expect indeterminate;
 
-    scenario "WILLI tries to read foo using single identifier and variable + combining algorithm override"
-    //given has to follow order:
-    	// - policy definiton
-        // - pdp variables (optional)
-        // - pdp combining-algorithm (optional)
-        // - environment (optional)
-        // - Imports / Mock Definitions (optional)
+    scenario "WILLI tries to read foo with deny-unless-permit"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+            - deny-unless-permit
+        when "WILLI" attempts "read" on "foo"
+        // At least one permit -> permit
+        expect permit;
+
+    scenario "WILLI tries to read foo with permit-unless-deny"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+            - permit-unless-deny
+        when "WILLI" attempts "read" on "foo"
+        // Policy C denies, so deny
+        expect deny;
+}
+
+requirement "Integration tests with variables" {
+
+    scenario "test with empty variables"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - permit-overrides
+            // Override PDP variables with empty object
+            - variables {}
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
+
+    scenario "test with custom variables"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - permit-overrides
+            // Define custom variables for test
+            - variables {
+                "maxAttempts": 3,
+                "debugMode": true,
+                "allowedRoles": ["admin", "user"]
+            }
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
+
+    scenario "test with variables and environment"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - deny-overrides
+            - variables { "testVar": "value" }
+            // Environment is part of the authorization subscription context
+            - environment { "tenant": "acme", "region": "eu-west" }
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
+}
+
+requirement "Integration test with all combining algorithms" {
+
+    // Central given for all scenarios
     given
-    	- set "policiesIT" //without special setup this identifier refers to the folder where all polices (and the pdp.json containing the PDP Configuration) are located. Has to be located in src/main/resources (or in a folder structure below this folder)
-        // additionally you can specify the used pdp variables manually, there overwriting the ones defined in pdp.json
-        - pdp variables {}
-        // additionally you can specify the used combining-algorithm manually, there overwriting the one defined in pdp.json
-        - pdp combining-algorithm deny-overrides
-        - environment {}
-        - static-function-library "filter"
-    when "WILLI" attempts "read" on "foo" //defines the AuthorizationSubscription that should be used for the test
-    expect deny;
+        - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
+
+    scenario "deny-overrides algorithm"
+        given
+            - deny-overrides
+        when "WILLI" attempts "read" on "foo"
+        // If any policy denies, result is deny
+        expect deny;
+
+    scenario "permit-overrides algorithm"
+        given
+            - permit-overrides
+        when "WILLI" attempts "read" on "foo"
+        // If any policy permits, result is permit
+        expect permit;
+
+    scenario "only-one-applicable algorithm"
+        given
+            - only-one-applicable
+        when "WILLI" attempts "read" on "foo"
+        // Multiple applicable policies -> indeterminate
+        expect indeterminate;
+
+    scenario "deny-unless-permit algorithm"
+        given
+            - deny-unless-permit
+        when "WILLI" attempts "read" on "foo"
+        // At least one permit exists -> permit
+        expect permit;
+
+    scenario "permit-unless-deny algorithm"
+        given
+            - permit-unless-deny
+        when "WILLI" attempts "read" on "foo"
+        // At least one deny exists -> deny
+        expect deny;
+}
+
+requirement "Integration test with mocking" {
+
+    scenario "integration test with function mock"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - permit-overrides
+            // Can still mock functions in integration tests
+            - function some.helper() maps to true
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
+
+    scenario "integration test with attribute mock"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - deny-overrides
+            // Can mock attributes in integration tests
+            - attribute "timeMock" <time.now> emits "2025-01-06T12:00:00Z"
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
+
+    scenario "integration test with mock and verification"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - permit-overrides
+            - function audit.log(any) maps to true
+        when "WILLI" attempts "read" on "foo"
+        expect permit
+        verify
+            // Verify function was called if policies use it
+            - function audit.log(any) is called once;
+
+    scenario "integration test with streaming"
+        given
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            - permit-overrides
+            - attribute "statusMock" <system.status> emits "online"
+        when "WILLI" attempts "read" on "foo"
+        expect permit
+        then
+            - attribute "statusMock" emits "maintenance"
+        // Depending on policy, may change decision
+        expect permit;
+}
+
+requirement "Minimal integration test syntax" {
+
+    // When no given block is provided at all, uses all documents
+    // with default combining algorithm from configuration
+    scenario "using all documents with defaults"
+        when "WILLI" attempts "read" on "foo"
+        // Result depends on all documents and default algorithm
+        expect permit;
+
+    scenario "minimal with just algorithm"
+        given
+            - permit-overrides
+        when "WILLI" attempts "read" on "foo"
+        expect permit;
 }

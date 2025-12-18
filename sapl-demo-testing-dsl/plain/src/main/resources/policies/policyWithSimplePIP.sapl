@@ -1,0 +1,7 @@
+policy "policyWithSimplePIP"
+permit
+    action == "read"
+where
+    subject.<test.upper> == "WILLI" ||
+    subject.<test.hasEnvVar> == "BAR" ||
+    subject.<test.hasAuthzSubVar> == "FOO";

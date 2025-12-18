@@ -1,84 +1,165 @@
-requirement "blacken from FunctionLibrary is applied" {
- 	given
-    	- policy "policyWithObligationAndResource" //this policy uses the FilterFunctionLibrary to blacken parts of the resource and puts them into an obligation
-        - static-function-library "filter" //by using a static import (FunctionLibrary which requires no instance since all methods are static) we can refer to a specific registration in our io.sapl.demo.testing.dsl.junit.TestAdapter by name (e.g. Map.of(ImportType.STATIC_FUNCTION_LIBRARY, Map.of("filter", FilterFunctionLibrary.class)))
+/*
+ * Function Library Demo
+ *
+ * This file demonstrates working with function libraries in SAPL tests:
+ * - Using function libraries in policies (like FilterFunctionLibrary)
+ * - Mocking function library methods for controlled testing
+ * - Testing obligations with transformed resources
+ * - Complex matcher syntax for obligations and resources
+ *
+ * Function libraries are registered with the PDP/test fixture.
+ * Tests can mock specific function calls for controlled behavior.
+ */
 
-	scenario "willi with authority ROLE_ADMIN can execute action with java.name=findById on complex resource with obligation and transformed resource"
-    //complex subject definition this time, setting name and required authority
-    when
-    {
-    	"name": "willi",
-        "authority": "ROLE_ADMIN"
-    }
-    //action definition contains a nested object under the key "java" with a property "name" being "findById"
-    attempts
-    {
-    	"java": {
-        	"name": "findById"
-        }
-    }
-    on
-    {
-    	"id": 56,
-        "diagnosisText": "diagnosisText",
-        "icd11Code": "icd11Code"
-    }
-    //we expect a permit here and also want to verify the correct obligation and resource
-    //since the blacken function of our imported FunctionLibrary is applied to the resource
-    //check that is permit with obligation in normal JSON syntax
-    expect permit with obligations
-    {
-    	//there needs to be a key with text value "logAccess"
-    	"type": "logAccess",
-        // we know the message
-        "message": "willi has accessed patient data (id=56) as an administrator."
-    }
-    // define expected resource with blacken function applied
-    with resource
-    {
-    	//here the blacken of our imported FunctionLibrary is applied
-    	"diagnosisText": "█████████████",
-        //here the blacken of our imported FunctionLibrary is applied
-        "icd11Code": "ic███████",
-        "id": 56
-    };
+requirement "FilterFunctionLibrary blacken is applied" {
 
-    scenario "willi with authority ROLE_ADMIN can execute action with java.name=findById on complex resource with obligation and transformed resource non exact match"
-    when
-    {
-    	"name": "willi",
-        "authority": "ROLE_ADMIN"
-    }
-    attempts
-    {
-    	"java": {
-        	"name": "findById"
-        }
-    }
-    on
-    {
-    	"id": 56,
-        "diagnosisText": "diagnosisText",
-        "icd11Code": "icd11Code"
-    }
-    // in case you don't know the exact obligation (since some values like timestamps, ids are generated on server side) you can use a variety of matchers
-    // see https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-test/README.md#authorizationdecisionmatcher for all available matchers
-    expect decision is permit,
-    with obligation matching object where
-    {
-    	//there needs to be a key with text value "logAccess"
-    	"type" is text "logAccess"
-        and
-        // simulate that we don't know the complete message only our subject name, patient data and administrator
-        "message" is text containing stream "willi", "patient data", "administrator" in order
-    },
-    // define expected resource with blacken function applied
-    with resource equals
-    {
-    	//here the blacken of our imported FunctionLibrary is applied
-    	"diagnosisText": "█████████████",
-        //here the blacken of our imported FunctionLibrary is applied
-        "icd11Code": "ic███████",
-        "id": 56
-    };
+    given
+        // This policy uses FilterFunctionLibrary to blacken parts of the resource
+        // and creates obligations for audit logging
+        - document "policyWithObligationAndResource"
+
+    scenario "admin can access with blackened resource"
+        // Complex subject with name and authority
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        // Action with nested structure
+        attempts
+            { "java": { "name": "findById" } }
+        // Resource to be transformed
+        on
+            { "id": 56, "diagnosisText": "diagnosisText", "icd11Code": "icd11Code" }
+        // Expect permit with specific obligations and transformed resource
+        expect permit
+            with obligations {
+                "type": "logAccess",
+                "message": "willi has accessed patient data (id=56) as an administrator."
+            }
+            with resource {
+                "diagnosisText": "█████████████",
+                "icd11Code": "ic███████",
+                "id": 56
+            };
+
+    scenario "admin access with matcher-based obligation verification"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 56, "diagnosisText": "diagnosisText", "icd11Code": "icd11Code" }
+        // Use matchers when exact values might vary (timestamps, generated IDs, etc.)
+        expect decision is permit,
+            // Obligation matcher: verify structure without exact values
+            with obligation matching object where {
+                "type" is text "logAccess"
+                and
+                // Match partial message containing key information
+                "message" is text containing stream "willi", "patient data", "administrator" in order
+            },
+            // Resource matcher with exact equality
+            with resource equals {
+                "diagnosisText": "█████████████",
+                "icd11Code": "ic███████",
+                "id": 56
+            };
+
+    scenario "non-admin is denied"
+        when
+            { "name": "willi", "authority": "ROLE_USER" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 56, "diagnosisText": "diagnosisText", "icd11Code": "icd11Code" }
+        expect deny;
+}
+
+requirement "Function mocking for controlled testing" {
+
+    given
+        - document "policyWithObligationAndResource"
+
+    scenario "mock blacken function to return custom value"
+        given
+            // Mock the filter.blacken function to return a controlled value
+            - function filter.blacken(any) maps to "REDACTED"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 56, "diagnosisText": "secret", "icd11Code": "ABC" }
+        // With mocked blacken, resource contains "REDACTED" instead of unicode blocks
+        expect decision is permit, with obligation;
+
+    scenario "mock blacken with specific input matching"
+        given
+            // Mock filter.blacken with specific parameter matchers
+            - function filter.blacken(matching text "secret") maps to "[HIDDEN]"
+            - function filter.blacken(matching text "ABC") maps to "***"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 56, "diagnosisText": "secret", "icd11Code": "ABC" }
+        expect decision is permit;
+
+    scenario "verify blacken was called"
+        given
+            - function filter.blacken(any) maps to "CENSORED"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 56, "diagnosisText": "text1", "icd11Code": "text2" }
+        expect decision is permit, with obligation
+        verify
+            // Verify blacken was called twice (once for each field)
+            - function filter.blacken(any) is called 2 times;
+}
+
+requirement "Matcher syntax demonstration" {
+
+    given
+        - document "policyWithObligationAndResource"
+
+    scenario "obligation with text matchers"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 99, "diagnosisText": "test", "icd11Code": "code" }
+        expect decision is permit,
+            with obligation matching object where {
+                // Text exact match
+                "type" is text "logAccess"
+                and
+                // Text starts with
+                "message" is text starting with "willi"
+            };
+
+    scenario "resource with number matcher"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 42, "diagnosisText": "test", "icd11Code": "code" }
+        expect decision is permit,
+            with resource matching object where {
+                // Number must be present
+                "id" is number 42
+            };
+
+    scenario "any decision matcher"
+        when
+            { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts
+            { "java": { "name": "findById" } }
+        on
+            { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        // Just check some decision is returned
+        expect decision any;
 }

@@ -12,7 +12,7 @@
 
 	<artifactId>sapl-demo-testing-dsl-plain</artifactId>
 	<name>SAPL Demo Policy Testing DSL Plain</name>
-	<description>Example for testing your SAPL policies using the SAPLTest DSL without a framework</description>
+	<description>Example for testing your SAPL policies using the PlainTestAdapter without JUnit</description>
 	<dependencies>
 		<dependency>
 			<groupId>io.sapl</groupId>
@@ -23,4 +23,17 @@
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.5.0</version>
+				<configuration>
+					<mainClass>io.sapl.demo.testing.dsl.plain.Main</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -1,76 +1,147 @@
+/*
+ * Copyright (C) 2017-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.sapl.demo.testing.dsl.plain;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.HashMap;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.sapl.demo.testing.dsl.plain.resolvers.CustomIntegrationTestPolicyResolver;
-import io.sapl.demo.testing.dsl.plain.resolvers.CustomUnitTestPolicyResolver;
-import io.sapl.demo.testing.dsl.plain.storage.TestStorage;
-import io.sapl.test.coverage.api.CoverageAPIFactory;
+import io.sapl.api.pdp.CombiningAlgorithm;
+import io.sapl.test.plain.PlainTestAdapter;
+import io.sapl.test.plain.SaplDocument;
+import io.sapl.test.plain.SaplTestDocument;
+import io.sapl.test.plain.TestConfiguration;
+import io.sapl.test.plain.TestEvent.ExecutionCompleted;
+import io.sapl.test.plain.TestEvent.ScenarioCompleted;
+import io.sapl.test.plain.TestStatus;
 
+/**
+ * Demonstrates programmatic test execution using PlainTestAdapter.
+ * <p>
+ * This demo loads the same policies and tests used in the JUnit demo
+ * but executes them programmatically without JUnit.
+ */
 public class Main {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-    public static void main(String[] args) throws IOException {
-        // initialize the test adapter and a Map to hold failed tests
-        final var testAdapter = getConfiguredTestAdapter();
-        final var failedTests = new HashMap<String, Throwable>();
+    private static final Logger LOG = LoggerFactory.getLogger(Main.class);
 
-        // load all test definitions from the TestStorage, execute test for each
-        // definition and put failed tests into map
-        TestStorage.getTestStore()
-                .forEach((identifier, test) -> failedTests.putAll(testAdapter.executeTests(identifier, test)));
+    public static void main(String[] args) {
+        LOG.info("=== SAPL PlainTestAdapter Demo ===\n");
 
-        // evaluate the results
-        if (!failedTests.isEmpty()) {
-            LOGGER.info("There are failed tests:");
-            failedTests.forEach((key, value) -> LOGGER.info("Test '%s' failed with error: '%s'".formatted(key, value)));
-        } else {
-            LOGGER.info("All tests passed");
+        // Load policies and tests
+        var policies = loadPolicies();
+        var tests = loadTests();
+
+        LOG.info("Loaded {} policies and {} test documents\n", policies.size(), tests.size());
+
+        // Create configuration
+        var config = TestConfiguration.builder()
+                .withSaplDocuments(policies)
+                .withSaplTestDocuments(tests)
+                .withDefaultAlgorithm(CombiningAlgorithm.DENY_OVERRIDES)
+                .build();
+
+        // Execute tests using PlainTestAdapter
+        var adapter = new PlainTestAdapter();
+
+        LOG.info("--- Executing Tests ---\n");
+
+        // Demonstrate reactive execution with progress events
+        adapter.executeReactive(config).subscribe(event -> {
+            if (event instanceof ScenarioCompleted sc) {
+                var result = sc.result();
+                var status = switch (result.status()) {
+                    case PASSED -> "[PASS]";
+                    case FAILED -> "[FAIL]";
+                    case ERROR -> "[ERROR]";
+                };
+                LOG.info("{} {} > {}", status, result.requirementName(), result.scenarioName());
+                if (result.failureMessage() != null) {
+                    LOG.info("       {}", result.failureMessage());
+                }
+            } else if (event instanceof ExecutionCompleted ec) {
+                LOG.info("\n--- Results ---");
+                var results = ec.results();
+                LOG.info("Total: {}  Passed: {}  Failed: {}  Errors: {}",
+                        results.total(), results.passed(), results.failed(), results.errors());
+
+                if (results.allPassed()) {
+                    LOG.info("\nAll tests passed!");
+                } else {
+                    LOG.error("\nSome tests failed!");
+                    // List failures
+                    results.scenarioResults().stream()
+                            .filter(r -> r.status() != TestStatus.PASSED)
+                            .forEach(r -> LOG.error("  - {} > {}: {}",
+                                    r.requirementName(), r.scenarioName(), r.failureMessage()));
+                }
+            }
+        });
+    }
+
+    private static List<SaplDocument> loadPolicies() {
+        var policies = new ArrayList<SaplDocument>();
+
+        // Load policies from classpath (same as junit demo)
+        policies.add(loadPolicy("policies/policySimple.sapl", "policySimple"));
+        policies.add(loadPolicy("policies/policyWithSimpleFunction.sapl", "policyWithSimpleFunction"));
+        policies.add(loadPolicy("policies/policyStreaming.sapl", "policyStreaming"));
+        policies.add(loadPolicy("policies/policyWithObligationAndResource.sapl", "policyWithObligationAndResource"));
+        policies.add(loadPolicy("policiesIT/policy_A.sapl", "policy_A"));
+        policies.add(loadPolicy("policiesIT/policy_B.sapl", "policy_B"));
+        policies.add(loadPolicy("policiesIT/policy_C.sapl", "policy_C"));
+
+        return policies;
+    }
+
+    private static SaplDocument loadPolicy(String resourcePath, String name) {
+        var source = loadResource(resourcePath);
+        return new SaplDocument(name, name, source);
+    }
+
+    private static List<SaplTestDocument> loadTests() {
+        var tests = new ArrayList<SaplTestDocument>();
+
+        // Load test definitions from classpath
+        tests.add(loadTest("unit/singleRequirement.sapltest", "singleRequirement"));
+        tests.add(loadTest("unit/functionMocking.sapltest", "functionMocking"));
+
+        return tests;
+    }
+
+    private static SaplTestDocument loadTest(String resourcePath, String name) {
+        var source = loadResource(resourcePath);
+        return new SaplTestDocument(name, name, source);
+    }
+
+    private static String loadResource(String path) {
+        try (InputStream is = Main.class.getClassLoader().getResourceAsStream(path)) {
+            if (is == null) {
+                throw new RuntimeException("Resource not found: " + path);
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read resource: " + path, e);
         }
-        printCoverage();
-    }
-
-    /**
-     * holds the logic to construct the actual {@link TestAdapter} instance by
-     * initializing the {@link CustomUnitTestPolicyResolver} and
-     * {@link CustomIntegrationTestPolicyResolver} beforehand and passing them to
-     * the
-     * {@link TestAdapter#TestAdapter(UnitTestPolicyResolver, IntegrationTestPolicyResolver)}
-     * 
-     * @return the created test adapter
-     */
-    private static TestAdapter getConfiguredTestAdapter() {
-        final var customUnitTestPolicyResolver        = new CustomUnitTestPolicyResolver();
-        final var customIntegrationTestPolicyResolver = new CustomIntegrationTestPolicyResolver();
-        customIntegrationTestPolicyResolver.addIntegrationTestConfiguration("demoSet",
-                List.of("policy_A", "policy_B", "policy_C"), "demoPDPConfig");
-
-        return new TestAdapter(customUnitTestPolicyResolver, customIntegrationTestPolicyResolver);
-    }
-
-    /**
-     * helper method to show how to print coverage hit information after test
-     * execution
-     * 
-     * @throws IOException when the
-     *                     {@link io.sapl.test.coverage.api.CoverageHitReader}
-     *                     throws
-     */
-    private static void printCoverage() throws IOException {
-        final var coverageHitReader = CoverageAPIFactory
-                .constructCoverageHitReader(Paths.get("target").resolve("sapl-coverage"));
-        LOGGER.info("policy hits");
-        coverageHitReader.readPolicyHits().forEach(policyHit -> LOGGER.info(policyHit.toString()));
-        LOGGER.info("policy set hits");
-        coverageHitReader.readPolicySetHits().forEach(policySetHit -> LOGGER.info(policySetHit.toString()));
-        LOGGER.info("policy condition hits");
-        coverageHitReader.readPolicyConditionHits()
-                .forEach(policyConditionHit -> LOGGER.info(policyConditionHit.toString()));
     }
 }

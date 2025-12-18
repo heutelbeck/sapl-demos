@@ -1,54 +1,97 @@
 # SAPL Demo Testing DSL Plain
 
-This demo is a sample repository for testing SAPL policies using the SAPLTest DSL without a dedicated test framework.
-This can be useful for productive runtime use case where a productive dependency to a test framework should be avoided.
+This demo shows how to execute SAPL tests programmatically using the `PlainTestAdapter` without JUnit or any test framework.
 
-The project uses the default project structure of a [Maven](https://maven.apache.org/) project
+This is useful for:
+- PAP (Policy Administration Point) web applications that need to run tests
+- CI/CD pipelines with custom test execution
+- Scenarios where tests are stored in databases instead of files
+- Cases where reactive progress events are needed for UI updates
 
-The Demo emulates a productive use case by providing the policies to test and the test definition via a 
-[Storage](src/main/java/io/sapl/demo/testing/dsl/plain/storage) that is intended as a placeholder for any external data
-source like a file server or Database instance.
+## How It Works
 
-- [PdpConfigurationStorage](src/main/java/io/sapl/demo/testing/dsl/plain/storage/PdpConfigurationStorage.java) contains data for the PDP configuration.
-- [PolicyStorage](src/main/java/io/sapl/demo/testing/dsl/plain/storage/PolicyStorage.java) contains all available policy definitions.
-- [TestStorage](src/main/java/io/sapl/demo/testing/dsl/plain/storage/TestStorage.java) contains all SAPLTest definitions to run.
+The demo loads policies and test definitions from resources and executes them using `PlainTestAdapter`:
 
-Additionally, there a concrete Implementations to define the logic needed to attach the storage system. There are
-contained in the [resolvers](src/main/java/io/sapl/demo/testing/dsl/plain/resolvers) folder. One resolver for unit test
-setup and one for integration test setup. These are then passed to the concrete [TestAdapter](src/main/java/io/sapl/demo/testing/dsl/plain/TestAdapter.java)
-instance to register the custom resolvers.
+```java
+// Create configuration with policies and tests
+var config = TestConfiguration.builder()
+    .withSaplDocuments(policies)        // List of SaplDocument
+    .withSaplTestDocuments(tests)       // List of SaplTestDocument
+    .withDefaultAlgorithm(CombiningAlgorithm.DENY_OVERRIDES)
+    .build();
 
-## Executing the tests
+// Execute with PlainTestAdapter
+var adapter = new PlainTestAdapter();
 
-The [Main](src/main/java/io/sapl/demo/testing/dsl/plain/Main.java) class contains the code required to construct an 
-instance of the [TestAdapter](src/main/java/io/sapl/demo/testing/dsl/plain/TestAdapter.java) and start the test execution.
-The results are then printed to the console, in a productive scenario you could then react to failed test cases.
-Access to the Policy Coverage information is also available via the [CoverageAPIFactory](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-coverage-api/src/main/java/io/sapl/test/coverage/api/CoverageAPIFactory.java)
-The console output for a successful run with coverage information printed to the console is shown below:
+// Synchronous execution
+var results = adapter.execute(config);
+System.out.println("All passed: " + results.allPassed());
 
-    [main] INFO io.sapl.test.integration.InputStringVariablesAndCombinatorSource - Loading the PDP configuration from input string
-    [main] INFO io.sapl.test.integration.InputStringVariablesAndCombinatorSource - Loading the PDP configuration from input string
-    [main] INFO io.sapl.test.integration.InputStringVariablesAndCombinatorSource - Loading the PDP configuration from input string
-    [main] INFO io.sapl.test.integration.InputStringVariablesAndCombinatorSource - Loading the PDP configuration from input string
-    [main] INFO io.sapl.test.integration.InputStringVariablesAndCombinatorSource - Loading the PDP configuration from input string
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - All tests passed
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - policy hits
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policy_B
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policy_A
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - testSet||policySimple
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - policy set hits
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - testSet
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - policy condition hits
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policy_B||0||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policy_A||0||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming||0||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming||1||false
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming||2||false
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming||2||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - ||policyStreaming||1||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - testSet||policySimple||0||true
-    [main] INFO io.sapl.demo.testing.dsl.plain.Main - testSet||policySimple||0||false
-    
-    Process finished with exit code 0
+// Or reactive execution with progress events
+adapter.executeReactive(config).subscribe(event -> {
+    if (event instanceof ScenarioCompleted sc) {
+        System.out.println("Completed: " + sc.result().fullName());
+    }
+});
+```
 
+## Key Classes
+
+- `SaplDocument` - A SAPL policy with id, name, and source code
+- `SaplTestDocument` - A test definition with id, name, and source code
+- `TestConfiguration` - Configuration builder for test execution
+- `PlainTestAdapter` - Executes tests and returns results
+- `PlainTestResults` - Aggregated test results with pass/fail counts
+- `ScenarioResult` - Individual scenario result with status and duration
+- `TestEvent` - Events emitted during reactive execution
+
+## Running the Demo
+
+```bash
+mvn compile exec:java
+```
+
+Expected output:
+
+```
+=== SAPL PlainTestAdapter Demo ===
+
+Loaded 7 policies and 2 test documents
+
+--- Executing Tests ---
+
+[PASS] Policy Simple should grant read access for willi on something > willi tries to read something
+[PASS] Policy Simple should grant read access for willi on something > not_willi tries to read something
+[PASS] Policy Simple should grant read access for willi on something > willi reads with complex subscription
+[PASS] Function mocking with simple function policy > mock dayOfWeek to return MONDAY
+...
+
+--- Results ---
+Total: 23  Passed: 23  Failed: 0  Errors: 0
+
+All tests passed!
+```
+
+## PAP Integration Pattern
+
+For a PAP web application, you would:
+
+1. Load policies and tests from the database
+2. Create `SaplDocument` and `SaplTestDocument` instances with DB IDs
+3. Execute with `PlainTestAdapter.executeReactive()`
+4. Push `ScenarioCompleted` events via WebSocket/SSE for live UI updates
+5. Map results back to DB IDs for storage
+
+```java
+// Pseudocode for PAP integration
+var policies = policyRepository.findAll().stream()
+    .map(p -> new SaplDocument(p.getId(), p.getName(), p.getSource()))
+    .toList();
+
+var tests = testRepository.findAll().stream()
+    .map(t -> new SaplTestDocument(t.getId(), t.getName(), t.getSource()))
+    .toList();
+
+adapter.executeReactive(config)
+    .subscribe(event -> webSocketSession.send(event));
+```

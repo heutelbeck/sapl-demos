@@ -43,7 +43,14 @@
 					</execution>
 				</executions>
 				<dependencies>
-					<!-- surefire plugin to provide a Tree view for nested JUnit Dynamic Tests, see https://github.com/fabriciorby/maven-surefire-junit5-tree-reporter -->
+					<!--
+					surefire plugin to provide a Tree view for nested JUnit Dynamic Tests
+					see https://github.com/fabriciorby/maven-surefire-junit5-tree-reporter
+
+					KNOWN LIMITATION: tree-reporter 1.5.1 is incompatible with surefire 3.5.4.
+					Nested DynamicContainer hierarchy is not displayed properly (shows flat).
+					Wait for tree-reporter 2.x release for proper surefire 3.5.4+ support.
+					-->
 					<dependency>
 						<groupId>me.fabriciorby</groupId>
 						<artifactId>maven-surefire-junit5-tree-reporter</artifactId>

@@ -1,30 +1,81 @@
-//this file contains 2 requirement definitions, one for checking read access and one for checking write access
-requirement "Policy Simple should grant read access for willi on something" {
-	//to avoid redundant given definitions for each scenario in a requirement a central given definition is possible
-    // it has the same syntax as the scenario specific given
-    // this allows to keep the scenario itself short if the share common logic regarding their given setup
-    // the given block can still defined in the scenario itself and will then overwrite the policy definition part of the central given
-    given
-    	- policy "policySimple"
+/*
+ * Multiple Requirements and Central Given Demo
+ *
+ * This file demonstrates organizing SAPL tests with:
+ * - Multiple requirement definitions in one file
+ * - Central given blocks that apply to all scenarios in a requirement
+ * - Scenario-specific given blocks that extend/override central given
+ */
 
-	scenario "willi tries to read something"
-    when "willi" attempts "read" on "something"
-    expect permit;
+// This file contains 2 requirement definitions, one for read and one for write access
+requirement "Policy Simple should grant read access for willi on something" {
+
+    // Central given block applies to all scenarios in this requirement.
+    // This avoids redundant given definitions for each scenario.
+    // The given block can still be defined in the scenario itself
+    // and will then merge with/override the central given.
+    given
+        - document "policySimple"
+
+    scenario "willi tries to read something"
+        when "willi" attempts "read" on "something"
+        expect permit;
 
     scenario "not_willi tries to read something"
-    when "not_willi" attempts "read" on "something"
-    expect deny;
+        when "not_willi" attempts "read" on "something"
+        expect deny;
+
+    // Scenario with its own given that extends central given
+    scenario "willi reads with additional mock"
+        given
+            // Document inherited from central given
+            // Add function mock for this specific scenario
+            - function audit.track(any) maps to true
+        when "willi" attempts "read" on "something"
+        expect permit
+        verify
+            - function audit.track(any) is called once;
 }
 
 requirement "Policy Simple should deny write access for willi on something" {
-    given
-    	- policy "policySimple"
 
-	scenario "willi tries to write something"
-    when "willi" attempts "write" on "something"
-    expect deny;
+    given
+        - document "policySimple"
+
+    scenario "willi tries to write something"
+        when "willi" attempts "write" on "something"
+        // Policy only permits "read" action
+        expect deny;
 
     scenario "not_willi tries to write something"
-    when "not_willi" attempts "write" on "something"
-    expect deny;
+        when "not_willi" attempts "write" on "something"
+        expect deny;
+}
+
+requirement "Central given with multiple items" {
+
+    // Central given can include document, algorithm, variables, environment, and mocks
+    given
+        - document "policyWithSimplePIP"
+        - variables { "defaultTimeout": 30 }
+        - attribute "upperMock" any.<test.upper> emits "WILLI"
+
+    scenario "first scenario uses central mocks"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "second scenario overrides attribute mock"
+        given
+            // Override the attribute mock from central given
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect deny;
+
+    scenario "third scenario adds to central given"
+        given
+            // Central attribute mock still applies
+            // Add additional function mock
+            - function helper.validate(any) maps to true
+        when "willi" attempts "read" on "something"
+        expect permit;
 }
