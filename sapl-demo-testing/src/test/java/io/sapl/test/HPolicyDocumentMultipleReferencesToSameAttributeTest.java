@@ -15,7 +15,7 @@
  */
 package io.sapl.test;
 
-import static io.sapl.test.DecisionMatchers.isPermit;
+import static io.sapl.test.Matchers.isPermit;
 import static io.sapl.test.Matchers.args;
 import static io.sapl.test.Matchers.eq;
 

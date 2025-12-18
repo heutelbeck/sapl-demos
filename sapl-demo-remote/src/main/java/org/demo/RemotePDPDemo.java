@@ -81,11 +81,10 @@ public class RemotePDPDemo implements Callable<Integer> {
         LOG.info("Subscription: {}", authzSubscription);
 
         final var multiSubscription = new MultiAuthorizationSubscription()
-                .addAuthorizationSubscription("id-1",
-                        AuthorizationSubscription.of("bs@simpsons.com", "read",
-                                "file://example/med/record/patient/BartSimpson"))
-                .addAuthorizationSubscription("id-2", AuthorizationSubscription.of("ms@simpsons.com", "read",
-                        "file://example/med/record/patient/MaggieSimpson"));
+                .addAuthorizationSubscription("id-1", "bs@simpsons.com", "read",
+                        "file://example/med/record/patient/BartSimpson")
+                .addAuthorizationSubscription("id-2", "ms@simpsons.com", "read",
+                        "file://example/med/record/patient/MaggieSimpson");
         LOG.info("Multi: {}", multiSubscription);
         final var mapper = new ObjectMapper();
         final var json   = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(multiSubscription);

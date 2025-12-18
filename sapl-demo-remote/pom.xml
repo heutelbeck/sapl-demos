@@ -1,6 +1,8 @@
 <!--
 
-    Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+    Copyright (C) 2019-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    SPDX-License-Identifier: Apache-2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +24,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-remote</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+	<version>4.0.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -35,21 +37,23 @@
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<!-- The Version of the SAPL Dependencies -->
+
+		<!-- SAPL Version -->
 		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
-		<spotbugs.version>4.9.8.1</spotbugs.version>
-		<sbcontrib.version>7.6.15</sbcontrib.version>
+
+		<!-- Dependencies (aligned with sapl-policy-engine) -->
+		<slf4j.version>2.0.16</slf4j.version>
+		<picocli.version>4.7.6</picocli.version>
+
+		<!-- Maven Plug-Ins (aligned with sapl-policy-engine) -->
+		<sb-contrib.version>7.7.2</sb-contrib.version>
+		<maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+		<spotbugs-maven-plugin.version>4.9.8.2</spotbugs-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<!-- Streaming Attribute Authorization Engine Bill of Materials -->
-			<!-- This is a 'Bill of Materials' dependency. It does not directly introduce 
-				additional dependencies. This is a utility dependency, making it easier to 
-				use SAPL dependencies. Once this BOM has been imported in the <dependencyManagement> 
-				section of the POM all SAPL dependencies can be used without explicitly declaring 
-				a version. This ensures that when multiple SAPL dependencies are used, the 
-				versions of them are consistent. -->
 			<dependency>
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-bom</artifactId>
@@ -71,26 +75,26 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>2.0.16</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- A library for parsing command-line parameters -->
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
-			<version>4.7.6</version>
+			<version>${picocli.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which 
-				contains the code from this module and in addition, all dependencies are 
-				packed into the JAR as well. This results in a self-contained executable 
+			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which
+				contains the code from this module and in addition, all dependencies are
+				packed into the JAR as well. This results in a self-contained executable
 				Java application directly runnable via 'java -jar'. -->
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.7.1</version>		
+				<version>${maven-assembly-plugin.version}</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -103,8 +107,8 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>make-assembly</id> <!-- this is used for inheritance merges -->
-						<phase>package</phase> <!-- bind to the packaging phase -->
+						<id>make-assembly</id>
+						<phase>package</phase>
 						<goals>
 							<goal>single</goal>
 						</goals>
@@ -112,9 +116,9 @@
 				</executions>
 			</plugin>
 			<plugin>
-		 	<groupId>com.github.spotbugs</groupId>
+				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>${spotbugs.version}</version>
+				<version>${spotbugs-maven-plugin.version}</version>
 				<configuration>
 					<excludeFilterFile>spotbugsExcludeFilter.xml</excludeFilterFile>
 					<includeTests>true</includeTests>
@@ -123,17 +127,18 @@
 						<plugin>
 							<groupId>com.mebigfatguy.sb-contrib</groupId>
 							<artifactId>sb-contrib</artifactId>
-							<version>${sbcontrib.version}</version>
+							<version>${sb-contrib.version}</version>
 						</plugin>
 					</plugins>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
+
 	<repositories>
 		<repository>
-			<name>Central Portal Snapshots</name>
 			<id>central-portal-snapshots</id>
+			<name>Central Portal Snapshots</name>
 			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
 			<releases>
 				<enabled>false</enabled>
