@@ -70,6 +70,28 @@
 					</statelessTestsetInfoReporter>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>sapl-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<!-- Set low hit ratios for initial testing -->
+					<policyHitRatio>0</policyHitRatio>
+					<policyConditionHitRatio>0</policyConditionHitRatio>
+					<failOnDisabledTests>false</failOnDisabledTests>
+					<enableSonarReport>true</enableSonarReport>
+					<enableHtmlReport>true</enableHtmlReport>
+				</configuration>
+				<executions>
+					<execution>
+						<id>coverage</id>
+						<goals>
+							<goal>enable-coverage-collection</goal>
+							<goal>report-coverage-information</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

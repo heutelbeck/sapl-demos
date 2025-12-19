@@ -34,6 +34,24 @@
 					<mainClass>io.sapl.demo.testing.dsl.plain.Main</mainClass>
 				</configuration>
 			</plugin>
+			<!--
+			SAPL Maven Plugin for coverage reporting.
+			Note: For this demo, run 'mvn compile exec:java' first to generate coverage data,
+			then 'mvn sapl:report-coverage-information' to generate the report.
+			-->
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>sapl-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<!-- Set low hit ratios for initial testing -->
+					<policyHitRatio>0</policyHitRatio>
+					<policyConditionHitRatio>0</policyConditionHitRatio>
+					<failOnDisabledTests>false</failOnDisabledTests>
+					<enableSonarReport>true</enableSonarReport>
+					<enableHtmlReport>true</enableHtmlReport>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 </project>

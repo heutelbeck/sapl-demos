@@ -19,21 +19,18 @@ package io.sapl.demo.testing.dsl.plain;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.sapl.test.plain.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.sapl.api.pdp.CombiningAlgorithm;
-import io.sapl.test.plain.PlainTestAdapter;
-import io.sapl.test.plain.SaplDocument;
-import io.sapl.test.plain.SaplTestDocument;
-import io.sapl.test.plain.TestConfiguration;
 import io.sapl.test.plain.TestEvent.ExecutionCompleted;
 import io.sapl.test.plain.TestEvent.ScenarioCompleted;
-import io.sapl.test.plain.TestStatus;
 
 /**
  * Demonstrates programmatic test execution using PlainTestAdapter.
@@ -68,8 +65,7 @@ public class Main {
 
         // Demonstrate reactive execution with progress events
         adapter.executeReactive(config).subscribe(event -> {
-            if (event instanceof ScenarioCompleted sc) {
-                var result = sc.result();
+            if (event instanceof ScenarioCompleted(ScenarioResult result)) {
                 var status = switch (result.status()) {
                     case PASSED -> "[PASS]";
                     case FAILED -> "[FAIL]";
@@ -79,9 +75,8 @@ public class Main {
                 if (result.failureMessage() != null) {
                     LOG.info("       {}", result.failureMessage());
                 }
-            } else if (event instanceof ExecutionCompleted ec) {
+            } else if (event instanceof ExecutionCompleted(PlainTestResults results)) {
                 LOG.info("\n--- Results ---");
-                var results = ec.results();
                 LOG.info("Total: {}  Passed: {}  Failed: {}  Errors: {}",
                         results.total(), results.passed(), results.failed(), results.errors());
 
@@ -137,11 +132,11 @@ public class Main {
     private static String loadResource(String path) {
         try (InputStream is = Main.class.getClassLoader().getResourceAsStream(path)) {
             if (is == null) {
-                throw new RuntimeException("Resource not found: " + path);
+                throw new IOException("Resource not found: " + path);
             }
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to read resource: " + path, e);
+            throw new UncheckedIOException("Failed to read resource: " + path, e);
         }
     }
 }
