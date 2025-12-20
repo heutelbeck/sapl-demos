@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.sapl</groupId>
+		<artifactId>sapl-demo-parent</artifactId>
+        <version>4.0.0-SNAPSHOT</version>
+		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>sapl-demo-testing-dsl-junit</artifactId>
+	<name>SAPL Demo Policy Testing DSL JUnit</name>
+	<description>Example for testing your SAPL policies using the SAPLTest DSL with JUnit</description>
+
+	<dependencies>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-nop</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>test</phase>
+					</execution>
+				</executions>
+				<dependencies>
+					<!--
+					surefire plugin to provide a Tree view for nested JUnit Dynamic Tests
+					see https://github.com/fabriciorby/maven-surefire-junit5-tree-reporter
+
+					KNOWN LIMITATION: tree-reporter 1.5.1 is incompatible with surefire 3.5.4.
+					Nested DynamicContainer hierarchy is not displayed properly (shows flat).
+					Wait for tree-reporter 2.x release for proper surefire 3.5.4+ support.
+					-->
+					<dependency>
+						<groupId>me.fabriciorby</groupId>
+						<artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+						<version>${maven-surefire-junit5-tree-reporter.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<!-- set file Encoding to UTF-8 in case of special chars in test definition -->
+					<argLine>-Dfile.encoding=UTF-8</argLine>
+					<!-- the block below configures the maven-surefire-junit5-tree-reporter to provide a Tree view for nested JUnit Dynamic Tests -->
+					<reportFormat>plain</reportFormat>
+					<consoleOutputReporter>
+						<disable>false</disable>
+					</consoleOutputReporter>
+					<statelessTestsetInfoReporter
+							implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+					</statelessTestsetInfoReporter>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>sapl-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<!-- Set low hit ratios for initial testing -->
+					<policyHitRatio>0</policyHitRatio>
+					<policyConditionHitRatio>0</policyConditionHitRatio>
+					<failOnDisabledTests>false</failOnDisabledTests>
+					<enableSonarReport>true</enableSonarReport>
+					<enableHtmlReport>true</enableHtmlReport>
+				</configuration>
+				<executions>
+					<execution>
+						<id>coverage</id>
+						<goals>
+							<goal>enable-coverage-collection</goal>
+							<goal>report-coverage-information</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -1,28 +1,59 @@
-# Introduction of the demo application
+# Demo: Spring Data MongoDB Reactive Query Manipulation
 
-This small application is intended to illustrate the use of the Mongo reactive module. 
+This demo shows SAPL's built-in query manipulation for reactive MongoDB repositories. Policies can automatically rewrite MongoDB queries to add filter conditions and control which fields are returned.
 
-It has been built so that only the software called Docker is required to run it. A test database has been added to this demo and this database is started as a Docker container to communicate with the application. 
+## How It Works
 
-## Additional software required:
-Docker Engine and Docker Compose must be installed on the computer for the Docker containers. Docker Engine and Docker Compose can be installed as independent binary files. Alternatively, Docker Desktop can be used, which already contains Docker Engine and Docker Compose.
+The `@QueryEnforce` annotation on repository methods triggers policy evaluation. When a policy permits access, it can include obligations that SAPL's MongoDB integration understands natively:
 
-## Preparations:
-The demo must be built once and the dependencies installed. The demo uses Maven, so the ``mvn install`` command takes over this task. It should be noted here that Docker must already be running in the background, as the tests of the demo are also executed with the ``mvn install`` command. The tests communicate with a test container.  The integration tests that require a test container for the database are located in the following path: ``io.sapl.springdatar2dbcdemo.demo.rest.integration``
+```sapl
+obligation {
+    "type": "mongoQueryManipulation",
+    "conditions": [ "{'active': {'$eq': true}}" ],
+    "selection": { "type": "blacklist", "columns": ["firstname"] }
+}
+```
 
-## Start the demo: 
-A file called ``docker-compose.yml`` is located in the root directory of the demo. To start this, a terminal must be opened in the root directory. The command ``docker-compose up`` then executes the YML file in the terminal. Docker now installs all dependencies in the YML file and then starts the database container. Once the database container is running, the demo can be started via the main method.  
+This adds a MongoDB filter condition and excludes the firstname field from results. No custom Java constraint handler is needed.
 
-## User manual of the demo:
-The demo is structured in such a way that there are always two versions for a database query. One version executes the database query without the use of SAPL and the other includes the protection of SAPL. Each version of all database queries has its own residual endpoint for illustration purposes. An overview of all database queries can be found in the path ``http://localhost:8080/info``. The demo does not have a graphical user interface, but objects of type JSON can be displayed in a structured manner via the rest endpoints. The info endpoint lists all information about the various database queries. This includes, among other things 
+## Prerequisites
 
-* Type of database method
-* Name of the method	
-* Original query	
-* Manipulated query	
-* Link to call the remaining endpoint with original query	
-* Link to call the remaining endpoint with a manipulated query	
-* Policy used	
+Java 21 or later and Maven.
 
-The links already have filled-in parameters for the remaining endpoint, but these can be changed. If, for example, the second parameter with the value ``USER`` of the remaining endpoint ``http://localhost:8080/user/findAllByAgeAfterAndRole/18/USER`` is set below ``ADMIN``, an exception called ``AccessDeniedException`` is thrown. The examples from the demo are only intended to illustrate the new functionalities that the Mongo reactive module provides. No attention was paid to meaningfulness.   
- 
+## Running the Demo
+
+```bash
+cd sapl-demo-spring-data-mongo-reactive
+mvn spring-boot:run
+```
+
+The application uses Flapdoodle embedded MongoDB with pre-loaded test data.
+
+## Demo Users
+
+Two users are configured:
+
+- **admin** / admin (ROLE_ADMIN)
+- **user** / user (ROLE_USER)
+
+## Endpoints
+
+Open your browser and navigate to any endpoint. You will be prompted to log in.
+
+| Endpoint                                        | Description                                           |
+|-------------------------------------------------|-------------------------------------------------------|
+| http://localhost:8080/findAll                   | Returns all users, filtered by policy                 |
+| http://localhost:8080/findAllByAgeAfter/25      | Returns users older than the specified age            |
+| http://localhost:8080/fetchingByQueryMethod/son | Returns users whose lastname contains the search term |
+
+## Query Manipulation Features
+
+The policies in this demo show two capabilities:
+
+**Conditions** add MongoDB query filters. For example, `"conditions": ["{'role': {'$eq': 'USER'}}"]` excludes admin records. The condition syntax follows MongoDB query syntax.
+
+**Selection** controls which fields are returned. Use `"type": "blacklist"` to exclude specific fields or `"type": "whitelist"` to include only specific fields.
+
+## Related Demos
+
+For a conceptual introduction to SAPL's argument modification feature, see [sapl-demo-argumentchange](../sapl-demo-argumentchange). For a simpler row-level security example using custom constraint handlers, see [sapl-demo-books](../sapl-demo-books). For the SQL/R2DBC equivalent of this demo, see [sapl-demo-spring-data-r2dbc](../sapl-demo-spring-data-r2dbc).

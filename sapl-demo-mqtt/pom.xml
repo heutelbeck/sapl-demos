@@ -31,17 +31,6 @@
 	<artifactId>sapl-demo-mqtt</artifactId>
 	<name>SAPL Demo MQTT Attributes</name>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>io.sapl</groupId>
-				<artifactId>sapl-bom</artifactId>
-				<version>${sapl.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
