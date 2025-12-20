@@ -1,38 +1,31 @@
 /*
- * Comprehensive Demo Policy for SAPL Test Grammar Features
+ * Demo Policy for SAPL Test Grammar Features
  *
  * This policy demonstrates various SAPL features that can be tested
  * with the new SAPLTest grammar.
  */
-policy "comprehensiveDemo"
+policy "policyDemo"
 permit
     action == "access" & resource == "demo"
 where
-    // Subject validation
-    subject.role == "admin" | subject.role == "user";
-
-    // Function call
+    subject.role == "admin" || subject.role == "user";
     time.dayOfWeek(<time.now>) =~ "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY";
-
-    // Attribute check
     var status = <system.status>;
-    status == "online" | status == "maintenance";
-
-    // Parameterized attribute
+    status == "online" || status == "maintenance";
     var level = subject.<access.level("demo")>;
     level >= 1;
-advice
-    {
-        "type": "log",
-        "message": "Access granted to demo resource"
-    }
 obligation
     {
         "type": "audit",
         "action": "record_access",
         "timestamp": <time.now>
     }
+advice
+    {
+        "type": "log",
+        "message": "Access granted to demo resource"
+    }
 transform
     resource |- {
-        @.sensitiveData : filter.blacken
+        @.sensitiveData : filter.blacken(0, 0, "\u2588")
     }

@@ -70,7 +70,8 @@ requirement "FilterFunctionLibrary blacken is applied" {
             { "java": { "name": "findById" } }
         on
             { "id": 56, "diagnosisText": "diagnosisText", "icd11Code": "icd11Code" }
-        expect deny;
+        // Policy is permit-only for ROLE_ADMIN, so ROLE_USER gets not-applicable
+        expect not-applicable;
 }
 
 requirement "Function mocking for controlled testing" {
@@ -81,7 +82,7 @@ requirement "Function mocking for controlled testing" {
     scenario "mock blacken function to return custom value"
         given
             // Mock the filter.blacken function to return a controlled value
-            - function filter.blacken(any) maps to "REDACTED"
+            - function filter.blacken(any, any, any, any) maps to "REDACTED"
         when
             { "name": "willi", "authority": "ROLE_ADMIN" }
         attempts
@@ -106,7 +107,7 @@ requirement "Function mocking for controlled testing" {
 
     scenario "verify blacken was called"
         given
-            - function filter.blacken(any) maps to "CENSORED"
+            - function filter.blacken(any, any, any, any) maps to "CENSORED"
         when
             { "name": "willi", "authority": "ROLE_ADMIN" }
         attempts
@@ -116,7 +117,7 @@ requirement "Function mocking for controlled testing" {
         expect decision is permit, with obligation
         verify
             // Verify blacken was called twice (once for each field)
-            - function filter.blacken(any) is called 2 times;
+            - function filter.blacken(any, any, any, any) is called 2 times;
 }
 
 requirement "Matcher syntax demonstration" {

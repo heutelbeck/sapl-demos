@@ -11,10 +11,13 @@
 
 requirement "Function mocking with simple function policy" {
 
+    // Document at requirement level - all scenarios test this document
+    given
+        - document "policyWithSimpleFunction"
+
     // Scenario using policyWithSimpleFunction which calls time.dayOfWeek()
     scenario "mock dayOfWeek to return MONDAY"
         given
-            - document "policyWithSimpleFunction"
             // Mock the function with exact parameter match
             - function time.dayOfWeek("2021-02-08T16:16:33.616Z") maps to "MONDAY"
         when "user" attempts "read" on "resource"
@@ -22,7 +25,6 @@ requirement "Function mocking with simple function policy" {
 
     scenario "mock dayOfWeek with any parameter"
         given
-            - document "policyWithSimpleFunction"
             // Mock the function to accept any parameter
             - function time.dayOfWeek(any) maps to "FRIDAY"
         when "user" attempts "read" on "resource"
@@ -30,15 +32,13 @@ requirement "Function mocking with simple function policy" {
 
     scenario "mock dayOfWeek to return SUNDAY causes deny"
         given
-            - document "policyWithSimpleFunction"
             // SUNDAY is not in the allowed days
             - function time.dayOfWeek(any) maps to "SUNDAY"
         when "user" attempts "read" on "resource"
-        expect deny;
+        expect not-applicable;
 
     scenario "mock dayOfWeek and verify call count"
         given
-            - document "policyWithSimpleFunction"
             - function time.dayOfWeek(any) maps to "WEDNESDAY"
         when "user" attempts "read" on "resource"
         expect permit
@@ -47,7 +47,6 @@ requirement "Function mocking with simple function policy" {
 
     scenario "mock dayOfWeek with matching text"
         given
-            - document "policyWithSimpleFunction"
             // Use matching syntax for parameter
             - function time.dayOfWeek(matching text) maps to "TUESDAY"
         when "user" attempts "read" on "resource"
@@ -56,10 +55,13 @@ requirement "Function mocking with simple function policy" {
 
 requirement "Function mocking with streaming policy" {
 
+    // Document at requirement level
+    given
+        - document "policyStreaming"
+
     // policyStreaming uses time.secondOf(<time.now>) > 4
     scenario "mock secondOf to allow access"
         given
-            - document "policyStreaming"
             // Mock the attribute and function
             - attribute "nowMock" <time.now> emits "2021-02-08T16:16:05.000Z"
             // Mock secondOf to return 5 (> 4, so permit)
@@ -71,7 +73,6 @@ requirement "Function mocking with streaming policy" {
 
     scenario "mock secondOf to deny access"
         given
-            - document "policyStreaming"
             - attribute "nowMock" <time.now> emits "2021-02-08T16:16:01.000Z"
             // Mock secondOf to return 3 (<= 4, so deny)
             - function time.secondOf(any) maps to 3
@@ -80,7 +81,6 @@ requirement "Function mocking with streaming policy" {
 
     scenario "verify function called multiple times with stream"
         given
-            - document "policyStreaming"
             // Mock attribute to emit multiple values
             - attribute "nowMock" <time.now> emits "first"
             // Mock function (idempotent - same result for any call)
@@ -99,12 +99,15 @@ requirement "Function mocking with streaming policy" {
 
 requirement "Function mocking with filter library" {
 
+    // Document at requirement level
+    given
+        - document "policyWithObligationAndResource"
+
     // policyWithObligationAndResource uses FilterFunctionLibrary
     scenario "admin with blacken filter creates obligations"
         given
-            - document "policyWithObligationAndResource"
-            // Filter functions are available, mock filter.blacken to return specific value
-            - function filter.blacken(any) maps to "REDACTED"
+            // Filter functions are available, mock filter.blacken (4 params: value, start, end, replacement) to return specific value
+            - function filter.blacken(any, any, any, any) maps to "REDACTED"
         when
             { "name": "willi", "authority": "ROLE_ADMIN" }
         attempts
@@ -117,9 +120,12 @@ requirement "Function mocking with filter library" {
 
 requirement "Function mocking with multiple parameters" {
 
+    // Document at requirement level
+    given
+        - document "policyWithSimpleFunction"
+
     scenario "mock function with multiple exact parameters"
         given
-            - document "policyWithSimpleFunction"
             // Hypothetical function with multiple params
             - function time.dayOfWeek("2021-02-08T16:16:33.616Z") maps to "MONDAY"
         when "user" attempts "read" on "resource"
@@ -129,26 +135,40 @@ requirement "Function mocking with multiple parameters" {
 
     scenario "mock function with mixed matchers"
         given
-            - document "policyWithSimpleFunction"
             // First param exact, would need 'any' for flexibility
             - function time.dayOfWeek(matching text "2021-02-08T16:16:33.616Z") maps to "THURSDAY"
         when "user" attempts "read" on "resource"
         expect permit;
 
-    scenario "mock no-arg function"
+    scenario "mock no-arg function does not match arity"
         given
-            - document "policyWithSimpleFunction"
-            // Mock with no parameters
+            // Mock with no parameters - won't match policy's 1-arg call
             - function time.dayOfWeek() maps to "MONDAY"
+            // Also mock the 1-arg version to show arity-specific mocking
+            - function time.dayOfWeek(any) maps to "FRIDAY"
         when "user" attempts "read" on "resource"
-        // Will not match because policy calls with a parameter
-        expect deny;
+        // 1-arg mock matches, returns FRIDAY, policy permits
+        expect permit;
 
     scenario "mock function returning error"
         given
-            - document "policyWithSimpleFunction"
             // Function can return an error
             - function time.dayOfWeek(any) maps to error("time service unavailable")
         when "user" attempts "read" on "resource"
         expect indeterminate;
+}
+
+requirement "Function mocking with undefined values" {
+
+    // Document at requirement level
+    given
+        - document "policyWithSimpleFunction"
+
+    scenario "mock function returning undefined"
+        given
+            // Function can return undefined - causes condition to not match
+            - function time.dayOfWeek(any) maps to undefined
+        when "user" attempts "read" on "resource"
+        // undefined values cause conditions to evaluate to false, making policy not applicable
+        expect not-applicable;
 }

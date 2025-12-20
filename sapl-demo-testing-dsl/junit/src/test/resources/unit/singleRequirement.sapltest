@@ -12,13 +12,14 @@
 // definitions. The requirement name needs to be unique within one file.
 requirement "Policy Simple should grant read access for willi on something" {
 
+    // Document at requirement level - all scenarios test this document
+    // This creates a UNIT test (single document).
+    given
+        - document "policySimple"
+
     // Define the scenario name. This represents a single isolated test case within the
     // requirement. The scenario name needs to be unique within a requirement.
     scenario "willi tries to read something"
-        given
-            // Define the document (policy) to test. Must be located in src/main/resources
-            // or a subfolder. This creates a UNIT test (single document).
-            - document "policySimple"
         // Define the AuthorizationSubscription for the test
         when subject "willi" attempts action "read" on resource "something"
         // Define the expected AuthorizationDecision
@@ -26,8 +27,6 @@ requirement "Policy Simple should grant read access for willi on something" {
 
     // Second scenario for negative test
     scenario "not_willi tries to read something"
-        given
-            - document "policySimple"
         // Short form: omit "subject", "action", "resource" keywords
         when "not_willi" attempts "read" on "something"
         // Expect deny since the policy only permits for "willi"
@@ -35,8 +34,6 @@ requirement "Policy Simple should grant read access for willi on something" {
 
     // Scenario demonstrating complex subject/action/resource definitions
     scenario "willi reads with complex subscription"
-        given
-            - document "policySimple"
         when
             { "name": "willi" }
         attempts

@@ -52,7 +52,7 @@ requirement "should grant read access for WILLI on foo depending on policy set a
             - documents "policiesIT/policy_A", "policiesIT/policy_B", "policiesIT/policy_C"
             - permit-unless-deny
         when "WILLI" attempts "read" on "foo"
-        // Policy C denies, so deny
+        // Policy A denies, so deny
         expect deny;
 }
 
@@ -83,7 +83,8 @@ requirement "Integration tests with variables" {
     scenario "test with variables and environment"
         given
             - documents "policiesIT/policy_A", "policiesIT/policy_B"
-            - deny-overrides
+            // Use permit-overrides so policy_B's permit wins over policy_A's deny
+            - permit-overrides
             - variables { "testVar": "value" }
             // Environment is part of the authorization subscription context
             - environment { "tenant": "acme", "region": "eu-west" }
@@ -147,8 +148,9 @@ requirement "Integration test with mocking" {
     scenario "integration test with attribute mock"
         given
             - documents "policiesIT/policy_A", "policiesIT/policy_B"
-            - deny-overrides
-            // Can mock attributes in integration tests
+            // Use permit-overrides so policy_B's permit wins
+            - permit-overrides
+            // Demonstrate that attributes can be mocked in integration tests
             - attribute "timeMock" <time.now> emits "2025-01-06T12:00:00Z"
         when "WILLI" attempts "read" on "foo"
         expect permit;
@@ -161,27 +163,35 @@ requirement "Integration test with mocking" {
         // policy_A denies, policy_B permits, permit-overrides means permit wins
         expect permit;
 
-    scenario "integration test with streaming"
+    scenario "streaming with policy that uses time attribute"
         given
-            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            // policy_C uses <time.now(interval)> with parameter
+            // It checks: time.secondOf(<time.now(interval)>) >= 4
+            - documents "policiesIT/policy_C"
             - permit-overrides
-            - attribute "statusMock" <system.status> emits "online"
-        when "WILLI" attempts "read" on "foo"
+            // Mock the time attribute with parameter using any matcher
+            - attribute "timeMock" <time.now(any)> emits "time1"
+            // Mock secondOf to return controlled values based on time values
+            - function time.secondOf("time1") maps to 5
+            - function time.secondOf("time2") maps to 2
+        when "WILLI" attempts "read" on "bar"
+        // With secondOf returning 5 (>= 4), policy_C permits
         expect permit
         then
-            - attribute "statusMock" emits "maintenance"
-        // Depending on policy, may change decision
-        expect permit;
+            // Change time to trigger re-evaluation
+            - attribute "timeMock" emits "time2"
+        // With secondOf returning 2 (< 4), policy_C's where clause fails
+        expect not-applicable;
 }
 
 requirement "Minimal integration test syntax" {
 
     // When no given block is provided at all, uses all documents
-    // with default combining algorithm from configuration
+    // with default combining algorithm (deny-overrides by default)
     scenario "using all documents with defaults"
         when "WILLI" attempts "read" on "foo"
-        // Result depends on all documents and default algorithm
-        expect permit;
+        // With deny-overrides default and policy_A denying "foo", result is deny
+        expect deny;
 
     scenario "minimal with just algorithm"
         given
