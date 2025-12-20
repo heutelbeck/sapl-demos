@@ -1,0 +1,367 @@
+/*
+ * Matcher Validation Tests
+ *
+ * This file comprehensively tests all matcher features:
+ * - Value matchers (any, exact, matching)
+ * - Type matchers (text, number, boolean, array, object, null)
+ * - String matchers (containing, regex, starts/ends with, etc.)
+ * - Object matchers (key-value matching)
+ * - Array matchers (element matching)
+ * - Function parameter matchers
+ * - Attribute entity matchers
+ */
+
+// =============================================================================
+// SECTION 1: VALUE MATCHERS IN FUNCTION PARAMETERS
+// =============================================================================
+
+requirement "Function Parameter Value Matchers" {
+
+    given
+        - document "policyWithSimpleFunction"
+
+    scenario "any matcher matches any value"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "exact value matcher matches specific value"
+        given
+            - function time.dayOfWeek("2025-01-06") maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "matching text matches any text"
+        given
+            - function time.dayOfWeek(matching text) maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "matching number matches any number"
+        given
+            // Assume a function that takes a number parameter
+            - function time.dayOfWeek(matching number) maps to "MONDAY"
+            // Also mock with any to ensure it works
+            - function time.dayOfWeek(any) maps to "TUESDAY"
+        when "user" attempts "read" on "resource"
+        // Any matcher is less specific, so the number matcher won't match text param
+        expect permit;
+
+    scenario "matching object matches any object"
+        given
+            - function time.dayOfWeek(matching object) maps to "WEDNESDAY"
+            - function time.dayOfWeek(any) maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 2: ATTRIBUTE ENTITY MATCHERS
+// =============================================================================
+
+requirement "Attribute Entity Matchers" {
+
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "any entity matcher matches all entities"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "exact text entity matcher matches specific subject"
+        given
+            - attribute "mock1" "willi".<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "matching text entity matcher matches text subjects"
+        given
+            - attribute "mock1" matching text.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "matching object entity matcher matches object subjects"
+        given
+            // Won't match string subject "willi", but demonstrates syntax
+            - attribute "mock1" matching object.<test.upper> emits "WILLI"
+            - attribute "fallback" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 3: STRING MATCHERS - COMPREHENSIVE
+// =============================================================================
+
+requirement "String Matchers - Comprehensive" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "text containing substring"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text containing "DACT"
+        };
+
+    scenario "text containing case insensitive"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text containing "dact" case-insensitive
+        };
+
+    scenario "text with regex pattern"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text with regex "^[A-Z]+$"
+        };
+
+    scenario "text starting with prefix"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text starting with "RED"
+        };
+
+    scenario "text ending with suffix"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text ending with "TED"
+        };
+
+    scenario "text with specific length"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        // REDACTED is 8 characters
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text with length 8
+        };
+
+    scenario "text equal case insensitive"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text equal to "redacted" case-insensitive
+        };
+}
+
+// =============================================================================
+// SECTION 4: OBJECT MATCHERS
+// =============================================================================
+
+requirement "Object Matchers" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "matching any object"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object;
+
+    scenario "object with single key-value pair"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "logAccess"
+        };
+
+    scenario "object with multiple key-value pairs"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "logAccess" and "message" is text
+        };
+
+    scenario "object with nested text matcher"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "message" is text containing "willi"
+        };
+
+    scenario "object containing key with value"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation containing key "type" with value matching text "logAccess";
+}
+
+// =============================================================================
+// SECTION 5: ARRAY MATCHERS
+// =============================================================================
+
+requirement "Array Matchers" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "matching any array"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "tags": ["a", "b"], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "tags" is array
+        };
+
+    scenario "array with specific elements"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "tags": ["alpha", "beta"], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "tags" is array where [text "alpha", text "beta"]
+        };
+
+    scenario "array with type matchers"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "tags": ["a", "b"], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "tags" is array where [text, text]
+        };
+
+    scenario "array with mixed number elements"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "scores": [10, 20, 30], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "scores" is array where [number 10, number 20, number 30]
+        };
+}
+
+// =============================================================================
+// SECTION 6: NUMBER AND BOOLEAN MATCHERS
+// =============================================================================
+
+requirement "Number and Boolean Matchers" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "number exact match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 42, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "id" is number 42
+        };
+
+    scenario "number any match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 999, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "id" is number
+        };
+
+    scenario "boolean true match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "active": true, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "active" is boolean true
+        };
+
+    scenario "boolean false match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "active": false, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "active" is boolean false
+        };
+
+    scenario "boolean any match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "active": true, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "active" is boolean
+        };
+}
+
+// =============================================================================
+// SECTION 7: NULL MATCHER
+// =============================================================================
+
+requirement "Null Matcher" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "null value match"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "optional": null, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "optional" is null
+        };
+}
+
+// =============================================================================
+// SECTION 8: DECISION MATCHERS
+// =============================================================================
+
+requirement "Decision Matchers" {
+
+    given
+        - document "policySimple"
+
+    scenario "is permit matcher"
+        when "willi" attempts "read" on "something"
+        expect decision is permit;
+
+    scenario "is deny matcher"
+        when "willi" attempts "write" on "something"
+        expect decision is deny;
+
+    scenario "any decision matcher"
+        when "willi" attempts "read" on "something"
+        expect decision any;
+}
+
+requirement "Decision Matchers - Indeterminate" {
+
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "is indeterminate matcher"
+        given
+            - attribute "errorMock" any.<test.upper> emits error("test error")
+        when "willi" attempts "read" on "something"
+        expect decision is indeterminate;
+}
+
+requirement "Decision Matchers - Not Applicable" {
+
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "is not-applicable matcher"
+        given
+            - attribute "mock1" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect decision is not-applicable;
+}

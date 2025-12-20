@@ -107,8 +107,8 @@ requirement "Attribute streaming with then blocks" {
             // Initial emission
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
-        // First decision with NOT_WILLI
-        expect deny
+        // First decision with NOT_WILLI (permit-only policy -> not-applicable)
+        expect not-applicable
         then
             // Emit new value - use mockId to identify which mock to update
             - attribute "upperMock" emits "WILLI"
@@ -119,14 +119,14 @@ requirement "Attribute streaming with then blocks" {
         given
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
-        expect deny
+        expect not-applicable
         then
             - attribute "upperMock" emits "WILLI"
         expect permit
         then
             - attribute "upperMock" emits "still_WILLI"
         // WILLI != still_WILLI
-        expect deny
+        expect not-applicable
         then
             - attribute "upperMock" emits "WILLI"
         expect permit
@@ -146,20 +146,37 @@ requirement "Attribute mocking with object entities" {
             // Entity can be a complex JSON object
             - attribute "upperMock" {"id": 1, "name": "willi"}.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        // Won't match because policy uses subject string, not object
-        expect deny;
+        // Won't match because policy uses subject string ("willi"), not object
+        // No mock matches -> returns error Value -> policy evaluates to indeterminate
+        expect indeterminate;
 
     scenario "mock with matching object entity"
         given
-            // Use matching syntax for entity
+            // Use matching syntax for entity - matches any object
+            // But subject is string "willi", not an object, so won't match
             - attribute "upperMock" matching object.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        expect permit;
+        expect indeterminate;
 
     scenario "mock with array entity"
         given
-            // Entity can be an array
+            // Entity is an array - won't match string subject "willi"
             - attribute "upperMock" ["willi", "admin"].<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        expect deny;
+        expect indeterminate;
+}
+
+requirement "Attribute mocking with undefined values" {
+
+    // Use policyWithSinglePIP
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "attribute emits undefined"
+        given
+            // Attribute can emit undefined - causes condition to not match
+            - attribute "upperMock" any.<test.upper> emits undefined
+        when "willi" attempts "read" on "something"
+        // undefined values cause conditions to evaluate to false, making policy not applicable
+        expect not-applicable;
 }

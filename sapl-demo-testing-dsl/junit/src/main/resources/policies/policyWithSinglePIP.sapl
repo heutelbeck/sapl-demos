@@ -1,0 +1,9 @@
+/*
+ * Simple policy using only a single PIP attribute.
+ * Use this for tests that don't need to mock multiple attributes.
+ */
+policy "policyWithSinglePIP"
+permit
+    action == "read"
+where
+    subject.<test.upper> == "WILLI";

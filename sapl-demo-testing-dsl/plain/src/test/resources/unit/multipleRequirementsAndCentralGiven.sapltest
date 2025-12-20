@@ -69,7 +69,8 @@ requirement "Central given with multiple items" {
             // Different MockId avoids collision
             - attribute "specificMock" "willi".<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
-        expect deny;
+        // policyWithSinglePIP is permit-only, when where clause fails, result is not-applicable
+        expect not-applicable;
 
     scenario "third scenario adds to central given"
         given

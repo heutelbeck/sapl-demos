@@ -12,15 +12,26 @@
 
 	<artifactId>sapl-demo-testing-dsl-plain</artifactId>
 	<name>SAPL Demo Policy Testing DSL Plain</name>
-	<description>Example for testing your SAPL policies using the PlainTestAdapter without JUnit</description>
+	<description>Example for testing your SAPL policies using the PlainTestAdapter</description>
 	<dependencies>
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-test</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
@@ -34,11 +45,6 @@
 					<mainClass>io.sapl.demo.testing.dsl.plain.Main</mainClass>
 				</configuration>
 			</plugin>
-			<!--
-			SAPL Maven Plugin for coverage reporting.
-			Note: For this demo, run 'mvn compile exec:java' first to generate coverage data,
-			then 'mvn sapl:report-coverage-information' to generate the report.
-			-->
 			<plugin>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>sapl-maven-plugin</artifactId>
@@ -51,6 +57,15 @@
 					<enableSonarReport>true</enableSonarReport>
 					<enableHtmlReport>true</enableHtmlReport>
 				</configuration>
+				<executions>
+					<execution>
+						<id>coverage</id>
+						<goals>
+							<goal>enable-coverage-collection</goal>
+							<goal>report-coverage-information</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

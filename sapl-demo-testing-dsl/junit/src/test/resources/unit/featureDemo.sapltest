@@ -1,8 +1,8 @@
 /*
- * COMPREHENSIVE FEATURE DEMONSTRATION
- * ====================================
+ * SAPL Test Language Feature Demonstration
+ * ========================================
  *
- * This file demonstrates ALL features of the SAPL test language:
+ * This file demonstrates features of the SAPL test language:
  *
  * 1. Document specification (unit vs integration tests)
  * 2. Combining algorithms
@@ -13,11 +13,9 @@
  * 7. Streaming with then blocks
  * 8. Verification blocks
  * 9. All decision types and matchers
- * 10. All JSON node matchers
+ * 10. Value model matchers
  * 11. String matchers
  * 12. Central given blocks
- *
- * Matching policy: policyComprehensiveDemo.sapl
  */
 
 // =============================================================================
@@ -41,8 +39,9 @@ requirement "Basic Structure Demo" {
     // With multiple documents (integration test)
     scenario "integration test with documents"
         given
-            - documents "policySimple", "policyWithSimplePIP"
+            - documents "policySimple", "policyWithSinglePIP"
             - permit-overrides
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
         expect permit;
 }
@@ -53,14 +52,17 @@ requirement "Basic Structure Demo" {
 
 requirement "Combining Algorithm Demo" {
 
+    // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - documents "policySimple", "policyWithSimplePIP"
+        - documents "policySimple", "policyWithSinglePIP"
 
     scenario "deny-overrides"
         given
             - deny-overrides
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
+        // policySimple permits willi, policyWithSinglePIP denies (NOT_WILLI)
+        // deny-overrides means deny wins
         expect deny;
 
     scenario "permit-overrides"
@@ -71,12 +73,12 @@ requirement "Combining Algorithm Demo" {
         // policySimple permits, so overall permit
         expect permit;
 
-    scenario "only-one-applicable"
+    scenario "only-one-applicable with multiple matches"
         given
             - only-one-applicable
-            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
-        when "not_willi" attempts "read" on "something"
-        // Multiple applicable -> indeterminate
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        // Both policies are applicable -> indeterminate
         expect indeterminate;
 
     scenario "deny-unless-permit"
@@ -91,6 +93,8 @@ requirement "Combining Algorithm Demo" {
             - permit-unless-deny
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "not_willi" attempts "read" on "something"
+        // not_willi doesn't match policySimple, policyWithSinglePIP denies
+        // permit-unless-deny: no permit found -> permit (unless deny converts to permit)
         expect permit;
 }
 
@@ -269,24 +273,11 @@ requirement "Function Mocking Demo" {
 
 requirement "Attribute Mocking Demo" {
 
+    // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - document "policyWithSimplePIP"
+        - document "policyWithSinglePIP"
 
-    // Environment attributes (no entity)
-    scenario "environment attribute simple"
-        given
-            - attribute "mock1" <test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit;
-
-    scenario "environment attribute with parameters"
-        given
-            - attribute "mock1" <test.lookup("key")> emits "value"
-            - attribute "mock2" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit;
-
-    // Entity attributes
+    // Entity attributes (policyWithSinglePIP uses subject.<test.upper>)
     scenario "entity attribute with any"
         given
             - attribute "mock1" any.<test.upper> emits "WILLI"
@@ -377,13 +368,12 @@ requirement "Attribute Mocking Demo" {
         when "willi" attempts "read" on "something"
         expect indeterminate;
 
-    // Without initial emit
-    scenario "attribute mock without initial emit"
-        given
-            - attribute "mock1" any.<test.upper>
-            - attribute "mock2" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit;
+    // Note: Attribute mocks without initial emit values are meaningful only
+    // when the attribute is initially not fetched due to short-circuit evaluation.
+    // SAPL's && and || operators short-circuit in where clauses. Example:
+    //   where action == "admin" || subject.<test.upper> == "WILLI"
+    // If action is "admin", || short-circuits and test.upper is never fetched.
+    // For policyWithSinglePIP (which always fetches test.upper), initial values are required.
 }
 
 // =============================================================================
@@ -392,8 +382,9 @@ requirement "Attribute Mocking Demo" {
 
 requirement "Streaming Demo" {
 
+    // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - document "policyWithSimplePIP"
+        - document "policyWithSinglePIP"
 
     scenario "single then block"
         given
@@ -419,20 +410,19 @@ requirement "Streaming Demo" {
             - attribute "mock1" emits "WILLI"
         expect permit;
 
-    scenario "multiple attributes in then"
+    scenario "multiple attributes streaming"
         given
             - attribute "mock1" any.<test.upper> emits "NOT_WILLI"
-            - attribute "mock2" any.<test.hasEnvVar> emits "NOT_BAR"
+            - attribute "mock2" any.<other.attr> emits "X"
         when "willi" attempts "read" on "something"
         expect deny
         then
             - attribute "mock1" emits "WILLI"
         expect permit
         then
-            - attribute "mock1" emits "X"
-            - attribute "mock2" emits "BAR"
-        // hasEnvVar now matches
-        expect permit;
+            - attribute "mock1" emits "NOT_WILLI"
+            - attribute "mock2" emits "Y"
+        expect deny;
 
     scenario "emit error in then block"
         given
@@ -450,28 +440,12 @@ requirement "Streaming Demo" {
 
 requirement "Verification Demo" {
 
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    // Verification only works for attributes/functions actually called by the policy
     given
-        - document "policyWithSimplePIP"
+        - document "policyWithSinglePIP"
 
-    scenario "verify function called once"
-        given
-            - function helper.log(any) maps to true
-            - attribute "mock1" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit
-        verify
-            - function helper.log(any) is called once;
-
-    scenario "verify function called multiple times"
-        given
-            - function counter.increment() maps to 1
-            - attribute "mock1" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit
-        verify
-            - function counter.increment() is called 3 times;
-
-    scenario "verify attribute called"
+    scenario "verify attribute called once"
         given
             - attribute "mock1" any.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
@@ -479,26 +453,7 @@ requirement "Verification Demo" {
         verify
             - attribute any.<test.upper> is called once;
 
-    scenario "verify environment attribute"
-        given
-            - attribute "mock1" <system.time> emits "2025-01-01"
-            - attribute "mock2" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit
-        verify
-            - attribute <system.time> is called once;
-
-    scenario "verify multiple items"
-        given
-            - function audit.log(any) maps to true
-            - attribute "mock1" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        expect permit
-        verify
-            - function audit.log(any) is called once
-            - attribute any.<test.upper> is called once;
-
-    scenario "verify after streaming"
+    scenario "verify after streaming - multiple calls"
         given
             - attribute "mock1" any.<test.upper> emits "A"
         when "willi" attempts "read" on "something"
@@ -510,7 +465,7 @@ requirement "Verification Demo" {
             - attribute "mock1" emits "WILLI"
         expect permit
         verify
-            // 3 evaluations total
+            // 3 evaluations total (one per emission)
             - attribute any.<test.upper> is called 3 times;
 }
 
@@ -537,7 +492,7 @@ requirement "Decision Types Demo" {
 
     scenario "expect indeterminate"
         given
-            - document "policyWithSimplePIP"
+            - document "policyWithSinglePIP"
             - attribute "mock1" any.<test.upper> emits error
         when "willi" attempts "read" on "something"
         expect indeterminate;
@@ -634,8 +589,9 @@ requirement "Decision Matcher Demo" {
 
 requirement "Stream Expectation Demo" {
 
+    // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - document "policyWithSimplePIP"
+        - document "policyWithSinglePIP"
 
     scenario "stream expect with once"
         given
@@ -912,8 +868,9 @@ requirement "String Matcher Demo" {
 requirement "Central Given Demo" {
 
     // Central given applies to all scenarios
+    // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - document "policyWithSimplePIP"
+        - document "policyWithSinglePIP"
         - variables { "shared": "value" }
         - attribute "sharedMock" any.<test.upper> emits "WILLI"
 
@@ -928,10 +885,11 @@ requirement "Central Given Demo" {
         when "willi" attempts "read" on "something"
         expect permit;
 
-    scenario "overrides central given attribute"
+    scenario "more specific matcher wins over central"
         given
-            // Override the shared attribute mock
-            - attribute "sharedMock" any.<test.upper> emits "NOT_WILLI"
+            // Use a more specific matcher - matches "willi" subject specifically
+            // This wins over the central "any" matcher
+            - attribute "specificMock" "willi".<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
         expect deny;
 

@@ -153,16 +153,13 @@ requirement "Integration test with mocking" {
         when "WILLI" attempts "read" on "foo"
         expect permit;
 
-    scenario "integration test with mock and verification"
+    scenario "integration test with multiple documents"
         given
             - documents "policiesIT/policy_A", "policiesIT/policy_B"
             - permit-overrides
-            - function audit.log(any) maps to true
         when "WILLI" attempts "read" on "foo"
-        expect permit
-        verify
-            // Verify function was called if policies use it
-            - function audit.log(any) is called once;
+        // policy_A denies, policy_B permits, permit-overrides means permit wins
+        expect permit;
 
     scenario "integration test with streaming"
         given
