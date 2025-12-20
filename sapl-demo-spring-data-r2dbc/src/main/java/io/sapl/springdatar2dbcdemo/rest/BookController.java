@@ -15,28 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.repository;
+package io.sapl.springdatar2dbcdemo.rest;
 
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.sapl.springdatar2dbcdemo.domain.Book;
+import io.sapl.springdatar2dbcdemo.domain.BookRepository;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
-@Data
-@Getter
-@Setter
-@Table("Person")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Person {
-    int     personId;
-    String  firstname;
-    String  lastname;
-    int     age;
-    Role    role;
-    boolean active;
-    int     addressId;
+@RestController
+@RequiredArgsConstructor
+public class BookController {
+
+    private final BookRepository repository;
+
+    @GetMapping("/")
+    public Flux<Book> findAll() {
+        return repository.findAllBooks();
+    }
+
 }

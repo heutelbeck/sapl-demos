@@ -15,15 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.repository;
+package io.sapl.springdatamongoreactivedemo.domain;
 
-import org.springframework.stereotype.Service;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Service
-public class CustomBean {
-	
-	public int getAge() {
-		return 22;
-	}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@Document("book")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Book {
+    @Id
+    Long    id;
+    String  name;
+    Integer category;
 }

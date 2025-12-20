@@ -27,8 +27,6 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -38,6 +36,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
+import io.sapl.springdatar2dbcdemo.data.DemoData;
 import reactor.core.publisher.Mono;
 
 @Configuration
@@ -48,22 +47,16 @@ public class SecurityConfig implements WebFilter {
 
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-
         return http
-                .authorizeExchange(
-                        exchange -> exchange.pathMatchers("/public/**").permitAll().anyExchange().authenticated())
-                .formLogin(withDefaults()).logout(logout -> logout.logoutUrl("/logout")).build();
+                .authorizeExchange(exchange -> exchange.anyExchange().authenticated())
+                .formLogin(withDefaults())
+                .logout(logout -> logout.logoutUrl("/logout"))
+                .build();
     }
 
     @Bean
     MapReactiveUserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails testUser1 = User.withUsername("admin").password(passwordEncoder.encode("admin")).roles("ADMIN")
-                .authorities("ROLE_ADMIN").disabled(false).build();
-
-        UserDetails testUser2 = User.withUsername("user").password(passwordEncoder.encode("user")).roles("USER")
-                .authorities("ROLE_USER").disabled(false).build();
-
-        return new MapReactiveUserDetailsService(testUser1, testUser2);
+        return new MapReactiveUserDetailsService(DemoData.users(passwordEncoder));
     }
 
     @Bean
@@ -81,6 +74,7 @@ public class SecurityConfig implements WebFilter {
                         SecurityContextHolder.setContext((SecurityContext) securityContext);
                     }
                     return chain.filter(exchange);
-                }).switchIfEmpty(Mono.empty());
+                }).switchIfEmpty(chain.filter(exchange));
     }
+
 }

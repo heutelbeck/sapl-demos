@@ -15,8 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.repository;
+package io.sapl.springdatar2dbcdemo.domain;
 
-public enum Role {
-    ADMIN, USER
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Table("book")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Book {
+    @Id
+    Long    id;
+    String  name;
+    Integer category;
 }

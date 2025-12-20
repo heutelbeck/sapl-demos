@@ -15,31 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.repository;
+package io.sapl.springdatar2dbcdemo;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.springframework.security.test.context.support.WithSecurityContext;
 
-@Data
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Document(collection = "users")
-public class User {
-
-    @Id
-    ObjectId id;
-    String   firstname;
-    String   lastname;
-    Integer  age;
-    Role     role;
-    Boolean  active;
+/**
+ * Annotation to run tests with a mock LibraryUser.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@WithSecurityContext(factory = WithMockLibraryUserSecurityContextFactory.class)
+public @interface WithMockLibraryUser {
+    String username() default "testuser";
+    int department() default 1;
+    int[] dataScope() default {};
 }

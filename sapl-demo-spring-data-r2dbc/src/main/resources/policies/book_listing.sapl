@@ -1,0 +1,22 @@
+set "List and filter books - R2DBC query manipulation"
+
+first-applicable
+
+for action == "findAll"
+
+policy "deny if scope null"
+deny
+where
+  subject.dataScope in [null, undefined];
+
+policy "empty scope means no limit"
+permit
+where
+  subject.dataScope == [];
+
+policy "enforce filtering"
+permit
+obligation {
+              "type"       : "r2dbcQueryManipulation",
+              "conditions" : [ "category IN (" + string.join(subject.dataScope, ",") + ")" ]
+            }

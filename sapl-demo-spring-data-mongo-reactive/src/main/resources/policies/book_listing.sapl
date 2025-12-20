@@ -1,0 +1,22 @@
+set "List and filter books - MongoDB query manipulation"
+
+first-applicable
+
+for action == "findAll"
+
+policy "deny if scope null"
+deny
+where
+  subject.principal.dataScope in [null, undefined];
+
+policy "empty scope means no limit"
+permit
+where
+  subject.principal.dataScope == [];
+
+policy "enforce filtering"
+permit
+obligation {
+              "type"       : "mongoQueryManipulation",
+              "conditions" : [ "{ 'category': { '$in': " + subject.principal.dataScope + " } }" ]
+            }

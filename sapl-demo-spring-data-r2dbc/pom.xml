@@ -105,6 +105,16 @@
 			<version>5.2.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -116,6 +126,26 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>sapl-maven-plugin</artifactId>
+				<version>${project.version}</version>
+				<configuration>
+					<policyHitRatio>100</policyHitRatio>
+					<policyConditionHitRatio>100</policyConditionHitRatio>
+					<enableSonarReport>true</enableSonarReport>
+					<enableHtmlReport>true</enableHtmlReport>
+				</configuration>
+				<executions>
+					<execution>
+						<id>coverage</id>
+						<goals>
+							<goal>enable-coverage-collection</goal>
+							<goal>report-coverage-information</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

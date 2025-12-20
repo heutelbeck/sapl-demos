@@ -15,8 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.repository;
+package io.sapl.springdatamongoreactivedemo.rest;
 
-public enum Role {
-    ADMIN, USER
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.sapl.springdatamongoreactivedemo.domain.Book;
+import io.sapl.springdatamongoreactivedemo.domain.BookRepository;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
+
+@RestController
+@RequiredArgsConstructor
+public class BookController {
+
+    private final BookRepository repository;
+
+    @GetMapping("/")
+    public Flux<Book> findAll() {
+        return repository.findAllBooks();
+    }
+
 }

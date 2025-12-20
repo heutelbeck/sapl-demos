@@ -15,15 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.repository;
+package io.sapl.springdatar2dbcdemo.domain;
 
-import org.springframework.stereotype.Service;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
 
-@Service
-public class CustomBean {
-	
-	public int getAge() {
-		return 22;
-	}
+import io.sapl.spring.method.metadata.QueryEnforce;
+import reactor.core.publisher.Flux;
+
+@Repository
+public interface BookRepository extends R2dbcRepository<Book, Long> {
+
+    @QueryEnforce(subject = "@authHelper.getPrincipal()", action = "findAll")
+    @Query("SELECT * FROM book")
+    Flux<Book> findAllBooks();
 
 }

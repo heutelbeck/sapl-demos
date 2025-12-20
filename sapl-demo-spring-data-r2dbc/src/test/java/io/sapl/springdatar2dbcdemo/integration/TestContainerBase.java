@@ -40,4 +40,3 @@ public class TestContainerBase {
         registry.add("spring.r2dbc.password", () -> postgreSQLContainer.getPassword());
     }
 }
-

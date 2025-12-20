@@ -15,25 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.repository;
+package io.sapl.springdatamongoreactivedemo.domain;
 
-import org.springframework.data.relational.core.mapping.Table;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.stereotype.Repository;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.sapl.spring.method.metadata.QueryEnforce;
+import reactor.core.publisher.Flux;
 
-@Data
-@Getter
-@Setter
-@Table("Address")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Address {
-    int    addressId;
-    String street;
-    String city;
-    String zip;
+@Repository
+public interface BookRepository extends ReactiveMongoRepository<Book, Long> {
+
+    @QueryEnforce(subject = "authentication", action = "findAll")
+    @Query("{}")
+    Flux<Book> findAllBooks();
+
 }
