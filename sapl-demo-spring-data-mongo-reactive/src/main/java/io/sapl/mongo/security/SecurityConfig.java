@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.config;
+package io.sapl.mongo.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -36,7 +36,7 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
-import io.sapl.springdatamongoreactivedemo.data.DemoData;
+import io.sapl.mongo.data.DemoData;
 import reactor.core.publisher.Mono;
 
 @Configuration

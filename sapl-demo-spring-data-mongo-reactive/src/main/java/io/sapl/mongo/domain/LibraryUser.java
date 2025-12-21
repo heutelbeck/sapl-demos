@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.domain;
+package io.sapl.mongo.domain;
 
 import java.util.List;
 

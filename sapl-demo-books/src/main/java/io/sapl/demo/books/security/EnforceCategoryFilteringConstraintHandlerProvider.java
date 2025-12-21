@@ -1,4 +1,4 @@
-package io.sapl.demo.books.domain;
+package io.sapl.demo.books.security;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -10,8 +10,6 @@ import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.Value;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
 

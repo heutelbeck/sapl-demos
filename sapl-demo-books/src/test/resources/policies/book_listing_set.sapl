@@ -1,18 +1,13 @@
 set "List and filter books - query modification with PreEnforce Example"
 
-first-applicable 
+first-applicable
 
 for action.java.name == "findAll"
 
-policy "deny if scope null"
+policy "deny if scope null or empty"
 deny
-where 
-  subject.principal.dataScope in [null, undefined];
-
-policy "empty scope means no limit"
-permit
 where
-  subject.principal.dataScope == [];
+     subject.principal.dataScope in [null, undefined, []];
 
 policy "enforce filtering"
 permit

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.data;
+package io.sapl.mongo.data;
 
 import java.util.List;
 
@@ -24,9 +24,9 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import io.sapl.springdatamongoreactivedemo.domain.Book;
-import io.sapl.springdatamongoreactivedemo.domain.BookRepository;
-import io.sapl.springdatamongoreactivedemo.domain.LibraryUser;
+import io.sapl.mongo.domain.Book;
+import io.sapl.mongo.domain.BookRepository;
+import io.sapl.mongo.domain.LibraryUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

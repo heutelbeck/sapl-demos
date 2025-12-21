@@ -15,20 +15,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.domain;
+package io.sapl.mongo.domain;
 
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-import io.sapl.spring.method.metadata.QueryEnforce;
-import reactor.core.publisher.Flux;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Repository
-public interface BookRepository extends ReactiveMongoRepository<Book, Long> {
-
-    @QueryEnforce(subject = "#authentication", action = "findAll")
-    @Query("{}")
-    Flux<Book> findAllBooks();
-
+@Data
+@Document("book")
+@NoArgsConstructor
+@AllArgsConstructor
+public class Book {
+    @Id
+    Long    id;
+    String  name;
+    Integer category;
 }

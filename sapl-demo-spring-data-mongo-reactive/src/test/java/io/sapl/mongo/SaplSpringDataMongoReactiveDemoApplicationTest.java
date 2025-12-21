@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo;
+package io.sapl.mongo;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -25,8 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import io.sapl.springdatamongoreactivedemo.integration.TestContainerBase;
 
 class SaplSpringDataMongoReactiveDemoApplicationTest extends TestContainerBase {
 

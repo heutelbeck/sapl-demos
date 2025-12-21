@@ -15,22 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo.domain;
+package io.sapl.mongo.rest;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.sapl.mongo.domain.Book;
+import io.sapl.mongo.domain.BookRepository;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
-@Data
-@Document("book")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Book {
-    @Id
-    Long    id;
-    String  name;
-    Integer category;
+@RestController
+@RequiredArgsConstructor
+public class BookController {
+
+    private final BookRepository repository;
+
+    @GetMapping("/")
+    public Flux<Book> findAll() {
+        return repository.findAllBooks();
+    }
+
 }

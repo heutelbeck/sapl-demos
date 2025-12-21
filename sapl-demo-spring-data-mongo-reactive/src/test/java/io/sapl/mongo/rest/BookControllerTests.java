@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatamongoreactivedemo;
+package io.sapl.mongo.rest;
 
 import java.util.Collection;
 import java.util.List;
@@ -29,11 +29,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
-import io.sapl.springdatamongoreactivedemo.data.DemoData;
-import io.sapl.springdatamongoreactivedemo.domain.Book;
-import io.sapl.springdatamongoreactivedemo.domain.LibraryUser;
-import io.sapl.springdatamongoreactivedemo.integration.TestContainerBase;
-import io.sapl.springdatamongoreactivedemo.rest.BookController;
+import io.sapl.mongo.data.DemoData;
+import io.sapl.mongo.domain.Book;
+import io.sapl.mongo.domain.LibraryUser;
+import io.sapl.mongo.TestContainerBase;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
