@@ -23,58 +23,48 @@ import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 
 import io.sapl.springdatamongoreactivedemo.data.DemoData;
 import io.sapl.springdatamongoreactivedemo.domain.Book;
 import io.sapl.springdatamongoreactivedemo.domain.LibraryUser;
+import io.sapl.springdatamongoreactivedemo.integration.TestContainerBase;
 import io.sapl.springdatamongoreactivedemo.rest.BookController;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@SpringJUnitConfig
-@SpringBootTest(classes = SaplSpringDataMongoReactiveDemoApplication.class)
-class BookControllerTests {
+class BookControllerTests extends TestContainerBase {
 
     @Autowired
     BookController controller;
 
-    @Autowired
-    PasswordEncoder encoder;
-
     private record UserAndAccessibleBooks(LibraryUser user, List<Book> books) {}
 
-    private static final Book[] ALL_CATEGORIES    = DemoData.DEMO_BOOKS.toArray(new Book[0]);
-    private static final Book[] CATEGORIES_1_TO_3 = new Book[] {
-            DemoData.DEMO_BOOKS.get(0), DemoData.DEMO_BOOKS.get(1),
-            DemoData.DEMO_BOOKS.get(2), DemoData.DEMO_BOOKS.get(3)
-    };
-    private static final Book[] CATEGORIES_1_TO_2 = new Book[] {
-            DemoData.DEMO_BOOKS.get(0), DemoData.DEMO_BOOKS.get(1),
-            DemoData.DEMO_BOOKS.get(2)
-    };
+    // Books 0-14: 3 per category (1-5), indices 0-2=cat1, 3-5=cat2, 6-8=cat3, 9-11=cat4, 12-14=cat5
+    private static final List<Book> ALL_BOOKS      = DemoData.DEMO_BOOKS;
+    private static final List<Book> CATEGORIES_1_2 = ALL_BOOKS.subList(0, 6);   // Children & SciFi
+    private static final List<Book> CATEGORIES_3_4 = ALL_BOOKS.subList(6, 12);  // Science & Mystery
+    private static final List<Book> CATEGORY_5     = ALL_BOOKS.subList(12, 15); // Classics
 
     private static Collection<UserAndAccessibleBooks> userSourcePermit() {
-        final var encoder        = org.springframework.security.crypto.factory.PasswordEncoderFactories.createDelegatingPasswordEncoder();
-        final var users          = DemoData.users(encoder);
-        final var permittedUsers = new UserAndAccessibleBooks[] {
-                new UserAndAccessibleBooks(users[0], List.of(ALL_CATEGORIES)),
-                new UserAndAccessibleBooks(users[1], List.of(CATEGORIES_1_TO_3)),
-                new UserAndAccessibleBooks(users[2], List.of(CATEGORIES_1_TO_2))
-        };
-        return List.of(permittedUsers);
+        final var encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        final var users   = DemoData.users(encoder);
+        // boss[0] -> all, zoe[1] -> cat 1&2, bob[2] -> cat 3&4, ann[3] -> cat 5
+        return List.of(
+                new UserAndAccessibleBooks(users[0], ALL_BOOKS),
+                new UserAndAccessibleBooks(users[1], CATEGORIES_1_2),
+                new UserAndAccessibleBooks(users[2], CATEGORIES_3_4),
+                new UserAndAccessibleBooks(users[3], CATEGORY_5));
     }
 
     private static Collection<LibraryUser> userSourceDeny() {
-        final var encoder = org.springframework.security.crypto.factory.PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        final var encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         final var users   = DemoData.users(encoder);
-        return List.of(users[3]);
+        return List.of(users[4]); // pat - new intern with empty scope
     }
 
     @ParameterizedTest

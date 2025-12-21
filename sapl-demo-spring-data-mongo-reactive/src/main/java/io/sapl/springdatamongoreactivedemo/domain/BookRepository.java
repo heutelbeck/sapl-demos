@@ -27,7 +27,7 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface BookRepository extends ReactiveMongoRepository<Book, Long> {
 
-    @QueryEnforce(subject = "authentication", action = "findAll")
+    @QueryEnforce(subject = "#authentication", action = "findAll")
     @Query("{}")
     Flux<Book> findAllBooks();
 

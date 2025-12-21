@@ -24,18 +24,17 @@ import static org.mockito.Mockito.times;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 
-@SpringBootTest(classes = SaplSpringDataMongoReactiveDemoApplication.class)
-class SaplSpringDataMongoReactiveDemoApplicationTest {
+import io.sapl.springdatamongoreactivedemo.integration.TestContainerBase;
+
+class SaplSpringDataMongoReactiveDemoApplicationTest extends TestContainerBase {
 
 	@Test
 	void when_applicationStarts_then_runApplication() {
 		try (MockedStatic<SpringApplication> mocked = mockStatic(SpringApplication.class)) {
 
-			mocked.when(() -> SpringApplication.run(SaplSpringDataMongoReactiveDemoApplication.class
-					))
+			mocked.when(() -> SpringApplication.run(SaplSpringDataMongoReactiveDemoApplication.class))
 					.thenReturn(mock(ConfigurableApplicationContext.class));
 
 			SaplSpringDataMongoReactiveDemoApplication.main(new String[] {});
