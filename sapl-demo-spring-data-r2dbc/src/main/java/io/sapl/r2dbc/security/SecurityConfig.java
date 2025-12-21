@@ -15,35 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.config;
+package io.sapl.r2dbc.security;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import io.sapl.r2dbc.data.DemoData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
-import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.server.WebFilter;
-import org.springframework.web.server.WebFilterChain;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
-import io.sapl.springdatar2dbcdemo.data.DemoData;
-import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
 @EnableReactiveSaplMethodSecurity
-public class SecurityConfig implements WebFilter {
+public class SecurityConfig {
 
     @Bean
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
@@ -62,19 +55,6 @@ public class SecurityConfig implements WebFilter {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        return exchange.getSession()
-                .map(session -> session.getAttributeOrDefault(
-                        WebSessionServerSecurityContextRepository.DEFAULT_SPRING_SECURITY_CONTEXT_ATTR_NAME, null))
-                .flatMap(securityContext -> {
-                    if (null != securityContext) {
-                        SecurityContextHolder.setContext((SecurityContext) securityContext);
-                    }
-                    return chain.filter(exchange);
-                }).switchIfEmpty(chain.filter(exchange));
     }
 
 }

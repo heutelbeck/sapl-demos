@@ -13,7 +13,7 @@
 
 	<artifactId>sapl-demo-web-editor</artifactId>
 	<packaging>jar</packaging>
-	<name>SAPL Demo Web Editor</name>
+	<name>Web Editors</name>
 
 	<properties>
 		<selenium.version>4.8.1</selenium.version>

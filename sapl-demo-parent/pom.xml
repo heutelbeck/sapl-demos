@@ -28,7 +28,7 @@
 	<version>4.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
-	<name>SAPL Demo Parent</name>
+	<name>Demo Parent</name>
 
 	<organization>
 		<name>Dominic Heutelbeck</name>

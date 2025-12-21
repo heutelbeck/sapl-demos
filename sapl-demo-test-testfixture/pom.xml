@@ -26,8 +26,8 @@
 		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
 	</parent>
 	<artifactId>sapl-demo-test-testfixture</artifactId>
-	<name>SAPL Demo Policy Testing</name>
-	<description>Example for testing your SAPL policies</description>
+	<name>Policy Testing (Java Test Fixture)</name>
+	<description>Example for testing your SAPL policies programmatically.</description>
 
 	<dependencies>
 		<dependency>

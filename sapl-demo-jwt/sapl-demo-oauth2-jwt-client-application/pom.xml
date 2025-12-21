@@ -29,8 +29,8 @@
 
 	<artifactId>sapl-demo-oauth2-jwt-client-application</artifactId>
 
-	<name>SAPL Demo OAuth2/JWT Client Application</name>
-	<description>Demo of a OAuth2 Cient Application with a JWT/SAPL secured Resource Server.</description>
+	<name>OAuth2/JWT Client Application</name>
+	<description>Demo of a OAuth2 client application with a JWT/SAPL secured Resource Server.</description>
 	
 	<properties>
 		<version.testcontainers>1.20.4</version.testcontainers>

@@ -31,8 +31,8 @@
 	<artifactId>sapl-demo-web-authorizationmanager</artifactId>
 	<packaging>jar</packaging>
 
-	<name>SAPL Demo SAPL Web Authorization Manager</name>
-	<description>SAPL Demo SAPL Web Authorization Manager</description>
+	<name>Spring Web Authorization Manager</name>
+	<description>Integrating a SAPL PEP into a Spring security Authorization Manager.</description>
 
 	<dependencies>
         <dependency>

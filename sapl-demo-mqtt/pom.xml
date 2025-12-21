@@ -29,8 +29,9 @@
 
 	<groupId>io.sapl.spring</groupId>
 	<artifactId>sapl-demo-mqtt</artifactId>
-	<name>SAPL Demo MQTT Attributes</name>
 
+	<name>MQTT Policy Informastion Point</name>
+	<description>Shows how to use data streams from MQTT as a dynamic source of data for policy decisions.</description>
 
 	<dependencies>
 		<dependency>

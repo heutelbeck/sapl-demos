@@ -15,11 +15,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.domain;
+package io.sapl.r2dbc.domain;
 
+import java.io.Serial;
 import java.util.List;
 
+import io.sapl.api.SaplVersion;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,9 +33,11 @@ import lombok.ToString;
 
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class LibraryUser extends org.springframework.security.core.userdetails.User implements UserDetails {
+@JsonAutoDetect(fieldVisibility = Visibility.ANY, getterVisibility = Visibility.ANY)
+public class LibraryUser extends User implements UserDetails {
 
-    private static final long serialVersionUID = -7244331453519181420L;
+    @Serial
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     @Getter
     private int           department;
@@ -39,7 +47,7 @@ public class LibraryUser extends org.springframework.security.core.userdetails.U
     public LibraryUser(String username, int department, List<Integer> dataScope, String password) {
         super(username, password, true, true, true, true, List.of());
         this.department = department;
-        this.dataScope  = dataScope;
+        this.dataScope  = dataScope != null ? dataScope : List.of();
     }
 
 }

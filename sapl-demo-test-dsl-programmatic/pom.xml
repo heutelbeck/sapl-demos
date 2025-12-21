@@ -11,8 +11,8 @@
 	</parent>
 
 	<artifactId>sapl-demo-testing-dsl-plain</artifactId>
-	<name>SAPL Demo Policy Testing DSL Plain</name>
-	<description>Example for testing your SAPL policies using the PlainTestAdapter</description>
+	<name>Policy Testing (Declarative DSL, Programmatic)</name>
+	<description>Example for testing your SAPL policies with the SAPL test language in a programmatic workflow.</description>
 	<dependencies>
 		<dependency>
 			<groupId>io.sapl</groupId>

@@ -12,8 +12,8 @@
 	</parent>
 
 	<artifactId>sapl-demo-testing-dsl-junit</artifactId>
-	<name>SAPL Demo Policy Testing DSL JUnit</name>
-	<description>Example for testing your SAPL policies using the SAPLTest DSL with JUnit</description>
+	<name>Policy Testing (Declarative DSL, JUnit)</name>
+	<description>Example for testing your SAPL policies with the SAPL test language as JUnit Tests.</description>
 
 	<dependencies>
         <dependency>

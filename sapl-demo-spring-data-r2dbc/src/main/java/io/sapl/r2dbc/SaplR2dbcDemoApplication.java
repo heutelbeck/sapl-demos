@@ -15,20 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.r2dbc;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import org.springframework.security.test.context.support.WithSecurityContext;
+@SpringBootApplication
+public class SaplR2dbcDemoApplication {
 
-/**
- * Annotation to run tests with a mock LibraryUser.
- */
-@Retention(RetentionPolicy.RUNTIME)
-@WithSecurityContext(factory = WithMockLibraryUserSecurityContextFactory.class)
-public @interface WithMockLibraryUser {
-    String username() default "testuser";
-    int department() default 1;
-    int[] dataScope() default {};
+    public static void main(String[] args) {
+        SpringApplication.run(SaplR2dbcDemoApplication.class, args);
+    }
 }

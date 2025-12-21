@@ -15,15 +15,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.r2dbc.rest;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@SpringBootApplication
-public class SaplSpringDataR2dbcDemoApplication {
+import io.sapl.r2dbc.domain.Book;
+import io.sapl.r2dbc.domain.BookRepository;
+import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 
-    public static void main(String[] args) {
-        SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class, args);
+@RestController
+@RequiredArgsConstructor
+public class BookController {
+
+    private final BookRepository repository;
+
+    @GetMapping("/")
+    public Flux<Book> findAll() {
+        return repository.findAll();
     }
+
 }

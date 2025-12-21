@@ -22,7 +22,7 @@ public class LibraryUser extends org.springframework.security.core.userdetails.U
     public LibraryUser(String username, int department, List<Integer> dataScope, String password) {
         super(username, password, true, true, true, true, List.of());
         this.department = department;
-        this.dataScope  = dataScope;
+        this.dataScope  = dataScope != null ? dataScope : List.of();
     }
 
 }

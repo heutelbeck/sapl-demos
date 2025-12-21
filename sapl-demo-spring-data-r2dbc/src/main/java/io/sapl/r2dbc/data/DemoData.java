@@ -1,4 +1,4 @@
-package io.sapl.demo.books.data;
+package io.sapl.r2dbc.data;
 
 import java.util.List;
 
@@ -6,10 +6,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import io.sapl.demo.books.domain.Book;
-import io.sapl.demo.books.domain.BookRepository;
-import io.sapl.demo.books.domain.LibraryUser;
-import io.sapl.demo.books.security.LibraryUserDetailsService;
+import io.sapl.r2dbc.domain.Book;
+import io.sapl.r2dbc.domain.BookRepository;
+import io.sapl.r2dbc.domain.LibraryUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,9 +52,7 @@ public class DemoData implements CommandLineRunner {
         // @formatter:on
     );
 
-    private final BookRepository            bookRepository;
-    private final LibraryUserDetailsService userDetailsService;
-    private final PasswordEncoder           encoder;
+    private final BookRepository bookRepository;
 
     /*
      * Library staff and their assigned sections:
@@ -81,11 +78,6 @@ public class DemoData implements CommandLineRunner {
     public void run(String... args) {
         log.info("Loading demo book collection...");
         bookRepository.saveAll(DEMO_BOOKS);
-
-        log.info("Loading demo users...");
-        for (var user : users(encoder)) {
-            userDetailsService.load(user);
-        }
     }
 
 }

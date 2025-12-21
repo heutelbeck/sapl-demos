@@ -36,7 +36,7 @@
 		<docker-registry-url>local</docker-registry-url>
 	</properties>
 
-	<name>SAPL Demo OAuth2/JWT Resource Server</name>
+	<name>OAuth2/JWT Resource Server</name>
 	<description>Demo of an OAuth2 Resource Server with JWT using SAPL for additional authorization.</description>
 
 	<dependencies>

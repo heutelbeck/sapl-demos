@@ -29,9 +29,8 @@
 
 	<groupId>io.sapl.spring</groupId>
 	<artifactId>sapl-demo-webflux</artifactId>
-	<name>SAPL Demo Reactive PEPs with Webflux</name>
+	<name>Reactive Method Security with Webflux</name>
 	<description>Illustrates how to do true reactive policy enforcement with SAPL in a fully reactive stack with Webflux.</description>
-
 
 	<dependencies>
 		<dependency>

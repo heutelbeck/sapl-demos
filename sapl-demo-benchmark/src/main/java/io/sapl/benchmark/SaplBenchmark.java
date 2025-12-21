@@ -134,7 +134,7 @@ public class SaplBenchmark {
     }
 
     /**
-     * Estimates the benchmark duration based on the given config and logs this.
+     * Estimates the benchmark duration based on the given security and logs this.
      */
     private void logEstimatedDuration() {
         try (PrintStream printStream = new PrintStream(new ByteArrayOutputStream(), true, StandardCharsets.UTF_8)) {

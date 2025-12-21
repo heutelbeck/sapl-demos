@@ -15,22 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo.domain;
+package io.sapl.r2dbc.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.relational.core.mapping.Table;
+import org.jspecify.annotations.NonNull;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.stereotype.Repository;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.sapl.spring.method.metadata.QueryEnforce;
+import reactor.core.publisher.Flux;
 
-@Data
-@Table("book")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Book {
-    @Id
-    Long    id;
-    String  name;
-    Integer category;
+@Repository
+public interface BookRepository extends R2dbcRepository<Book, Long> {
+
+    @NonNull
+    @QueryEnforce()
+    Flux<Book> findAll();
+
 }

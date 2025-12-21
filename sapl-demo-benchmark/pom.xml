@@ -32,7 +32,7 @@
 	<artifactId>sapl-demo-benchmark</artifactId>
 	<packaging>jar</packaging>
 
-	<name>SAPL Demo Benchmark</name>
+	<name>SAPL Benchmark Demo</name>
 
 	<properties>
 		<!-- Dependencies -->

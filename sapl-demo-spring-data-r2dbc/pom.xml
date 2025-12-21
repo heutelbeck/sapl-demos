@@ -26,8 +26,8 @@
 	<artifactId>sapl-demo-spring-data-r2dbc</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Spring Data R2DBC Demo</name>
-	<description>Spring Data R2DBC Demo</description>
+	<name>Query Rewriting - SQL, Reactive</name>
+	<description>Demo of policy-based query rewriting with Spring Data and reactive R2DBC drivers.</description>
 
 	<properties>
 		<java.version>21</java.version>

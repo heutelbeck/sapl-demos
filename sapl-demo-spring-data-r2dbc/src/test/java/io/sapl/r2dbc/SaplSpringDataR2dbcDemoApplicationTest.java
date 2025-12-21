@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.springdatar2dbcdemo;
+package io.sapl.r2dbc;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -27,20 +27,20 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 
-@SpringBootTest(classes = SaplSpringDataR2dbcDemoApplication.class)
+@SpringBootTest(classes = SaplR2dbcDemoApplication.class)
 class SaplSpringDataR2dbcDemoApplicationTest {
 
 	@Test
 	void when_applicationStarts_then_runApplication() {
 		try (MockedStatic<SpringApplication> mocked = mockStatic(SpringApplication.class)) {
 
-			mocked.when(() -> SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class
+			mocked.when(() -> SpringApplication.run(SaplR2dbcDemoApplication.class
 					))
 					.thenReturn(mock(ConfigurableApplicationContext.class));
 
-			SaplSpringDataR2dbcDemoApplication.main(new String[] {});
+			SaplR2dbcDemoApplication.main(new String[] {});
 
-			mocked.verify(() -> SpringApplication.run(SaplSpringDataR2dbcDemoApplication.class), times(1));
+			mocked.verify(() -> SpringApplication.run(SaplR2dbcDemoApplication.class), times(1));
 		}
 	}
 }

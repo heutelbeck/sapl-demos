@@ -28,7 +28,8 @@
 
 	<packaging>jar</packaging>
 
-	<name>SAPL Demo Embedded PDP</name>
+	<name>Embedded PDP - No Framework</name>
+	<description>Simple Demo on how to set up a Policy Decision Point manually.</description>
 
 	<properties>
 		<java.version>21</java.version>

@@ -29,8 +29,8 @@
 
 	<groupId>io.sapl.spring</groupId>
 	<artifactId>sapl-demo-webflux-authorizationmanager</artifactId>
-	<name>SAPL Demo Reactive AuthorizationManager with Webflux</name>
-	<description>Illustrates how to do reactive policy enforcement with SAPL in a Webflux filterchain.</description>
+	<name>Reactive AuthorizationManager with Webflux</name>
+	<description>Illustrates how to do reactive policy enforcement with SAPL in a Webflux filter chain.</description>
 
 
 	<dependencies>
