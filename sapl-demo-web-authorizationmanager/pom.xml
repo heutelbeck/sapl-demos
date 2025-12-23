@@ -22,17 +22,50 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
-		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.9</version>
+		<relativePath />
 	</parent>
 
+	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-web-authorizationmanager</artifactId>
+	<version>4.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
+
+	<inceptionYear>2017-2026</inceptionYear>
 
 	<name>Spring Web Authorization Manager</name>
 	<description>Integrating a SAPL PEP into a Spring security Authorization Manager.</description>
+
+	<properties>
+		<java.version>21</java.version>
+
+		<!-- SAPL Version -->
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
+
+		<!-- Dependencies -->
+		<lombok.version>1.18.42</lombok.version>
+
+		<!-- Maven Plug-Ins -->
+		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+
+		<!-- Base argLine for JDK21+ -->
+		<argLine />
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
         <dependency>
@@ -71,9 +104,44 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>${maven-surefire-plugin.version}</version>
+				<configuration>
+					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
+	<repositories>
+		<repository>
+			<id>central-portal-snapshots</id>
+			<name>Central Portal Snapshots</name>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 </project>

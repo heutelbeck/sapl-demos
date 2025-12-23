@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+    Copyright (C) 2017-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    SPDX-License-Identifier: Apache-2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,24 +22,35 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
-		<relativePath>../../sapl-demo-parent/pom.xml</relativePath>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.9</version>
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<artifactId>sapl-demo-oauth2-jwt-resource-server</artifactId>
+	<groupId>io.sapl</groupId>
+	<artifactId>oauth2-jwt-authorization-server</artifactId>
+	<version>4.0.0-SNAPSHOT</version>
 
-	<packaging>jar</packaging>
+	<inceptionYear>2017-2026</inceptionYear>
+
+	<name>OAuth2/JWT Authorization Server</name>
+	<description>Demo of an OAuth2 Authorization Server with JWT for the SAPL demo setup.</description>
 
 	<properties>
-		<!-- Local docker registry for development -->
-		<docker-registry-url>local</docker-registry-url>
-	</properties>
+		<java.version>21</java.version>
 
-	<name>OAuth2/JWT Resource Server</name>
-	<description>Demo of an OAuth2 Resource Server with JWT using SAPL for additional authorization.</description>
+		<!-- Dependencies -->
+		<bouncycastle.version>1.83</bouncycastle.version>
+
+		<!-- Docker -->
+		<docker-registry-url>local</docker-registry-url>
+
+		<!-- Base argLine for JDK21+ -->
+		<argLine />
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -50,17 +63,37 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+			<artifactId>spring-boot-starter-jdbc</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>io.sapl</groupId>
-            <artifactId>sapl-spring-security</artifactId>
-        </dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
-			<optional>true</optional>
+		</dependency>
+		<!-- Auth server -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-cas</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-authorization-server</artifactId>
+		</dependency>
+		<!-- /Auth server -->
+		<dependency>
+			<groupId>com.heutelbeck</groupId>
+			<artifactId>base64uuid</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>${bouncycastle.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk18on</artifactId>
+			<version>${bouncycastle.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -69,7 +102,23 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -77,16 +126,20 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-					<!-- create fat JAR, required as boot starter is not parent -->
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<image>
 						<builder>paketobuildpacks/builder-jammy-tiny</builder>
@@ -122,6 +175,13 @@
 							<artifactId>lombok</artifactId>
 						</exclude>
 					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2019-2021 Dominic Heutelbeck (dominic@heutelbeck.com)
+    Copyright (C) 2017-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    SPDX-License-Identifier: Apache-2.0
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,17 +22,47 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
 	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-        <version>4.0.0-SNAPSHOT</version>
-		<relativePath>../../sapl-demo-parent/pom.xml</relativePath>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.9</version>
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<artifactId>sapl-demo-oauth2-jwt-client-application</artifactId>
+	<groupId>io.sapl</groupId>
+	<artifactId>oauth2-jwt-client-application</artifactId>
+	<version>4.0.0-SNAPSHOT</version>
+
+	<inceptionYear>2017-2026</inceptionYear>
 
 	<name>OAuth2/JWT Client Application</name>
-	<description>Demo of a OAuth2 client application with a JWT/SAPL secured Resource Server.</description>
+	<description>Demo of an OAuth2 client application with a JWT/SAPL secured Resource Server.</description>
+
+	<properties>
+		<java.version>21</java.version>
+
+		<!-- Dependencies -->
+		<testcontainers.version>1.21.4</testcontainers.version>
+		<xmlunit.version>2.10.0</xmlunit.version>
+		<bootstrap.version>5.3.3</bootstrap.version>
+		<jquery.version>3.7.1</jquery.version>
+
+		<!-- Base argLine for JDK21+ -->
+		<argLine />
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
@@ -68,18 +100,12 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>5.3.3</version>
+			<version>${bootstrap.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery</artifactId>
-			<version>3.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
+			<version>${jquery.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -88,13 +114,19 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.springframework.security</groupId>
-		    <artifactId>spring-security-test</artifactId>
-		    <scope>test</scope>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
@@ -102,17 +134,45 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-		    <groupId>org.xmlunit</groupId>
-		    <artifactId>xmlunit-assertj3</artifactId>
-		    <scope>test</scope>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-assertj3</artifactId>
+			<version>${xmlunit.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -122,15 +182,16 @@
 			<id>it</id>
 			<build>
 				<plugins>
-					<!--
-					    Note: spring-boot:start/stop removed.
-					    The @SpringBootTest annotation handles app context lifecycle,
-					    and @Testcontainers starts auth-server/resource-server containers
-					    BEFORE the Spring context initializes.
-					-->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+							<trimStackTrace>false</trimStackTrace>
+							<enableAssertions>true</enableAssertions>
+							<!-- Use original classes, not the repackaged JAR -->
+							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
+						</configuration>
 						<executions>
 							<execution>
 								<goals>
@@ -139,17 +200,10 @@
 								</goals>
 							</execution>
 						</executions>
-						<configuration>
-							<trimStackTrace>false</trimStackTrace>
-							<enableAssertions>true</enableAssertions>
-							<!-- Use original classes, not the repackaged JAR -->
-							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
 
 </project>

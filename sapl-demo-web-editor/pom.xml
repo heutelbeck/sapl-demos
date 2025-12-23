@@ -1,26 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2017-2026 Dominic Heutelbeck (dominic@heutelbeck.com)
+
+    SPDX-License-Identifier: Apache-2.0
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
-		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.9</version>
+		<relativePath />
 	</parent>
 
+	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-web-editor</artifactId>
-	<packaging>jar</packaging>
+	<version>4.0.0-SNAPSHOT</version>
+
+	<inceptionYear>2017-2026</inceptionYear>
+
 	<name>Web Editors</name>
 
 	<properties>
-		<selenium.version>4.8.1</selenium.version>
+		<java.version>21</java.version>
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
+		<vaadin.version>24.9.7</vaadin.version>
+		<argLine />
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
-		<!-- SAPL -->
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-vaadin-theme</artifactId>
@@ -33,7 +77,6 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-test</artifactId>
 		</dependency>
-		<!-- Vaadin -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-core</artifactId>
@@ -50,6 +93,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
@@ -68,24 +112,32 @@
 		<defaultGoal>spring-boot:run</defaultGoal>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>io.sapl.demo.SAPLWebEditorDemoApplication</mainClass>
-					<layout>JAR</layout>
-					<jvmArguments>
-						-Xdebug
-						-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5262</jvmArguments>
+					<jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5262</jvmArguments>
 					<wait>500</wait>
 					<maxAttempts>240</maxAttempts>
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
 				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.vaadin</groupId>
@@ -100,8 +152,8 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<version>3.4.0</version>
 				<configuration>
 					<filesets>
 						<fileset>
@@ -115,15 +167,20 @@
 					</filesets>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
 		<profile>
-			<!-- Production mode is activated using -Pproduction -->
 			<id>production</id>
 			<dependencies>
-				<!-- Exclude development dependencies from production -->
 				<dependency>
 					<groupId>com.vaadin</groupId>
 					<artifactId>vaadin-core</artifactId>
@@ -153,7 +210,6 @@
 				</plugins>
 			</build>
 		</profile>
-
 		<profile>
 			<id>it</id>
 			<build>
@@ -178,9 +234,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<!-- Runs the integration tests (*IT) after the server is
-					started -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
@@ -193,6 +246,7 @@
 							</execution>
 						</executions>
 						<configuration>
+							<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
 							<trimStackTrace>false</trimStackTrace>
 							<enableAssertions>true</enableAssertions>
 						</configuration>
@@ -200,6 +254,20 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
+
+	<repositories>
+		<repository>
+			<id>central-portal-snapshots</id>
+			<name>Central Portal Snapshots</name>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+
 </project>

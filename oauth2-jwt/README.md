@@ -28,18 +28,18 @@ You have to open three terminals. One for each of the three applications to run.
 
 2. Run the authorization server:
    1. Open a new terminal.
-   2. Change to the `sapl-demos\sapl-demo-jwt\sapl-demo-oauth2-jwt-authorization-server`folder.
+   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-authorization-server` folder.
    3. Run: `mvn spring-boot:run` .
    
 3. Run the resource server. It is important that this happens after the authorization server started, 
    as the resource server contacts the authorization server on startup:
    1. Open a new terminal.
-   2. Change to the `sapl-demos\sapl-demo-jwt\sapl-demo-oauth2-jwt-resource-server`folder.
+   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-resource-server` folder.
    3. Run: `mvn spring-boot:run` .
 
 4. Run the client application:
    1. Open a new terminal.
-   2. Change to the `sapl-demos\sapl-demo-jwt\sapl-demo-oauth2-jwt-client-application`folder.
+   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-client-application` folder.
    3. Run: `mvn spring-boot:run` .
 
 5. To access the client application, go to <http://localhost:8080>. 

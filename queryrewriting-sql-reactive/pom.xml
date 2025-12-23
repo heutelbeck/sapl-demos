@@ -34,6 +34,8 @@
 	<artifactId>queryrewriting-sql-reactive</artifactId>
 	<version>4.0.0-SNAPSHOT</version>
 
+	<inceptionYear>2017-2026</inceptionYear>
+
 	<name>Query Rewriting - Spring, SQL, Reactive</name>
 	<description>Demo of policy-based query rewriting with Spring Data and reactive R2DBC drivers.</description>
 

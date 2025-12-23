@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2017-2025 Dominic Heutelbeck (dominic@heutelbeck.com)
+    Copyright (C) 2017-2026 Dominic Heutelbeck (dominic@heutelbeck.com)
 
     SPDX-License-Identifier: Apache-2.0
 
@@ -22,58 +23,77 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>io.sapl</groupId>
-		<artifactId>sapl-demo-parent</artifactId>
-		<version>4.0.0-SNAPSHOT</version>
-		<relativePath>../sapl-demo-parent/pom.xml</relativePath>
-	</parent>
-
+	<groupId>io.sapl</groupId>
 	<artifactId>sapl-demo-benchmark</artifactId>
-	<packaging>jar</packaging>
+	<version>4.0.0-SNAPSHOT</version>
 
-	<name>SAPL Benchmark Demo</name>
+	<inceptionYear>2017-2026</inceptionYear>
+
+	<name>Benchmark Demo</name>
 
 	<properties>
-		<!-- Dependencies -->
+		<java.version>21</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
+		<springboot.version>3.5.9</springboot.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
+		<lombok.version>1.18.42</lombok.version>
 		<jmh.version>1.37</jmh.version>
 		<picocli.version>4.7.6</picocli.version>
 		<jinjava.version>2.8.1</jinjava.version>
 		<jfreechart.version>1.5.4</jfreechart.version>
 		<bouncycastle.version>1.79</bouncycastle.version>
-
-		<!-- Maven Plug-Ins -->
-		<maven-eclipse-plugin.version>2.10</maven-eclipse-plugin.version>
+		<argLine />
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${springboot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
-		<!-- Testcontainer library required for Benchmark with target=docker -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
 		</dependency>
-
-		<!-- Library to support the benchmark chart generation -->
 		<dependency>
 			<groupId>org.jfree</groupId>
 			<artifactId>jfreechart</artifactId>
 			<version>${jfreechart.version}</version>
 		</dependency>
-
-		<!-- A library for parsing command-line parameters -->
 		<dependency>
 			<groupId>info.picocli</groupId>
 			<artifactId>picocli</artifactId>
 			<version>${picocli.version}</version>
 		</dependency>
-
-		<!-- Logging library -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
-
-		<!-- SAPL -->
 		<dependency>
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp</artifactId>
@@ -82,8 +102,6 @@
 			<groupId>io.sapl</groupId>
 			<artifactId>sapl-pdp-remote</artifactId>
 		</dependency>
-
-		<!-- Dependency for the RSocket -->
 		<dependency>
 			<groupId>io.rsocket</groupId>
 			<artifactId>rsocket-core</artifactId>
@@ -92,27 +110,20 @@
 			<groupId>io.rsocket</groupId>
 			<artifactId>rsocket-transport-netty</artifactId>
 		</dependency>
-
-		<!-- Project Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<!-- Dependency for the WebClient -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webflux</artifactId>
 		</dependency>
-
-		<!-- Dependency for SSL Handling -->
 		<dependency>
 			<groupId>io.projectreactor.netty</groupId>
 			<artifactId>reactor-netty</artifactId>
 		</dependency>
-
-		<!-- Dependency for Java Microbenchmark Harness (JMH) -->
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-core</artifactId>
@@ -123,22 +134,16 @@
 			<artifactId>jmh-generator-annprocess</artifactId>
 			<version>${jmh.version}</version>
 		</dependency>
-
-		<!-- Dependency for Report generation using Jinja templating -->
 		<dependency>
 			<groupId>com.hubspot.jinjava</groupId>
 			<artifactId>jinjava</artifactId>
 			<version>${jinjava.version}</version>
 		</dependency>
-
-		<!-- Dependency required for Argon2 secret generation -->
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk18on</artifactId>
 			<version>${bouncycastle.version}</version>
 		</dependency>
-
-		<!-- Testing -->
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
@@ -151,52 +156,40 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>central-portal-snapshots</id>
-			<name>Central Portal Snapshots</name>
-			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<annotationProcessorPaths>
-							<path>
-								<groupId>org.projectlombok</groupId>
-								<artifactId>lombok</artifactId>
-								<version>${lombok.version}</version>
-							</path>
-							<path>
-								<groupId>org.openjdk.jmh</groupId>
-								<artifactId>jmh-generator-annprocess</artifactId>
-								<version>${jmh.version}</version>
-							</path>
-						</annotationProcessorPaths>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-
 		<plugins>
-			<!-- This plug-in creates a so-called "fat JAR", i.e., a JAR file which
-				contains the code from this module and in addition, all dependencies are
-				packed into the JAR as well. This results in a self-contained executable
-				Java application directly runnable via 'java -jar'. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.0</version>
+				<configuration>
+					<release>${java.version}</release>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.openjdk.jmh</groupId>
+							<artifactId>jmh-generator-annprocess</artifactId>
+							<version>${jmh.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.4</version>
+				<configuration>
+					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.7.1</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -217,17 +210,6 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>${maven-eclipse-plugin.version}</version>
-				<configuration>
-					<sourceExcludes>
-						<sourceExclude>target/generated-test-sources/**</sourceExclude>
-						<sourceExclude>target/generated-sources/**</sourceExclude>
-					</sourceExcludes>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -239,6 +221,10 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>3.5.4</version>
+						<configuration>
+							<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+						</configuration>
 						<executions>
 							<execution>
 								<goals>
@@ -252,5 +238,19 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<repositories>
+		<repository>
+			<id>central-portal-snapshots</id>
+			<name>Central Portal Snapshots</name>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>

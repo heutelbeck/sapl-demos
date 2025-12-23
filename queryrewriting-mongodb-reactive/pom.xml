@@ -34,6 +34,8 @@
 	<artifactId>queryrewriting-mongo-reactive</artifactId>
 	<version>4.0.0-SNAPSHOT</version>
 
+	<inceptionYear>2017-2026</inceptionYear>
+
 	<name>Query Rewriting - Spring, MongoDB, Reactive</name>
 	<description>Demo of policy-based query rewriting with Spring Data and a reactive MongoDB.</description>
 

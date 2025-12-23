@@ -101,7 +101,7 @@ class OAuth2DemoIT {
     @Container
     @SuppressWarnings("resource") // Fine for tests which are short-lived
     static GenericContainer<?> authServer = new GenericContainer<>(
-            DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
+            DockerImageName.parse(REGISTRY + "oauth2-jwt-authorization-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
             .withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
             .waitingFor(Wait.forListeningPort())
@@ -112,7 +112,7 @@ class OAuth2DemoIT {
     @Container
     @SuppressWarnings("resource") // Fine for tests which are short-lived
     static GenericContainer<?> resourceServer = new GenericContainer<>(
-            DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-resource-server" + TAG))
+            DockerImageName.parse(REGISTRY + "oauth2-jwt-resource-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
             .withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
             .waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
