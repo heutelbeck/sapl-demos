@@ -55,12 +55,13 @@
 		<!-- SAPL Version -->
 		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 
-		<!-- Dependencies (aligned with sapl-policy-engine) -->
+		<!-- Dependencies -->
 		<vaadin.version>24.9.7</vaadin.version>
 		<lombok.version>1.18.42</lombok.version>
-		<springboot.version>3.5.8</springboot.version>
+		<springboot.version>3.5.9</springboot.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
 
-		<!-- Maven Plug-Ins (aligned with sapl-policy-engine) -->
+		<!-- Maven Plug-Ins -->
 		<sb-contrib.version>7.7.2</sb-contrib.version>
 		<maven-jar-plugin.version>3.5.0</maven-jar-plugin.version>
 		<maven-war-plugin.version>3.5.3</maven-war-plugin.version>
@@ -91,6 +92,14 @@
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-bom</artifactId>
 				<version>${sapl.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<!-- Testcontainers (must be before Spring Boot to override its version) -->
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>testcontainers-bom</artifactId>
+				<version>${testcontainers.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -203,6 +212,21 @@
 					<groupId>org.springframework.boot</groupId>
 					<artifactId>spring-boot-maven-plugin</artifactId>
 					<version>${springboot.version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<excludes>
+							<exclude>
+								<groupId>org.projectlombok</groupId>
+								<artifactId>lombok</artifactId>
+							</exclude>
+						</excludes>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
@@ -262,5 +286,27 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>it</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

@@ -34,7 +34,7 @@
 	<properties>
 		<!-- Local docker registry for development -->
 		<docker-registry-url>local</docker-registry-url>
-		<bouncycastle.version>1.79</bouncycastle.version>
+		<bouncycastle.version>1.83</bouncycastle.version>
 	</properties>
 
 	<name>OAuth2/JWT Authorization Server</name>

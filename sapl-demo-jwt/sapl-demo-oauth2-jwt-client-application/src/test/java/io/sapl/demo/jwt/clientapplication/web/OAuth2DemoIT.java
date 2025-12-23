@@ -61,7 +61,7 @@ class OAuth2DemoIT {
 
     private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
     private static final String   REGISTRY       = "ghcr.io/heutelbeck/";
-    private static final String   TAG            = ":3.0.0-SNAPSHOT";
+    private static final String   TAG            = ":4.0.0-SNAPSHOT";
 
     private static final int     AUTH_SERVER_PORT     = 9000;
     private static final int     RESOURCE_SERVER_PORT = 8090;

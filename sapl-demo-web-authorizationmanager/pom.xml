@@ -64,7 +64,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -73,23 +73,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<executions>
-        			<execution>
-            			<goals>
- 			            	<goal>repackage</goal>
-            			</goals>
-         			</execution>
-    			</executions>
-				<configuration>    
-                	<mainClass>io.sapl.demo.web.WebAuthorizationManagerDemoApplication</mainClass>
-		            <layout>JAR</layout>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>                	
-            	</configuration>
 			</plugin>
 		</plugins>
 	</build>
