@@ -1,21 +1,17 @@
 package io.sapl.demo.jwt.clientapplication.web;
 
-import static org.junit.Assert.assertTrue;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.xmlunit.assertj3.XmlAssert.assertThat;
 
 import java.time.Duration;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,12 +20,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -38,6 +31,7 @@ import org.testcontainers.images.PullPolicy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+import org.xmlunit.assertj3.XmlAssert;
 import org.xmlunit.builder.Input;
 
 import com.github.dockerjava.api.command.CreateContainerCmd;
@@ -53,15 +47,17 @@ import lombok.experimental.FieldDefaults;
 
 @DirtiesContext
 @Testcontainers
-@SpringJUnitConfig
-@WebAppConfiguration
+@AutoConfigureMockMvc
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @SpringBootTest(classes = OAuth2ClientApplication.class)
 class OAuth2DemoIT {
 
     private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
-    private static final String   REGISTRY       = "ghcr.io/heutelbeck/";
+    // Configurable via -Ddocker.registry=ghcr.io/heutelbeck/ for CI, defaults to local/ for dev
+    private static final String   REGISTRY       = System.getProperty("docker.registry", "local/");
     private static final String   TAG            = ":4.0.0-SNAPSHOT";
+    // Don't pull for local images, use default policy for remote registries
+    private static final boolean  USE_LOCAL      = REGISTRY.startsWith("local");
 
     private static final int     AUTH_SERVER_PORT     = 9000;
     private static final int     RESOURCE_SERVER_PORT = 8090;
@@ -106,7 +102,8 @@ class OAuth2DemoIT {
     @SuppressWarnings("resource") // Fine for tests which are short-lived
     static GenericContainer<?> authServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-authorization-server" + TAG))
-            .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
+            .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
+            .withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
             .waitingFor(Wait.forListeningPort())
             .waitingFor(Wait.forLogMessage(containsPattern("Started OAuth2AuthorizationServerApplication"), 1))
             .withStartupTimeout(TIMEOUT_SPINUP)
@@ -116,7 +113,8 @@ class OAuth2DemoIT {
     @SuppressWarnings("resource") // Fine for tests which are short-lived
     static GenericContainer<?> resourceServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "sapl-demo-oauth2-jwt-resource-server" + TAG))
-            .withImagePullPolicy(PullPolicy.defaultPolicy()).withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
+            .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
+            .withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
             .waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
             .withStartupTimeout(TIMEOUT_SPINUP)
             .withCreateContainerCmdModifier(configureContainerStartup(RESOURCE_SERVER_PORT));
@@ -146,17 +144,10 @@ class OAuth2DemoIT {
     }
 
     @Autowired
-    WebApplicationContext webApplicationContext;
+    MockMvc mockMvc;
 
     @Autowired
     WebClient webClient;
-
-    MockMvc mockMvc;
-
-    @BeforeEach
-    void beforeEach() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
-    }
 
     @Test
     @WithMockUser(username = "user1", password = "password")
@@ -164,8 +155,8 @@ class OAuth2DemoIT {
         final var request  = request(HttpMethod.GET, INDEX_URL);
         final var response = mockMvc.perform(request).andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-        assertThat(Input.fromString(response.getContentAsString())).and(Input.fromFile(INDEX_RESULT_PATH))
-                .areIdentical();
+        XmlAssert.assertThat(Input.fromString(response.getContentAsString()))
+                .and(Input.fromFile(INDEX_RESULT_PATH)).areIdentical();
     }
 
     @Test
@@ -180,8 +171,9 @@ class OAuth2DemoIT {
                 .andReturn().getResponse();
         final var redirectURI  = response.getHeader("Location");
         final var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
-        assertTrue(authResponse.getStatusCode().is3xxRedirection());
-        assertTrue(authResponse.getHeaders().containsKey("Location"));
+        assertThat(authResponse).isNotNull();
+        assertThat(authResponse.getStatusCode().is3xxRedirection()).isTrue();
+        assertThat(authResponse.getHeaders()).containsKey("Location");
     }
 
     @Test
@@ -190,7 +182,7 @@ class OAuth2DemoIT {
         final var request  = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
         final var response = mockMvc.perform(request).andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-        assertThat(Input.fromString(response.getContentAsString()))
+        XmlAssert.assertThat(Input.fromString(response.getContentAsString()))
                 .and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();
     }
 

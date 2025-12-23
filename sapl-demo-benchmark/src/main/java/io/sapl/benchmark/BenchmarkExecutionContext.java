@@ -26,6 +26,7 @@ import org.testcontainers.containers.GenericContainer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.sapl.api.model.jackson.SaplJacksonModule;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -60,7 +61,7 @@ public class BenchmarkExecutionContext {
     private boolean                   useSsl;
     private List<Integer>             threadList;
     private AuthorizationSubscription authorizationSubscription;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper().registerModule(new SaplJacksonModule());
 
     @SneakyThrows
     public static BenchmarkExecutionContext fromString(String jsonString) {
