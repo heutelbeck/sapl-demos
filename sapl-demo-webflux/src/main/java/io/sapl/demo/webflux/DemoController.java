@@ -15,6 +15,8 @@
  */
 package io.sapl.demo.webflux;
 
+import static io.sapl.spring.method.reactive.RecoverableFluxes.recover;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.access.AccessDeniedException;
@@ -73,9 +75,9 @@ public class DemoController {
 
     @GetMapping(value = "/enforcerecoverableifdeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-        return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class, (error, reason) -> log
-                .warn("ACCESS DENIED ('{}') (data will automatically resume once access is granted again) - reason: {}",
-                        error.getMessage(), reason))
+        return recover(service.getFluxStringRecoverable(),
+                error -> log.warn("ACCESS DENIED ('{}') (data will automatically resume once access is granted again)",
+                        error.getMessage()))
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 

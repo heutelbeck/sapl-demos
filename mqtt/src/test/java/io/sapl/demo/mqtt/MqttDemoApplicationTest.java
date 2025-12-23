@@ -19,9 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.context.ApplicationContext;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = "demo.mqtt.auto-publish=false")
 class MqttDemoApplicationTest {
 
     @Test

@@ -1,155 +1,371 @@
 # Demo - Reactive Policy Enforcement Points in Webflux
 
-This demo shows how to add reactive policy enforcement points to components in a Webflux-based API.
+This demo shows **Attribute Stream-Based Access Control (ASBAC)** in a Webflux API. Unlike traditional access control where decisions are made once per request, ASBAC continuously re-evaluates policies as attributes (like time) change, enabling real-time authorization updates on long-lived reactive streams. SAPL supports both traditional request-response ABAC style authorization and ASBAC authorization. This demo demonstrates different patterns of stream-based access control.
 
-While in non-reactive environments, only the two annotations `@PreEnforce` and `@PostEnforce` for 
-method invocation interception.
+## Running the Demo
 
-In a Webflux environment with methods returning reactive types, i.e., `Flux<?>` and `Mono<?>` these
-annotations get a different behavior, and some additional annotations are available.
+```bash
+mvn spring-boot:run
+```
 
-The demo can be started by executing `mvn spring-boot:run` in its modules root directory.
+## Architecture Overview
 
-The demo will expose REST and Server-Sent Events (SSE) endpoints, which connect to a 
-service bean, which has matching methods secured by SAPL annotations.
+```mermaid
+flowchart TB
+    subgraph Client
+        BROWSER[Browser]
+    end
+    
+    subgraph Controller Layer
+        CTRL[DemoController]
+    end
+    
+    subgraph Service Layer
+        SVC[DemoService]
+        PEP[Policy Enforcement Point]
+    end
+    
+    subgraph SAPL Infrastructure
+        PDP[Policy Decision Point]
+        PIP[Time PIP]
+        POLICIES[(Policies)]
+    end
+    
+    subgraph Constraint Handling
+        LOG[LoggingConstraintHandler]
+        EMAIL[EmailConstraintHandler]
+    end
+    
+    BROWSER -->|HTTP/SSE| CTRL
+    CTRL --> SVC
+    SVC -.->|wrapped by| PEP
+    PEP <-->|decision stream| PDP
+    PDP --> POLICIES
+    PDP <-->|attribute stream| PIP
+    PEP --> LOG
+    PEP --> EMAIL
+```
 
-The different endpoints can be accessed as follows:
+## Endpoints
 
-* <http://localhost:8080/numbers>: Sends a sequence of numbers as SSE. For each number, two constraint handlers are triggered, logging messages to the server's console. 
-  The matching service is secured with `@PreEnforce`.
+| Endpoint                                                                    | Annotation                    | Behavior                                               |
+|-----------------------------------------------------------------------------|-------------------------------|--------------------------------------------------------|
+| [/numbers](http://localhost:8080/numbers)                                   | `@PreEnforce`                 | SSE stream with constraint handlers on each element    |
+| [/string](http://localhost:8080/string)                                     | `@PreEnforce`                 | Single value with argument modification                |
+| [/changedstring](http://localhost:8080/changedstring)                       | `@PostEnforce`                | Response transformed by policy                         |
+| [/enforcetilldeny](http://localhost:8080/enforcetilldeny)                   | `@EnforceTillDenied`          | Stream terminates on deny                              |
+| [/enforcedropwhiledeny](http://localhost:8080/enforcedropwhiledeny)         | `@EnforceDropWhileDenied`     | Messages silently dropped during deny                  |
+| [/enforcerecoverableifdeny](http://localhost:8080/enforcerecoverableifdeny) | `@EnforceRecoverableIfDenied` | Client notified on deny, can recover                   |
+| [/documents](http://localhost:8080/documents)                               | `@PreEnforce`                 | Flux filtering based on security clearance             |
+| [/patients](http://localhost:8080/patients)                                 | `@PreEnforce`                 | JSON content transformation (blacken, delete, replace) |
 
-* <http://localhost:8080/string>: Sends a single String. Two constraint handlers are triggered, 
-  logging messages to the server's console. 
-  The matching service is secured with `@PreEnforce`.
-  
-* <http://localhost:8080/changedstring>: Returns a single string. The string is changed by the 
-  decision containing a resource generated in a `transform` statement in the matching policy.
-  The matching service is secured with `@PostEnforce`.
+## Time-Based Access Control
 
-* <http://localhost:8080/enforcetilldeny>: Returns a sequence of strings. The matching policy is time-based and access depends on the current second of the current minute of the system clock. For the first 40 seconds, access is granted, then access is denied. 
-  If you directly get an `ACCESS DENIED` message, try reloading the endpoint when the local minute rolls over. Different constraints log different messages during the first and the second 20 seconds of the minute.
-  The matching service is secured with `@EnforceTillDenied`.
+The streaming endpoints use **time as a PIP attribute**. Access changes based on the current second:
 
-* <http://localhost:8080/enforcedropwhiledeny>: Returns a sequence of strings. The matching policy is time-based and access depends on the current second of the current minute of the system clock. For the first 40 seconds, access is granted, then access is denied. 
-  If you get no message, wait till the local minute rolls over. 
-  Different messages are logged by different constraints during the first and the second 20 seconds of the minute.
-  The matching service is secured with `@EnforceDropWhileDenied`.
+| Seconds | Decision | Message            |
+|---------|----------|--------------------|
+| 0-19    | PERMIT   | "Time < 20"        |
+| 20-39   | PERMIT   | "Time < 40"        |
+| 40-59   | DENY     | "DENY ! Time < 60" |
 
-* <http://localhost:8080/enforcerecoverableifdeny>: Returns a sequence of strings. The matching policy is time-based, and access depends on the current second of the current minute of the system clock. For the first 40 seconds, access is granted, then access is denied. 
-   If you directly get an `ACCESS DENIED` message, wait till the local minute rolls over. 
-  Different constraints log different messages during the first and the second 20 seconds of the minute.
-  The matching service is secured with `@EnforceRecoverableIfDenied`.
+Watch the server console to see constraint handler messages change as time progresses.
 
-## `@PreEnforce`
+## The Service Layer with PEP Annotations
 
-The `@PreEnforce` annotation wraps the `Mono<>` or `Flux<>` returned by the method with
-a Policy Enforcement Point.
+```java
+@Service
+public class DemoService {
 
-The access control only starts when a subscriber subscribes to the wrapped `Publisher<>`, not at the construction time of the `Publisher<>` object.
- 
-Before allowing the subscriber to access the original `Publisher<>`, the PEP
-constructs an AuthorizationSubscription and sends it to the PDP deployed in
-the infrastructure. The PEP consumes exactly one decision and then cancels
-its subscription to the PDP.
+    // One-time decision, constraints enforced on each stream element
+    @PreEnforce
+    public Flux<Integer> getFluxNumbers() {
+        return Flux.just(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+                   .delayElements(Duration.ofMillis(500L));
+    }
 
-If the decision contained constraints, i.e., advice or obligations, them the
-PEP hooks the execution of the constraint handling into the matching signal
-handlers of the reactive stream, e.g., onSubscription, onNext, onError etc.
+    // Response can be transformed by policy
+    @PostEnforce(resource = "returnObject")
+    public Mono<String> getMonoStringWithPreAndPost() {
+        return Mono.just("I will be decorated");
+    }
 
-This means that constraints contained within the one decision made by the
-PDP are enforced continuously throughout the lifetime of the reactive stream.
-E.g., a constrained hooked into the onNext signal path will be triggered on
-every data item published on the stream.
+    // Stream ends when access denied
+    @EnforceTillDenied
+    public Flux<String> getFluxString() { ... }
 
-If you want to be able to react to changing decisions throughout the lifetime of the reactive stream, consider using the @Enforce annotation instead.
+    // Messages dropped silently during deny
+    @EnforceDropWhileDenied  
+    public Flux<String> getFluxStringDroppable() { ... }
 
-The `@PreEnforce` annotation can be combined with a @PostEnforce annotation, only if the Publisher is of type `Mono<?>`. It cannot be combined with other `@EnforceX` annotations on the same method. Also, it cannot be combined with Spring security method security annotations, e.g., `@PreAuthorize`.
+    // Client notified on deny, can choose to stay subscribed
+    @EnforceRecoverableIfDenied
+    public Flux<String> getFluxStringRecoverable() { ... }
+}
+```
 
-# `@PostEnforce`
+## The Policies
 
-The `@PostEnforce` annotation is typically used if the return object of a protected method is required to make the decision, or if the return object can be modified via a transformation statement in a policy.
- 
-As an AuthorizationSubscription has to be constructed supplying the resource to be modified, and this value has to be well-defined, this annotation is only applicable to methods returning a `Mono<>`.
+```
+set "demo set"
+first-applicable
 
-By adding the SpEL expression `resource="returnObject"` to the
-annotation has the effect to tell the PEP to set the return object of the
-Mono as the resource value of the AuthorizationSubscription to the PDP.
+// Transform the response by wrapping in ***
+policy "Change Resource Example"
+permit action.http.contextPath == "/changedstring"
+transform "***" + resource + "***"
 
-Please note that in the AuthorizationSubscription the object has to be
-marshaled to JSON. For this to work, one has to ensure that the default
-Jackson ObjectMapper, in the application context, knows to do this for the given type. Thus, it may be necessary to deploy matching custom serializers or to annotate the class with the matching Jackson annotations.
+// Time-based policies for streaming endpoints
+policy "Time based (1/3)"
+permit action.http.contextPath == "/enforcetilldeny" | ...
+where time.secondOf(<time.now>) < 20
+obligation { "type": "logAccess", "message": "Time < 20" }
 
+policy "Time based (2/3)"  
+permit action.http.contextPath == "/enforcetilldeny" | ...
+where time.secondOf(<time.now>) < 40
+obligation { "type": "logAccess", "message": "Time < 40" }
 
-# `@EnforceTillDenied`
+policy "Time based (3/3)"
+deny action.http.contextPath == "/enforcetilldeny" | ...
+where time.secondOf(<time.now>) < 60
+obligation { "type": "logAccess", "message": "DENY ! Time < 60" }
+```
 
-The `@EnforceTillDenied` annotation wraps the `Flux<>` in a PEP.
+The key ASBAC feature: `<time.now>` is an **attribute stream** that emits new values as time changes. The PDP re-evaluates and emits new decisions, which the PEP enforces in real-time.
 
-The access control only starts when a subscriber subscribes to the wrapped
-`Flux<>`, not at construction time of the `Flux<>`.
+## Constraint Handlers
 
-The basic concept of the `@EnforceTillDenied` PEP is to grant access to the
-Flux<> upon an initial `PERMIT` decision and to grant access until a non-`PERMIT` decision is received.
+Policies can include **obligations** (must be handled) and **advice** (optional). This demo registers constraint handlers as Spring beans:
 
-Upon the initial `PERMIT`, the PEP subscribes to the original Flux<>. During access to the `Flux<>`, all constraints are enforced.
+```java
+@Service
+public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandlerProvider<Object> {
 
-Upon receiving a new `PERMIT` decision with different constraints, the
-constraint handling is updated accordingly.
+    @Override
+    public boolean isResponsible(Value constraint) {
+        // Handle constraints with type "logAccess"
+        return constraint.get("type").equals("logAccess");
+    }
 
-Upon receiving a non-`PERMIT` decision, the final constraints are enforced, and an AccessDeniedException ends the `Flux<>`.
+    @Override
+    public Consumer<Object> getHandler(Value constraint) {
+        var message = constraint.get("message").textValue();
+        return value -> log.info(message);
+    }
+}
+```
 
-The `@EnforceTillDenied` annotation cannot be combined with any other
-enforcement annotation.
+## Handling `@EnforceRecoverableIfDenied`
 
-# `@EnforceDropWhileDenied`
+The `RecoverableFluxes` utility provides clean error handling:
 
-The `@EnforceDropWhileDenied` annotation wraps the `Flux<>` in a PEP.
+```java
+@GetMapping("/enforcerecoverableifdeny")
+public Flux<ServerSentEvent<String>> recoverAfterDeny() {
+    return recover(service.getFluxStringRecoverable(),
+            error -> log.warn("ACCESS DENIED - will resume when permitted"))
+            .map(value -> ServerSentEvent.<String>builder().data(value).build());
+}
+```
 
-The access control only starts when a subscriber subscribes to the wrapped
-`Flux<>`, not at construction time of the `Flux<>`.
+| Method                                  | Behavior                                         |
+|-----------------------------------------|--------------------------------------------------|
+| `recover(flux)`                         | Drop `AccessDeniedException` and continue        |
+| `recover(flux, consumer)`               | Execute side-effect (e.g., logging) and continue |
+| `recoverWith(flux, supplier)`           | Emit replacement value to client                 |
+| `recoverWith(flux, consumer, supplier)` | Side-effect + replacement value                  |
 
-The basic concept of the `@EnforceDropWhileDenied` PEP is to grant access to
-the `FLux<>` upon an initial `PERMIT` decision and to grant access until the
-client cancels the subscription, or the original `Flux<>` completes. However,
-whenever a non-`PERMIT` decision is received, all messages are dropped from the
-`Flux<>` until a new `PERMIT` decision is received.
+## PEP Annotations
 
-The subscriber will not be made aware of the fact that events are dropped
-from the stream.
+SAPL provides several annotations for securing reactive methods. Each annotation offers different behavior for handling authorization decisions on streams.
 
-Upon the initial `PERMIT`, the PEP subscribes to the original `Flux<>`. During
-access to the `Flux<>`, all constraints are enforced.
+### `@PreEnforce`
 
-Upon receiving a new `PERMIT` decision with different constraints, the
-constraint handling is updated accordingly.
+Makes a single authorization decision before the method executes. For `Flux` return types, the decision is made once at subscription time, then constraints are enforced on each emitted element. Best for streams where the authorization context doesn't change.
 
-Upon receiving a non-`PERMIT` decision, the constraints are enforced, and
-messages are dropped without sending an `AccessDeniedException` downstream. The
-date resumes on receiving a new `PERMIT` decision.
+```mermaid
+flowchart LR
+    A[Subscribe] --> B[Single Decision]
+    B --> C[Stream with Constraints]
+```
 
-The `@EnforceDropWhileDenied` annotation cannot be combined with any other
-enforcement annotation.
+### `@PostEnforce`
 
-# `EnforceRecoverableIfDenied` 
+Evaluates authorization after the method returns, allowing the policy to inspect and transform the result. The `resource` parameter specifies what to expose to the policy (e.g., `"returnObject"`).
 
-The `@EnforceRecoverableIfDenied` annotation wraps the `Flux<>` in a PEP.
+```mermaid
+flowchart LR
+    A[Method Returns] --> B[Decision with Result]
+    B -->|PERMIT| C[Return Value]
+    B -->|transform| D[Modified Value]
+```
 
-The access control only starts when a subscriber subscribes to the wrapped
-`Flux<>`, not at construction time of the `Flux<>`.
+### `@EnforceTillDenied`
 
-The basic concept of the @EnforceRecoverableIfDenied PEP is to grant access
-to the `FLux<>` upon an initial `PERMIT` decision and to grant access until the
-client cancels the subscription, or the original `Flux<>` completes. However,
-whenever a non-`PERMIT` decision is received, all messages are dropped from the
-`Flux<>` until a new `PERMIT` decision is received.
+Continuously re-evaluates authorization as attributes change. When a DENY decision occurs, the stream terminates immediately. The client must reconnect to resume. Use when denied access should be final.
 
-The subscriber will be made not be made aware of the fact that events are
-dropped from the stream by sending `AccessDeniedExceptions` on a non-`PERMIT`
-decision.
+```mermaid
+flowchart LR
+    A[Subscribe] --> B[Decision Stream]
+    B -->|PERMIT| C[Data Flows]
+    B -->|DENY| D[Stream Ends]
+    C --> B
+```
 
-The subscriber can then decide to stay subscribed via `.onErrorContinue()`.
-Without .onErrorContinue this behaves similar to `@EnforceTillDenied`. With
-`.onErrorContinue()` this behaves similar to `@EnforceDropWhileDenied`, however
-the subscriber can explicitly handle the event that access is denied and
-choose to stay subscribed or not.
+### `@EnforceDropWhileDenied`
 
-The `@EnforceRecoverableIfDenied` annotation cannot be combined with any other enforcement annotation.
+Continuously re-evaluates authorization. During DENY periods, data is silently dropped�the client sees nothing but remains connected. When PERMIT resumes, data flows again automatically. Use when temporary access interruptions should be invisible.
+
+```mermaid
+flowchart LR
+    A[Subscribe] --> B[Decision Stream]
+    B -->|PERMIT| C[Data Flows]
+    B -->|DENY| D[Data Dropped]
+    C --> B
+    D --> B
+```
+
+### `@EnforceRecoverableIfDenied`
+
+Continuously re-evaluates authorization. On DENY, emits an `AccessDeniedException` that can be caught and handled. Combined with `RecoverableFluxes`, the client can be notified of denied access while the stream continues. Use when clients need explicit notification of access changes.
+
+```mermaid
+flowchart LR
+    A[Subscribe] --> B[Decision Stream]
+    B -->|PERMIT| C[Data Flows]
+    B -->|DENY| D[Error Emitted]
+    D -->|recover| B
+    C --> B
+```
+
+## Flux Element Filtering
+
+The [/documents](http://localhost:8080/documents) endpoint demonstrates **filtering Flux elements** based on policy constraints. Documents have NATO security classifications, and the policy filters them based on the user's clearance level (simulated via time).
+
+```java
+@Service
+public class DocumentsService {
+
+    @PreEnforce(genericsType = Document.class)
+    public Flux<Document> getDocuments() {
+        return Flux.fromArray(documents);
+    }
+}
+```
+
+The `genericsType` parameter tells SAPL the element type for proper constraint handling. The policy uses a custom `FilterPredicateConstraintHandlerProvider`:
+
+```java
+@Service
+public class FilterClassifiedDocumentsConstraintHandlerProvider
+        implements FilterPredicateConstraintHandlerProvider {
+
+    @Override
+    public Predicate<Object> getHandler(Value constraint) {
+        var clearance = NatoSecurityClassification.valueOf(
+            constraint.get("clearance").textValue());
+        return doc -> ((Document) doc).classification().compareTo(clearance) <= 0;
+    }
+}
+```
+
+| Seconds | Clearance Level | Documents Visible        |
+|---------|-----------------|--------------------------|
+| 0-19    | RESTRICTED      | Unclassified, Restricted |
+| 20-39   | TOP SECRET      | All documents            |
+| 40-59   | UNCLASSIFIED    | Only unclassified        |
+
+## JSON Content Transformation
+
+The [/patients](http://localhost:8080/patients) endpoint demonstrates **transforming JSON content** within Flux elements. Patient records are modified based on policy--fields can be blackened, deleted, or replaced.
+
+```java
+@Service
+public class PatientsService {
+
+    @PreEnforce
+    public Flux<Patient> getPatients() {
+        return Flux.fromArray(PATIENTS);
+    }
+}
+```
+
+The policy uses the built-in `filterJsonContent` constraint handler:
+
+```
+policy "Patient Data (1/3)"
+permit action.java.name == "getPatients"
+where time.secondOf(<time.now>) < 20
+obligation {
+    "type": "filterJsonContent",
+    "actions": [
+        { "type": "blacken", "path": "$.icd11Code", "discloseLeft": 2 },
+        { "type": "delete", "path": "$.diagnosis" }
+    ]
+}
+```
+
+| Seconds | ICD Code                    | Diagnosis              |
+|---------|-----------------------------|------------------------|
+| 0-19    | Blackened (2 chars visible) | Deleted (null)         |
+| 20-39   | Replaced with stars         | `[DIAGNOSIS HIDDEN]`   |
+| 40-59   | Full code visible           | Full diagnosis visible |
+
+## Method Argument Modification
+
+The [/string](http://localhost:8080/string) endpoint demonstrates **modifying method arguments** via policy obligations. The constraint handler appends text to the input before the method executes.
+
+```java
+@Service
+public class StringService {
+
+    @PreEnforce
+    public Mono<String> lowercase(String aString) {
+        return Mono.just(aString.toLowerCase());
+    }
+}
+```
+
+The policy adds a suffix via obligation:
+
+```
+policy "modify string arguments"
+permit action.http.contextPath == "/string"
+obligation { "suffix": "HELLO MODIFICATION" }
+```
+
+A custom `MethodInvocationConstraintHandlerProvider` modifies the arguments:
+
+```java
+@Service
+public class StringArgumentModificationConstraintHandlerProvider
+        implements MethodInvocationConstraintHandlerProvider {
+
+    @Override
+    public Consumer<ReactiveSaplMethodInvocation> getHandler(Value constraint) {
+        return invocation -> {
+            var suffix = constraint.get("suffix").textValue();
+            var args = invocation.getArguments();
+            args[0] = args[0] + " " + suffix;
+        };
+    }
+}
+```
+
+## Key Files
+
+| File                                                      | Purpose                                      |
+|-----------------------------------------------------------|----------------------------------------------|
+| `DemoService.java`                                        | All PEP annotation types demonstrated        |
+| `DemoController.java`                                     | REST endpoints with SSE streaming            |
+| `demo_set.sapl`                                           | Time-based policies with obligations         |
+| `DocumentsService.java`                                   | Flux filtering by security classification    |
+| `classified_documents.sapl`                               | Clearance-based filtering policy             |
+| `FilterClassifiedDocumentsConstraintHandlerProvider.java` | Custom filter predicate handler              |
+| `PatientsService.java`                                    | JSON content transformation demo             |
+| `patients.sapl`                                           | Blacken/delete/replace transformation policy |
+| `StringService.java`                                      | Argument modification demo                   |
+| `argumentmodification.sapl`                               | Argument modification policy                 |
+| `LoggingConstraintHandlerProvider.java`                   | Handles "logAccess" constraints              |
+| `SecurityConfiguration.java`                              | Enables `@EnableReactiveSaplMethodSecurity`  |

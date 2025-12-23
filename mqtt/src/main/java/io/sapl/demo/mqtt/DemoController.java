@@ -15,19 +15,16 @@
  */
 package io.sapl.demo.mqtt;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import static io.sapl.spring.method.reactive.RecoverableFluxes.recoverWith;
 
 @Slf4j
 @RestController
@@ -35,22 +32,17 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class DemoController {
 
-    public static final JsonNodeFactory JSON = JsonNodeFactory.instance;
+    private static final String ACCESS_DENIED_MESSAGE = "Access Denied: The data stream is temporarily suspended. "
+            + "Stream will recover upon a MQTT event stating that the system is in 'emergency' state again.";
 
     private final DemoService       service;
-    private final MqttClientService mqttClient;
 
     @GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-        return service.getFluxStringRecoverable().onErrorContinue(AccessDeniedException.class,
-                (error, reason) -> log.warn("ACCESS DENIED ('" + error.getMessage()
-                        + "') (data will automatically resume once the MQTT topic 'status' gets an 'emergency' event."))
+        return recoverWith(service.getFluxStringRecoverable(),
+                error -> log.info("Access denied: {}", error.getMessage()),
+                () -> ACCESS_DENIED_MESSAGE)
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
-    }
-
-    @GetMapping(value = "/publishMqttEvent")
-    public Mono<String> publishMqttEvent() {
-        return mqttClient.publish("demoTopic", "aMessage", true).map(Object::toString);
     }
 
 }

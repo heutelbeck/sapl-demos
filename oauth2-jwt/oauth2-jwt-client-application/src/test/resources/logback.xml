@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xml>
 <configuration>
-    <include resource="org/springframework/boot/logging/logback/base.xml" />
-    <logger name="root" level="WARN"/>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="OFF">
+        <appender-ref ref="CONSOLE" />
+    </root>
 </configuration>
