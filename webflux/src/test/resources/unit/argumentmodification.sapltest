@@ -1,0 +1,40 @@
+/*
+ * Argument Modification Policy Tests
+ *
+ * Tests for the argumentmodification.sapl policy that demonstrates:
+ * - Method argument modification via obligations
+ */
+
+requirement "String argument modification for /string endpoint" {
+
+    given
+        - document "argumentmodification"
+
+    scenario "permit with suffix obligation"
+        when "user" attempts { "http": { "contextPath": "/string" } } on "resource"
+        expect decision is permit, with obligation equals {
+            "suffix": "HELLO MODIFICATION"
+        };
+
+    scenario "permit includes suffix key in obligation"
+        when "user" attempts { "http": { "contextPath": "/string" } } on "resource"
+        expect decision is permit, with obligation containing key "suffix";
+}
+
+requirement "Policy scope - only /string context path" {
+
+    given
+        - document "argumentmodification"
+
+    scenario "not-applicable for /numbers endpoint"
+        when "user" attempts { "http": { "contextPath": "/numbers" } } on "resource"
+        expect not-applicable;
+
+    scenario "not-applicable for /changedstring endpoint"
+        when "user" attempts { "http": { "contextPath": "/changedstring" } } on "resource"
+        expect not-applicable;
+
+    scenario "not-applicable for /documents endpoint"
+        when "user" attempts { "http": { "contextPath": "/documents" } } on "resource"
+        expect not-applicable;
+}

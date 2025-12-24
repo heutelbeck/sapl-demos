@@ -50,7 +50,7 @@
 		<module>test-dsl-programmatic</module>
 		<module>sapl-demo-mvc-app</module>
 		<module>sapl-demo-web-authorizationmanager</module>
-		<module>sapl-demo-webflux</module>
+		<module>webflux</module>
 		<module>sapl-demo-webflux-authorizationmanager</module>
 		<module>queryrewriting-jpa</module>
 		<module>queryrewriting-sql-reactive</module>

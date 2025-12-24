@@ -133,8 +133,8 @@
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${sapl.version}</version>
 				<configuration>
-					<policyHitRatio>0</policyHitRatio>
-					<policyConditionHitRatio>0</policyConditionHitRatio>
+					<policyHitRatio>100</policyHitRatio>
+					<policyConditionHitRatio>60</policyConditionHitRatio>
 					<failOnDisabledTests>false</failOnDisabledTests>
 					<enableSonarReport>true</enableSonarReport>
 					<enableHtmlReport>true</enableHtmlReport>

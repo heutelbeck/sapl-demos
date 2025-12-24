@@ -1,0 +1,73 @@
+/*
+ * Patients Policy Tests
+ */
+
+requirement "JSON content transformation by time window" {
+
+    given
+        - document "patients"
+
+    scenario "blacken and delete in first 20 seconds"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "getPatients" } } on "resource"
+        expect decision is permit, with obligation containing key "type" with value matching text "filterJsonContent";
+
+    scenario "blacken with asterisks and replace in 20-40 second window"
+        given
+            - attribute "nowMock" <time.now> emits "t2"
+            - function time.secondOf(any) maps to 25
+        when "user" attempts { "java": { "name": "getPatients" } } on "resource"
+        expect decision is permit, with obligation containing key "type" with value matching text "filterJsonContent";
+
+    scenario "no transformation in 40-60 second window (full data)"
+        given
+            - attribute "nowMock" <time.now> emits "t3"
+            - function time.secondOf(any) maps to 45
+        when "user" attempts { "java": { "name": "getPatients" } } on "resource"
+        expect permit;
+}
+
+requirement "Policy scope - only getPatients action" {
+
+    given
+        - document "patients"
+
+    scenario "not-applicable for getDocuments action"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "getDocuments" } } on "resource"
+        expect not-applicable;
+
+    scenario "not-applicable for deletePatient action"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "deletePatient" } } on "resource"
+        expect not-applicable;
+}
+
+requirement "Streaming transformation changes with time" {
+
+    given
+        - document "patients"
+
+    scenario "transformation level changes as seconds progress"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf("t1") maps to 10
+            - function time.secondOf("t2") maps to 30
+            - function time.secondOf("t3") maps to 50
+        when "user" attempts { "java": { "name": "getPatients" } } on "resource"
+        expect decision is permit, with obligation containing key "type" with value matching text "filterJsonContent"
+        then
+            - attribute "nowMock" emits "t2"
+        expect decision is permit, with obligation containing key "type" with value matching text "filterJsonContent"
+        then
+            - attribute "nowMock" emits "t3"
+        expect permit
+        verify
+            - attribute <time.now> is called 3 times;
+}

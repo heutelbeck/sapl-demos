@@ -29,7 +29,7 @@
 	</parent>
 
 	<groupId>io.sapl.spring</groupId>
-	<artifactId>sapl-demo-webflux</artifactId>
+	<artifactId>webflux</artifactId>
 	<version>4.0.0-SNAPSHOT</version>
 
 	<inceptionYear>2017-2026</inceptionYear>
@@ -114,6 +114,11 @@
 			<artifactId>awaitility</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -141,6 +146,20 @@
 				<configuration>
 					<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-maven-plugin</artifactId>
+				<version>${sapl.version}</version>
+				<executions>
+					<execution>
+						<id>coverage</id>
+						<goals>
+							<goal>enable-coverage-collection</goal>
+							<goal>report-coverage-information</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

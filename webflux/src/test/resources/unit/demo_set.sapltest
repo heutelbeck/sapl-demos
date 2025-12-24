@@ -1,0 +1,108 @@
+/*
+ * Demo Set Policy Tests
+ */
+
+requirement "Time-based permit and deny windows for streaming endpoints" {
+
+    given
+        - document "demo_set"
+
+    scenario "permit with logging obligation in first 20 seconds"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:05Z"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "http": { "contextPath": "/enforcetilldeny" } } on "resource"
+        expect decision is permit, with obligation containing key "type" with value matching text "logAccess";
+
+    scenario "permit with logging obligation in first 20 seconds for drop endpoint"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:10Z"
+            - function time.secondOf(any) maps to 10
+        when "user" attempts { "http": { "contextPath": "/enforcedropwhiledeny" } } on "resource"
+        expect decision is permit, with obligation containing key "message" with value matching text "Time < 20";
+
+    scenario "permit in 20-40 second window with different message"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:25Z"
+            - function time.secondOf(any) maps to 25
+        when "user" attempts { "http": { "contextPath": "/enforcetilldeny" } } on "resource"
+        expect decision is permit, with obligation containing key "message" with value matching text "Time < 40";
+
+    scenario "deny in 40-60 second window"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:45Z"
+            - function time.secondOf(any) maps to 45
+        when "user" attempts { "http": { "contextPath": "/enforcetilldeny" } } on "resource"
+        expect decision is deny, with obligation containing key "message" with value matching text "DENY ! Time < 60";
+
+    scenario "deny in 40-60 second window for drop endpoint"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:50Z"
+            - function time.secondOf(any) maps to 50
+        when "user" attempts { "http": { "contextPath": "/enforcedropwhiledeny" } } on "resource"
+        expect deny;
+}
+
+requirement "Post-enforce resource transformation for changedstring endpoint" {
+
+    given
+        - document "demo_set"
+
+    scenario "transform response by wrapping with asterisks"
+        when { "name": "testuser" } attempts { "http": { "contextPath": "/changedstring", "requestedURI": "/changedstring" } } on "original text"
+        expect decision is permit, with resource equals "***original text***";
+
+    scenario "transform empty string"
+        when { "name": "testuser" } attempts { "http": { "contextPath": "/changedstring", "requestedURI": "/changedstring" } } on ""
+        expect decision is permit, with resource equals "******";
+}
+
+requirement "Permit numbers endpoint with email obligation and logging advice" {
+
+    given
+        - document "demo_set"
+
+    scenario "permit numbers with email obligation"
+        when { "name": "admin" } attempts { "http": { "contextPath": "/numbers", "requestedURI": "/numbers" } } on "resource"
+        expect decision is permit, with obligation containing key "type" with value matching text "sendEmail";
+
+    scenario "permit numbers has logging advice"
+        when { "name": "admin" } attempts { "http": { "contextPath": "/numbers", "requestedURI": "/numbers" } } on "resource"
+        expect decision is permit, with advice containing key "type" with value matching text "logAccess";
+}
+
+requirement "Streaming decisions change as time progresses" {
+
+    given
+        - document "demo_set"
+
+    scenario "decision changes from permit to deny as seconds increase"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf("t1") maps to 10
+            - function time.secondOf("t2") maps to 30
+            - function time.secondOf("t3") maps to 50
+        when "user" attempts { "http": { "contextPath": "/enforcetilldeny" } } on "resource"
+        expect permit
+        then
+            - attribute "nowMock" emits "t2"
+        expect permit
+        then
+            - attribute "nowMock" emits "t3"
+        expect deny
+        verify
+            - attribute <time.now> is called 3 times;
+}
+
+requirement "Policy scope - unmatched paths return not-applicable" {
+
+    given
+        - document "demo_set"
+
+    scenario "not-applicable for unknown endpoint"
+        given
+            - attribute "nowMock" <time.now> emits "2024-01-01T12:00:05Z"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "http": { "contextPath": "/unknown" } } on "resource"
+        expect not-applicable;
+}

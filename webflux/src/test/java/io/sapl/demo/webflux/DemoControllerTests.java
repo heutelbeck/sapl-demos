@@ -38,7 +38,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
  * These tests verify the HTTP layer and policy enforcement via HTTP context paths.
  */
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class DemoControllerTests {
 
     @Autowired
@@ -79,7 +79,7 @@ class DemoControllerTests {
     @WithAnonymousUser
     void whenGetEnforceTillDenyAndPermitted_thenReturnsData() {
         when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
-        webTestClient.mutate().responseTimeout(Duration.ofSeconds(5)).build()
+        webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcetilldeny")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()
@@ -90,7 +90,7 @@ class DemoControllerTests {
     @WithAnonymousUser
     void whenGetEnforceTillDenyAndDenied_thenReturnsAccessDeniedMessage() {
         when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45))); // second 45, denies
-        webTestClient.mutate().responseTimeout(Duration.ofSeconds(5)).build()
+        webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcetilldeny")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()
@@ -105,7 +105,7 @@ class DemoControllerTests {
     @WithAnonymousUser
     void whenGetEnforceDropWhileDenyAndPermitted_thenReturnsData() {
         when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
-        webTestClient.mutate().responseTimeout(Duration.ofSeconds(5)).build()
+        webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcedropwhiledeny")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()
@@ -118,7 +118,7 @@ class DemoControllerTests {
     @WithAnonymousUser
     void whenGetEnforceRecoverableIfDenyAndPermitted_thenReturnsData() {
         when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
-        webTestClient.mutate().responseTimeout(Duration.ofSeconds(5)).build()
+        webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcerecoverableifdeny")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()

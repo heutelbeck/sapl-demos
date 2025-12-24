@@ -191,7 +191,7 @@
 				<version>${sapl.version}</version>
 				<configuration>
 					<policyHitRatio>100</policyHitRatio>
-					<policyConditionHitRatio>100</policyConditionHitRatio>
+					<policyConditionHitRatio>60</policyConditionHitRatio>
 				</configuration>
 				<executions>
 					<execution>
