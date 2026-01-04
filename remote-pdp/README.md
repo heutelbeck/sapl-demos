@@ -1,81 +1,177 @@
-# Demo of using a remote PDP
+# Using a Remote SAPL Policy Decision Point
 
 ## Overview
 
-The core of a system using Attribute Stream Based Access Control (ASBAC) is the so-called Policy Decision Point (PDP).
+This demo shows how to connect to a remote SAPL Policy Decision Point (PDP) server without any framework support like Spring Boot. It demonstrates:
 
-In this demo, we will use a client to connect to a dedicated PDP server.
+- Connecting to a SAPL Server using HTTP or RSocket
+- Single and multi-authorization subscriptions
+- The `RemotePolicyDecisionPoint.builder()` API
+
+## Prerequisites
+
+- JDK 21 or newer
+- Maven
+- A running SAPL PDP server (e.g., [SAPL Server LT](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt))
 
 ## Running the Demo
 
-For running the demo, JDK 11 or newer and Maven are required.
+### Start a PDP Server
 
-Also, a PDP server has to be running. Please refer to the [SAPL Server LT](https://github.com/heutelbeck/sapl-policy-engine/blob/master/sapl-server-lt/README.md) for an easy way to run a demo server.
+First, start a SAPL Server LT instance. See the [SAPL Server LT documentation](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt) for instructions.
 
-First, build this demo by changing into the `sapl-demo-remote` folder and executing the command:
+### Build the Demo
 
-```
-mvn install
-```
-
-After the build completes, the `target` folder contains the executable JAR.
-Change into this folder and execute the following command to run the demo:
-
-```
-java -jar sapl-demo-remote-3.0.0-SNAPSHOT-jar-with-dependencies.jar
+```bash
+cd remote-pdp
+mvn clean package
 ```
 
-By default, the demo attempts so connect to `127.0.0.1:8443` and uses the default client 
-credentials configured in the SAPL Server LT for demo purposes.
+### Run the Demo
 
-The demo accepts the following command line parameters:
+```bash
+cd target
+java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar
+```
+
+By default, the demo connects to `https://localhost:8443` using the default SAPL Server LT demo credentials.
+
+### Command Line Options
 
 ```
+Usage: <main class> [-h=<host>] [-k=<clientKey>] [-s=<clientSecret>]
+
+Options:
   -h, -host=<host>       Hostname of the policy decision point including prefix
-                           and port. E.g. 'https://example.org:8443'.
+                         and port. E.g. 'https://example.org:8443'.
   -k, -key=<clientKey>   Client key for the demo application, to be obtained
-                           from the PDP administrator.
+                         from the PDP administrator.
   -s, -secret=<clientSecret>
                          Client secret for the demo application, to be obtained
-                           from the PDP administrator.
+                         from the PDP administrator.
 ```
 
-The demo will send the following authorization subscription to the server:
-
-```json
-{
-	"subject": "Willi",
-	"action": "eat",
-	"resource": "icecream"
-}
-```
-If you want to use the RSocket endpoint, you must transfer a value to the Host variable that begins with "rsocket". The default host is the localhost. The default port is the number 7000.
-
-The demo will now output some messages on the console showing the incoming decisions or log the errors to connect to the server.
-
-The demo will run until the PDP decides there will be no further decisions or until the user manually stops the process (e.g., `CTRL-C`).
-
-If the demo fails to connect to the server:
-
-```
-[main] WARN org.demo.RemotePDPDemo - INSECURE SSL SETTINGS! This demo uses an insecure SslContext for testing purposes only. It will accept all certificates. This is only for testing local servers with self-signed certificates easily. NERVER USE SUCH A CONFIURATION IN PRODUCTION!
-[main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription(subject="Willi", action="eat", resource="icecream", environment=null)
-[reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemotePolicyDecisionPoint - Error : Connection refused: no further information: localhost/127.0.0.1:8443; nested exception is io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8443
-[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: AuthorizationDecision(decision=INDETERMINATE, resource=Optional.empty, obligations=Optional.empty, advice=Optional.empty)
-[reactor-http-nio-3] ERROR io.sapl.pdp.remote.RemotePolicyDecisionPoint - Error : Connection refused: no further information: localhost/127.0.0.1:8443; nested exception is io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8443
-[reactor-http-nio-4] ERROR io.sapl.pdp.remote.RemotePolicyDecisionPoint - Error : Connection refused: no further information: localhost/127.0.0.1:8443; nested exception is io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8443
-...
+**Example with custom server:**
+```bash
+java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
+  -h=https://myserver:8443 \
+  -k=myClientKey \
+  -s=myClientSecret
 ```
 
-If the server is available and has matching policies (e.g., a time-based policy):
+**Using RSocket transport:**
+```bash
+java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
+  -h=rsocket://localhost:7000
+```
+
+### Sample Output (No Server Running)
 
 ```
-[main] WARN org.demo.RemotePDPDemo - INSECURE SSL SETTINGS! This demo uses an insecure SslContext for testing purposes only. It will accept all certificates. This is only for testing local servers with self-signed certificates easily. NERVER USE SUCH A CONFIURATION IN PRODUCTION!
-[main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription(subject="Willi", action="eat", resource="icecream", environment=null)
-[reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemotePolicyDecisionPoint - Error : Connection refused: no further information: localhost/127.0.0.1:8443; nested exception is io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8443
-[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: AuthorizationDecision(decision=PERMIT, resource=Optional.empty, obligations=Optional.empty, advice=Optional.empty)
-[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: AuthorizationDecision(decision=DENY, resource=Optional.empty, obligations=Optional.empty, advice=Optional.empty)
-[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: AuthorizationDecision(decision=PERMIT, resource=Optional.empty, obligations=Optional.empty, advice=Optional.empty)
-[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: AuthorizationDecision(decision=DENY, resource=Optional.empty, obligations=Optional.empty, advice=Optional.empty)
-...
+[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - ------------------------------------------------------------------
+[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - !!! ATTENTION: don't not use insecure sslContext in production !!!
+[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - ------------------------------------------------------------------
+[main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription[subject="Willi", action="eat", resource="icecream", environment=undefined]
+[main] INFO org.demo.RemotePDPDemo - Multi: MultiAuthorizationSubscription { ... }
+[reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - Error : Connection refused: localhost/127.0.0.1:8443
+[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: IdentifiableAuthorizationDecision[subscriptionId=, decision=AuthorizationDecision[decision=INDETERMINATE, ...]]
 ```
+
+### Sample Output (Server Running with Matching Policies)
+
+```
+[main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription[subject="Willi", action="eat", resource="icecream", environment=undefined]
+[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: IdentifiableAuthorizationDecision[subscriptionId=id-1, decision=AuthorizationDecision[decision=PERMIT, ...]]
+[reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: IdentifiableAuthorizationDecision[subscriptionId=id-2, decision=AuthorizationDecision[decision=DENY, ...]]
+```
+
+## Key Concepts
+
+### Building the Remote PDP Client
+
+**HTTP Transport:**
+```java
+PolicyDecisionPoint pdp = RemotePolicyDecisionPoint.builder()
+    .http()
+    .baseUrl("https://localhost:8443")
+    .basicAuth(clientKey, clientSecret)
+    .withUnsecureSSL()  // Only for testing with self-signed certificates!
+    .build();
+```
+
+**RSocket Transport:**
+```java
+PolicyDecisionPoint pdp = RemotePolicyDecisionPoint.builder()
+    .rsocket()
+    .host("localhost")
+    .port(7000)
+    .basicAuth(clientKey, clientSecret)
+    .withUnsecureSSL()
+    .build();
+```
+
+### Single Authorization Subscription
+
+```java
+var subscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
+pdp.decide(subscription)
+    .doOnNext(decision -> log.info("Decision: {}", decision))
+    .blockFirst();
+```
+
+### Multi-Authorization Subscription
+
+Send multiple authorization requests in a single subscription:
+
+```java
+var multiSubscription = new MultiAuthorizationSubscription()
+    .addAuthorizationSubscription("id-1", "bs@simpsons.com", "read",
+        "file://example/med/record/patient/BartSimpson")
+    .addAuthorizationSubscription("id-2", "ms@simpsons.com", "read",
+        "file://example/med/record/patient/MaggieSimpson");
+
+pdp.decide(multiSubscription)
+    .doOnNext(decision -> log.info("Decision: {}", decision))
+    .blockFirst();
+```
+
+Each decision includes the `subscriptionId` to correlate responses with requests.
+
+### Continuous Decision Stream
+
+For reactive scenarios where policies may change:
+
+```java
+pdp.decide(subscription)
+    .subscribe(decision -> handleDecision(decision));
+// Stream continues until cancelled or server terminates
+```
+
+## Dependencies
+
+```xml
+<dependency>
+    <groupId>io.sapl</groupId>
+    <artifactId>sapl-pdp-remote</artifactId>
+</dependency>
+```
+
+Use the SAPL BOM for version management:
+
+```xml
+<dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>io.sapl</groupId>
+            <artifactId>sapl-bom</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+</dependencyManagement>
+```
+
+## Security Note
+
+The demo uses `withUnsecureSSL()` to accept self-signed certificates for local testing. **Never use this in production!** For production deployments, configure proper SSL/TLS certificates.

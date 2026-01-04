@@ -2,7 +2,6 @@
 logging:
   level:
     root: OFF
-io.sapl.pdp.embedded.enabled: true
 
 # do not show the default spring banner
 spring.main.banner-mode: off

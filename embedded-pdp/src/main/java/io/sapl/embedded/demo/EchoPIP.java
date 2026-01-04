@@ -28,7 +28,7 @@ import reactor.core.publisher.Flux;
 public class EchoPIP {
 
     @Attribute(name = "echo")
-    public static Flux<Value> echo(TextValue value) {
+    public Flux<Value> echo(TextValue value) {
         return Flux.just(value);
     }
 

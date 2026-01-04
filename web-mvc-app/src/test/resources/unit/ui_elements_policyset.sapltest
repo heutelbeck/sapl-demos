@@ -1,0 +1,197 @@
+/*
+ * Tests for the UI elements policy set
+ */
+
+requirement "Doctors can access the create patient button" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "doctor can use createPatientButton"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "use"
+        on "ui:view:patients:createPatientButton"
+        expect permit;
+
+    scenario "nurse cannot use createPatientButton"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "use"
+        on "ui:view:patients:createPatientButton"
+        expect not-applicable;
+
+    scenario "visitor cannot use createPatientButton"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            "use"
+        on "ui:view:patients:createPatientButton"
+        expect not-applicable;
+}
+
+requirement "Staff can access the update patient button" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "doctor can use updatePatientButton"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "use"
+        on "ui:view:patient:updatePatientButton"
+        expect permit;
+
+    scenario "nurse can use updatePatientButton"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "use"
+        on "ui:view:patient:updatePatientButton"
+        expect permit;
+
+    scenario "admin can use updatePatientButton"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            "use"
+        on "ui:view:patient:updatePatientButton"
+        expect permit;
+
+    scenario "visitor cannot use updatePatientButton"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            "use"
+        on "ui:view:patient:updatePatientButton"
+        expect not-applicable;
+}
+
+requirement "Nurses cannot edit diagnosis and doctor fields" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "nurse denied from editing icd11Field"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:icd11Field"
+        expect deny;
+
+    scenario "nurse denied from editing doctorField"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:doctorField"
+        expect deny;
+
+    scenario "nurse denied from editing diagnosisField"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:diagnosisField"
+        expect deny;
+}
+
+requirement "Administrators cannot edit diagnosis and classification" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "admin denied from editing icd11Field"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:icd11Field"
+        expect deny;
+
+    scenario "admin denied from editing diagnosisField"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:diagnosisField"
+        expect deny;
+}
+
+requirement "Doctors can edit all fields" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "doctor can edit icd11Field"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:icd11Field"
+        expect permit;
+
+    scenario "doctor can edit diagnosisField"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:diagnosisField"
+        expect permit;
+
+    scenario "doctor can edit doctorField"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:doctorField"
+        expect permit;
+
+    scenario "doctor can edit nurseField"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:nurseField"
+        expect permit;
+}
+
+requirement "Nurses can edit nurse field" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "nurse can edit nurseField"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:nurseField"
+        expect permit;
+}
+
+requirement "Admins can edit doctor and nurse fields" {
+
+    given
+        - document "ui_elements_policyset"
+
+    scenario "admin can edit doctorField"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:doctorField"
+        expect permit;
+
+    scenario "admin can edit nurseField"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            "edit"
+        on "ui:view:patients:nurseField"
+        expect permit;
+}

@@ -136,16 +136,16 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     /**
-     * If traditional blocking behavior is required, use .blockFirst(). This is not
+     * If traditional blocking behavior is required, use decideOnceBlocking(). This is not
      * applicable in multithreaded environments, e.g., web applications. The Reactor
      * runtime will likely complain that this behavior is not permitted.
      */
     private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
         LOGGER.info("");
-        LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using .blockFirst()");
-        var readDecision = pdp.decide(READ_SUBSCRIPTION).blockFirst();
+        LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using decideOnceBlocking()");
+        var readDecision = pdp.decideOnceBlocking(READ_SUBSCRIPTION);
         LOGGER.info("Decision for action 'read' : {}", readDecision != null ? readDecision.decision() : "null");
-        var writeDecision = pdp.decide(WRITE_SUBSCRIPTION).blockFirst();
+        var writeDecision = pdp.decideOnceBlocking(WRITE_SUBSCRIPTION);
         LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.decision() : "null");
         LOGGER.info("");
         LOGGER.info(LINE);
@@ -153,18 +153,18 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     /**
      * If only one result is required, the appropriate way to consume exactly one
-     * decision event is to use .take(1) and subscribe accordingly. In this demo
+     * decision event is to use decideOnce() and subscribe accordingly. In this demo
      * these will be processed sequentially, as this application is not declaring
      * schedulers.
      */
     private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
         LOGGER.info("");
-        LOGGER.info("Demo Part 2: Accessing the PDP in a reactive manner using .take(1).subscribe()");
+        LOGGER.info("Demo Part 2: Accessing the PDP in a reactive manner using decideOnce().subscribe()");
 
-        LOGGER.info("Single reactive decision by using .take(1) and .subscribe()...");
-        pdp.decide(READ_SUBSCRIPTION).take(1)
+        LOGGER.info("Single reactive decision using decideOnce().subscribe()...");
+        pdp.decideOnce(READ_SUBSCRIPTION)
                 .subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
-        pdp.decide(WRITE_SUBSCRIPTION).take(1)
+        pdp.decideOnce(WRITE_SUBSCRIPTION)
                 .subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
         LOGGER.info("");
         LOGGER.info(LINE);

@@ -1,4 +1,15 @@
-# SAPL JWT Demo OAuth 2.0 Client Application
+# OAuth 2.0 Client Application
 
-This project contains a client application that is intended for use with `oauth2-jwt-resource-server`
-and `oauth2-jwt-authorization-server`. Please refer to the README of the parent folder on how to run the demo.
+This module provides a web-based OAuth 2.0 client for the JWT demo.
+
+**This module does not use SAPL.** It demonstrates the OAuth 2.0 authorization code flow.
+
+For complete demo instructions, see the [parent README](../README.md).
+
+## Quick Start
+
+```bash
+mvn spring-boot:run
+```
+
+The client runs on port **8080** and is accessible at [http://localhost:8080](http://localhost:8080).

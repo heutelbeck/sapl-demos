@@ -48,10 +48,10 @@
 		<module>test-fixture</module>
 		<module>test-dsl-junit</module>
 		<module>test-dsl-programmatic</module>
-		<module>sapl-demo-mvc-app</module>
-		<module>sapl-demo-web-authorizationmanager</module>
+		<module>web-mvc-app</module>
+		<module>web-authorizationmanager</module>
 		<module>webflux</module>
-		<module>sapl-demo-webflux-authorizationmanager</module>
+		<module>webflux-authorizationmanager</module>
 		<module>queryrewriting-jpa</module>
 		<module>queryrewriting-sql-reactive</module>
 		<module>queryrewriting-mongodb-reactive</module>
@@ -59,8 +59,7 @@
 		<module>oauth2-jwt/oauth2-jwt-authorization-server</module>
 		<module>oauth2-jwt/oauth2-jwt-client-application</module>
 		<module>mqtt</module>
-		<module>sapl-demo-web-editor</module>
-		<module>sapl-demo-benchmark</module>
+		<module>editor-components</module>
 	</modules>
 
 </project>

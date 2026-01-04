@@ -1,0 +1,121 @@
+/*
+ * Tests for the PatientRepository policy set
+ */
+
+requirement "Doctors and nurses have full read access to patient records" {
+
+    given
+        - document "patient_repository_policyset"
+
+    scenario "doctor can access patient data"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "findById", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "id": 1 }
+        expect permit;
+
+    scenario "nurse can access patient data"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "findById", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "id": 1 }
+        expect permit;
+}
+
+requirement "All authenticated users can see the patient list" {
+
+    given
+        - document "patient_repository_policyset"
+
+    scenario "doctor can see patient list"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "findAll", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on "patients"
+        expect permit;
+
+    scenario "visitor can see patient list"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            { "java": { "name": "findAll", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on "patients"
+        expect permit;
+
+    scenario "anonymous users cannot see patient list"
+        when
+            { "name": "anonymous", "authorities": [{"authority": "ROLE_ANONYMOUS"}] }
+        attempts
+            { "java": { "name": "findAll", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on "patients"
+        expect not-applicable;
+}
+
+requirement "Administrator access includes logging obligation" {
+
+    given
+        - document "patient_repository_policyset"
+
+    scenario "admin can access patient with logging"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            { "java": { "name": "findById", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "id": 1, "name": "Lenny", "icd11Code": "DA63.Z/ME24.90", "diagnosisText": "Duodenal ulcer" }
+        expect permit;
+}
+
+requirement "Doctors and system can create patients" {
+
+    given
+        - document "patient_repository_policyset"
+
+    scenario "doctor can save patient"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "save", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "name": "NewPatient" }
+        expect permit;
+
+    scenario "system can save patient"
+        when
+            { "name": "system", "authorities": [{"authority": "ROLE_SYSTEM"}] }
+        attempts
+            { "java": { "name": "save", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "name": "NewPatient" }
+        expect permit;
+
+    scenario "nurse cannot save patient"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "save", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on { "name": "NewPatient" }
+        expect not-applicable;
+}
+
+requirement "Doctors and nurses can update non-diagnosis fields" {
+
+    given
+        - document "patient_repository_policyset"
+
+    scenario "doctor can update attending nurse"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "updateAttendingNurseById", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on "patient"
+        expect permit;
+
+    scenario "nurse can update phone number"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "updatePhoneNumberById", "instanceof": [{"simpleName": "PatientRepository"}] } }
+        on "patient"
+        expect permit;
+}

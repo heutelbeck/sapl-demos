@@ -1,52 +1,203 @@
-# SAPL Demo OAuth 2.0 and JWT
+# SAPL Demo: OAuth 2.0 with JWT
 
-This demo shows how to use JSON Web Tokens with OAuth 2.0 in tandem with SAPL. 
+This demo demonstrates how to integrate SAPL with OAuth 2.0 and JSON Web Tokens (JWT) for fine-grained authorization in a Spring Security application.
 
-Here, SAPL is primarily applied in the resource server. The resource server 
-embeds the JWT as an attribute of the subject in the authorization subscription 
-sent to the PDP. In this case the resource server uses an embedded PDP.
+## Overview
 
-The PDP makes use of a dedicated JWT function library and policy information point.
+The demo consists of three applications:
 
-To be able to use the resource server an authorization server and a client 
-application are required.
+| Application              | Port | Description                                     |
+|--------------------------|------|-------------------------------------------------|
+| **Authorization Server** | 9000 | Spring Authorization Server issuing JWT tokens  |
+| **Resource Server**      | 8090 | SAPL-protected REST API with JWT-based policies |
+| **Client Application**   | 8080 | Web UI for OAuth 2.0 authorization code flow    |
 
-These are the two other modules of the demo. They are not using SAPL and are only 
-used to demonstrate the resource server in action.
+Only the **Resource Server** uses SAPL. The other two applications provide the OAuth 2.0 infrastructure.
 
-## Running the demo
+## What This Demo Demonstrates
 
-You have to open three terminals. One for each of the three applications to run.
+- **JWT Claims in SAPL Policies**: Accessing token claims, scopes, and expiration in authorization decisions
+- **Multiple JWT Access Patterns**: Different ways to access JWT data in policies
+- **Token Validation**: Using SAPL's JWT Policy Information Point for token validation
+- **Dynamic Policies**: Policies that react to token expiration in real-time
 
-1. Change your systems host file by adding an alias of `auth-server` for localhost, i.e. `127.0.0.1`.
-   * For Windows 10/11 the host file is located in `C:\Windows\System32\drivers\etc\hosts` . 
-   * For Linux the host file is located in `/etc/hosts` .
-   * Add the following line to the end of the file:
-   ```
-   127.0.0.1 auth-server
-   ```
+## Running the Demo
 
-2. Run the authorization server:
-   1. Open a new terminal.
-   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-authorization-server` folder.
-   3. Run: `mvn spring-boot:run` .
-   
-3. Run the resource server. It is important that this happens after the authorization server started, 
-   as the resource server contacts the authorization server on startup:
-   1. Open a new terminal.
-   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-resource-server` folder.
-   3. Run: `mvn spring-boot:run` .
+### Prerequisites
 
-4. Run the client application:
-   1. Open a new terminal.
-   2. Change to the `sapl-demos\oauth2-jwt\oauth2-jwt-client-application` folder.
-   3. Run: `mvn spring-boot:run` .
+Add an alias for `auth-server` to your hosts file:
 
-5. To access the client application, go to <http://localhost:8080>. 
-   The default username is `user1` and the password is `password`.
+**Windows** (`C:\Windows\System32\drivers\etc\hosts`):
+```
+127.0.0.1 auth-server
+```
 
-# Acknowledgement
+**Linux/macOS** (`/etc/hosts`):
+```
+127.0.0.1 auth-server
+```
 
-The demo is derived from the sample projects of the [Spring Authorization Server](https://github.com/spring-projects/spring-authorization-server).
+### Start the Applications
 
+Open three terminals and start each application in order:
 
+**Terminal 1 - Authorization Server** (must start first):
+```bash
+cd oauth2-jwt-authorization-server
+mvn spring-boot:run
+```
+
+**Terminal 2 - Resource Server** (after authorization server is ready):
+```bash
+cd oauth2-jwt-resource-server
+mvn spring-boot:run
+```
+
+**Terminal 3 - Client Application**:
+```bash
+cd oauth2-jwt-client-application
+mvn spring-boot:run
+```
+
+### Access the Demo
+
+1. Open [http://localhost:8080](http://localhost:8080)
+2. Login with username `user1` and password `password`
+3. Authorize the client application to access your data
+4. Browse the protected resources (books, faculty, bestiary)
+
+## SAPL Integration Details
+
+### Resource Server Configuration
+
+The resource server enables SAPL method security and configures JWT validation:
+
+```java
+@Configuration
+@EnableWebSecurity
+@EnableSaplMethodSecurity
+public class WebSecurityConfiguration {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+        return http.build();
+    }
+}
+```
+
+### Protected Endpoints
+
+The controller uses `@PreEnforce` annotations to protect endpoints:
+
+```java
+@RestController
+public class MiskatonicUniversityController {
+
+    @GetMapping("/books")
+    @PreEnforce(action = "'read'", resource = "'books'")
+    public String[] books(Principal principal) {
+        return new String[] { "Necronomicon", "Nameless Cults", "Book of Eibon" };
+    }
+
+    @GetMapping("/faculty")
+    @PreEnforce(action = "'read'", resource = "'faculty'")
+    public String[] getMessages() { ... }
+
+    @GetMapping("/bestiary")
+    @PreEnforce(action = "'read'", resource = "'bestiary'")
+    public String[] getBestiary() { ... }
+}
+```
+
+### JWT Access Patterns in Policies
+
+The demo shows three ways to access JWT data in SAPL policies:
+
+#### 1. OAuth2 Scopes as Spring Security Authorities
+
+Spring Security maps JWT scopes to authorities with `SCOPE_` prefix:
+
+```
+policy "Scopes as Authority in Principal"
+permit resource == "books"
+where 
+    "SCOPE_books.read" in subject..authority;
+```
+
+#### 2. Direct Access to Token Claims
+
+Access claims directly from the serialized principal:
+
+```
+policy "Reading scopes from JWT claims"
+permit resource == "faculty"
+where
+    "faculty.read" in subject.token.claims.scope;
+```
+
+#### 3. Parsing Raw JWT Token
+
+Use the JWT function library to parse the raw token:
+
+```
+policy "Reading scopes from raw JWT"
+permit resource == "bestiary"
+where
+    "bestiary.read" in jwt.parseJwt(subject.principal.tokenValue).payload.scope;
+```
+
+### Token Validation Policy
+
+SAPL can validate tokens and create policies that react to token expiration:
+
+```
+policy "Policy with token timeout"
+permit resource == "mysteries"
+where
+    subject.principal.tokenValue.<jwt.valid>;
+```
+
+This policy uses the `jwt.valid` attribute which dynamically tracks token validity over time.
+
+## Project Structure
+
+```
+oauth2-jwt/
+├── oauth2-jwt-authorization-server/   # OAuth2 Authorization Server (no SAPL)
+├── oauth2-jwt-client-application/     # OAuth2 Client (no SAPL)
+└── oauth2-jwt-resource-server/        # Resource Server with SAPL
+    └── src/main/resources/policies/
+        ├── pdp.json                   # PDP configuration
+        └── jwt_based_policy_set.sapl  # JWT-based policies
+```
+
+## Dependencies (Resource Server)
+
+```xml
+<dependency>
+    <groupId>io.sapl</groupId>
+    <artifactId>sapl-spring-boot-starter</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+</dependency>
+```
+
+## Configuration (Resource Server)
+
+```yaml
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://auth-server:9000
+```
+
+The embedded PDP is enabled by default via `sapl-spring-boot-starter`.
+
+## Acknowledgement
+
+This demo is derived from the sample projects of the [Spring Authorization Server](https://github.com/spring-projects/spring-authorization-server).

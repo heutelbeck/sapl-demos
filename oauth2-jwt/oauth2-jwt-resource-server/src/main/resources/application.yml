@@ -14,12 +14,6 @@ logging:
         web: INFO
         security: INFO
 
-io:
-  sapl:
-    pdp:
-      embedded:
-        enabled: true
-
 spring:
   security:
     oauth2:

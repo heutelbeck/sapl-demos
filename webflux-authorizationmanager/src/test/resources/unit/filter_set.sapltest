@@ -1,0 +1,121 @@
+/*
+ * Tests for the filter_set policy which protects the /secret endpoint.
+ *
+ * The policy uses permit-unless-deny combining algorithm and contains
+ * a single policy "deny_secret" that blocks anonymous users from
+ * accessing GET /secret.
+ */
+
+requirement "Anonymous users cannot access /secret" {
+
+    given
+        - document "filter_set"
+
+    scenario "anonymous user denied GET /secret"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/secret" }
+        expect deny;
+
+    scenario "anonymous user with multiple roles including ROLE_ANONYMOUS denied"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" }, { "authority": "ROLE_GUEST" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/secret" }
+        expect deny;
+}
+
+requirement "Authenticated users can access /secret" {
+
+    given
+        - document "filter_set"
+
+    scenario "authenticated user with ROLE_USER permitted GET /secret"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+
+    scenario "authenticated user with multiple roles permitted"
+        when
+            { "authority": [ { "authority": "ROLE_USER" }, { "authority": "ROLE_ADMIN" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+
+    scenario "admin user permitted GET /secret"
+        when
+            { "authority": [ { "authority": "ROLE_ADMIN" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+}
+
+requirement "Other endpoints are accessible to everyone (permit-unless-deny)" {
+
+    given
+        - document "filter_set"
+
+    scenario "anonymous user permitted GET /public"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/public" }
+        expect permit;
+
+    scenario "authenticated user permitted GET /public"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "contextPath": "/public" }
+        expect permit;
+}
+
+requirement "Only GET method is blocked for anonymous on /secret" {
+
+    given
+        - document "filter_set"
+
+    scenario "anonymous user permitted POST /secret"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" } ] }
+        attempts
+            { "method": "POST" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+
+    scenario "anonymous user permitted PUT /secret"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" } ] }
+        attempts
+            { "method": "PUT" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+
+    scenario "anonymous user permitted DELETE /secret"
+        when
+            { "authority": [ { "authority": "ROLE_ANONYMOUS" } ] }
+        attempts
+            { "method": "DELETE" }
+        on
+            { "contextPath": "/secret" }
+        expect permit;
+}

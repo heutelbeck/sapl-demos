@@ -188,16 +188,12 @@ First, import the SAPL BOM (Bill of Materials) in your dependency management sec
 </dependencyManagement>
 ```
 
-Then add the SAPL dependencies. You need sapl-spring-security for the Spring Security integration and sapl-pdp for the embedded Policy Decision Point:
+Then add the SAPL dependencies. You need the SAPL Spring Boot Starter which includes the embedded Policy Decision Point:
 
 ```xml
 <dependency>
     <groupId>io.sapl</groupId>
-    <artifactId>sapl-spring-security</artifactId>
-</dependency>
-<dependency>
-    <groupId>io.sapl</groupId>
-    <artifactId>sapl-pdp</artifactId>
+    <artifactId>sapl-spring-boot-starter</artifactId>
 </dependency>
 ```
 
@@ -264,20 +260,16 @@ The getHandler method returns a consumer that modifies the method invocation. He
 
 ### Configuring the Embedded PDP
 
-Enable the embedded Policy Decision Point in your application.yml or application.properties:
+The embedded PDP is enabled by default and loads policies from `src/main/resources/policies`. No configuration is required for the default setup.
+
+For custom configuration, you can set these properties in `application.yml`:
 
 ```yaml
 io.sapl.pdp:
   embedded:
-    enabled: true
     pdp-config-type: RESOURCES
     policies-path: /policies
-    config-path: /policies
 ```
-
-The key properties are:
-
-**io.sapl.pdp.embedded.enabled** activates the embedded PDP. Set to true for applications that bundle policies in their resources.
 
 **io.sapl.pdp.embedded.pdp-config-type** determines where to load policies from. Use RESOURCES to load from the classpath (bundled in the JAR) or FILESYSTEM to load from a directory on disk.
 

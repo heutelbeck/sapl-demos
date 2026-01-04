@@ -1,9 +1,8 @@
 io.sapl.pdp:
 # The following lines show the default configuration and could be omitted.
-# pdp-security-type may be RESOURCES (loading policies and configuration from bundles resources)
-# or FILESYSTEM (loading policies and configuration from a folder on the filesystem
+# pdp-config-type may be RESOURCES (loading policies and configuration from bundles resources)
+# or FILESYSTEM (loading policies and configuration from a folder on the filesystem)
   embedded:
-    enabled: true
     pdp-config-type: RESOURCES
     # defines the path (in resources or filesystem respectively) for the pdp.json file with combining algorithm and variables
     config-path: /policies

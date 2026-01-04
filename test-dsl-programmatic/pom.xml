@@ -113,14 +113,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.5.0</version>
-				<configuration>
-					<mainClass>io.sapl.demo.testing.dsl.plain.Main</mainClass>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${sapl.version}</version>

@@ -1,6 +1,26 @@
-# SAPL JWT Demo OAuth 2.0 Resource Server
+# OAuth 2.0 Resource Server with SAPL
 
-This project contains an OAuth 2.0 resource server that is intended for use with `oauth2-jwt-client-application`
-and `oauth2-jwt-authorization-server`. Please refer to the README of the parent folder on how to run the demo.
+This module demonstrates SAPL integration with OAuth 2.0 JWT-based resource protection.
 
-This project contains the actual SAPL demo code and policies using the JWT integration.
+**This is the only module in the demo that uses SAPL.** It shows how to:
+- Access JWT claims in SAPL policies
+- Use OAuth2 scopes for authorization decisions
+- Validate JWT tokens dynamically in policies
+
+For complete demo instructions and policy examples, see the [parent README](../README.md).
+
+## Quick Start
+
+```bash
+mvn spring-boot:run
+```
+
+The server runs on port **8090**.
+
+## Protected Endpoints
+
+| Endpoint    | Required Scope  | Description                |
+|-------------|-----------------|----------------------------|
+| `/books`    | `books.read`    | List of forbidden tomes    |
+| `/faculty`  | `faculty.read`  | University faculty members |
+| `/bestiary` | `bestiary.read` | Creature compendium        |
