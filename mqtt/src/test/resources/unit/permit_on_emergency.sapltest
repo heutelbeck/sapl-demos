@@ -98,5 +98,5 @@ requirement "Streaming - decision changes dynamically with MQTT status" {
             - attribute "statusMock" emits "normal"
         expect not-applicable
         verify
-            - attribute "status".<mqtt.messages> is called 4 times;
+            - attribute "status".<mqtt.messages> is called 1 times;
 }

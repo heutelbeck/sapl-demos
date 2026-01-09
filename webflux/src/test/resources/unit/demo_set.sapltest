@@ -91,7 +91,7 @@ requirement "Streaming decisions change as time progresses" {
             - attribute "nowMock" emits "t3"
         expect deny
         verify
-            - attribute <time.now> is called 3 times;
+            - attribute <time.now> is called 4 times;
 }
 
 requirement "Policy scope - unmatched paths return not-applicable" {

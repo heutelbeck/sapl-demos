@@ -27,11 +27,7 @@ requirement "Policy Simple should grant read access for willi on something" {
 
     // Scenario with its own given that extends central given
     scenario "willi reads with additional mock"
-        given
-            // Document inherited from central given
-            // Add additional environment for this scenario
-            - environment { "trace": true }
-        when "willi" attempts "read" on "something"
+        when "willi" attempts "read" on "something" in { "trace": true }
         expect permit;
 }
 

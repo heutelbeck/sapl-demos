@@ -136,9 +136,7 @@ requirement "Variables and Environment Demo" {
         expect permit;
 
     scenario "with environment in given"
-        given
-            - environment { "tenant": "acme", "region": "eu" }
-        when "willi" attempts "read" on "something"
+        when "willi" attempts "read" on "something" in { "tenant": "acme", "region": "eu" }
         expect permit;
 
     scenario "with environment in subscription"
@@ -148,8 +146,7 @@ requirement "Variables and Environment Demo" {
     scenario "combined variables and environment"
         given
             - variables { "timeout": 30 }
-            - environment { "mode": "test" }
-        when "willi" attempts "read" on "something" in { "trace": true }
+        when "willi" attempts "read" on "something" in { "mode": "test", "trace": true }
         expect permit;
 }
 
@@ -474,8 +471,8 @@ requirement "Verification Demo" {
             - attribute "mock1" emits "WILLI"
         expect permit
         verify
-            // 3 evaluations total (one per emission)
-            - attribute any.<test.upper> is called 3 times;
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
 }
 
 // =============================================================================
@@ -933,8 +930,6 @@ requirement "Central Given Demo" {
         expect not-applicable;
 
     scenario "adds environment to central given"
-        given
-            - environment { "extra": "env" }
-        when "willi" attempts "read" on "something"
+        when "willi" attempts "read" on "something" in { "extra": "env" }
         expect permit;
 }

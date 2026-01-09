@@ -78,11 +78,8 @@ requirement "Environment and subscription context" {
 
     scenario "attribute with environment context"
         given
-            // Define environment that will be available in PIP context
-            - environment { "willi": "WILLI", "klaus": "KLAUS" }
-            // Mock the attribute to use environment data
             - attribute "upperMock" any.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
+        when "willi" attempts "read" on "something" in { "willi": "WILLI", "klaus": "KLAUS" }
         expect permit;
 
     scenario "subscription environment in when clause"
@@ -94,11 +91,8 @@ requirement "Environment and subscription context" {
 
     scenario "combined environments"
         given
-            // Given environment adds to PDP context
-            - environment { "tenant": "acme" }
             - attribute "upperMock" any.<test.upper> emits "WILLI"
-        // Subscription environment is separate
-        when "willi" attempts "read" on "something" in { "requestId": "xyz789" }
+        when "willi" attempts "read" on "something" in { "tenant": "acme", "requestId": "xyz789" }
         expect permit;
 }
 
@@ -170,6 +164,6 @@ requirement "Attribute streaming" {
             - attribute "upperMock" emits "C"
         expect not-applicable
         verify
-            // 4 decisions means 4 attribute evaluations
-            - attribute any.<test.upper> is called 4 times;
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
 }

@@ -131,8 +131,8 @@ requirement "Attribute streaming with then blocks" {
             - attribute "upperMock" emits "WILLI"
         expect permit
         verify
-            // Attribute was evaluated 4 times (initial + 3 emissions)
-            - attribute any.<test.upper> is called 4 times;
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
 }
 
 requirement "Attribute mocking with object entities" {
