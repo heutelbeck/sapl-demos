@@ -65,5 +65,5 @@ java -jar target/sapl-demo-benchmark-3.0.0-SNAPSHOT-jar-with-dependencies.jar --
 # "large" sample benchmarks representative enough to compare pdp performance
 # --------------------------------------------------------------------------
 # large_docker_benchmark
-java -jar target/target/sapl-demo-benchmark-3.0.0-SNAPSHOT-jar-with-dependencies.jar --cfg examples/large_docker_benchmark.yaml --output results/large_docker_benchmark/
+java -jar target/sapl-demo-benchmark-3.0.0-SNAPSHOT-jar-with-dependencies.jar --cfg examples/large_docker_benchmark.yaml --output results/large_docker_benchmark/
 ```
