@@ -6,8 +6,7 @@
  */
 policy "comprehensiveDemo"
 permit
-    action == "access" & resource == "demo"
-where
+    action == "access" & resource == "demo";
     // Subject validation
     subject.role == "admin" | subject.role == "user";
 

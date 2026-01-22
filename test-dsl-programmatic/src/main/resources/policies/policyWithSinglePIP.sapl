@@ -4,6 +4,5 @@
  */
 policy "policyWithSinglePIP"
 permit
-    action == "read"
-where
+    action == "read";
     subject.<test.upper> == "WILLI";

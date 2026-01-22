@@ -1,12 +1,11 @@
 set "classified documents"
-first-applicable
+first or abstain errors propagate
 
 for action.java.name == "getDocuments"
 
 policy "Clearance (1/3)"
 permit
-where
-  time.secondOf(<time.now>) < 20; 
+  time.secondOf(<time.now>) < 20;
 obligation
 	{
 		"type" 		: "filterClassifiedDocuments",
@@ -15,8 +14,7 @@ obligation
 
 policy "Clearance (2/3)"
 permit
-where
-  time.secondOf(<time.now>) < 40; 
+  time.secondOf(<time.now>) < 40;
 obligation
 	{
 		"type" 		: "filterClassifiedDocuments",

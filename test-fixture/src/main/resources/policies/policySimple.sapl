@@ -1,9 +1,8 @@
 set "testSet"
-deny-unless-permit
+priority permit or deny errors abstain
 for resource == "document"
 
 policy "policySimple"
 permit
-    action == "read"
-where
+    action == "read";
     subject == "willi";

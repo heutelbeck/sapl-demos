@@ -1,12 +1,16 @@
 {
-	"algorithm": "DENY_UNLESS_PERMIT",
+	"algorithm": {
+		"votingMode": "FIRST",
+		"defaultDecision": "DENY",
+		"errorHandling": "ABSTAIN"
+	},
 	"variables": {
-				   "jwt": {
-		                    "publicKeyServer": {
-                                                 "uri":    "http://auth-server:9000/public-key/{kid}",
-                                                 "method": "GET"
-                                               },
-					        "whitelist" : { }					     
-	                       }
-                  }
+		"jwt": {
+			"publicKeyServer": {
+				"uri": "http://auth-server:9000/public-key/{kid}",
+				"method": "GET"
+			},
+			"whitelist": {}
+		}
+	}
 }

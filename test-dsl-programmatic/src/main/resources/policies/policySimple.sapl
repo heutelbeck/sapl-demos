@@ -1,8 +1,7 @@
 set "testSet"
-deny-unless-permit
+priority permit or deny errors abstain
 
 policy "policySimple"
 permit
-    action == "read"
-where
+    action == "read";
     subject == "willi";

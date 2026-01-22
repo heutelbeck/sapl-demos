@@ -6,8 +6,7 @@
  */
 policy "policyDemo"
 permit
-    action == "access" & resource == "demo"
-where
+    action == "access" & resource == "demo";
     subject.role == "admin" || subject.role == "user";
     time.dayOfWeek(<time.now>) =~ "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY";
     var status = <system.status>;
