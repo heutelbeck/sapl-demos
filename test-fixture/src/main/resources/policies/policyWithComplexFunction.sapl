@@ -1,5 +1,4 @@
 policy "policyWithComplexFunction"
 permit
-    action == "read"
-where
+    action == "read";
     company.complexFunction(<company.pip1>, <company.pip2>);

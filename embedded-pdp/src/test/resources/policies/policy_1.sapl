@@ -4,8 +4,7 @@ import simple.length
 
 policy "policy read"
 permit
-  action == "read"
-where
+  action == "read";
   subject == "willi" & resource =~ "some.+";
   1 in [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2 / 2]]..[2];
   [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2], 6]..* == [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2], {"text": 1, "arr": [3, 4, 5]}, 1, [3, 4, 5], 3, 4, 5, 1, 2, 6];

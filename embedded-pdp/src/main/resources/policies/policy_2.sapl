@@ -1,5 +1,4 @@
 policy "policy write"
 permit
-  action == "write"
-where
+  action == "write";
   subject == "willi" & resource =~ "some.+";

@@ -1,7 +1,6 @@
 policy "policyWithSimplePIP"
 permit
-    action == "read"
-where
+    action == "read";
     subject.<test.upper> == "WILLI" ||
     subject.<test.hasEnvVar> == "BAR" ||
     subject.<test.hasAuthzSubVar> == "FOO";
