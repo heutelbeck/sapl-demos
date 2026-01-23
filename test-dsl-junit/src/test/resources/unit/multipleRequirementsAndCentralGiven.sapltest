@@ -15,7 +15,7 @@ requirement "Policy Simple should grant read access for willi on something" {
     // The given block can still be defined in the scenario itself
     // and will then merge with/override the central given.
     given
-        - document "policySimple"
+        - document "testSet"
 
     scenario "willi tries to read something"
         when "willi" attempts "read" on "something"
@@ -34,7 +34,7 @@ requirement "Policy Simple should grant read access for willi on something" {
 requirement "Policy Simple should deny write access for willi on something" {
 
     given
-        - document "policySimple"
+        - document "testSet"
 
     scenario "willi tries to write something"
         when "willi" attempts "write" on "something"

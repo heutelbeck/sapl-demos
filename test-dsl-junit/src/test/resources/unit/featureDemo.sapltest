@@ -29,7 +29,7 @@ requirement "Basic Structure Demo - Unit Test" {
 
     // Document at requirement level - all scenarios test this document
     given
-        - document "policySimple"
+        - document "testSet"
 
     // Minimal scenario
     scenario "minimal syntax"
@@ -46,7 +46,7 @@ requirement "Basic Structure Demo - Integration Test" {
 
     // Multiple documents - this is an integration test
     given
-        - documents "policySimple", "policyWithSinglePIP"
+        - documents "testSet", "policyWithSinglePIP"
         - priority permit or permit errors propagate
         - attribute "upperMock" any.<test.upper> emits "WILLI"
 
@@ -63,7 +63,7 @@ requirement "Combining Algorithm Demo" {
 
     // Use policyWithSinglePIP which only requires test.upper attribute
     given
-        - documents "policySimple", "policyWithSinglePIP"
+        - documents "testSet", "policyWithSinglePIP"
 
     scenario "deny-overrides"
         given
@@ -114,7 +114,7 @@ requirement "Combining Algorithm Demo" {
 requirement "Variables and Environment Demo" {
 
     given
-        - document "policySimple"
+        - document "testSet"
 
     scenario "with empty variables"
         given
@@ -482,7 +482,7 @@ requirement "Verification Demo" {
 requirement "Decision Types Demo - Permit and Deny" {
 
     given
-        - document "policySimple"
+        - document "testSet"
 
     scenario "expect permit"
         when "willi" attempts "read" on "something"
@@ -932,4 +932,225 @@ requirement "Central Given Demo" {
     scenario "adds environment to central given"
         when "willi" attempts "read" on "something" in { "extra": "env" }
         expect permit;
+}
+
+// =============================================================================
+// SECTION 13: POLICY SET DEMO
+// =============================================================================
+
+/*
+ * This section demonstrates testing a policy set.
+ * The testSet policy set contains:
+ * - No "for" clause (always applicable)
+ * - Combining algorithm: permit or deny errors abstain
+ * - Nested policy "policySimple" that permits when action=="read" && subject=="willi"
+ */
+
+requirement "Policy Set Demo - Basic Scenarios" {
+
+    given
+        - document "testSet"
+
+    scenario "willi reading is permitted by nested policy"
+        when "willi" attempts "read" on "anything"
+        expect permit;
+
+    scenario "willi writing is denied (no matching policy)"
+        when "willi" attempts "write" on "anything"
+        expect deny;
+
+    scenario "other user reading is denied"
+        when "other" attempts "read" on "anything"
+        expect deny;
+
+    scenario "other user writing is denied"
+        when "other" attempts "write" on "anything"
+        expect deny;
+}
+
+requirement "Policy Set Demo - Combining Algorithm Behavior" {
+
+    given
+        - document "testSet"
+
+    scenario "permit-unless-deny semantics: no applicable policy returns deny"
+        // testSet uses "permit or deny errors abstain" which is permit-unless-deny
+        // When no policy permits, the default is deny
+        when "nobody" attempts "unknown" on "resource"
+        expect deny;
+
+    scenario "nested policy permit propagates through set"
+        when "willi" attempts "read" on "resource"
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 14: COMPREHENSIVE POLICY DEMO
+// =============================================================================
+
+/*
+ * This section demonstrates testing a complex policy with multiple PIPs,
+ * obligations, advice, and transforms. The policyComprehensiveDemo policy requires:
+ *
+ * 1. action == "access" && resource.type == "demo"
+ * 2. subject.role == "admin" || subject.role == "user"
+ * 3. time.dayOfWeek(<time.now>) matches weekday regex
+ * 4. <system.status> is "online" or "maintenance"
+ * 5. subject.<access.level("demo")> >= 1
+ *
+ * PIPs to mock:
+ * - <time.now> (environment attribute)
+ * - <system.status> (environment attribute)
+ * - subject.<access.level("demo")> (entity attribute with parameter)
+ *
+ * Functions to mock:
+ * - time.dayOfWeek(any) for condition evaluation
+ * - filter.blacken(any, any, any) for transform
+ */
+
+requirement "Comprehensive Policy Demo - Permit Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        // Mock functions
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "███████"
+        // Mock environment attributes
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "statusMock" <system.status> emits "online"
+        // Mock entity attribute with parameter
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "admin user on weekday with online system permits"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "secret123" }
+        expect decision is permit, with obligation, with advice, with resource;
+
+    scenario "regular user also permits"
+        when { "role": "user" } attempts "access" on { "type": "demo", "sensitiveData": "data" }
+        expect permit;
+
+    scenario "verify obligation contains audit type"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "audit" and "action" is text "record_access"
+        };
+
+    scenario "verify advice contains log message"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect decision is permit, with advice matching object where {
+            "type" is text "log" and "message" is text containing "Access granted"
+        };
+
+    scenario "verify transform redacts sensitive data"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "secret" }
+        expect decision is permit, with resource matching object where {
+            "sensitiveData" is text "███████"
+        };
+
+}
+
+requirement "Comprehensive Policy Demo - Maintenance Mode" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "maintenanceStatus" <system.status> emits "maintenance"
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "maintenance mode also permits"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect permit;
+}
+
+requirement "Comprehensive Policy Demo - Deny Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "statusMock" <system.status> emits "online"
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "wrong action returns not-applicable"
+        when { "role": "admin" } attempts "read" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "wrong resource type returns not-applicable"
+        when { "role": "admin" } attempts "access" on { "type": "other", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "missing resource type returns not-applicable"
+        when { "role": "admin" } attempts "access" on { "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "unknown role returns not-applicable"
+        when { "role": "guest" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+}
+
+requirement "Comprehensive Policy Demo - Condition Failures" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+
+    scenario "weekend returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "SATURDAY"
+            - attribute "statusCheck" <system.status> emits "online"
+            - attribute "levelCheck" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "system offline returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOffline" <system.status> emits "offline"
+            - attribute "levelHigh" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "access level too low returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOnline" <system.status> emits "online"
+            - attribute "levelZero" any.<access.level("demo")> emits 0
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+}
+
+requirement "Comprehensive Policy Demo - Error Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+
+    scenario "time service error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to error("Time service unavailable")
+            - attribute "statusOk" <system.status> emits "online"
+            - attribute "levelOk" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
+
+    scenario "system status PIP error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusError" <system.status> emits error("System check failed")
+            - attribute "levelOk2" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
+
+    scenario "access level PIP error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOk2" <system.status> emits "online"
+            - attribute "levelError" any.<access.level("demo")> emits error
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
 }

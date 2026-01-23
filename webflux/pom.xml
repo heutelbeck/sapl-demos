@@ -147,6 +147,11 @@
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${sapl.version}</version>
+				<configuration>
+					<policySetHitRatio>100</policySetHitRatio>
+					<policyHitRatio>100</policyHitRatio>
+					<policyConditionHitRatio>95</policyConditionHitRatio>
+				</configuration>
 				<executions>
 					<execution>
 						<id>coverage</id>

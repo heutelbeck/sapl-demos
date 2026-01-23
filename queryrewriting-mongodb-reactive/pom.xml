@@ -176,8 +176,8 @@
 				<artifactId>sapl-maven-plugin</artifactId>
 				<version>${sapl.version}</version>
 				<configuration>
-					<policyHitRatio>100</policyHitRatio>
-					<policyConditionHitRatio>60</policyConditionHitRatio>
+					<policySetHitRatio>100</policySetHitRatio>
+					<policyConditionHitRatio>100</policyConditionHitRatio>
 				</configuration>
 				<executions>
 					<execution>

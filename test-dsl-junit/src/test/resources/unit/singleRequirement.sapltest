@@ -15,7 +15,7 @@ requirement "Policy Simple should grant read access for willi on something" {
     // Document at requirement level - all scenarios test this document
     // This creates a UNIT test (single document).
     given
-        - document "policySimple"
+        - document "testSet"
 
     // Define the scenario name. This represents a single isolated test case within the
     // requirement. The scenario name needs to be unique within a requirement.
