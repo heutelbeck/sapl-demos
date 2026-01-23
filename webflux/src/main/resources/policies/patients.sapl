@@ -2,8 +2,9 @@ set "patients"
 first or abstain errors propagate
 
 policy "Change Resource Example (1/3)"
-permit action.java.name == "getPatients";
-  time.secondOf(<time.now>) < 20;
+permit
+    action.java.name == "getPatients";
+    time.secondOf(<time.now>) < 20;
 obligation
 	{
 		"type" 		: "filterJsonContent",
@@ -21,8 +22,9 @@ obligation
 	}
 
 policy "Change Resource Example (2/3)"
-permit action.java.name == "getPatients";
-  time.secondOf(<time.now>) < 40;
+permit
+    action.java.name == "getPatients";
+    time.secondOf(<time.now>) < 40;
 obligation
 	{
 		"type" 		: "filterJsonContent",
@@ -41,4 +43,5 @@ obligation
 	}
 
 policy "Change Resource Example (3/3)"
-permit action.java.name == "getPatients"
+permit
+    action.java.name == "getPatients";

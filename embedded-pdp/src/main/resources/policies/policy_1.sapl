@@ -1,4 +1,5 @@
 import filter.blacken
+import filter.remove
 import simple.append
 import simple.length
 

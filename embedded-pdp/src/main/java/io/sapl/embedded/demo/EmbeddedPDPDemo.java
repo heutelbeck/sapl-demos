@@ -101,7 +101,7 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         reactiveUsageDemo(pdp);
         runPerformanceDemoSingleBlocking(pdp);
         runPerformanceDemoSingleSequentialReactive(pdp);
-
+        runPerformanceDemoSingleSequentialPure(pdp);
         LOGGER.info("End of demo.");
         components.dispose();
         return 0;
@@ -209,6 +209,28 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         var start = System.nanoTime();
         for (var i = 0; i < runs; i++) {
             pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
+        }
+        var end = System.nanoTime();
+        LOGGER.info("");
+        logResults("Benchmark results for .take(1) access:", runs, start, end);
+        LOGGER.info("");
+        LOGGER.info(LINE);
+    }
+
+    private static void runPerformanceDemoSingleSequentialPure(PolicyDecisionPoint pdp) {
+        var runs = getRuns();
+        LOGGER.info("");
+        LOGGER.info("Demo Part 5: Perform a small benchmark for sequential .take(1) decisions.");
+
+        LOGGER.info("Warming up for {} runs...", runs);
+        for (var i = 0; i < runs; i++) {
+            pdp.decideOnceBlocking(READ_SUBSCRIPTION);
+        }
+        LOGGER.info("Measure time for {} runs...", runs);
+
+        var start = System.nanoTime();
+        for (var i = 0; i < runs; i++) {
+            pdp.decideOnceBlocking(READ_SUBSCRIPTION);
         }
         var end = System.nanoTime();
         LOGGER.info("");

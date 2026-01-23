@@ -1,6 +1,6 @@
 {
 	"algorithm": {
-		"votingMode": "FIRST",
+		"votingMode": "PRIORITY_DENY",
 		"defaultDecision": "DENY",
 		"errorHandling": "ABSTAIN"
 	},

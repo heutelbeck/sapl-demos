@@ -74,7 +74,8 @@ class GPolicyWithComplexExpectStepTest {
                 "id", Value.of("56"),
                 "diagnosisText", Value.of("█████████████"),
                 "icd11Code", Value.of("ic███████")));
-
+        var x = AuthorizationSubscription.of(subject, action, resource);
+        System.err.println("->"+x);
         SaplTestFixture.createSingleTest()
                 .withFunctionLibrary(FilterFunctionLibrary.class)
                 .withPolicyFromResource(POLICY)

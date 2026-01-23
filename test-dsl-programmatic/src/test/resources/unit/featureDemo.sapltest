@@ -47,7 +47,7 @@ requirement "Basic Structure Demo - Integration Test" {
     // Multiple documents - this is an integration test
     given
         - documents "policySimple", "policyWithSinglePIP"
-        - permit-overrides
+        - priority permit or permit errors propagate
         - attribute "upperMock" any.<test.upper> emits "WILLI"
 
     scenario "integration test permits willi"
@@ -67,7 +67,7 @@ requirement "Combining Algorithm Demo" {
 
     scenario "deny-overrides"
         given
-            - deny-overrides
+            - priority deny or deny errors propagate
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
         // policySimple permits willi, policyWithSinglePIP denies (NOT_WILLI)
@@ -76,7 +76,7 @@ requirement "Combining Algorithm Demo" {
 
     scenario "permit-overrides"
         given
-            - permit-overrides
+            - priority permit or permit errors propagate
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
         // policySimple permits, so overall permit
@@ -84,7 +84,7 @@ requirement "Combining Algorithm Demo" {
 
     scenario "only-one-applicable with multiple matches"
         given
-            - only-one-applicable
+            - unique or abstain errors propagate
             - attribute "upperMock" any.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
         // Both policies are applicable -> indeterminate
@@ -92,14 +92,14 @@ requirement "Combining Algorithm Demo" {
 
     scenario "deny-unless-permit"
         given
-            - deny-unless-permit
+            - priority permit or deny errors abstain
             - attribute "upperMock" any.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
         expect permit;
 
     scenario "permit-unless-deny"
         given
-            - permit-unless-deny
+            - priority deny or permit errors abstain
             - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
         when "not_willi" attempts "read" on "something"
         // not_willi doesn't match policySimple, policyWithSinglePIP denies

@@ -1,7 +1,7 @@
 {
 	"algorithm": {
-		"votingMode": "FIRST",
-		"defaultDecision": "DENY",
+		"votingMode": "PRIORITY_DENY",
+		"defaultDecision": "ABSTAIN",
 		"errorHandling": "ABSTAIN"
 	},
 	"variables": {}
