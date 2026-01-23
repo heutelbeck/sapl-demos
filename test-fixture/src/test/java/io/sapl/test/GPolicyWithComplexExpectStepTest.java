@@ -15,17 +15,16 @@
  */
 package io.sapl.test;
 
-import static io.sapl.test.Matchers.isPermit;
-
-import java.util.Map;
-
-import org.junit.jupiter.api.Test;
-
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.functions.libraries.FilterFunctionLibrary;
+import org.junit.jupiter.api.Test;
+
+import java.util.Map;
+
+import static io.sapl.test.Matchers.isPermit;
 
 /**
  * Tests for complex authorization decision expectations with obligations and
@@ -74,8 +73,6 @@ class GPolicyWithComplexExpectStepTest {
                 "id", Value.of("56"),
                 "diagnosisText", Value.of("█████████████"),
                 "icd11Code", Value.of("ic███████")));
-        var x = AuthorizationSubscription.of(subject, action, resource);
-        System.err.println("->"+x);
         SaplTestFixture.createSingleTest()
                 .withFunctionLibrary(FilterFunctionLibrary.class)
                 .withPolicyFromResource(POLICY)
@@ -100,8 +97,8 @@ class GPolicyWithComplexExpectStepTest {
                         .containsObligationMatching(obligationValue -> {
                             if (obligationValue instanceof ObjectValue obj) {
                                 var typeField = obj.get("type");
-                                return typeField instanceof TextValue typeText
-                                        && "logAccess".equals(typeText.value());
+                                return typeField instanceof TextValue(String value)
+                                        && "logAccess".equals(value);
                             }
                             return false;
                         }))

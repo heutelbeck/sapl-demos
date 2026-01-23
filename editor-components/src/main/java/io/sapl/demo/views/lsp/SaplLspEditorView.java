@@ -57,8 +57,7 @@ public class SaplLspEditorView extends VerticalLayout {
              */
             policy "document-access-control"
             permit
-                action == "read"
-            where
+                action == "read";
                 var userClearance = subject.<user.clearanceLevel>;
                 var docClassification = resource.<document.classification>;
                 userClearance >= docClassification;

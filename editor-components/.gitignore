@@ -4,6 +4,7 @@
 .settings
 .project
 .classpath
+bundles/
 
 *.iml
 .DS_Store
