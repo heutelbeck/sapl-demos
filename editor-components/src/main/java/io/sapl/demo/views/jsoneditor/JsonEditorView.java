@@ -27,8 +27,8 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import io.sapl.demo.views.MainLayout;
-import io.sapl.vaadin.lsp.JsonEditorLsp;
-import io.sapl.vaadin.lsp.JsonEditorLspConfiguration;
+import io.sapl.vaadin.lsp.JsonEditor;
+import io.sapl.vaadin.lsp.JsonEditorConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -92,18 +92,18 @@ public class JsonEditorView extends VerticalLayout {
             }
             """;
 
-    private final JsonEditorLsp editor;
+    private final JsonEditor editor;
 
     public JsonEditorView() {
         setSizeFull();
         setPadding(true);
         setSpacing(true);
 
-        var config = new JsonEditorLspConfiguration();
+        var config = new JsonEditorConfiguration();
         config.setDarkTheme(true);
         config.setHasLineNumbers(true);
 
-        editor = new JsonEditorLsp(config);
+        editor = new JsonEditor(config);
         editor.setWidthFull();
         editor.setHeight("70vh");
         editor.setDocument(DEFAULT_JSON);
