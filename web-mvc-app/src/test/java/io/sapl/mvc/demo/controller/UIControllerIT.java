@@ -15,6 +15,8 @@
  */
 package io.sapl.mvc.demo.controller;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -74,7 +76,7 @@ class UIControllerIT {
         @Test
         @DisplayName("Unauthenticated user is redirected to login")
         void unauthenticatedUserRedirectedToLogin() throws Exception {
-            mockMvc.perform(get("/patients"))
+            mockMvc.perform(get("/patients").with(anonymous()))
                     .andExpect(status().is3xxRedirection());
         }
     }
@@ -120,14 +122,14 @@ class UIControllerIT {
         @Test
         @DisplayName("Doctor can access delete endpoint")
         void doctorCanAccessDeleteEndpoint() throws Exception {
-            mockMvc.perform(delete("/patients/1").with(user("Julia").roles("DOCTOR")))
+            mockMvc.perform(delete("/patients/1").with(user("Julia").roles("DOCTOR")).with(csrf()))
                     .andExpect(status().is3xxRedirection());
         }
 
         @Test
         @DisplayName("Nurse cannot access delete endpoint")
         void nurseCannotAccessDeleteEndpoint() throws Exception {
-            mockMvc.perform(delete("/patients/1").with(user("Thomas").roles("NURSE")))
+            mockMvc.perform(delete("/patients/1").with(user("Thomas").roles("NURSE")).with(csrf()))
                     .andExpect(status().isForbidden());
         }
     }

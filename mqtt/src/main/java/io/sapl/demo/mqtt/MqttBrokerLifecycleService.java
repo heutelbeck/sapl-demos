@@ -1,19 +1,18 @@
 package io.sapl.demo.mqtt;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.ExecutionException;
-
+import com.hivemq.configuration.service.InternalConfigurations;
+import com.hivemq.embedded.EmbeddedHiveMQ;
+import com.hivemq.migration.meta.PersistenceType;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 
-import com.hivemq.configuration.service.InternalConfigurations;
-import com.hivemq.embedded.EmbeddedHiveMQ;
-import com.hivemq.migration.meta.PersistenceType;
-
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -41,7 +40,7 @@ public class MqttBrokerLifecycleService implements DisposableBean {
     }
 
     private static EmbeddedHiveMQ buildBroker(Path configDir, Path dataDir, Path extensionsDir) {
-        final var broker = EmbeddedHiveMQ.builder().withConfigurationFolder(configDir).withDataFolder(dataDir)
+        val broker = EmbeddedHiveMQ.builder().withConfigurationFolder(configDir).withDataFolder(dataDir)
                 .withExtensionsFolder(extensionsDir).build();
         InternalConfigurations.PAYLOAD_PERSISTENCE_TYPE.set(PersistenceType.FILE);
         InternalConfigurations.RETAINED_MESSAGE_PERSISTENCE_TYPE.set(PersistenceType.FILE);

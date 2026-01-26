@@ -15,9 +15,8 @@
  */
 package io.sapl.test;
 
-import java.util.Map;
-
 import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.AttributeAccessContext;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
@@ -31,7 +30,7 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Flux<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
+    public Flux<Value> upper(TextValue leftHandValue, AttributeAccessContext ctx) {
         return Flux.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 

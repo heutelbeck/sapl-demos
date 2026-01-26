@@ -1,17 +1,17 @@
 package io.sapl.demo.books.security;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.function.Consumer;
-
 import io.sapl.api.model.ArrayValue;
 import io.sapl.api.model.NumberValue;
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.Value;
+import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
+import lombok.val;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Service;
 
-import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 @Service
 public class EnforceCategoryFilteringConstraintHandlerProvider implements MethodInvocationConstraintHandlerProvider {
@@ -27,7 +27,7 @@ public class EnforceCategoryFilteringConstraintHandlerProvider implements Method
     public Consumer<ReflectiveMethodInvocation> getHandler(Value constraint) {
         return methodInvocation -> {
             if (constraint instanceof ObjectValue ov && ov.containsKey(LIMIT_CATEGORIES) && ov.get(LIMIT_CATEGORIES) instanceof ArrayValue constraintCategories) {
-                final var categories = new ArrayList<Integer>();
+                val categories = new ArrayList<Integer>();
 
                 if (constraintCategories.isEmpty()) {
                     methodInvocation.setArguments(Optional.empty());
@@ -35,8 +35,8 @@ public class EnforceCategoryFilteringConstraintHandlerProvider implements Method
                 }
 
                 for (var category : constraintCategories) {
-                    if (category instanceof NumberValue categoryNumber) {
-                        categories.add(categoryNumber.value().intValue());
+                    if (category instanceof NumberValue(java.math.BigDecimal value)) {
+                        categories.add(value.intValue());
                     }
                 }
                 methodInvocation.setArguments(Optional.of(categories));

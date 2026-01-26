@@ -15,8 +15,8 @@
  */
 package io.sapl.demo.webflux;
 
-import java.util.List;
-
+import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
+import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -26,7 +26,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 
-import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
+import java.util.List;
 
 /**
  * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration
@@ -41,7 +41,7 @@ public class SecurityConfiguration {
     SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         // @formatter:off
 		http.authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
-            .formLogin(form-> form.disable())
+            .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
             .httpBasic(basic -> basic.authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED)));
 		return http.build();
 		// @formatter:on
@@ -49,7 +49,7 @@ public class SecurityConfiguration {
 
     @Bean
     MapReactiveUserDetailsService userDetailsService() {
-        final var userDetails = User.withUsername("admin").password("admin").roles("ADMIN").build();
+        val userDetails = User.withUsername("admin").password("admin").roles("ADMIN").build();
         return new MapReactiveUserDetailsService(List.of(userDetails));
     }
 

@@ -15,21 +15,20 @@
  */
 package io.sapl.demo.jwt.resourceserver.controller;
 
-import java.security.Principal;
-import java.time.Duration;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.spring.method.metadata.PreEnforce;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuples;
+
+import java.security.Principal;
+import java.time.Duration;
 
 @RestController
 @RequiredArgsConstructor
@@ -56,10 +55,10 @@ public class MiskatonicUniversityController {
     }
 
     public void doATimeoutDemoTest(Principal principal) {
-        final var authzSub            = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
-        final var decisions           = pdp.decide(authzSub).map(AuthorizationDecision::decision);
-        final var ticktock            = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
-        final var decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
+        val authzSub            = AuthorizationSubscription.of(principal, "subscribe", "mysteries", mapper);
+        val  decisions           = pdp.decide(authzSub).map(AuthorizationDecision::decision);
+        val  ticktock            = Flux.just("tick", "tock").repeat().delayElements(Duration.ofSeconds(3L));
+        val  decisionsWithTicker = Flux.combineLatest(x -> Tuples.of(x[0], x[1]), ticktock, decisions);
         decisionsWithTicker.subscribe();
     }
 

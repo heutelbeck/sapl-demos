@@ -15,29 +15,25 @@
  */
 package io.sapl.mvc.demo.pip;
 
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.sapl.api.attributes.Attribute;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.*;
-import lombok.val;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.sapl.mvc.demo.domain.Patient;
 import io.sapl.mvc.demo.domain.Relation;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
 
 /**
  * This class realizes a custom Policy Information Point (PIP) which can
  * retrieve attributes of patients from the Patient and Relation repositories.
- *
+ * <p/>
  * This PIP is registered under the name 'patient'.
- *
+ * <p/>
  * As it is registered as a Spring @Service, the embedded Spring SAPL PDP will
  * pick it up automatically during the autoconfiguration process.
  */
@@ -54,26 +50,25 @@ public class PatientPIP {
 
     /**
      * This attribute is accessed in a SAPL policy through an expression like this:
-     *
+     * <p/>
      * resource.patientId.<patient.relatives>
-     *
+     * <p/>
      * The value on the left-hand side of the <> expression is fed into the function
      * as the first parameter as a Val. The attribute is identified within the <>
      * and consists of the name of the PIP and the name of the attribute:
      * 'patient.relatives' Import statements in a policy can be used to provide a
      * shorthand in the policy.
-     *
+     * <p/>
      * This implementation does not track changes in the repository, i.e. this is a
      * non-streaming PIP.
      * 
      * @param leftHandValue     the id of the patient. This parameter must be a number, as
      *                  defined by the @Number annotation.
-     * @param variables the variables in the current evaluation context
      * @return the relatives of the patient as registered in the relationRepo.
      *
      */
     @Attribute(name = "relatives")
-    public Flux<Value> getRelations(NumberValue leftHandValue, Map<String, Value> variables) {
+    public Flux<Value> getRelations(NumberValue leftHandValue) {
         final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.value().longValue());
         final List<TextValue>   relationNames = relations.stream().map(Relation::getUsername).map(Value::of).toList();
         final ArrayValue     jsonNode      = ArrayValue.builder().addAll(relationNames).build();
@@ -82,26 +77,25 @@ public class PatientPIP {
 
     /**
      * This attribute is accessed in a SAPL policy through an expression like this:
-     *
+     * <p/>
      * resource.patientId.<patient.patientRecord>
-     *
+     * <p/>
      * The value on the left-hand side of the <> expression is fed into the function
      * as the first parameter as a Val. The attribute is identified within the <>
      * and consists of the name of the PIP and the name of the attribute:
      * 'patient.patientRecord' Import statements in a policy can be used to provide
      * a shorthand in the policy.
-     *
+     * <p/>
      * This implementation does not track changes in the repository, i.e. this is a
      * non-streaming PIP.
      * 
      * @param patientId the id of the patient. This parameter must be a number, as
      *                  defined by the @Number annotation.
-     * @param variables the variables in the current evaluation context
      * @return the patient record or null. This is a Flux containing only one value.
      *
      */
     @Attribute(name = "patientRecord")
-    public Flux<Value> getPatientRecord(NumberValue patientId, Map<String, Value> variables) {
+    public Flux<Value> getPatientRecord(NumberValue patientId) {
         try {
             val maybePatient  = patientRepo.findById(patientId.value().longValue());
             if(maybePatient.isEmpty()) {

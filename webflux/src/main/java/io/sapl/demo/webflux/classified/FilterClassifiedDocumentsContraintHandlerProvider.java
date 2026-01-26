@@ -1,13 +1,12 @@
 package io.sapl.demo.webflux.classified;
 
-import java.util.function.Predicate;
-
-import org.springframework.stereotype.Service;
-
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.FilterPredicateConstraintHandlerProvider;
+import org.springframework.stereotype.Service;
+
+import java.util.function.Predicate;
 
 @Service
 public class FilterClassifiedDocumentsContraintHandlerProvider implements FilterPredicateConstraintHandlerProvider {
@@ -18,7 +17,7 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
             return false;
         }
         var type = objectValue.get("type");
-        return type instanceof TextValue textValue && "filterClassifiedDocuments".equals(textValue.value());
+        return type instanceof TextValue(String value) && "filterClassifiedDocuments".equals(value);
     }
 
     @Override
@@ -27,9 +26,9 @@ public class FilterClassifiedDocumentsContraintHandlerProvider implements Filter
 
         if (constraint instanceof ObjectValue objectValue && objectValue.containsKey("clearance")) {
             var clearanceValue = objectValue.get("clearance");
-            if (clearanceValue instanceof TextValue textValue) {
+            if (clearanceValue instanceof TextValue(String value)) {
                 try {
-                    clearanceAux = NatoSecurityClassification.valueOf(textValue.value());
+                    clearanceAux = NatoSecurityClassification.valueOf(value);
                 } catch (IllegalArgumentException e) {
                     // NOOP
                 }

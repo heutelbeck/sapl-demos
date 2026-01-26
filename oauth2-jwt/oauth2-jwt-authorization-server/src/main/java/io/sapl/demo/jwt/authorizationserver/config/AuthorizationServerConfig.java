@@ -15,10 +15,15 @@
  */
 package io.sapl.demo.jwt.authorizationserver.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import java.util.UUID;
-
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.source.JWKSource;
+import com.nimbusds.jose.proc.SecurityContext;
+import io.sapl.demo.jwt.authorizationserver.keyserver.KeyRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,15 +51,9 @@ import org.springframework.security.oauth2.server.authorization.settings.ClientS
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.proc.SecurityContext;
+import java.util.UUID;
 
-import io.sapl.demo.jwt.authorizationserver.keyserver.KeyRepository;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @RequiredArgsConstructor
 @Configuration(proxyBeanMethods = false)
@@ -73,7 +72,7 @@ public class AuthorizationServerConfig {
     SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         PathPatternRequestMatcher.Builder match = PathPatternRequestMatcher.withDefaults();
         http.authorizeHttpRequests(authorize -> authorize.requestMatchers(match.matcher("/public-key/**")).permitAll());
-        final var authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
+        val authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
         http.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());

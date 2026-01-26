@@ -17,6 +17,9 @@
  */
 package io.sapl.demo.testing.dsl.plain;
 
+import static io.sapl.api.pdp.CombiningAlgorithm.DefaultDecision.ABSTAIN;
+import static io.sapl.api.pdp.CombiningAlgorithm.ErrorHandling.PROPAGATE;
+import static io.sapl.api.pdp.CombiningAlgorithm.VotingMode.PRIORITY_DENY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
@@ -63,7 +66,7 @@ class PlainTestAdapterTests {
 
         // Create configuration
         var config = TestConfiguration.builder().withSaplDocuments(policies).withSaplTestDocuments(tests)
-                .withDefaultAlgorithm(CombiningAlgorithm.DENY_OVERRIDES).build();
+                .withDefaultAlgorithm(new CombiningAlgorithm(PRIORITY_DENY, ABSTAIN, PROPAGATE)).build();
 
         // Execute tests using PlainTestAdapter
         var adapter = new PlainTestAdapter();

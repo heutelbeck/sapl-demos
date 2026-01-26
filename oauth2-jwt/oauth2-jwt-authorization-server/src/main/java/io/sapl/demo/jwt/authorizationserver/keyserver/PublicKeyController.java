@@ -15,8 +15,9 @@
  */
 package io.sapl.demo.jwt.authorizationserver.keyserver;
 
-import java.util.Base64;
-
+import com.nimbusds.jose.JOSEException;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.nimbusds.jose.JOSEException;
-
-import lombok.RequiredArgsConstructor;
+import java.util.Base64;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,7 +41,7 @@ public class PublicKeyController {
     }
 
     private String publicKey(String keyId) throws JOSEException {
-        final var key = keyRepo.findById(keyId);
+        val key = keyRepo.findById(keyId);
         if (key.isEmpty())
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Unable to find key with ID " + keyId);
         return ENCODER.encodeToString(key.get().toRSAKey().toRSAPublicKey().getEncoded());
