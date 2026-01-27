@@ -36,15 +36,13 @@ import picocli.CommandLine.Option;
 @Command
 public class RemotePDPDemo implements Callable<Integer> {
 
-    private static final Logger LOG         = LoggerFactory.getLogger(RemotePDPDemo.class);
-    private static final int    RSOCKETPORT = 7000;
-    private static final String RSOCKETHOST = "localhost";
+    private static final Logger LOG = LoggerFactory.getLogger(RemotePDPDemo.class);
 
     @Option(names = { "-h",
             "-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
     private String host = "https://localhost:8443";
 
-    // The default option set here are the default credentials of the pdp-server-lt
+    // The default option set here are the default credentials of the SAPL Node
 
     @Option(names = { "-k",
             "-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
@@ -62,13 +60,8 @@ public class RemotePDPDemo implements Callable<Integer> {
 
         PolicyDecisionPoint pdp;
 
-        if (host.startsWith("rsocket")) {
-            pdp = RemotePolicyDecisionPoint.builder().rsocket().host(RSOCKETHOST).port(RSOCKETPORT)
-                    .basicAuth(clientKey, clientSecret).withUnsecureSSL().build();
-        } else {
-            pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).basicAuth(clientKey, clientSecret)
-                    .withUnsecureSSL().build();
-        }
+        pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).basicAuth(clientKey, clientSecret)
+                .withUnsecureSSL().build();
 
         /*
          * To have the client use the default SSL verification use this constructor

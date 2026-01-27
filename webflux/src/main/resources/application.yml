@@ -33,11 +33,11 @@ io.sapl.pdp:
 
 # The following lines of configuration are for connecting the application to a remote PDP.
 # To do so, replace the dependency to sapl-spring-pdp-embedded with sapl-spring-pdp-remote
-# The following settings are select that it will connect to a sapl-server-lt you started locally with mvn spring-boot:run
+# The following settings are select that it will connect to a sapl-node you started locally with mvn spring-boot:run
   remote:
     type: http
     host: https://localhost:8443
-    # These are the default credentials configured for the sapl-server-lt when running with the 'local' profile
+    # These are the default credentials configured for the sapl-node when running with the 'local' profile
     key: xwuUaRD65G
     secret: 3j_PK71bjy!hN3*xq.xZqveU)t5hKLR_
     # Do not add this parameter in production! This is only for testing with self-signed localhost certificates during development

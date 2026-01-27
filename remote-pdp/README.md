@@ -4,7 +4,7 @@
 
 This demo shows how to connect to a remote SAPL Policy Decision Point (PDP) server without any framework support like Spring Boot. It demonstrates:
 
-- Connecting to a SAPL Server using HTTP or RSocket
+- Connecting to a SAPL Server using HTTP
 - Single and multi-authorization subscriptions
 - The `RemotePolicyDecisionPoint.builder()` API
 
@@ -12,13 +12,13 @@ This demo shows how to connect to a remote SAPL Policy Decision Point (PDP) serv
 
 - JDK 21 or newer
 - Maven
-- A running SAPL PDP server (e.g., [SAPL Server LT](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt))
+- A running SAPL PDP server (e.g., [SAPL Node](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-node))
 
 ## Running the Demo
 
-### Start a PDP Server
+### Start a Sapl Node
 
-First, start a SAPL Server LT instance. See the [SAPL Server LT documentation](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-server-lt) for instructions.
+First, start a SAPL Node instance. See the [SAPL Node documentation](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-node) for instructions.
 
 ### Build the Demo
 
@@ -34,7 +34,7 @@ cd target
 java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-By default, the demo connects to `https://localhost:8443` using the default SAPL Server LT demo credentials.
+By default, the demo connects to `https://localhost:8443` using the default SAPL Node demo credentials.
 
 ### Command Line Options
 
@@ -57,12 +57,6 @@ java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
   -h=https://myserver:8443 \
   -k=myClientKey \
   -s=myClientSecret
-```
-
-**Using RSocket transport:**
-```bash
-java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
-  -h=rsocket://localhost:7000
 ```
 
 ### Sample Output (No Server Running)
@@ -89,24 +83,12 @@ java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
 
 ### Building the Remote PDP Client
 
-**HTTP Transport:**
 ```java
 PolicyDecisionPoint pdp = RemotePolicyDecisionPoint.builder()
     .http()
     .baseUrl("https://localhost:8443")
     .basicAuth(clientKey, clientSecret)
     .withUnsecureSSL()  // Only for testing with self-signed certificates!
-    .build();
-```
-
-**RSocket Transport:**
-```java
-PolicyDecisionPoint pdp = RemotePolicyDecisionPoint.builder()
-    .rsocket()
-    .host("localhost")
-    .port(7000)
-    .basicAuth(clientKey, clientSecret)
-    .withUnsecureSSL()
     .build();
 ```
 

@@ -17,7 +17,7 @@ If you are new to SAPL, start with these demos:
 | Demo                         | Description                                         |
 |------------------------------|-----------------------------------------------------|
 | [embedded-pdp](embedded-pdp) | Build and use a PDP programmatically without Spring |
-| [remote-pdp](remote-pdp)     | Connect to a remote PDP server via HTTP or RSocket  |
+| [remote-pdp](remote-pdp)     | Connect to a remote PDP server via HTTP  |
 
 ### Spring Security
 
