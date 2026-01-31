@@ -20,7 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -138,8 +138,8 @@ class OAuth2DemoIT {
 
     static <T> void printResponse(ResponseEntity<T> response) {
         System.out.println(response.getStatusCode());
-        for (var header : response.getHeaders().keySet())
-            System.out.println(header + "\t:\t" + response.getHeaders().get(header));
+        response.getHeaders().forEach((header, values) ->
+            System.out.println(header + "\t:\t" + values));
         System.out.println(response.getBody());
     }
 
@@ -173,7 +173,7 @@ class OAuth2DemoIT {
         final var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
         assertThat(authResponse).isNotNull();
         assertThat(authResponse.getStatusCode().is3xxRedirection()).isTrue();
-        assertThat(authResponse.getHeaders()).containsKey("Location");
+        assertThat(authResponse.getHeaders().getLocation()).isNotNull();
     }
 
     @Test

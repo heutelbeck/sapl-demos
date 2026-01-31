@@ -1,16 +1,13 @@
 package io.sapl.demo.webflux.classified;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.function.Function;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.security.autoconfigure.web.reactive.ReactiveWebSecurityAutoConfiguration;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -18,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 @WebFluxTest(controllers = DocumentsController.class, excludeAutoConfiguration = {
-        ReactiveSecurityAutoConfiguration.class })
+        ReactiveWebSecurityAutoConfiguration.class })
 class DocumentsControllerTests {
 
     @MockitoBean
@@ -33,7 +30,7 @@ class DocumentsControllerTests {
         final var documents = Flux.just(document);
         when(documentsService.getDocuments()).thenReturn(documents);
         webTestClient.get().uri("/documents").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
-                .expectBodyList(Document.class).value(Function.identity(), hasItem(document));
+                .expectBodyList(Document.class).contains(document);
         verify(documentsService, times(1)).getDocuments();
     }
 

@@ -90,8 +90,7 @@ public class WebSecurityConfig {
     @Bean
     AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder) {
-        var delegate = new DaoAuthenticationProvider();
-        delegate.setUserDetailsService(userDetailsService);
+        var delegate = new DaoAuthenticationProvider(userDetailsService);
         delegate.setPasswordEncoder(passwordEncoder);
 
         return new AuthenticationProvider() {

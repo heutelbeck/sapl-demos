@@ -1,16 +1,13 @@
 package io.sapl.demo.webflux.medical;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.function.Function;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.reactive.ReactiveSecurityAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.security.autoconfigure.web.reactive.ReactiveWebSecurityAutoConfiguration;
+import org.springframework.boot.webflux.test.autoconfigure.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -18,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 @WebFluxTest(controllers = PatientsController.class, excludeAutoConfiguration = {
-        ReactiveSecurityAutoConfiguration.class })
+        ReactiveWebSecurityAutoConfiguration.class })
 class PatientsControllerTests {
 
     @MockitoBean
@@ -33,7 +30,7 @@ class PatientsControllerTests {
         final var patients    = Flux.just(patientZero);
         when(patientsService.getPatients()).thenReturn(patients);
         webTestClient.get().uri("/patients").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk()
-                .expectBodyList(Patient.class).value(Function.identity(), hasItem(patientZero));
+                .expectBodyList(Patient.class).contains(patientZero);
         verify(patientsService, times(1)).getPatients();
     }
 

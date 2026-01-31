@@ -22,8 +22,8 @@ import javax.net.ssl.SSLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.MultiAuthorizationSubscription;
@@ -56,7 +56,7 @@ public class RemotePDPDemo implements Callable<Integer> {
         System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
     }
 
-    public Integer call() throws SSLException, JsonProcessingException {
+    public Integer call() throws SSLException, JacksonException {
 
         PolicyDecisionPoint pdp;
 

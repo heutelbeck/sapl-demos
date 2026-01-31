@@ -16,6 +16,9 @@
 package io.sapl.mvc.demo;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.Collection;
 
@@ -27,27 +30,23 @@ import org.htmlunit.html.HtmlHeading3;
 import org.htmlunit.html.HtmlInput;
 import org.htmlunit.html.HtmlPage;
 import org.htmlunit.html.HtmlTableRow;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import io.sapl.mvc.demo.controller.UIController;
 import io.sapl.mvc.demo.domain.DemoData;
 import lombok.SneakyThrows;
 
 @DirtiesContext
-@AutoConfigureMockMvc
 @SpringBootTest(classes = MvcDemoApplication.class)
 class MvcDemoApplicationTest {
 
@@ -87,8 +86,6 @@ class MvcDemoApplicationTest {
         }
     }
 
-    WebClient mockClient;
-
     @Autowired
     UserDetailsService userDetailsService;
 
@@ -96,12 +93,7 @@ class MvcDemoApplicationTest {
     UIController uiController;
 
     @Autowired
-    MockMvc mockMvc;
-
-    @BeforeEach
-    void beforeEach() {
-        mockClient = MockMvcWebClientBuilder.mockMvcSetup(mockMvc).build();
-    }
+    WebApplicationContext webApplicationContext;
 
     @Test
     void contextLoads(ApplicationContext context) {
@@ -113,8 +105,8 @@ class MvcDemoApplicationTest {
     @MethodSource("userNameSource")
     void when_home_then_showHome(String username) {
         final String url = "http://localhost:8080/";
-        setAuthentication(username);
-        HtmlPage page = mockClient.getPage(url);
+        var webClient = createWebClientForUser(username);
+        HtmlPage page = webClient.getPage(url);
 
         final var header = page.<HtmlHeading1>getByXPath("//h1");
         assertThat(header).hasSize(1);
@@ -141,8 +133,8 @@ class MvcDemoApplicationTest {
     @MethodSource("doctorNameSource")
     void when_patientsList_as_doctor_then_showPatientsList_and_showCreateButton(String username) {
         final String url = "http://localhost:8080/patients";
-        setAuthentication(username);
-        HtmlPage page = mockClient.getPage(url);
+        var webClient = createWebClientForUser(username);
+        HtmlPage page = webClient.getPage(url);
 
         final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
@@ -175,8 +167,8 @@ class MvcDemoApplicationTest {
     @MethodSource("nonDoctorNameSource")
     void when_patientsList_as_nonDoctor_then_showPatientsList(String username) {
         final String url = "http://localhost:8080/patients";
-        setAuthentication(username);
-        HtmlPage page = mockClient.getPage(url);
+        var webClient = createWebClientForUser(username);
+        HtmlPage page = webClient.getPage(url);
 
         final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
@@ -201,8 +193,8 @@ class MvcDemoApplicationTest {
     @MethodSource("doctorNameSource")
     void when_newPatient_as_doctor_then__(String username) {
         final String url = "http://localhost:8080/patients/new";
-        setAuthentication(username);
-        HtmlPage page = mockClient.getPage(url);
+        var webClient = createWebClientForUser(username);
+        HtmlPage page = webClient.getPage(url);
 
         final var header = page.<HtmlHeading3>getByXPath("//h3");
         assertThat(header).hasSize(1);
@@ -223,11 +215,13 @@ class MvcDemoApplicationTest {
         assertThat(homeFormInput.get(0).getValueAttribute()).isEqualTo("Back to Home");
     }
 
-    private void setAuthentication(String username) {
-        final var user  = userDetailsService.loadUserByUsername(username);
-        final var authn = new UsernamePasswordAuthenticationToken(user, DemoData.DEFAULT_RAW_PASSWORD,
-                user.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authn);
+    private WebClient createWebClientForUser(String username) {
+        var userDetails = userDetailsService.loadUserByUsername(username);
+        var mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .defaultRequest(get("/").with(user(userDetails)))
+                .build();
+        return MockMvcWebClientBuilder.mockMvcSetup(mockMvc).build();
     }
 
 }
