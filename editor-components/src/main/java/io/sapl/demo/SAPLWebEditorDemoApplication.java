@@ -4,13 +4,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
+import com.vaadin.flow.component.page.ColorScheme;
 
 import java.io.Serial;
 
+@ColorScheme(ColorScheme.Value.DARK)
 @SpringBootApplication
-@Theme(value = "sapl", variant = Lumo.DARK)
 public class SAPLWebEditorDemoApplication implements AppShellConfigurator {
 
     @Serial

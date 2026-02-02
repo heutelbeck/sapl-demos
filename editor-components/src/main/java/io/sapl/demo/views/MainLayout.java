@@ -1,34 +1,17 @@
 package io.sapl.demo.views;
 
-import io.sapl.api.SaplVersion;
-
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Header;
-import com.vaadin.flow.component.html.ListItem;
-import com.vaadin.flow.component.html.Nav;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.html.UnorderedList;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.lumo.LumoUtility.AlignItems;
-import com.vaadin.flow.theme.lumo.LumoUtility.BoxSizing;
-import com.vaadin.flow.theme.lumo.LumoUtility.Display;
-import com.vaadin.flow.theme.lumo.LumoUtility.FlexDirection;
 import com.vaadin.flow.theme.lumo.LumoUtility.FontSize;
-import com.vaadin.flow.theme.lumo.LumoUtility.FontWeight;
-import com.vaadin.flow.theme.lumo.LumoUtility.Gap;
-import com.vaadin.flow.theme.lumo.LumoUtility.Height;
-import com.vaadin.flow.theme.lumo.LumoUtility.ListStyleType;
 import com.vaadin.flow.theme.lumo.LumoUtility.Margin;
-import com.vaadin.flow.theme.lumo.LumoUtility.Overflow;
-import com.vaadin.flow.theme.lumo.LumoUtility.Padding;
-import com.vaadin.flow.theme.lumo.LumoUtility.TextColor;
-import com.vaadin.flow.theme.lumo.LumoUtility.Whitespace;
-import com.vaadin.flow.theme.lumo.LumoUtility.Width;
-
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.views.graph.GraphVisualizationView;
 import io.sapl.demo.views.jsoneditor.JsonEditorView;
 import io.sapl.demo.views.lsp.SaplLspEditorView;
@@ -44,80 +27,35 @@ public class MainLayout extends AppLayout {
     @Serial
     private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
-    /**
-     * A simple navigation item component, based on ListItem element.
-     */
-    public static class MenuItemInfo extends ListItem {
-
-        @Serial
-        private static final long serialVersionUID = SaplVersion.VERSION_UID;
-
-        private final Class<? extends Component> view;
-
-        public MenuItemInfo(String menuTitle, Component icon, Class<? extends Component> view) {
-            this.view = view;
-            RouterLink link = new RouterLink();
-            // Use Lumo classnames for various styling
-            link.addClassNames(Display.FLEX, Gap.XSMALL, Height.MEDIUM, AlignItems.CENTER, Padding.Horizontal.SMALL,
-                    TextColor.BODY);
-            link.setRoute(view);
-
-            Span text = new Span(menuTitle);
-            // Use Lumo classnames for various styling
-            text.addClassNames(FontWeight.MEDIUM, FontSize.MEDIUM, Whitespace.NOWRAP);
-
-            if (null != icon) {
-                link.add(icon);
-            }
-            link.add(text);
-            add(link);
-        }
-
-        public Class<?> getView() {
-            return view;
-        }
-
-    }
-
     public MainLayout() {
-        addToNavbar(createHeaderContent());
-    }
-
-    private Component createHeaderContent() {
-        Header header = new Header();
-        header.addClassNames(BoxSizing.BORDER, Display.FLEX, FlexDirection.COLUMN, Width.FULL);
-
-        Div layout = new Div();
-        layout.addClassNames(Display.FLEX, AlignItems.CENTER, Padding.Horizontal.LARGE);
-
         H1 appName = new H1("SAPL Demo Web Editor");
         appName.addClassNames(Margin.Vertical.MEDIUM, Margin.End.AUTO, FontSize.LARGE);
-        layout.add(appName);
 
-        Nav nav = new Nav();
-        nav.addClassNames(Display.FLEX, Overflow.AUTO, Padding.Horizontal.MEDIUM, Padding.Vertical.XSMALL);
+        Tabs tabs = createTabs();
 
-        // Wrap the links in a list; improves accessibility
-        UnorderedList list = new UnorderedList();
-        list.addClassNames(Display.FLEX, Gap.SMALL, ListStyleType.NONE, Margin.NONE, Padding.NONE);
-        nav.add(list);
+        HorizontalLayout header = new HorizontalLayout(appName, tabs);
+        header.setWidthFull();
+        header.setAlignItems(FlexComponent.Alignment.CENTER);
+        header.setPadding(true);
 
-        for (MenuItemInfo menuItem : createMenuItems()) {
-            list.add(menuItem);
-
-        }
-
-        header.add(layout, nav);
-        return header;
+        addToNavbar(header);
     }
 
-    private MenuItemInfo[] createMenuItems() {
-        return new MenuItemInfo[] {
-                new MenuItemInfo("SAPL Editor", VaadinIcon.EDIT.create(), SaplLspEditorView.class),
-                new MenuItemInfo("SAPL Test Editor", VaadinIcon.FILE_CODE.create(), SaplTestLspEditorView.class),
-                new MenuItemInfo("JSON Editor", VaadinIcon.CURLY_BRACKETS.create(), JsonEditorView.class),
-                new MenuItemInfo("Graph Visualization", VaadinIcon.CLUSTER.create(), GraphVisualizationView.class),
-        };
+    private Tabs createTabs() {
+        Tabs tabs = new Tabs();
+        tabs.add(createTab("SAPL Editor", VaadinIcon.EDIT, SaplLspEditorView.class));
+        tabs.add(createTab("SAPL Test Editor", VaadinIcon.FILE_CODE, SaplTestLspEditorView.class));
+        tabs.add(createTab("JSON Editor", VaadinIcon.CURLY_BRACKETS, JsonEditorView.class));
+        tabs.add(createTab("Graph Visualization", VaadinIcon.CLUSTER, GraphVisualizationView.class));
+        return tabs;
+    }
+
+    private Tab createTab(String title, VaadinIcon icon, Class<? extends Component> viewClass) {
+        RouterLink link = new RouterLink();
+        link.add(icon.create());
+        link.add(title);
+        link.setRoute(viewClass);
+        return new Tab(link);
     }
 
 }
