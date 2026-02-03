@@ -103,12 +103,16 @@ jobs:
 
     - name: Build Integration Test Images
       if: env.RUN_ANALYSIS == 'true'
-      run: mvn -B spring-boot:build-image -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -DskipTests
+      run: mvn -B spring-boot:build-image -pl :oauth2-jwt/oauth2-jwt-authorization-server,:oauth2-jwt/oauth2-jwt-resource-server -DskipTests
 
     - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
       if: env.RUN_ANALYSIS == 'true'
       # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
       run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report spotbugs:spotbugs -fae -Pproduction,it
+
+    - name: Build and Run Unit Tests
+      if: env.RUN_ANALYSIS != 'true'
+      run: mvn -B verify -DskipITs
 
     - name: Cache Sonar Packages
       if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'false') }}
