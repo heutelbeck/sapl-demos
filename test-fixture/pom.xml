@@ -44,7 +44,7 @@
 
 		<!-- Dependencies -->
 		<junit.version>5.11.4</junit.version>
-		<assertj.version>3.27.6</assertj.version>
+		<assertj.version>3.27.7</assertj.version>
 		<slf4j.version>2.0.17</slf4j.version>
 
 		<!-- Base argLine for JDK21+ -->

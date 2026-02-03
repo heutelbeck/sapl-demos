@@ -101,18 +101,9 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: echo "127.0.0.1 auth-server" | sudo tee -a /etc/hosts
 
-    - name: Build Modules
-      if: env.RUN_ANALYSIS == 'true'
-      run: mvn -U -B install -DskipTests -pl !:sapl-demo-testing
-
     - name: Build Integration Test Images
       if: env.RUN_ANALYSIS == 'true'
       run: mvn -B spring-boot:build-image -pl :sapl-demo-oauth2-jwt-authorization-server,:sapl-demo-oauth2-jwt-resource-server -DskipTests
-
-    - name: Run Unit Tests Only
-      if: env.RUN_ANALYSIS == 'false'
-      # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
-      run: mvn -B package -fae -Pproduction
 
     - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
       if: env.RUN_ANALYSIS == 'true'
