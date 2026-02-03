@@ -47,6 +47,8 @@ public class SaplTestLspEditorView extends VerticalLayout {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String WS_URL = "ws://localhost:8080/sapl-lsp";
+
     private static final String DEFAULT_TEST = """
             /*
              * Integration Test Demo
@@ -446,7 +448,7 @@ public class SaplTestLspEditorView extends VerticalLayout {
         var config = new SaplEditorLspConfiguration();
         config.setDarkTheme(true);
         config.setHasLineNumbers(true);
-        config.setWsUrl(getWsUrl());
+        config.setWsUrl(WS_URL);
 
         editor = new SaplTestEditorLsp(config);
         editor.setWidthFull();
@@ -462,10 +464,6 @@ public class SaplTestLspEditorView extends VerticalLayout {
 
         // Load default content after component is attached to ensure proper initialization
         editor.addAttachListener(event -> editor.setDocument(DEFAULT_TEST));
-    }
-
-    private String getWsUrl() {
-        return "ws://localhost:8080/sapl-lsp";
     }
 
     private VerticalLayout buildControls() {

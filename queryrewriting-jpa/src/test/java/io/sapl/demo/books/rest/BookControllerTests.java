@@ -117,11 +117,7 @@ class BookControllerTests {
                 .as("User '%s' with scope %s should see exactly %d books in categories %s",
                     userName, scope, expectedBooks.size(), expectedCategories)
                 .hasSize(expectedBooks.size())
-                .containsExactlyInAnyOrderElementsOf(expectedBooks);
-
-            // Verify no books from unauthorized categories leaked through
-            assertThat(actualBooks)
-                .as("No books from unauthorized categories should be present")
+                .containsExactlyInAnyOrderElementsOf(expectedBooks)
                 .allMatch(book -> expectedCategories.contains(book.getCategory()));
         }
     }

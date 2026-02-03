@@ -80,8 +80,7 @@ class PatientRepositoryIT {
         void authenticatedUserCanSeePatientList(String username, String role) {
             setAuthentication(username, role);
             List<Patient> patients = patientRepository.findAll();
-            assertThat(patients).isNotEmpty();
-            assertThat(patients).hasSize(2);
+            assertThat(patients).isNotEmpty().hasSize(2);
         }
     }
 

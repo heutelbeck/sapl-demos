@@ -40,7 +40,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) {
         // @formatter:off
 		return http.authorizeHttpRequests(requests -> 
 						requests.anyRequest()

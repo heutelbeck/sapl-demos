@@ -34,7 +34,7 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 public class WebSecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) {
         PathPatternRequestMatcher.Builder match = PathPatternRequestMatcher.withDefaults();
         // @formatter:off
 		http.authorizeHttpRequests(authorize -> authorize.requestMatchers(match.matcher("/css/**")).permitAll()

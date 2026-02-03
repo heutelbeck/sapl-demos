@@ -93,7 +93,7 @@ public class UIController {
 
     @PreEnforce
     @GetMapping("/patients/{id}")
-    public String getPatient(@PathVariable Long id, Model model, Authentication authentication) throws IOException {
+    public String getPatient(@PathVariable Long id, Model model, Authentication authentication) {
         Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         model.addAttribute(PATIENT, patient);
         model.addAttribute("permittedToUseUpdatePatientButton",

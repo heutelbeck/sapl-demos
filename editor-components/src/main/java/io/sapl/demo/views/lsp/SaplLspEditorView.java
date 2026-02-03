@@ -49,6 +49,8 @@ public class SaplLspEditorView extends VerticalLayout {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String WS_URL = "ws://localhost:8080/sapl-lsp";
+
     private static final String DEFAULT_POLICY = """
             /*
              * Document Access Control Policy
@@ -108,7 +110,7 @@ public class SaplLspEditorView extends VerticalLayout {
         config.setDarkTheme(true);
         config.setHasLineNumbers(true);
         // WebSocket URL for LSP - relative to current host
-        config.setWsUrl(getWsUrl());
+        config.setWsUrl(WS_URL);
 
         editor = new SaplEditorLsp(config);
         editor.setWidthFull();
@@ -124,13 +126,6 @@ public class SaplLspEditorView extends VerticalLayout {
 
         // Load default content after component is attached to ensure proper initialization
         editor.addAttachListener(event -> editor.setDocument(DEFAULT_POLICY));
-    }
-
-    private String getWsUrl() {
-        // Construct WebSocket URL based on current page location
-        // This will be evaluated client-side, so we use a placeholder
-        // that the JavaScript can resolve
-        return "ws://localhost:8080/sapl-lsp";
     }
 
     private VerticalLayout buildControls() {

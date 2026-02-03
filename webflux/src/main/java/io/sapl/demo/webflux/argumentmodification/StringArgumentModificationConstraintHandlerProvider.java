@@ -31,8 +31,8 @@ public class StringArgumentModificationConstraintHandlerProvider implements Meth
             Object[] newArguments      = Arrays.copyOf(originalArguments, originalArguments.length);
 
             for (int i = 0; i < newArguments.length; i++)
-                if (newArguments[i] instanceof String)
-                    newArguments[i] = (String) newArguments[i] + suffix;
+                if (newArguments[i] instanceof String str)
+                    newArguments[i] = str + suffix;
 
             methodInvocation.setArguments(newArguments);
         };
