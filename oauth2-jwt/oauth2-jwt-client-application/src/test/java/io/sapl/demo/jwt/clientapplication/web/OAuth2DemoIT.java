@@ -65,9 +65,11 @@ class OAuth2DemoIT {
             DockerImageName.parse(REGISTRY + "oauth2-jwt-authorization-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
             .withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
-            .waitingFor(Wait.forListeningPort())
-            .waitingFor(Wait.forLogMessage(containsPattern("Started OAuth2AuthorizationServerApplication"), 1))
-            .withStartupTimeout(TIMEOUT_SPINUP)
+            .withExposedPorts(AUTH_SERVER_PORT)
+            .waitingFor(Wait.forHttp("/.well-known/openid-configuration")
+                    .forPort(AUTH_SERVER_PORT)
+                    .forStatusCode(200)
+                    .withStartupTimeout(TIMEOUT_SPINUP))
             .withCreateContainerCmdModifier(configureContainerStartup(AUTH_SERVER_PORT));
 
     @Container
@@ -75,14 +77,13 @@ class OAuth2DemoIT {
     static GenericContainer<?> resourceServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "oauth2-jwt-resource-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
-            .withNetwork(IT_NETWORK).waitingFor(Wait.forListeningPort())
-            .waitingFor(Wait.forLogMessage(containsPattern("Started ResourceServerApplication"), 1))
-            .withStartupTimeout(TIMEOUT_SPINUP)
+            .withNetwork(IT_NETWORK)
+            .withExposedPorts(RESOURCE_SERVER_PORT)
+            .waitingFor(Wait.forHttp("/books")
+                    .forPort(RESOURCE_SERVER_PORT)
+                    .forStatusCode(401)
+                    .withStartupTimeout(TIMEOUT_SPINUP))
             .withCreateContainerCmdModifier(configureContainerStartup(RESOURCE_SERVER_PORT));
-
-    private static String containsPattern(String pattern) {
-        return "^.*" + pattern.replaceAll("[\\^\\$]", "") + ".*$";
-    }
 
     private static Consumer<CreateContainerCmd> configureContainerStartup(int fixedPort) {
         return cmd -> cmd.getHostConfig()
