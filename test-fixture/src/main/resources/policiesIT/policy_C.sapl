@@ -1,0 +1,6 @@
+policy "policyStreaming"
+permit
+  resource == "bar";
+  subject == "WILLI";
+  var interval = 2;
+  time.secondOf(<time.now(interval)>) >= 4;

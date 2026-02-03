@@ -1,0 +1,219 @@
+/*
+ * Streaming Demo
+ *
+ * This file demonstrates streaming scenarios in SAPL tests:
+ * - Streaming attribute values with then blocks
+ * - Multiple sequential expect blocks
+ * - Decision count expectations (N times)
+ * - Combining attribute streaming with function mocking
+ * - Verification after streaming scenarios
+ *
+ * Note: Functions are idempotent - they return the same value for
+ * the same input. For varying behavior, use attribute mocking.
+ */
+
+requirement "ROLE_DOCTOR can access when secondOf time.now is larger than 4" {
+
+    given
+        - document "policyStreaming"
+
+    scenario "doctor denied then permitted as time passes"
+        given
+            // Mock the time.now attribute with initial value
+            - attribute "nowMock" <time.now> emits "2021-02-08T16:16:01.000Z"
+            // Mock secondOf to extract seconds (idempotent: same extraction logic)
+            // The function returns seconds from the timestamp string
+            - function time.secondOf(any) maps to 1
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        // Second 1 <= 4, so not-applicable
+        expect not-applicable;
+
+    scenario "doctor permitted when seconds greater than 4"
+        given
+            - attribute "nowMock" <time.now> emits "2021-02-08T16:16:05.000Z"
+            // secondOf returns 5 which is > 4
+            - function time.secondOf(any) maps to 5
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect permit;
+
+    scenario "streaming decisions with then blocks"
+        given
+            // Start with low second value
+            - attribute "nowMock" <time.now> emits "2021-02-08T16:16:01.000Z"
+            // For this test, we mock the function to return what we control
+            // First call returns 1, but functions are idempotent...
+            // So we need different approach - mock function to always return 5
+            // and control via attribute values that the policy evaluates
+            - function time.secondOf(any) maps to 1
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect not-applicable;
+
+    scenario "attribute stream controls decisions"
+        given
+            // Mock with specific function behavior per attribute value
+            - attribute "nowMock" <time.now> emits "t1"
+            // Function always returns 5 (> 4) so policy permits
+            - function time.secondOf(any) maps to 5
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        // With secondOf always returning 5, should permit
+        expect permit
+        then
+            // Emit new time value - function still returns 5
+            - attribute "nowMock" emits "t2"
+        expect permit
+        then
+            - attribute "nowMock" emits "t3"
+        expect permit
+        verify
+            // Function called 3 times (once per attribute emission)
+            - function time.secondOf(any) is called 3 times;
+
+    scenario "multiple permits in sequence"
+        given
+            - attribute "nowMock" <time.now> emits "2021-02-08T16:16:05.000Z"
+            - function time.secondOf(any) maps to 5
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect
+            // Expect permit multiple times in stream format
+            - permit once
+        then
+            - attribute "nowMock" emits "2021-02-08T16:16:06.000Z"
+        expect
+            - permit once
+        then
+            - attribute "nowMock" emits "2021-02-08T16:16:07.000Z"
+        expect
+            - permit once;
+
+    scenario "non-doctor always denied regardless of time"
+        given
+            - attribute "nowMock" <time.now> emits "2021-02-08T16:16:10.000Z"
+            - function time.secondOf(any) maps to 10
+        when "ROLE_NURSE" attempts "read" on "heartBeatData"
+        // Policy requires subject == "ROLE_DOCTOR"
+        expect not-applicable;
+}
+
+requirement "Streaming with varying decisions" {
+
+    given
+        - document "policyStreaming"
+
+    scenario "decisions change as attribute values change"
+        given
+            // Start with denied state
+            - attribute "nowMock" <time.now> emits "low_time"
+            // Function mock controls the outcome
+            - function time.secondOf("low_time") maps to 2
+            - function time.secondOf("high_time") maps to 6
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        // 2 <= 4, so not-applicable
+        expect not-applicable
+        then
+            // Change to high time
+            - attribute "nowMock" emits "high_time"
+        // 6 > 4, so permit
+        expect permit;
+
+    scenario "alternating permit and deny"
+        given
+            // Setup mocks for different values
+            - attribute "nowMock" <time.now> emits "t5"
+            - function time.secondOf("t5") maps to 5
+            - function time.secondOf("t3") maps to 3
+            - function time.secondOf("t7") maps to 7
+            - function time.secondOf("t2") maps to 2
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        // t5 -> 5 > 4 -> permit
+        expect permit
+        then
+            - attribute "nowMock" emits "t3"
+        // t3 -> 3 <= 4 -> not-applicable
+        expect not-applicable
+        then
+            - attribute "nowMock" emits "t7"
+        // t7 -> 7 > 4 -> permit
+        expect permit
+        then
+            - attribute "nowMock" emits "t2"
+        // t2 -> 2 <= 4 -> not-applicable
+        expect not-applicable
+        verify
+            - function time.secondOf("t5") is called once
+            - function time.secondOf("t3") is called once
+            - function time.secondOf("t7") is called once
+            - function time.secondOf("t2") is called once;
+}
+
+requirement "Streaming with count expectations" {
+
+    given
+        - document "policyStreaming"
+
+    scenario "expect multiple same decisions using count"
+        given
+            - attribute "nowMock" <time.now> emits "time1"
+            - function time.secondOf(any) maps to 6
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        // First permit
+        expect permit
+        then
+            - attribute "nowMock" emits "time2"
+        expect permit
+        then
+            - attribute "nowMock" emits "time3"
+        expect permit
+        then
+            - attribute "nowMock" emits "time4"
+        expect permit
+        verify
+            - function time.secondOf(any) is called 4 times
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute <time.now> is called once;
+
+    scenario "mixed decisions with counts in expect block"
+        given
+            // Setup for controlled sequence
+            - attribute "nowMock" <time.now> emits "a"
+            - function time.secondOf("a") maps to 1
+            - function time.secondOf("b") maps to 2
+            - function time.secondOf("c") maps to 5
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect
+            // First decision
+            - not-applicable once
+        then
+            - attribute "nowMock" emits "b"
+        expect
+            - not-applicable once
+        then
+            - attribute "nowMock" emits "c"
+        expect
+            - permit once;
+}
+
+requirement "Function error handling in streaming" {
+
+    given
+        - document "policyStreaming"
+
+    scenario "function error causes indeterminate"
+        given
+            - attribute "nowMock" <time.now> emits "invalid_time"
+            // Function returns error for invalid input
+            - function time.secondOf(any) maps to error("Cannot parse time")
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect indeterminate;
+
+    scenario "recovery from function error"
+        given
+            - attribute "nowMock" <time.now> emits "error_time"
+            // First setup: error-returning function
+            - function time.secondOf("error_time") maps to error("Parse error")
+            - function time.secondOf("valid_time") maps to 5
+        when "ROLE_DOCTOR" attempts "read" on "heartBeatData"
+        expect indeterminate
+        then
+            - attribute "nowMock" emits "valid_time"
+        expect permit;
+}

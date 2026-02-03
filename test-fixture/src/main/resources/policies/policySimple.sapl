@@ -1,0 +1,8 @@
+set "testSet"
+priority permit or deny errors abstain
+for resource == "document"
+
+policy "policySimple"
+permit
+    action == "read";
+    subject == "willi";

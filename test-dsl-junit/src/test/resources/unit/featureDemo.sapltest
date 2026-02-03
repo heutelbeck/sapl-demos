@@ -1,0 +1,1156 @@
+/*
+ * SAPL Test Language Feature Demonstration
+ * ========================================
+ *
+ * This file demonstrates features of the SAPL test language:
+ *
+ * 1. Document specification (unit vs integration tests)
+ * 2. Combining algorithms
+ * 3. Variables definition
+ * 4. Environment configuration
+ * 5. Function mocking with various matchers
+ * 6. Attribute mocking (environment and entity attributes)
+ * 7. Streaming with then blocks
+ * 8. Verification blocks
+ * 9. All decision types and matchers
+ * 10. Value model matchers
+ * 11. String matchers
+ * 12. Central given blocks
+ */
+
+// =============================================================================
+// SECTION 1: BASIC STRUCTURE
+// =============================================================================
+
+// Document specification must be at requirement level, not scenario level.
+// Use separate requirements to test different documents.
+
+requirement "Basic Structure Demo - Unit Test" {
+
+    // Document at requirement level - all scenarios test this document
+    given
+        - document "testSet"
+
+    // Minimal scenario
+    scenario "minimal syntax"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    // Same document, different subject
+    scenario "non-matching subject"
+        when "not_willi" attempts "read" on "something"
+        expect deny;
+}
+
+requirement "Basic Structure Demo - Integration Test" {
+
+    // Multiple documents - this is an integration test
+    given
+        - documents "testSet", "policyWithSinglePIP"
+        - priority permit or permit errors propagate
+        - attribute "upperMock" any.<test.upper> emits "WILLI"
+
+    scenario "integration test permits willi"
+        when "willi" attempts "read" on "something"
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 2: COMBINING ALGORITHMS
+// =============================================================================
+
+requirement "Combining Algorithm Demo" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - documents "testSet", "policyWithSinglePIP"
+
+    scenario "deny-overrides"
+        given
+            - priority deny or deny errors propagate
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        // policySimple permits willi, policyWithSinglePIP denies (NOT_WILLI)
+        // deny-overrides means deny wins
+        expect permit;
+
+    scenario "permit-overrides"
+        given
+            - priority permit or permit errors propagate
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        // policySimple permits, so overall permit
+        expect permit;
+
+    scenario "only-one-applicable with multiple matches"
+        given
+            - unique or abstain errors propagate
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        // Both policies are applicable -> indeterminate
+        expect indeterminate;
+
+    scenario "deny-unless-permit"
+        given
+            - priority permit or deny errors abstain
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "permit-unless-deny"
+        given
+            - priority deny or permit errors abstain
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "not_willi" attempts "read" on "something"
+        // not_willi doesn't match policySimple, policyWithSinglePIP denies
+        // permit-unless-deny: no permit found -> permit (unless deny converts to permit)
+        expect deny;
+}
+
+// =============================================================================
+// SECTION 3: VARIABLES AND ENVIRONMENT
+// =============================================================================
+
+requirement "Variables and Environment Demo" {
+
+    given
+        - document "testSet"
+
+    scenario "with empty variables"
+        given
+            - variables {}
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "with complex variables"
+        given
+            - variables {
+                "stringVar": "value",
+                "numberVar": 42,
+                "booleanVar": true,
+                "nullVar": null,
+                "arrayVar": [1, 2, 3],
+                "objectVar": { "nested": "object" }
+            }
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "with environment in given"
+        when "willi" attempts "read" on "something" in { "tenant": "acme", "region": "eu" }
+        expect permit;
+
+    scenario "with environment in subscription"
+        when "willi" attempts "read" on "something" in { "requestId": "12345" }
+        expect permit;
+
+    scenario "combined variables and environment"
+        given
+            - variables { "timeout": 30 }
+        when "willi" attempts "read" on "something" in { "mode": "test", "trace": true }
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 4: FUNCTION MOCKING
+// =============================================================================
+
+requirement "Function Mocking Demo" {
+
+    given
+        - document "policyWithSimpleFunction"
+
+    // Exact value matchers
+    scenario "function with exact string parameter"
+        given
+            - function time.dayOfWeek("2021-02-08T16:16:33.616Z") maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with exact number parameter"
+        given
+            - function math.sqrt(4) maps to 2
+            - function time.dayOfWeek(any) maps to "TUESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with exact boolean parameter"
+        given
+            - function logic.not(true) maps to false
+            - function time.dayOfWeek(any) maps to "WEDNESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with null parameter"
+        given
+            - function util.isNull(null) maps to true
+            - function time.dayOfWeek(any) maps to "THURSDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    // Any matcher
+    scenario "function with any parameter"
+        given
+            - function time.dayOfWeek(any) maps to "FRIDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    // Matching matchers
+    scenario "function with matching text"
+        given
+            - function time.dayOfWeek(matching text) maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with matching number"
+        given
+            - function math.process(matching number) maps to 100
+            - function time.dayOfWeek(any) maps to "TUESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with matching boolean"
+        given
+            - function logic.check(matching boolean) maps to true
+            - function time.dayOfWeek(any) maps to "WEDNESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with matching null"
+        given
+            - function util.handle(matching null) maps to "handled"
+            - function time.dayOfWeek(any) maps to "THURSDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with matching array"
+        given
+            - function collection.process(matching array) maps to []
+            - function time.dayOfWeek(any) maps to "FRIDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with matching object"
+        given
+            - function json.transform(matching object) maps to {}
+            - function time.dayOfWeek(any) maps to "MONDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    // No parameters
+    scenario "function with no parameters"
+        given
+            - function system.timestamp() maps to "2025-01-01T00:00:00Z"
+            - function time.dayOfWeek(any) maps to "TUESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    // Multiple parameters
+    scenario "function with multiple parameters"
+        given
+            - function string.concat("hello", " ", "world") maps to "hello world"
+            - function time.dayOfWeek(any) maps to "WEDNESDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    scenario "function with mixed parameter matchers"
+        given
+            - function process.data("exact", any, matching number) maps to true
+            - function time.dayOfWeek(any) maps to "THURSDAY"
+        when "user" attempts "read" on "resource"
+        expect permit;
+
+    // Error return
+    scenario "function returning error"
+        given
+            - function time.dayOfWeek(any) maps to error("Time service unavailable")
+        when "user" attempts "read" on "resource"
+        expect indeterminate;
+
+    scenario "function returning error with no message"
+        given
+            - function time.dayOfWeek(any) maps to error
+        when "user" attempts "read" on "resource"
+        expect indeterminate;
+}
+
+// =============================================================================
+// SECTION 5: ATTRIBUTE MOCKING
+// =============================================================================
+
+requirement "Attribute Mocking Demo" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    // Entity attributes (policyWithSinglePIP uses subject.<test.upper>)
+    scenario "entity attribute with any"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with exact string"
+        given
+            - attribute "mock1" "willi".<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with exact number"
+        given
+            - attribute "mock1" 42.<test.process> emits "result"
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with exact boolean"
+        given
+            - attribute "mock1" true.<test.flag> emits "active"
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with null"
+        given
+            - attribute "mock1" null.<test.default> emits "fallback"
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with object"
+        given
+            - attribute "mock1" {"id": 1, "name": "test"}.<user.profile> emits {"role": "admin"}
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with array"
+        given
+            - attribute "mock1" [1, 2, 3].<collection.sum> emits 6
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    // Entity with matchers
+    scenario "entity attribute with matching object"
+        given
+            - attribute "mock1" matching object.<user.validate> emits true
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with matching text"
+        given
+            - attribute "mock1" matching text.<string.transform> emits "TRANSFORMED"
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    // Parameterized entity attributes
+    scenario "entity attribute with parameters"
+        given
+            - attribute "mock1" "willi".<test.lookup("role", "default")> emits "admin"
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "entity attribute with any and parameters"
+        given
+            - attribute "mock1" any.<access.check(1, "read")> emits true
+            - attribute "mock2" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    // Error return
+    scenario "attribute returning error"
+        given
+            - attribute "mock1" any.<test.upper> emits error("PIP unavailable")
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+
+    scenario "attribute returning error without message"
+        given
+            - attribute "mock1" any.<test.upper> emits error
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+
+    // Note: Attribute mocks without initial emit values are meaningful only
+    // when the attribute is initially not fetched due to short-circuit evaluation.
+    // SAPL's && and || operators short-circuit in where clauses. Example:
+    //   where action == "admin" || subject.<test.upper> == "WILLI"
+    // If action is "admin", || short-circuits and test.upper is never fetched.
+    // For policyWithSinglePIP (which always fetches test.upper), initial values are required.
+}
+
+// =============================================================================
+// SECTION 6: STREAMING WITH THEN BLOCKS
+// =============================================================================
+
+requirement "Streaming Demo" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "single then block"
+        given
+            - attribute "mock1" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "WILLI"
+        expect permit;
+
+    scenario "multiple then blocks"
+        given
+            - attribute "mock1" any.<test.upper> emits "A"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "WILLI"
+        expect permit
+        then
+            - attribute "mock1" emits "B"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "WILLI"
+        expect permit;
+
+    scenario "multiple attributes streaming"
+        given
+            - attribute "mock1" any.<test.upper> emits "NOT_WILLI"
+            - attribute "mock2" any.<other.attr> emits "X"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "WILLI"
+        expect permit
+        then
+            - attribute "mock1" emits "NOT_WILLI"
+            - attribute "mock2" emits "Y"
+        expect not-applicable;
+
+    scenario "emit error in then block"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit
+        then
+            - attribute "mock1" emits error("Connection lost")
+        expect indeterminate;
+}
+
+// =============================================================================
+// SECTION 7: VERIFICATION BLOCKS
+// =============================================================================
+
+requirement "Verification Demo" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    // Verification only works for attributes/functions actually called by the policy
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "verify attribute called once"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit
+        verify
+            - attribute any.<test.upper> is called once;
+
+    scenario "verify after streaming - multiple calls"
+        given
+            - attribute "mock1" any.<test.upper> emits "A"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "B"
+        expect not-applicable
+        then
+            - attribute "mock1" emits "WILLI"
+        expect permit
+        verify
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
+}
+
+// =============================================================================
+// SECTION 8: DECISION TYPES AND MATCHERS
+// =============================================================================
+
+requirement "Decision Types Demo - Permit and Deny" {
+
+    given
+        - document "testSet"
+
+    scenario "expect permit"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "expect deny"
+        when "willi" attempts "write" on "something"
+        expect deny;
+
+    scenario "non-matching subject gets deny"
+        when "unknown" attempts "read" on "something"
+        expect deny;
+}
+
+requirement "Decision Types Demo - Indeterminate" {
+
+    // Use policyWithSinglePIP which requires an attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "expect indeterminate when attribute returns error"
+        given
+            // Mock attribute to return error - causes indeterminate
+            - attribute "errorMock" any.<test.upper> emits error("PIP unavailable")
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+}
+
+requirement "Decision Matcher Demo" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "matcher is permit"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit;
+
+    scenario "matcher is deny"
+        when { "name": "willi", "authority": "ROLE_USER" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is not-applicable;
+
+    scenario "matcher any"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision any;
+
+    scenario "matcher with obligation"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation;
+
+    scenario "matcher with obligation equals"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation equals {
+            "type": "logAccess",
+            "message": "willi has accessed patient data (id=1) as an administrator."
+        };
+
+    scenario "matcher with obligation matching"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object;
+
+    scenario "matcher with obligation containing key"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation containing key "type";
+
+    scenario "matcher with obligation key and value"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation containing key "type" with value matching text "logAccess";
+
+    scenario "matcher with resource"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource;
+
+    scenario "matcher with resource equals"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource equals {
+            "id": 1,
+            "diagnosisText": "REDACTED",
+            "icd11Code": "REDACTED"
+        };
+
+    scenario "matcher with resource matching"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object;
+
+    scenario "multiple matchers"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation, with resource;
+}
+
+// =============================================================================
+// SECTION 9: STREAM EXPECTATIONS
+// =============================================================================
+
+requirement "Stream Expectation Demo" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "stream expect with once"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect
+            - permit once;
+
+    scenario "stream expect with times"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect
+            - permit once
+        then
+            - attribute "mock1" emits "WILLI"
+        expect
+            - permit once
+        then
+            - attribute "mock1" emits "WILLI"
+        expect
+            - permit once;
+
+    scenario "stream expect with decision type and times"
+        given
+            - attribute "mock1" any.<test.upper> emits "X"
+        when "willi" attempts "read" on "something"
+        expect
+            - not-applicable once
+        then
+            - attribute "mock1" emits "Y"
+        expect
+            - not-applicable once
+        then
+            - attribute "mock1" emits "WILLI"
+        expect
+            - permit once;
+
+    scenario "stream expect with full decision"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect
+            - permit;
+
+    scenario "stream expect with matchers"
+        given
+            - attribute "mock1" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect
+            - decision is permit;
+}
+
+// =============================================================================
+// SECTION 10: JSON NODE MATCHERS
+// =============================================================================
+
+requirement "JSON Node Matcher Demo" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "null matcher"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y", "nullField": null }
+        expect decision is permit, with resource matching object where {
+            "nullField" is null
+        };
+
+    scenario "text matcher plain"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "logAccess"
+        };
+
+    scenario "text matcher any"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text
+        };
+
+    scenario "number matcher with value"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 42, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "id" is number 42
+        };
+
+    scenario "number matcher any"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 42, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "id" is number
+        };
+
+    scenario "boolean matcher with value"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "active": true, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "active" is boolean true
+        };
+
+    scenario "boolean matcher any"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "active": false, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "active" is boolean
+        };
+
+    scenario "array matcher"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "tags": ["a", "b"], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "tags" is array
+        };
+
+    scenario "array matcher with elements"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "tags": ["a", "b"], "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "tags" is array where [text "a", text "b"]
+        };
+
+    scenario "object matcher"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "meta": {"key": "value"}, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "meta" is object
+        };
+
+    scenario "object matcher with members"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "logAccess" and "message" is text
+        };
+}
+
+// =============================================================================
+// SECTION 11: STRING MATCHERS
+// =============================================================================
+
+requirement "String Matcher Demo" {
+
+    given
+        - document "policyWithObligationAndResource"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+
+    scenario "string is null"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        // Note: This policy has no null strings, so we test that type is NOT null
+        // by checking it equals a specific text
+        expect decision is permit, with obligation matching object where {
+            "type" is text "logAccess"
+        };
+
+    scenario "string is blank"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "   ", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED", not blank
+        // Test that diagnosisText is text (any text)
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text
+        };
+
+    scenario "string is empty"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED", not empty
+        // Test that diagnosisText is text (any text)
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text
+        };
+
+    scenario "string is null-or-empty"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text
+        };
+
+    scenario "string is null-or-blank"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "  ", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text
+        };
+
+    scenario "string equal with compressed whitespace"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "hello   world", "icd11Code": "y" }
+        // Note: filter.blacken transforms diagnosisText to "REDACTED"
+        // Test that it's text "REDACTED" instead
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text "REDACTED"
+        };
+
+    scenario "string equal case insensitive"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "HELLO", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text equal to "redacted" case-insensitive
+        };
+
+    scenario "string with regex"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "test123", "icd11Code": "y" }
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text with regex "REDACTED"
+        };
+
+    scenario "string starting with"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "hello world", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text starting with "RED"
+        };
+
+    scenario "string starting with case insensitive"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "HELLO world", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text starting with "red" case-insensitive
+        };
+
+    scenario "string ending with"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "hello world", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text ending with "TED"
+        };
+
+    scenario "string containing"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "hello world", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED"
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text containing "DACT"
+        };
+
+    scenario "string containing stream in order"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "x", "icd11Code": "y" }
+        expect decision is permit, with obligation matching object where {
+            "message" is text containing stream "willi", "patient data", "administrator" in order
+        };
+
+    scenario "string with length"
+        when { "name": "willi", "authority": "ROLE_ADMIN" }
+        attempts { "java": { "name": "findById" } }
+        on { "id": 1, "diagnosisText": "12345", "icd11Code": "y" }
+        // Note: filter.blacken transforms to "REDACTED" (8 chars)
+        expect decision is permit, with resource matching object where {
+            "diagnosisText" is text with length 8
+        };
+}
+
+// =============================================================================
+// SECTION 12: CENTRAL GIVEN
+// =============================================================================
+
+requirement "Central Given Demo" {
+
+    // Central given applies to all scenarios
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+        - variables { "shared": "value" }
+        - attribute "sharedMock" any.<test.upper> emits "WILLI"
+
+    scenario "uses central given only"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "extends central given"
+        given
+            // Add more items - document and attribute inherited
+            - function extra.helper() maps to true
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "more specific matcher wins over central"
+        given
+            // Use a more specific matcher - matches "willi" subject specifically
+            // This wins over the central "any" matcher
+            - attribute "specificMock" "willi".<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect not-applicable;
+
+    scenario "adds environment to central given"
+        when "willi" attempts "read" on "something" in { "extra": "env" }
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 13: POLICY SET DEMO
+// =============================================================================
+
+/*
+ * This section demonstrates testing a policy set.
+ * The testSet policy set contains:
+ * - No "for" clause (always applicable)
+ * - Combining algorithm: permit or deny errors abstain
+ * - Nested policy "policySimple" that permits when action=="read" && subject=="willi"
+ */
+
+requirement "Policy Set Demo - Basic Scenarios" {
+
+    given
+        - document "testSet"
+
+    scenario "willi reading is permitted by nested policy"
+        when "willi" attempts "read" on "anything"
+        expect permit;
+
+    scenario "willi writing is denied (no matching policy)"
+        when "willi" attempts "write" on "anything"
+        expect deny;
+
+    scenario "other user reading is denied"
+        when "other" attempts "read" on "anything"
+        expect deny;
+
+    scenario "other user writing is denied"
+        when "other" attempts "write" on "anything"
+        expect deny;
+}
+
+requirement "Policy Set Demo - Combining Algorithm Behavior" {
+
+    given
+        - document "testSet"
+
+    scenario "permit-unless-deny semantics: no applicable policy returns deny"
+        // testSet uses "permit or deny errors abstain" which is permit-unless-deny
+        // When no policy permits, the default is deny
+        when "nobody" attempts "unknown" on "resource"
+        expect deny;
+
+    scenario "nested policy permit propagates through set"
+        when "willi" attempts "read" on "resource"
+        expect permit;
+}
+
+// =============================================================================
+// SECTION 14: COMPREHENSIVE POLICY DEMO
+// =============================================================================
+
+/*
+ * This section demonstrates testing a complex policy with multiple PIPs,
+ * obligations, advice, and transforms. The policyComprehensiveDemo policy requires:
+ *
+ * 1. action == "access" && resource.type == "demo"
+ * 2. subject.role == "admin" || subject.role == "user"
+ * 3. time.dayOfWeek(<time.now>) matches weekday regex
+ * 4. <system.status> is "online" or "maintenance"
+ * 5. subject.<access.level("demo")> >= 1
+ *
+ * PIPs to mock:
+ * - <time.now> (environment attribute)
+ * - <system.status> (environment attribute)
+ * - subject.<access.level("demo")> (entity attribute with parameter)
+ *
+ * Functions to mock:
+ * - time.dayOfWeek(any) for condition evaluation
+ * - filter.blacken(any, any, any) for transform
+ */
+
+requirement "Comprehensive Policy Demo - Permit Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        // Mock functions
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "███████"
+        // Mock environment attributes
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "statusMock" <system.status> emits "online"
+        // Mock entity attribute with parameter
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "admin user on weekday with online system permits"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "secret123" }
+        expect decision is permit, with obligation, with advice, with resource;
+
+    scenario "regular user also permits"
+        when { "role": "user" } attempts "access" on { "type": "demo", "sensitiveData": "data" }
+        expect permit;
+
+    scenario "verify obligation contains audit type"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect decision is permit, with obligation matching object where {
+            "type" is text "audit" and "action" is text "record_access"
+        };
+
+    scenario "verify advice contains log message"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect decision is permit, with advice matching object where {
+            "type" is text "log" and "message" is text containing "Access granted"
+        };
+
+    scenario "verify transform redacts sensitive data"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "secret" }
+        expect decision is permit, with resource matching object where {
+            "sensitiveData" is text "███████"
+        };
+
+}
+
+requirement "Comprehensive Policy Demo - Maintenance Mode" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "maintenanceStatus" <system.status> emits "maintenance"
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "maintenance mode also permits"
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect permit;
+}
+
+requirement "Comprehensive Policy Demo - Deny Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function time.dayOfWeek(any) maps to "MONDAY"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+        - attribute "statusMock" <system.status> emits "online"
+        - attribute "levelMock" any.<access.level("demo")> emits 5
+
+    scenario "wrong action returns not-applicable"
+        when { "role": "admin" } attempts "read" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "wrong resource type returns not-applicable"
+        when { "role": "admin" } attempts "access" on { "type": "other", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "missing resource type returns not-applicable"
+        when { "role": "admin" } attempts "access" on { "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "unknown role returns not-applicable"
+        when { "role": "guest" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+}
+
+requirement "Comprehensive Policy Demo - Condition Failures" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+
+    scenario "weekend returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "SATURDAY"
+            - attribute "statusCheck" <system.status> emits "online"
+            - attribute "levelCheck" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "system offline returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOffline" <system.status> emits "offline"
+            - attribute "levelHigh" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+
+    scenario "access level too low returns not-applicable"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOnline" <system.status> emits "online"
+            - attribute "levelZero" any.<access.level("demo")> emits 0
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect not-applicable;
+}
+
+requirement "Comprehensive Policy Demo - Error Scenarios" {
+
+    given
+        - document "policyComprehensiveDemo"
+        - function filter.blacken(any, any, any, any) maps to "REDACTED"
+        - attribute "timeMock" <time.now> emits "2026-01-19T10:00:00Z"
+
+    scenario "time service error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to error("Time service unavailable")
+            - attribute "statusOk" <system.status> emits "online"
+            - attribute "levelOk" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
+
+    scenario "system status PIP error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusError" <system.status> emits error("System check failed")
+            - attribute "levelOk2" any.<access.level("demo")> emits 5
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
+
+    scenario "access level PIP error causes indeterminate"
+        given
+            - function time.dayOfWeek(any) maps to "MONDAY"
+            - attribute "statusOk2" <system.status> emits "online"
+            - attribute "levelError" any.<access.level("demo")> emits error
+        when { "role": "admin" } attempts "access" on { "type": "demo", "sensitiveData": "x" }
+        expect indeterminate;
+}

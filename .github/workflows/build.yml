@@ -97,9 +97,9 @@ jobs:
       with:
         node-version: '20'
 
-    - name: Add auth-host to /etc/hosts for OAuth Integration Tests
-      if: env.RUN_ANALYSIS == 'true'
-      run: sudo sh -c 'echo "127.0.0.1 auth-host" >> /etc/hosts'
+    - name: Add auth-server to /etc/hosts
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: echo "127.0.0.1 auth-server" | sudo tee -a /etc/hosts
 
     - name: Build Modules
       if: env.RUN_ANALYSIS == 'true'
@@ -117,7 +117,7 @@ jobs:
     - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
       if: env.RUN_ANALYSIS == 'true'
       # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
-      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report spotbugs:spotbugs -fae -pl !:sapl-demo-oauth2-jwt-client-application -Pproduction,it
+      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report spotbugs:spotbugs -fae -Pproduction,it
 
     - name: Cache Sonar Packages
       if: ${{ (env.RUN_ANALYSIS == 'true') && (env.IS_FORK == 'false') }}
@@ -133,7 +133,6 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
       run: >
         mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.1.2184:sonar
-        -pl !:sapl-demo-oauth2-jwt-client-application
         -Dsonar.organization=heutelbeck
         -Dsonar.host.url=https://sonarcloud.io
         -Dsonar.projectKey=heutelbeck_sapl-demos

@@ -1,39 +1,66 @@
-[![Build Status](https://github.com/heutelbeck/sapl-demos/workflows/build/badge.svg)](https://github.com/heutelbeck/sapl-demos/actions)
-
 # SAPL Demo Projects
 
-This project contains some demo modules demonstrating the usage of the SAPL engine.
-A good point to start exploring SAPL is by running and experimenting with modifying these demo projects.
+This repository contains demo projects demonstrating various aspects of SAPL (Streaming Attribute Policy Language) for Attribute-Based Access Control.
 
-If you are interested in how SAPL would be used in an application, you should take a look at [sapl-demo-mvc-app](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mvc-app) and [sapl-demo-webflux](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux).
+## Getting Started
 
-If you want to get familiar with using a PDP directly, start with [sapl-demo-embedded](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-embedded).
+If you are new to SAPL, start with these demos:
 
-After that pick a demo that matches your interest.
+- [embedded-pdp](embedded-pdp) - Manually construct and use a PDP without framework support
+- [webflux](webflux) - Reactive method security with streaming PEP annotations
+- [queryrewriting-jpa](queryrewriting-jpa) - Row-level security with Spring Data JPA
 
-* [sapl-demo-webflux](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux): Demonstrates how to hook a SAPL PEP into method security with Spring Security and Webflux.
+## Demo Categories
 
+### Core PDP Usage
 
-* [sapl-demo-webflux-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-webflux-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security reactive filter chain in Webflux.
+| Demo                         | Description                                         |
+|------------------------------|-----------------------------------------------------|
+| [embedded-pdp](embedded-pdp) | Build and use a PDP programmatically without Spring |
+| [remote-pdp](remote-pdp)     | Connect to a remote PDP server via HTTP  |
 
+### Spring Security
 
-* [sapl-demo-mvc-app](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mvc-app): A full stack Spring MVC application secured with SAPL. Demonstrates non-reactive declarative Policy Enforcement Points via annotations.
+| Demo                                                         | Description                                             |
+|--------------------------------------------------------------|---------------------------------------------------------|
+| [web-mvc-app](web-mvc-app)                                   | Method-level security annotations in Spring MVC         |
+| [webflux](webflux)                                           | Reactive method security with streaming PEP annotations |
+| [web-authorizationmanager](web-authorizationmanager)         | Filter chain authorization in Spring MVC                |
+| [webflux-authorizationmanager](webflux-authorizationmanager) | Filter chain authorization in WebFlux                   |
 
+### Database Query Rewriting
 
-* [sapl-demo-filterchain](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-filterchain): Demonstrates how to hook a SAPL PEP into the Spring Security filter chain for non-reactive environments.
+| Demo                                                               | Description                              |
+|--------------------------------------------------------------------|------------------------------------------|
+| [queryrewriting-jpa](queryrewriting-jpa)                           | Row-level security with Spring Data JPA  |
+| [queryrewriting-sql-reactive](queryrewriting-sql-reactive)         | Row-level security with R2DBC            |
+| [queryrewriting-mongodb-reactive](queryrewriting-mongodb-reactive) | Row-level security with reactive MongoDB |
 
+### Integrations
 
-* [sapl-demo-embedded](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-embedded): Manually instantiating a SAPL Policy Decision Point (PDP) and basic PDP interaction. Reading policies from bundled resources or monitoring a file system.
+| Demo | Description |
+|------|-------------|
+| [mqtt](mqtt) | MQTT as a Policy Information Point for real-time attributes |
+| [oauth2-jwt](oauth2-jwt) | OAuth 2.0 / JWT integration with SAPL policies |
 
+### Policy Testing
 
-* [sapl-demo-remote](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-remote): Connect to a dedicated SAPL PDP Server.
+| Demo | Description |
+|------|-------------|
+| [test-dsl-junit](test-dsl-junit) | Test policies with .sapltest files and JUnit |
+| [test-dsl-programmatic](test-dsl-programmatic) | Programmatic test execution with PlainTestAdapter |
+| [test-fixture](test-fixture) | Java fluent API for policy testing |
 
-* [sapl-demo-extension](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-extension): Write a custom Policy Information Point (PIP) and function library to extend SAPL with custom attributes and functions.
+### Tools
 
-* [sapl-demo-jwt](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-jwt): A resource server secured with OAuth 2.0, JSON Web Tokens (JWT) and SAPL, with a matching OAuth authorization server and client application.
+| Demo | Description |
+|------|-------------|
+| [editor-components](editor-components) | Vaadin-based SAPL policy editor components |
 
-* [sapl-demo-web-editor](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-web-editor): Demonstrates the Vaadin-based SAPL policy editor component.
+## Prerequisites
 
-* [sapl-demo-testing](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-testing): Demonstrates how to test SAPL policies with unit tests, including test code coverage reports.
+All demos require:
+- JDK 21 or newer
+- Maven
 
-* [sapl-demo-mqtt-pip](https://github.com/heutelbeck/sapl-demos/tree/master/sapl-demo-mqtt-pip): Demonstrates how to evaluate MQTT messages with a Policy Information Point.
+Some demos have additional requirements documented in their READMEs.

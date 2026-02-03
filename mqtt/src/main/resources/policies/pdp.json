@@ -1,0 +1,20 @@
+{
+	"algorithm": {
+		"votingMode": "PRIORITY_DENY",
+		"defaultDecision": "DENY",
+		"errorHandling": "PROPAGATE"
+	},
+	"variables": {
+		"mqttPipConfig": {
+			"defaultBrokerConfigName": "demo",
+			"brokerConfig": [
+				{
+					"name": "demo",
+					"brokerAddress": "localhost",
+					"brokerPort": 1883,
+					"clientId": "demo-pip"
+				}
+			]
+		}
+	}
+}

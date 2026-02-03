@@ -1,0 +1,182 @@
+/*
+ * Attribute Mocking Demo
+ *
+ * This file demonstrates how to mock attributes (PIPs) in SAPL tests:
+ * - Environment attribute mocking (no entity): <pip.attr>
+ * - Entity attribute mocking: entity.<pip.attr>
+ * - Parameterized attribute mocking: entity.<pip.attr(params)>
+ * - Attribute streaming with then blocks
+ * - Attribute call verification
+ * - Value matchers for entity matching
+ */
+
+requirement "Basic attribute mocking with single PIP" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "willi tries to read with entity attribute mocking using any"
+        given
+            // Mock attribute with 'any' entity matcher - matches any parent value
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "willi tries to read with specific entity value"
+        given
+            // Mock attribute with specific entity value
+            // Only matches when parent value is exactly "willi"
+            - attribute "upperMock" "willi".<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "attribute mocking with error"
+        given
+            // Mock attribute to return an error
+            - attribute "upperMock" "willi".<test.upper> emits error("PIP unavailable")
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+
+    scenario "attribute verification"
+        given
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit
+        verify
+            // Verify the attribute was called
+            - attribute any.<test.upper> is called once;
+}
+
+requirement "Policy with complex PIP should only permit read when pip.attributeWithParams emits true" {
+
+    given
+        - document "policyWithComplexPIP"
+
+    scenario "complex attribute with exact parameter matchers"
+        given
+            // Mock the simple attributes first
+            - attribute "attr1Mock" <pip.attribute1> emits 1
+            - attribute "attr2Mock" <pip.attribute2> emits 2
+            // Mock the complex attribute with entity and parameters
+            // parent value is 'true', parameters are (1, 2)
+            - attribute "paramsMock" true.<pip.attributeWithParams(1, 2)> emits true
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "complex attribute with any entity and mixed parameter matchers"
+        given
+            - attribute "attr1Mock" <pip.attribute1> emits 1
+            - attribute "attr2Mock" <pip.attribute2> emits 2
+            // Use 'any' for entity and mix exact/any matchers for parameters
+            - attribute "paramsMock" any.<pip.attributeWithParams(matching number, any)> emits true
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "complex attribute with 'any' for all matchers"
+        given
+            - attribute "attr1Mock" <pip.attribute1> emits 1
+            - attribute "attr2Mock" <pip.attribute2> emits 2
+            // Use 'any' for entity and all parameters
+            - attribute "paramsMock" any.<pip.attributeWithParams(any, any)> emits true
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "verify complex attribute calls"
+        given
+            - attribute "attr1Mock" <pip.attribute1> emits 1
+            - attribute "attr2Mock" <pip.attribute2> emits 2
+            - attribute "paramsMock" any.<pip.attributeWithParams(any, any)> emits true
+        when "willi" attempts "read" on "something"
+        expect permit
+        verify
+            // Verify each attribute was called
+            - attribute <pip.attribute1> is called once
+            - attribute <pip.attribute2> is called once
+            - attribute any.<pip.attributeWithParams(any, any)> is called once;
+}
+
+requirement "Attribute streaming with then blocks" {
+
+    // Use policyWithSinglePIP for simpler streaming demos
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "attribute emits multiple values in sequence"
+        given
+            // Initial emission
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        // First decision with NOT_WILLI (permit-only policy -> not-applicable)
+        expect not-applicable
+        then
+            // Emit new value - use mockId to identify which mock to update
+            - attribute "upperMock" emits "WILLI"
+        // Second decision after attribute changed
+        expect permit;
+
+    scenario "attribute streaming with multiple then blocks and verification"
+        given
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "upperMock" emits "WILLI"
+        expect permit
+        then
+            - attribute "upperMock" emits "still_WILLI"
+        // WILLI != still_WILLI
+        expect not-applicable
+        then
+            - attribute "upperMock" emits "WILLI"
+        expect permit
+        verify
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
+}
+
+requirement "Attribute mocking with object entities" {
+
+    // Use policyWithSinglePIP
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "mock with JSON object as entity"
+        given
+            // Entity can be a complex JSON object
+            - attribute "upperMock" {"id": 1, "name": "willi"}.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        // Won't match because policy uses subject string ("willi"), not object
+        // No mock matches -> returns error Value -> policy evaluates to indeterminate
+        expect indeterminate;
+
+    scenario "mock with matching object entity"
+        given
+            // Use matching syntax for entity - matches any object
+            // But subject is string "willi", not an object, so won't match
+            - attribute "upperMock" matching object.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+
+    scenario "mock with array entity"
+        given
+            // Entity is an array - won't match string subject "willi"
+            - attribute "upperMock" ["willi", "admin"].<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect indeterminate;
+}
+
+requirement "Attribute mocking with undefined values" {
+
+    // Use policyWithSinglePIP
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "attribute emits undefined"
+        given
+            // Attribute can emit undefined - causes condition to not match
+            - attribute "upperMock" any.<test.upper> emits undefined
+        when "willi" attempts "read" on "something"
+        // undefined values cause conditions to evaluate to false, making policy not applicable
+        expect not-applicable;
+}

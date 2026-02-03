@@ -1,0 +1,78 @@
+/*
+ * Multiple Requirements and Central Given Demo
+ *
+ * This file demonstrates organizing SAPL tests with:
+ * - Multiple requirement definitions in one file
+ * - Central given blocks that apply to all scenarios in a requirement
+ * - Scenario-specific given blocks that extend/override central given
+ */
+
+// This file contains 2 requirement definitions, one for read and one for write access
+requirement "Policy Simple should grant read access for willi on something" {
+
+    // Central given block applies to all scenarios in this requirement.
+    // This avoids redundant given definitions for each scenario.
+    // The given block can still be defined in the scenario itself
+    // and will then merge with/override the central given.
+    given
+        - document "policySimple"
+
+    scenario "willi tries to read something"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "not_willi tries to read something"
+        when "not_willi" attempts "read" on "something"
+        expect deny;
+
+    // Scenario with its own given that extends central given
+    scenario "willi reads with additional mock"
+        when "willi" attempts "read" on "something" in { "trace": true }
+        expect permit;
+}
+
+requirement "Policy Simple should deny write access for willi on something" {
+
+    given
+        - document "policySimple"
+
+    scenario "willi tries to write something"
+        when "willi" attempts "write" on "something"
+        // Policy only permits "read" action
+        expect deny;
+
+    scenario "not_willi tries to write something"
+        when "not_willi" attempts "write" on "something"
+        expect deny;
+}
+
+requirement "Central given with multiple items" {
+
+    // Central given can include document, algorithm, variables, environment, and mocks
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+        - variables { "defaultTimeout": 30 }
+        - attribute "centralMock" any.<test.upper> emits "WILLI"
+
+    scenario "first scenario uses central mocks"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "second scenario uses more specific matcher"
+        given
+            // Use a more specific matcher that wins over the central "any" matcher
+            // Different MockId avoids collision
+            - attribute "specificMock" "willi".<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        // policyWithSinglePIP is permit-only, when where clause fails, result is not-applicable
+        expect not-applicable;
+
+    scenario "third scenario adds to central given"
+        given
+            // Central attribute mock still applies
+            // Add additional function mock
+            - function helper.validate(any) maps to true
+        when "willi" attempts "read" on "something"
+        expect permit;
+}

@@ -1,0 +1,7 @@
+set "testSet"
+priority permit or deny errors abstain
+
+policy "policySimple"
+permit
+    action == "read";
+    subject == "willi";

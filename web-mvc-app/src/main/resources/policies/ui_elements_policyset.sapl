@@ -1,0 +1,33 @@
+import filter.blacken
+
+set "ui elements"
+first or abstain errors propagate
+for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*"
+
+policy "doctors may access the creation interface via navigation button"
+permit (action == "use") & (resource == "ui:view:patients:createPatientButton");
+	("ROLE_DOCTOR" in subject..authority);
+
+policy "doctors and administrators may access the update patient data interface via navigation button"
+permit action == "use" & resource == "ui:view:patient:updatePatientButton";
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);
+
+policy "attending doctors can access delete patient button"
+permit action == "use" & resource.uiElement == "ui:view:patient:deletePatientButton";
+	("ROLE_DOCTOR" in subject..authority);
+	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
+
+policy "nurses may not edit doctors, diagnosis and classification"
+deny  		resource == "ui:view:patients:icd11Field"
+		| 	resource == "ui:view:patients:doctorField"
+		| 	resource == "ui:view:patients:diagnosisField";
+	("ROLE_NURSE" in subject..authority);
+
+policy "administrators may not edit diagnosis and classification"
+deny  		resource == "ui:view:patients:icd11Field"
+		| 	resource == "ui:view:patients:diagnosisField";
+	("ROLE_ADMIN" in subject..authority);
+
+policy "staff may edit all fields"
+permit (action == "edit");
+	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);

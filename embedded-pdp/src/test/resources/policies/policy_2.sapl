@@ -1,0 +1,4 @@
+policy "policy write"
+permit
+  action == "write";
+  subject == "willi" & resource =~ "some.+";

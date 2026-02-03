@@ -1,0 +1,4 @@
+policy "permit on emergency"
+permit action == "read" & resource == "time";
+	"status".<mqtt.messages> == "emergency";
+

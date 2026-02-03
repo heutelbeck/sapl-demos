@@ -1,0 +1,45 @@
+/*
+ * Single Requirement Demo
+ *
+ * This file demonstrates the fundamental structure of SAPL tests:
+ * - requirement/scenario structure
+ * - document specification for unit tests
+ * - authorization subscription definition
+ * - simple decision expectations
+ */
+
+// Top-level requirement definition. Each .sapltest file can contain 1:n requirement
+// definitions. The requirement name needs to be unique within one file.
+requirement "Policy Simple should grant read access for willi on something" {
+
+    // Document at requirement level - all scenarios test this document
+    // This creates a UNIT test (single document).
+    given
+        - document "testSet"
+
+    // Define the scenario name. This represents a single isolated test case within the
+    // requirement. The scenario name needs to be unique within a requirement.
+    scenario "willi tries to read something"
+        // Define the AuthorizationSubscription for the test
+        when subject "willi" attempts action "read" on resource "something"
+        // Define the expected AuthorizationDecision
+        expect permit;
+
+    // Second scenario for negative test
+    scenario "not_willi tries to read something"
+        // Short form: omit "subject", "action", "resource" keywords
+        when "not_willi" attempts "read" on "something"
+        // Expect deny since the policy only permits for "willi"
+        expect deny;
+
+    // Scenario demonstrating complex subject/action/resource definitions
+    scenario "willi reads with complex subscription"
+        when
+            { "name": "willi" }
+        attempts
+            { "type": "read", "java": { "name": "findById" } }
+        on
+            { "id": 123, "type": "document" }
+        // Policy only checks subject == "willi", but complex subjects work differently
+        expect deny;
+}

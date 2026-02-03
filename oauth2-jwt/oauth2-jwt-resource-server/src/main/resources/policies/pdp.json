@@ -1,0 +1,16 @@
+{
+	"algorithm": {
+		"votingMode": "PRIORITY_DENY",
+		"defaultDecision": "DENY",
+		"errorHandling": "ABSTAIN"
+	},
+	"variables": {
+		"jwt": {
+			"publicKeyServer": {
+				"uri": "http://auth-server:9000/public-key/{kid}",
+				"method": "GET"
+			},
+			"whitelist": {}
+		}
+	}
+}

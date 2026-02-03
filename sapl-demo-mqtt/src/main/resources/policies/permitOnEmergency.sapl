@@ -1,5 +1,0 @@
-policy "permit on emergency" 
-permit action == "read" & resource == "time" 
-where
-	"status".<mqtt.messages> == "emergency";
-

@@ -1,0 +1,4 @@
+policy "policyWithSimplePIP"
+permit
+    action == "read";
+    subject.<test.upper> == "WILLI";

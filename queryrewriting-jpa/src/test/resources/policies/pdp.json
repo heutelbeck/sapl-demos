@@ -1,0 +1,8 @@
+{
+	"algorithm": {
+		"votingMode": "FIRST",
+		"defaultDecision": "DENY",
+		"errorHandling": "ABSTAIN"
+	},
+	"variables": {}
+}

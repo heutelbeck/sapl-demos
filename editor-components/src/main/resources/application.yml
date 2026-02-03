@@ -1,0 +1,20 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  mustache:
+    check-template-location: false
+
+vaadin:
+  launch-browser: false
+  allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
+
+logging:
+  level:
+    org.atmosphere: warn
+    org.springframework.boot.devtools.restart.ChangeableUrls: warn
+    io.sapl.lsp.core.ConfigurationManager: warn
+    io.sapl.lsp.core.document.DocumentManager: warn
+    io.sapl.lsp.server.SAPLLanguageServer: warn
+    io.sapl.vaadin: info
+    io.sapl.vaadin.lsp.LspWebSocketEndpoint: warn

@@ -1,0 +1,102 @@
+/*
+ * MQTT Policy Tests
+ *
+ * Tests for the permitOnEmergency.sapl policy that demonstrates
+ * Attribute Stream-Based Access Control (ASBAC) using MQTT messages
+ * as a dynamic attribute source.
+ */
+
+requirement "Permit access only during emergency status" {
+
+    given
+        - document "permitOnEmergency"
+
+    scenario "permit when MQTT status is emergency"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "read" on "time"
+        expect permit;
+
+    scenario "not-applicable when MQTT status is ok"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "ok"
+        when "user" attempts "read" on "time"
+        expect not-applicable;
+
+    scenario "not-applicable when MQTT status is any other value"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "normal"
+        when "user" attempts "read" on "time"
+        expect not-applicable;
+
+    scenario "indeterminate when MQTT PIP returns error"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits error("MQTT broker unavailable")
+        when "user" attempts "read" on "time"
+        expect indeterminate;
+}
+
+requirement "Policy scope - only read action on time resource" {
+
+    given
+        - document "permitOnEmergency"
+
+    scenario "not-applicable for write action even during emergency"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "write" on "time"
+        expect not-applicable;
+
+    scenario "not-applicable for delete action even during emergency"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "delete" on "time"
+        expect not-applicable;
+
+    scenario "not-applicable for read on different resource"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "read" on "data"
+        expect not-applicable;
+}
+
+requirement "Streaming - decision changes dynamically with MQTT status" {
+
+    given
+        - document "permitOnEmergency"
+
+    scenario "permit then not-applicable as status changes from emergency to ok"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "read" on "time"
+        expect permit
+        then
+            - attribute "statusMock" emits "ok"
+        expect not-applicable;
+
+    scenario "not-applicable then permit as status changes from ok to emergency"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "ok"
+        when "user" attempts "read" on "time"
+        expect not-applicable
+        then
+            - attribute "statusMock" emits "emergency"
+        expect permit;
+
+    scenario "alternating permit and not-applicable with multiple status changes"
+        given
+            - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
+        when "user" attempts "read" on "time"
+        expect permit
+        then
+            - attribute "statusMock" emits "ok"
+        expect not-applicable
+        then
+            - attribute "statusMock" emits "emergency"
+        expect permit
+        then
+            - attribute "statusMock" emits "normal"
+        expect not-applicable
+        verify
+            - attribute "status".<mqtt.messages> is called 1 times;
+}

@@ -1,0 +1,185 @@
+/*
+ * Tests for the UIController policy set
+ */
+
+requirement "All authenticated users can see the patient list" {
+
+    given
+        - document "ui_controller_policyset"
+
+    scenario "doctor can access getPatients"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "getPatients", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect permit;
+
+    scenario "nurse can access getPatients"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "getPatients", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect permit;
+
+    scenario "visitor can access getPatients"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            { "java": { "name": "getPatients", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect permit;
+
+    scenario "admin can access getPatients"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            { "java": { "name": "getPatients", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect permit;
+
+    scenario "anonymous cannot access getPatients"
+        when
+            { "name": "anonymous", "authorities": [{"authority": "ROLE_ANONYMOUS"}] }
+        attempts
+            { "java": { "name": "getPatients", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect not-applicable;
+}
+
+requirement "All authenticated users can access patient records" {
+
+    given
+        - document "ui_controller_policyset"
+
+    scenario "doctor can access getPatient"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "getPatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect permit;
+
+    scenario "visitor can access getPatient"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            { "java": { "name": "getPatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect permit;
+
+    scenario "anonymous cannot access getPatient"
+        when
+            { "name": "anonymous", "authorities": [{"authority": "ROLE_ANONYMOUS"}] }
+        attempts
+            { "java": { "name": "getPatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect not-applicable;
+}
+
+requirement "Only doctors and administrators can delete patients" {
+
+    given
+        - document "ui_controller_policyset"
+
+    scenario "doctor can access deletePatient"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "deletePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect permit;
+
+    scenario "admin can access deletePatient"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            { "java": { "name": "deletePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect permit;
+
+    scenario "nurse cannot access deletePatient"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "deletePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect not-applicable;
+
+    scenario "visitor cannot access deletePatient"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            { "java": { "name": "deletePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1" } }
+        expect not-applicable;
+}
+
+requirement "Only doctors can register new patients" {
+
+    given
+        - document "ui_controller_policyset"
+
+    scenario "doctor can access newPatient GET"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "newPatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/new" } }
+        expect permit;
+
+    scenario "doctor can access createPatient POST"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "http": { "method": "POST" }, "java": { "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients" } }
+        expect permit;
+
+    scenario "nurse cannot access newPatient"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "newPatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/new" } }
+        expect not-applicable;
+}
+
+requirement "Staff can access update patient view" {
+
+    given
+        - document "ui_controller_policyset"
+
+    scenario "doctor can access updatePatient GET"
+        when
+            { "name": "Julia", "authorities": [{"authority": "ROLE_DOCTOR"}] }
+        attempts
+            { "java": { "name": "updatePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1/update" } }
+        expect permit;
+
+    scenario "nurse can access updatePatient GET"
+        when
+            { "name": "Thomas", "authorities": [{"authority": "ROLE_NURSE"}] }
+        attempts
+            { "java": { "name": "updatePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1/update" } }
+        expect permit;
+
+    scenario "admin can access updatePatient GET"
+        when
+            { "name": "Horst", "authorities": [{"authority": "ROLE_ADMIN"}] }
+        attempts
+            { "java": { "name": "updatePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1/update" } }
+        expect permit;
+
+    scenario "visitor cannot access updatePatient"
+        when
+            { "name": "Dominic", "authorities": [{"authority": "ROLE_VISITOR"}] }
+        attempts
+            { "java": { "name": "updatePatient", "instanceof": [{"simpleName": "UIController"}] } }
+        on { "http": { "requestedURI": "/patients/1/update" } }
+        expect not-applicable;
+}

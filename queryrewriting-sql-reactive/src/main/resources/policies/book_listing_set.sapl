@@ -1,0 +1,18 @@
+set "List and filter books - R2DBC query manipulation"
+
+first or abstain errors propagate
+
+for action == "findAll"
+
+policy "deny if scope null or empty"
+deny
+    subject.principal.dataScope == undefined ||
+    subject.principal.dataScope == null ||
+    subject.principal.dataScope == [];
+
+policy "enforce filtering"
+permit
+obligation {
+                "type": "r2dbcQueryManipulation",
+                "conditions": [ "category IN " + string.replace(string.replace(standard.toString(subject.principal.dataScope), "[", "("), "]", ")") ]
+            }

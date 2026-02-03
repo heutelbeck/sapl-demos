@@ -1,0 +1,82 @@
+/*
+ * Classified Documents Policy Tests
+ */
+
+requirement "Clearance-based document filtering by time window" {
+
+    given
+        - document "classified_documents"
+
+    scenario "NATO_RESTRICTED clearance in first 20 seconds"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "getDocuments" } } on "resource"
+        expect decision is permit, with obligation equals {
+            "type": "filterClassifiedDocuments",
+            "clearance": "NATO_RESTRICTED"
+        };
+
+    scenario "COSMIC_TOP_SECRET clearance in 20-40 second window"
+        given
+            - attribute "nowMock" <time.now> emits "t2"
+            - function time.secondOf(any) maps to 25
+        when "user" attempts { "java": { "name": "getDocuments" } } on "resource"
+        expect decision is permit, with obligation equals {
+            "type": "filterClassifiedDocuments",
+            "clearance": "COSMIC_TOP_SECRET"
+        };
+
+    scenario "NATO_UNCLASSIFIED clearance in 40-60 second window"
+        given
+            - attribute "nowMock" <time.now> emits "t3"
+            - function time.secondOf(any) maps to 45
+        when "user" attempts { "java": { "name": "getDocuments" } } on "resource"
+        expect decision is permit, with obligation equals {
+            "type": "filterClassifiedDocuments",
+            "clearance": "NATO_UNCLASSIFIED"
+        };
+}
+
+requirement "Policy scope - only getDocuments action" {
+
+    given
+        - document "classified_documents"
+
+    scenario "not-applicable for getPatients action"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "getPatients" } } on "resource"
+        expect not-applicable;
+
+    scenario "not-applicable for deleteDocument action"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf(any) maps to 5
+        when "user" attempts { "java": { "name": "deleteDocument" } } on "resource"
+        expect not-applicable;
+}
+
+requirement "Streaming clearance level changes with time" {
+
+    given
+        - document "classified_documents"
+
+    scenario "clearance level changes as seconds progress"
+        given
+            - attribute "nowMock" <time.now> emits "t1"
+            - function time.secondOf("t1") maps to 10
+            - function time.secondOf("t2") maps to 30
+            - function time.secondOf("t3") maps to 50
+        when "user" attempts { "java": { "name": "getDocuments" } } on "resource"
+        expect decision is permit, with obligation containing key "clearance" with value matching text "NATO_RESTRICTED"
+        then
+            - attribute "nowMock" emits "t2"
+        expect decision is permit, with obligation containing key "clearance" with value matching text "COSMIC_TOP_SECRET"
+        then
+            - attribute "nowMock" emits "t3"
+        expect decision is permit, with obligation containing key "clearance" with value matching text "NATO_UNCLASSIFIED"
+        verify
+            - attribute <time.now> is called 3 times;
+}

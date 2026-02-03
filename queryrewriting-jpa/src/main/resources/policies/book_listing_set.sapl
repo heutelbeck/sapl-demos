@@ -1,0 +1,15 @@
+set "List and filter books - query modification with PreEnforce Example"
+
+first or abstain errors propagate
+
+for action.java.name == "findAll"
+
+policy "deny if scope null or empty"
+deny
+     subject.principal.dataScope in [null, undefined, []];
+
+policy "enforce filtering"
+permit
+obligation 	{
+			"limitCategoriesTo" : subject.principal.dataScope
+		}

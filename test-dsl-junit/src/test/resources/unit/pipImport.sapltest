@@ -1,0 +1,169 @@
+/*
+ * PIP (Policy Information Point) Demo
+ *
+ * This file demonstrates attribute mocking in SAPL tests:
+ * - Environment attribute mocking (<pip.attr>)
+ * - Entity attribute mocking (entity.<pip.attr>)
+ * - Environment integration with attributes
+ * - Authorization subscription environment
+ *
+ * PIPs are registered with the test fixture, and tests can either
+ * use real PIPs or mock specific attribute calls for isolation.
+ */
+
+requirement "Single attribute mocking" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "willi can read with mocked uppercase attribute"
+        given
+            // Mock the test.upper attribute to return WILLI
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "klaus cannot read with mocked uppercase attribute"
+        given
+            // Mock returns KLAUS (uppercase of klaus) but policy expects WILLI
+            - attribute "upperMock" any.<test.upper> emits "KLAUS"
+        when "klaus" attempts "read" on "something"
+        // Policy is permit-only, when where clause fails, result is not-applicable
+        expect not-applicable;
+
+    scenario "verify attribute calls"
+        given
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit
+        verify
+            // Verify the attribute was called
+            - attribute any.<test.upper> is called once;
+}
+
+requirement "Multiple attribute mocking - OR conditions" {
+
+    // policyWithSimplePIP has OR conditions checking 3 attributes
+    // All attributes must be mocked since SAPL doesn't short-circuit
+    given
+        - document "policyWithSimplePIP"
+
+    scenario "klaus can read if hasEnvVar returns BAR"
+        given
+            // Mock all 3 attributes - SAPL evaluates all in OR
+            - attribute "upperMock" any.<test.upper> emits "KLAUS"
+            - attribute "envMock" any.<test.hasEnvVar> emits "BAR"
+            - attribute "subVarMock" any.<test.hasAuthzSubVar> emits "NOT_FOO"
+        when "klaus" attempts "read" on "something"
+        // Policy: subject.<test.upper> == "WILLI" || subject.<test.hasEnvVar> == "BAR" || ...
+        // hasEnvVar matches, so permit
+        expect permit;
+
+    scenario "klaus can read if hasAuthzSubVar returns FOO"
+        given
+            - attribute "upperMock" any.<test.upper> emits "KLAUS"
+            - attribute "envMock" any.<test.hasEnvVar> emits "NOT_BAR"
+            - attribute "subVarMock" any.<test.hasAuthzSubVar> emits "FOO"
+        when "klaus" attempts "read" on "something"
+        // hasAuthzSubVar matches, so permit
+        expect permit;
+}
+
+requirement "Environment and subscription context" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "attribute with environment context"
+        given
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something" in { "willi": "WILLI", "klaus": "KLAUS" }
+        expect permit;
+
+    scenario "subscription environment in when clause"
+        given
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        // Environment can also be part of the authorization subscription
+        when "willi" attempts "read" on "something" in { "requestId": "abc123" }
+        expect permit;
+
+    scenario "combined environments"
+        given
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something" in { "tenant": "acme", "requestId": "xyz789" }
+        expect permit;
+}
+
+requirement "Attribute with specific entity matching" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "match specific entity value"
+        given
+            // Only match when parent value is exactly "willi"
+            - attribute "upperMock" "willi".<test.upper> emits "WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    /* Removed: non-matching entity returns no mock
+     * This test demonstrates that when no mock matches the entity,
+     * the system throws an exception (onError) instead of returning
+     * a decision. This requires different test handling.
+     */
+
+    scenario "multiple mocks for different entities"
+        given
+            - attribute "upperMock1" "willi".<test.upper> emits "WILLI"
+            - attribute "upperMock2" "klaus".<test.upper> emits "KLAUS"
+        when "willi" attempts "read" on "something"
+        expect permit;
+
+    scenario "any entity matcher for flexibility"
+        given
+            // any matches any entity value
+            - attribute "upperMock" any.<test.upper> emits "WILLI"
+        when "anyuser" attempts "read" on "something"
+        // Will still permit because mock returns WILLI for any entity
+        expect permit;
+}
+
+requirement "Attribute streaming" {
+
+    // Use policyWithSinglePIP which only requires test.upper attribute
+    given
+        - document "policyWithSinglePIP"
+
+    scenario "attribute changes over time"
+        given
+            // Initial value doesn't match
+            - attribute "upperMock" any.<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            // Update attribute value
+            - attribute "upperMock" emits "WILLI"
+        // Now it matches
+        expect permit;
+
+    scenario "multiple attribute changes"
+        given
+            - attribute "upperMock" any.<test.upper> emits "A"
+        when "willi" attempts "read" on "something"
+        expect not-applicable
+        then
+            - attribute "upperMock" emits "B"
+        expect not-applicable
+        then
+            - attribute "upperMock" emits "WILLI"
+        expect permit
+        then
+            - attribute "upperMock" emits "C"
+        expect not-applicable
+        verify
+            // Attribute is subscribed once, emissions don't create new subscriptions
+            - attribute any.<test.upper> is called once;
+}
