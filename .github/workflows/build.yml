@@ -99,7 +99,7 @@ jobs:
 
     - name: Build Integration Test Images
       if: env.RUN_ANALYSIS == 'true'
-      run: mvn -B spring-boot:build-image -pl :oauth2-jwt/oauth2-jwt-authorization-server,:oauth2-jwt/oauth2-jwt-resource-server -DskipTests
+      run: mvn -B spring-boot:build-image -pl :oauth2-jwt-authorization-server,:oauth2-jwt-resource-server -DskipTests
 
     - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
       if: env.RUN_ANALYSIS == 'true'
