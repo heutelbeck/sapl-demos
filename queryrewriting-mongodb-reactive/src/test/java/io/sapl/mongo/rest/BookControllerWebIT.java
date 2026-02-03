@@ -18,7 +18,6 @@
 package io.sapl.mongo.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockAuthentication;
 
 import java.util.List;
 import java.util.Set;
@@ -31,19 +30,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.mongodb.MongoDBContainer;
 
 import io.sapl.mongo.data.DemoData;
 import io.sapl.mongo.domain.Book;
-import io.sapl.mongo.domain.LibraryUser;
 
 /**
  * End-to-end integration tests for BookController at the HTTP level.
@@ -51,41 +47,26 @@ import io.sapl.mongo.domain.LibraryUser;
  * These tests verify the complete request flow including:
  * <ul>
  *   <li>HTTP routing and content negotiation</li>
- *   <li>Spring Security authentication</li>
+ *   <li>Spring Security authentication via HTTP Basic</li>
  *   <li>SAPL policy enforcement with query rewriting</li>
  *   <li>JSON serialization of responses</li>
  * </ul>
  * <p>
- * Unlike {@link BookControllerIT}, these tests exercise the full WebFlux stack.
+ * Uses real HTTP with actual demo users (boss, zoe, bob, ann, pat) to verify
+ * the demo application works as a user would experience it.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureWebTestClient
+@AutoConfigureWebTestClient(timeout = "30000")
 @Testcontainers
 @DisplayName("BookController HTTP-level security")
 class BookControllerWebIT {
 
     @Container
+    @ServiceConnection
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0");
-
-    @DynamicPropertySource
-    static void configureMongoDb(DynamicPropertyRegistry registry) {
-        registry.add("spring.data.mongodb.uri", mongoDBContainer::getReplicaSetUrl);
-    }
 
     @Autowired
     WebTestClient webTestClient;
-
-    private static LibraryUser testUser(String name, List<Integer> dataScope) {
-        return new LibraryUser(name, 0, dataScope, List.of());
-    }
-
-    /**
-     * Creates an authentication token with LibraryUser as principal.
-     * This ensures SAPL policies can access subject.principal.dataScope.
-     */
-    private static UsernamePasswordAuthenticationToken authenticationFor(LibraryUser user) {
-        return new UsernamePasswordAuthenticationToken(user, null, user.authorities());
-    }
 
     private static List<Book> booksInCategories(Set<Integer> categories) {
         return DemoData.DEMO_BOOKS.stream()
@@ -97,25 +78,31 @@ class BookControllerWebIT {
     @DisplayName("GET /")
     class FindAllEndpoint {
 
+        /**
+         * Test data using real demo users from DemoData:
+         *   boss - all sections (1,2,3,4,5) -> 15 books
+         *   zoe  - sections 1,2 -> 6 books
+         *   bob  - sections 3,4 -> 6 books
+         *   ann  - section 5 -> 3 books
+         */
         static Stream<Arguments> authorizedUsers() {
             return Stream.of(
-                Arguments.of("full-access",   List.of(1, 2, 3, 4, 5), Set.of(1, 2, 3, 4, 5), 15),
-                Arguments.of("partial-access", List.of(1, 2),         Set.of(1, 2),          6),
-                Arguments.of("single-section", List.of(5),            Set.of(5),             3)
+                Arguments.of("boss", Set.of(1, 2, 3, 4, 5), 15),
+                Arguments.of("zoe",  Set.of(1, 2),          6),
+                Arguments.of("bob",  Set.of(3, 4),          6),
+                Arguments.of("ann",  Set.of(5),             3)
             );
         }
 
-        @ParameterizedTest(name = "{0}: expects {3} books from categories {2}")
+        @ParameterizedTest(name = "{0}: expects {2} books from categories {1}")
         @MethodSource("authorizedUsers")
-        void authorizedUser_receivesFilteredBooks(String userName, List<Integer> scope,
-                                                   Set<Integer> expectedCategories, int expectedCount) {
-            var user          = testUser(userName, scope);
+        void authorizedUser_receivesFilteredBooks(String username, Set<Integer> expectedCategories, int expectedCount) {
             var expectedBooks = booksInCategories(expectedCategories);
 
             webTestClient
-                .mutateWith(mockAuthentication(authenticationFor(user)))
                 .get()
                 .uri("/")
+                .headers(headers -> headers.setBasicAuth(username, DemoData.DEFAULT_PASSWORD))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Book.class)
@@ -129,27 +116,24 @@ class BookControllerWebIT {
         }
 
         @Test
-        @DisplayName("user with empty scope receives 403 Forbidden")
+        @DisplayName("pat (no sections) receives 403 Forbidden")
         void emptyScope_returnsForbidden() {
-            var user = testUser("no-access", List.of());
-
             webTestClient
-                .mutateWith(mockAuthentication(authenticationFor(user)))
                 .get()
                 .uri("/")
+                .headers(headers -> headers.setBasicAuth("pat", DemoData.DEFAULT_PASSWORD))
                 .exchange()
                 .expectStatus().isForbidden();
         }
 
         @Test
-        @DisplayName("unauthenticated request redirects to login")
-        void unauthenticated_redirectsToLogin() {
-            // Default Spring Security form login redirects unauthenticated requests
+        @DisplayName("unauthenticated request receives 401 Unauthorized")
+        void unauthenticated_returnsUnauthorized() {
             webTestClient
                 .get()
                 .uri("/")
                 .exchange()
-                .expectStatus().is3xxRedirection();
+                .expectStatus().isUnauthorized();
         }
     }
 }

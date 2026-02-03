@@ -48,7 +48,7 @@
 		<!-- Dependencies -->
 		<lombok.version>1.18.42</lombok.version>
 		<mockito-inline.version>5.2.0</mockito-inline.version>
-		<testcontainers.version>1.21.4</testcontainers.version>
+		<testcontainers.version>2.0.3</testcontainers.version>
 
 		<!-- Maven Plug-Ins -->
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
@@ -136,12 +136,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>postgresql</artifactId>
+			<artifactId>testcontainers-postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-testcontainers</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

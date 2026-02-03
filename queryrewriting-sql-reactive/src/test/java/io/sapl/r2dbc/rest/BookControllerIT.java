@@ -38,9 +38,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 import io.sapl.r2dbc.data.DemoData;
 import io.sapl.r2dbc.domain.Book;
@@ -67,7 +67,7 @@ import reactor.test.StepVerifier;
 class BookControllerIT {
 
     @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17")
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17")
             .withInitScript("init_scripts/schema.sql");
 
     @DynamicPropertySource

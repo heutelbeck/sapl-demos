@@ -54,6 +54,7 @@ public class SecurityConfig {
         return http
                 .authenticationManager(authenticationManager)
                 .authorizeExchange(exchange -> exchange.anyExchange().authenticated())
+                .httpBasic(withDefaults())
                 .formLogin(withDefaults())
                 .logout(logout -> logout.logoutUrl("/logout"))
                 .build();

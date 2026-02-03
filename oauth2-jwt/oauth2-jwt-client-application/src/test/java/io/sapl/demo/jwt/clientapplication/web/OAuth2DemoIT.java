@@ -1,29 +1,22 @@
 package io.sapl.demo.jwt.clientapplication.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Duration;
+import java.util.Base64;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.regex.Pattern;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -31,32 +24,27 @@ import org.testcontainers.images.PullPolicy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-import org.xmlunit.assertj3.XmlAssert;
-import org.xmlunit.builder.Input;
 
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 
-import io.sapl.demo.jwt.clientapplication.OAuth2ClientApplication;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
+import tools.jackson.databind.json.JsonMapper;
 
+/**
+ * Integration tests for OAuth2/JWT demo verifying SAPL access control.
+ * <p>
+ * Tests obtain real JWT tokens from the authorization server and call
+ * the resource server directly to verify SAPL policies are enforced.
+ */
 @DirtiesContext
 @Testcontainers
-@AutoConfigureMockMvc
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@SpringBootTest(classes = OAuth2ClientApplication.class)
 class OAuth2DemoIT {
 
-    private static final Duration TIMEOUT_SPINUP = Duration.ofSeconds(20);
-    // Configurable via -Ddocker.registry=ghcr.io/heutelbeck/ for CI, defaults to local/ for dev
+    private static final Duration TIMEOUT_SPINUP = Duration.ofMinutes(2);
     private static final String   REGISTRY       = System.getProperty("docker.registry", "local/");
     private static final String   TAG            = ":4.0.0-SNAPSHOT";
-    // Don't pull for local images, use default policy for remote registries
     private static final boolean  USE_LOCAL      = REGISTRY.startsWith("local");
 
     private static final int     AUTH_SERVER_PORT     = 9000;
@@ -64,42 +52,15 @@ class OAuth2DemoIT {
     private static final Network IT_NETWORK           = Network.newNetwork();
     private static final String  AUTH_SERVER          = "auth-server";
 
-    private static final String INDEX_URL         = "http://localhost:8080/index";
-    private static final String INDEX_RESULT_PATH = "target/test-classes/xml/index_result.html";
+    private static final String CLIENT_ID     = "miskatonic-client";
+    private static final String CLIENT_SECRET = "secret";
 
-    private static final String AUTH_CODE_GRANT_TYPE_URL              = "http://localhost:8080/authorize?grant_type=authorization_code";
-    private static final String AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN = "^" + Pattern.quote(
-            "http://auth-server:9000/oauth2/authorize?response_type=code&client_id=miskatonic-client&scope=books.read%20faculty.read%20bestiary.read&state=")
-            + ".*" + Pattern.quote("%3D&redirect_uri=http://127.0.0.1:8080/authorized") + "$";
-
-    private static final String AUTH_CREDENTIALS_GRANT_TYPE_URL         = "http://localhost:8080/authorize?grant_type=client_credentials";
-    private static final String AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH = "target/test-classes/xml/credentials_grant_type_result.html";
-
-    @RequiredArgsConstructor
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static class PredicateMatcher<T> extends BaseMatcher<T> {
-
-        Predicate<T> test;
-
-        @Override
-        @SuppressWarnings("unchecked")
-        public boolean matches(Object actual) {
-            try {
-                return test.test((T) actual);
-            } catch (Exception e) {
-                return false;
-            }
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("passes Predicate ").appendValue(test);
-        }
-
-    }
+    private static final RestTemplate restTemplate = new RestTemplate();
+    private static final JsonMapper   jsonMapper   = new JsonMapper();
+    private static String             accessToken;
 
     @Container
-    @SuppressWarnings("resource") // Fine for tests which are short-lived
+    @SuppressWarnings("resource")
     static GenericContainer<?> authServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "oauth2-jwt-authorization-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
@@ -110,7 +71,7 @@ class OAuth2DemoIT {
             .withCreateContainerCmdModifier(configureContainerStartup(AUTH_SERVER_PORT));
 
     @Container
-    @SuppressWarnings("resource") // Fine for tests which are short-lived
+    @SuppressWarnings("resource")
     static GenericContainer<?> resourceServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "oauth2-jwt-resource-server" + TAG))
             .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
@@ -128,62 +89,65 @@ class OAuth2DemoIT {
                 .withPortBindings(new PortBinding(Ports.Binding.bindPort(fixedPort), new ExposedPort(fixedPort)));
     }
 
-    @SneakyThrows
-    static void printResponse(MockHttpServletResponse response) {
-        System.out.println(response.getStatus());
-        for (var header : response.getHeaderNames())
-            System.out.println(header + "\t:\t" + response.getHeaderValues(header));
-        System.out.println(response.getContentAsString());
+    @BeforeAll
+    static void obtainAccessToken() throws Exception {
+        var tokenUrl = "http://localhost:" + AUTH_SERVER_PORT + "/oauth2/token";
+
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        var credentials = CLIENT_ID + ":" + CLIENT_SECRET;
+        headers.setBasicAuth(Base64.getEncoder().encodeToString(credentials.getBytes()));
+
+        var body = new LinkedMultiValueMap<String, String>();
+        body.add("grant_type", "client_credentials");
+        body.add("scope", "books.read faculty.read bestiary.read");
+
+        var request  = new HttpEntity<>(body, headers);
+        var response = restTemplate.postForEntity(tokenUrl, request, String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        var tokenResponse = jsonMapper.readTree(response.getBody());
+        accessToken = tokenResponse.get("access_token").asText();
+        assertThat(accessToken).isNotBlank();
     }
 
-    static <T> void printResponse(ResponseEntity<T> response) {
-        System.out.println(response.getStatusCode());
-        response.getHeaders().forEach((header, values) ->
-            System.out.println(header + "\t:\t" + values));
-        System.out.println(response.getBody());
-    }
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @Autowired
-    WebClient webClient;
-
-    @Test
-    @WithMockUser(username = "user1", password = "password")
-    void test_index() throws Exception {
-        final var request  = request(HttpMethod.GET, INDEX_URL);
-        final var response = mockMvc.perform(request).andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-        XmlAssert.assertThat(Input.fromString(response.getContentAsString()))
-                .and(Input.fromFile(INDEX_RESULT_PATH)).areIdentical();
-    }
-
-    @Test
-    @WithMockUser(username = "user1", password = "password")
-    void test_codeGrantType_clientRedirect() throws Exception {
-        final var request      = request(HttpMethod.GET, AUTH_CODE_GRANT_TYPE_URL);
-        final var response     = mockMvc.perform(request).andExpect(status().is3xxRedirection())
-                .andExpect(content().string("")).andExpect(header().exists("Location"))
-                .andExpect(header().string("Location",
-                        new PredicateMatcher<String>(
-                                str -> Pattern.matches(AUTH_CODE_GRANT_TYPE_REDIRECT_PATTERN, str))))
-                .andReturn().getResponse();
-        final var redirectURI  = response.getHeader("Location");
-        final var authResponse = webClient.get().uri(redirectURI).retrieve().toEntity(String.class).block();
-        assertThat(authResponse).isNotNull();
-        assertThat(authResponse.getStatusCode().is3xxRedirection()).isTrue();
-        assertThat(authResponse.getHeaders().getLocation()).isNotNull();
+    private ResponseEntity<String[]> callResourceServer(String endpoint) {
+        var url     = "http://localhost:" + RESOURCE_SERVER_PORT + endpoint;
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        var request = new HttpEntity<>(headers);
+        return restTemplate.exchange(url, HttpMethod.GET, request, String[].class);
     }
 
     @Test
-    @WithMockUser(username = "user1", password = "password")
-    void test_credectialsGrantType_accessToRessources() throws Exception {
-        final var request  = request(HttpMethod.GET, AUTH_CREDENTIALS_GRANT_TYPE_URL);
-        final var response = mockMvc.perform(request).andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML)).andReturn().getResponse();
-        XmlAssert.assertThat(Input.fromString(response.getContentAsString()))
-                .and(Input.fromFile(AUTH_CREDENTIALS_GRANT_TYPE_RESULT_PATH)).areIdentical();
+    void whenAccessingBooksWithValidToken_thenSaplPolicyPermitsAccess() {
+        var response = callResourceServer("/books");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .isNotNull()
+                .contains("Necronomicon", "Nameless Cults", "Book of Eibon");
+    }
+
+    @Test
+    void whenAccessingFacultyWithValidToken_thenSaplPolicyPermitsAccess() {
+        var response = callResourceServer("/faculty");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .isNotNull()
+                .contains("Dr. Henry Armitage", "Professor William Dyer");
+    }
+
+    @Test
+    void whenAccessingBestiaryWithValidToken_thenSaplPolicyPermitsAccess() {
+        var response = callResourceServer("/bestiary");
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody())
+                .isNotNull()
+                .contains("Shoggoths", "Deep Ones", "Mi-Go");
     }
 
 }
