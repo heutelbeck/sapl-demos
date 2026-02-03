@@ -17,10 +17,13 @@
  */
 package io.sapl.demo.testing.dsl.plain;
 
-import static io.sapl.api.pdp.CombiningAlgorithm.DefaultDecision.ABSTAIN;
-import static io.sapl.api.pdp.CombiningAlgorithm.ErrorHandling.PROPAGATE;
-import static io.sapl.api.pdp.CombiningAlgorithm.VotingMode.PRIORITY_DENY;
-import static org.assertj.core.api.Assertions.assertThat;
+import io.sapl.api.pdp.CombiningAlgorithm;
+import io.sapl.test.plain.*;
+import io.sapl.test.plain.TestEvent.ExecutionCompleted;
+import io.sapl.test.plain.TestEvent.ScenarioCompleted;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,20 +32,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.sapl.api.pdp.CombiningAlgorithm;
-import io.sapl.test.plain.PlainTestAdapter;
-import io.sapl.test.plain.PlainTestResults;
-import io.sapl.test.plain.SaplDocument;
-import io.sapl.test.plain.SaplTestDocument;
-import io.sapl.test.plain.ScenarioResult;
-import io.sapl.test.plain.TestConfiguration;
-import io.sapl.test.plain.TestEvent.ExecutionCompleted;
-import io.sapl.test.plain.TestEvent.ScenarioCompleted;
-import io.sapl.test.plain.TestStatus;
+import static io.sapl.api.pdp.CombiningAlgorithm.DefaultDecision.ABSTAIN;
+import static io.sapl.api.pdp.CombiningAlgorithm.ErrorHandling.PROPAGATE;
+import static io.sapl.api.pdp.CombiningAlgorithm.VotingMode.PRIORITY_DENY;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for PlainTestAdapter demonstration.

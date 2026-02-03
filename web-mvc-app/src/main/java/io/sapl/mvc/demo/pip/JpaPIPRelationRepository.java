@@ -15,9 +15,8 @@
  */
 package io.sapl.mvc.demo.pip;
 
-import org.springframework.data.repository.CrudRepository;
-
 import io.sapl.mvc.demo.domain.Relation;
+import org.springframework.data.repository.CrudRepository;
 
 public interface JpaPIPRelationRepository extends CrudRepository<Relation, Long>, PIPRelationRepository {
 }

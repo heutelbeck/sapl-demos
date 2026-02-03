@@ -15,9 +15,9 @@
  */
 package io.sapl.mvc.demo.domain;
 
-import java.util.List;
-
 import org.springframework.data.repository.CrudRepository;
+
+import java.util.List;
 
 public interface RelationRepository extends CrudRepository<Relation, Long> {
 

@@ -15,21 +15,20 @@
  */
 package io.sapl.embedded.demo;
 
-import java.nio.file.Path;
-import java.text.DecimalFormat;
-import java.util.concurrent.Callable;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.pdp.PolicyDecisionPointBuilder;
 import io.sapl.pdp.PolicyDecisionPointBuilder.PDPComponents;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+
+import java.nio.file.Path;
+import java.text.DecimalFormat;
+import java.util.concurrent.Callable;
 
 /**
  * This demo shows how to manually construct a PDP without infrastructure

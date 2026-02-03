@@ -15,9 +15,8 @@
  */
 package io.sapl.test;
 
-import org.junit.jupiter.api.Test;
-
 import io.sapl.api.pdp.AuthorizationSubscription;
+import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests that verify combined policy evaluation and single policy

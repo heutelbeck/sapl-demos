@@ -17,10 +17,10 @@
  */
 package io.sapl.r2dbc.domain;
 
-import java.util.Collection;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 /**
  * Authentication wrapper containing credentials for Spring Security.

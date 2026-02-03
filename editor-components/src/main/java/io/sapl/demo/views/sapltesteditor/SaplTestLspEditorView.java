@@ -17,8 +17,6 @@
  */
 package io.sapl.demo.views.sapltesteditor;
 
-import java.io.Serial;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -26,7 +24,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.ValidationFinishedEvent;
@@ -35,6 +32,8 @@ import io.sapl.vaadin.lsp.SaplEditorLspConfiguration;
 import io.sapl.vaadin.lsp.SaplEditorLspConfiguration.AutocompleteTrigger;
 import io.sapl.vaadin.lsp.SaplTestEditorLsp;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.Serial;
 
 /**
  * Demo view for the LSP-based SAPLTest editor using CodeMirror 6.

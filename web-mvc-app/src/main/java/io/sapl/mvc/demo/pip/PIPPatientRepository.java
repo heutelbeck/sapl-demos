@@ -15,9 +15,9 @@
  */
 package io.sapl.mvc.demo.pip;
 
-import java.util.Optional;
-
 import io.sapl.mvc.demo.domain.Patient;
+
+import java.util.Optional;
 
 public interface PIPPatientRepository {
     Optional<Patient> findById(Long id);

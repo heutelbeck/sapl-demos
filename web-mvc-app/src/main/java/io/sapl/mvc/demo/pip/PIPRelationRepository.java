@@ -15,9 +15,9 @@
  */
 package io.sapl.mvc.demo.pip;
 
-import java.util.List;
-
 import io.sapl.mvc.demo.domain.Relation;
+
+import java.util.List;
 
 public interface PIPRelationRepository {
 

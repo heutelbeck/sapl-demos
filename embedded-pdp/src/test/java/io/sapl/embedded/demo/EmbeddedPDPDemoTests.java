@@ -2,7 +2,6 @@ package io.sapl.embedded.demo;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import picocli.CommandLine;
 
 class EmbeddedPDPDemoTests {

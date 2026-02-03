@@ -1,11 +1,11 @@
 package io.sapl.demo.testing.dsl.junit;
 
-import java.util.Map;
-
 import io.sapl.functions.libraries.FilterFunctionLibrary;
 import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.junit.ImportType;
 import io.sapl.test.junit.JUnitTestAdapter;
+
+import java.util.Map;
 
 /**
  * Default TestAdapter that is used to execute the tests. the sapl-test-junit

@@ -17,12 +17,8 @@
  */
 package io.sapl.r2dbc.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
+import io.sapl.r2dbc.data.DemoData;
+import io.sapl.r2dbc.domain.Book;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,8 +35,11 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
-import io.sapl.r2dbc.data.DemoData;
-import io.sapl.r2dbc.domain.Book;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * End-to-end integration tests for BookController at the HTTP level.

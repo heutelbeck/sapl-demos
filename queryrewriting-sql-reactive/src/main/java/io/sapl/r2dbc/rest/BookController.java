@@ -17,15 +17,14 @@
  */
 package io.sapl.r2dbc.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.sapl.r2dbc.domain.Book;
 import io.sapl.r2dbc.domain.BookRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequiredArgsConstructor

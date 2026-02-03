@@ -15,9 +15,8 @@
  */
 package io.sapl.mvc.demo.pip;
 
-import org.springframework.data.repository.CrudRepository;
-
 import io.sapl.mvc.demo.domain.Patient;
+import org.springframework.data.repository.CrudRepository;
 
 public interface JpaPIPPatientRepository extends CrudRepository<Patient, Long>, PIPPatientRepository {
 }

@@ -1,8 +1,7 @@
 package io.sapl.demo.webflux.medical;
 
-import org.springframework.stereotype.Service;
-
 import io.sapl.spring.method.metadata.PreEnforce;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
 @Service

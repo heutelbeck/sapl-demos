@@ -15,7 +15,6 @@
  */
 package io.sapl.demo.jwt.resourceserver.controller;
 
-import tools.jackson.databind.ObjectMapper;
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuples;
+import tools.jackson.databind.ObjectMapper;
 
 import java.security.Principal;
 import java.time.Duration;

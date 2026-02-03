@@ -1,14 +1,13 @@
 package io.sapl.demo.mqtt;
 
-import java.time.Duration;
-
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+
+import java.time.Duration;
 
 @Slf4j
 @Service

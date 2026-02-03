@@ -17,14 +17,12 @@
  */
 package io.sapl.mongo;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import static org.mockito.Mockito.*;
 
 class ApplicationStartsUpTest {
 

@@ -1,12 +1,5 @@
 package io.sapl.demo.mqtt;
 
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ExecutionException;
-
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.stereotype.Service;
-
 import com.hivemq.client.mqtt.datatypes.MqttQos;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
@@ -14,9 +7,14 @@ import com.hivemq.client.mqtt.mqtt5.message.connect.connack.Mqtt5ConnAckReasonCo
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PayloadFormatIndicator;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5Publish;
 import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
+
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service

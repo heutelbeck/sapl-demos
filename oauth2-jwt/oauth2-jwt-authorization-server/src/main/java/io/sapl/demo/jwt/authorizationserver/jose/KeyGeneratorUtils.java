@@ -15,6 +15,11 @@
  */
 package io.sapl.demo.jwt.authorizationserver.jose;
 
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -22,12 +27,6 @@ import java.security.spec.ECFieldFp;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
-
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-
-import lombok.SneakyThrows;
-import lombok.experimental.UtilityClass;
 
 @UtilityClass
 final class KeyGeneratorUtils {

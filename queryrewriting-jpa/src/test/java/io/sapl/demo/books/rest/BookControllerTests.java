@@ -17,13 +17,9 @@
  */
 package io.sapl.demo.books.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
+import io.sapl.demo.books.data.DemoData;
+import io.sapl.demo.books.domain.Book;
+import io.sapl.demo.books.domain.LibraryUser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,9 +33,12 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import io.sapl.demo.books.data.DemoData;
-import io.sapl.demo.books.domain.Book;
-import io.sapl.demo.books.domain.LibraryUser;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
  * Integration tests for BookController method-level security.

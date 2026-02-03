@@ -17,19 +17,18 @@
  */
 package io.sapl.r2dbc.data;
 
-import java.util.List;
-
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
 import io.sapl.r2dbc.domain.Book;
 import io.sapl.r2dbc.domain.BookRepository;
 import io.sapl.r2dbc.domain.LibraryUser;
 import io.sapl.r2dbc.domain.LibraryUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component

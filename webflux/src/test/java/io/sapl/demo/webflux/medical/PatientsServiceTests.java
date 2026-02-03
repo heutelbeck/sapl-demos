@@ -1,19 +1,18 @@
 package io.sapl.demo.webflux.medical;
 
-import static org.mockito.Mockito.when;
-
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
 import reactor.test.StepVerifier;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)

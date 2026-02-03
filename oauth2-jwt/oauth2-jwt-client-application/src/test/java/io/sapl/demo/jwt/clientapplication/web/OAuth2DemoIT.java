@@ -1,19 +1,12 @@
 package io.sapl.demo.jwt.clientapplication.web;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.Duration;
-import java.util.Base64;
-import java.util.function.Consumer;
-
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.PortBinding;
+import com.github.dockerjava.api.model.Ports;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -24,13 +17,13 @@ import org.testcontainers.images.PullPolicy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
-
-import com.github.dockerjava.api.command.CreateContainerCmd;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.PortBinding;
-import com.github.dockerjava.api.model.Ports;
-
 import tools.jackson.databind.json.JsonMapper;
+
+import java.time.Duration;
+import java.util.Base64;
+import java.util.function.Consumer;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for OAuth2/JWT demo verifying SAPL access control.
@@ -63,7 +56,7 @@ class OAuth2DemoIT {
     @SuppressWarnings("resource")
     static GenericContainer<?> authServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "oauth2-jwt-authorization-server" + TAG))
-            .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
+            .withImagePullPolicy(USE_LOCAL ? ignored -> false : PullPolicy.defaultPolicy())
             .withNetwork(IT_NETWORK).withNetworkAliases(AUTH_SERVER)
             .withExposedPorts(AUTH_SERVER_PORT)
             .waitingFor(Wait.forHttp("/.well-known/openid-configuration")
@@ -76,7 +69,7 @@ class OAuth2DemoIT {
     @SuppressWarnings("resource")
     static GenericContainer<?> resourceServer = new GenericContainer<>(
             DockerImageName.parse(REGISTRY + "oauth2-jwt-resource-server" + TAG))
-            .withImagePullPolicy(USE_LOCAL ? __ -> false : PullPolicy.defaultPolicy())
+            .withImagePullPolicy(USE_LOCAL ? ignored -> false : PullPolicy.defaultPolicy())
             .withNetwork(IT_NETWORK)
             .withExposedPorts(RESOURCE_SERVER_PORT)
             .waitingFor(Wait.forHttp("/books")
@@ -109,7 +102,7 @@ class OAuth2DemoIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var tokenResponse = jsonMapper.readTree(response.getBody());
-        accessToken = tokenResponse.get("access_token").asText();
+        accessToken = tokenResponse.get("access_token").textValue();
         assertThat(accessToken).isNotBlank();
     }
 

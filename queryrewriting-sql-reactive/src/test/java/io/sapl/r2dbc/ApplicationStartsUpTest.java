@@ -17,15 +17,13 @@
  */
 package io.sapl.r2dbc;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.times;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(classes = SaplR2dbcDemoApplication.class)
 class ApplicationStartsUpTest {

@@ -1,14 +1,13 @@
 package io.sapl.demo.books.domain;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
+import io.sapl.spring.method.metadata.PreEnforce;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import io.sapl.spring.method.metadata.PreEnforce;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends CrudRepository<Book, Long> {
 

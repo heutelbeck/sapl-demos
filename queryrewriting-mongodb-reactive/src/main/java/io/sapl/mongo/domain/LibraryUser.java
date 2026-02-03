@@ -17,11 +17,11 @@
  */
 package io.sapl.mongo.domain;
 
+import org.springframework.security.core.GrantedAuthority;
+
 import java.security.Principal;
 import java.util.Collection;
 import java.util.List;
-
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Subject identity containing authorization-relevant user attributes.

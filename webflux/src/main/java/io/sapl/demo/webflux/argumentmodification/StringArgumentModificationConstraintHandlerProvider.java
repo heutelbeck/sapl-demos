@@ -1,15 +1,14 @@
 package io.sapl.demo.webflux.argumentmodification;
 
-import java.util.Arrays;
-import java.util.function.Consumer;
-
-import org.springframework.aop.framework.ReflectiveMethodInvocation;
-import org.springframework.stereotype.Service;
-
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
+import org.springframework.aop.framework.ReflectiveMethodInvocation;
+import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.function.Consumer;
 
 @Service
 public class StringArgumentModificationConstraintHandlerProvider implements MethodInvocationConstraintHandlerProvider {

@@ -17,12 +17,9 @@
  */
 package io.sapl.demo.books.security;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
+import io.sapl.demo.books.data.DemoData;
+import io.sapl.demo.books.domain.LibraryUserDetails;
+import io.sapl.spring.config.EnableSaplMethodSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -41,9 +38,11 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import io.sapl.demo.books.data.DemoData;
-import io.sapl.demo.books.domain.LibraryUserDetails;
-import io.sapl.spring.config.EnableSaplMethodSecurity;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -51,7 +50,7 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 public class WebSecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http
                 .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .formLogin(withDefaults())
@@ -116,7 +115,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
 

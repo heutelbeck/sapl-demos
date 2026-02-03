@@ -15,8 +15,6 @@
  */
 package io.sapl.demo.jwt.authorizationserver.config;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -29,6 +27,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 @SuppressWarnings("deprecation") // NoOp Encoder OK for demo !
@@ -36,7 +36,7 @@ public class DefaultSecurityConfig {
 
     // @formatter:off
 	@Bean
-	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) {
         PathPatternRequestMatcher.Builder match = PathPatternRequestMatcher.withDefaults();
 		http.authorizeHttpRequests (authorize -> authorize.requestMatchers(match.matcher("/public-key/**")).permitAll()
 				        .anyRequest().authenticated()

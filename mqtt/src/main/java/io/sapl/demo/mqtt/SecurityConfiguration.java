@@ -15,12 +15,11 @@
  */
 package io.sapl.demo.mqtt;
 
+import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-
-import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 
 /**
  * Provide the @EnableReactiveSaplMethodSecurity annotation on any configuration

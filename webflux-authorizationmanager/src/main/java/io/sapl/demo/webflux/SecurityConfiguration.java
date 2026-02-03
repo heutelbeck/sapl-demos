@@ -15,8 +15,8 @@
  */
 package io.sapl.demo.webflux;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
+import io.sapl.spring.manager.ReactiveSaplAuthorizationManager;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -26,8 +26,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-import io.sapl.spring.manager.ReactiveSaplAuthorizationManager;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebFluxSecurity

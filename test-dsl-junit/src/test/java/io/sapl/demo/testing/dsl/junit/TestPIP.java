@@ -15,8 +15,6 @@
  */
 package io.sapl.demo.testing.dsl.junit;
 
-import java.util.Map;
-
 import io.sapl.api.attributes.Attribute;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.ObjectValue;
@@ -24,6 +22,8 @@ import io.sapl.api.model.TextValue;
 import io.sapl.api.model.UndefinedValue;
 import io.sapl.api.model.Value;
 import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
 public class TestPIP {

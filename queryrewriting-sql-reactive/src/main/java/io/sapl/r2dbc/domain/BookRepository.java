@@ -17,11 +17,10 @@
  */
 package io.sapl.r2dbc.domain;
 
+import io.sapl.spring.method.metadata.QueryEnforce;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-
-import io.sapl.spring.method.metadata.QueryEnforce;
 import reactor.core.publisher.Flux;
 
 @Repository

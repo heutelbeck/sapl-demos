@@ -1,16 +1,15 @@
 package io.sapl.demo.books.rest;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import io.sapl.demo.books.domain.Book;
+import io.sapl.demo.books.domain.BookRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.sapl.demo.books.domain.Book;
-import io.sapl.demo.books.domain.BookRepository;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequiredArgsConstructor

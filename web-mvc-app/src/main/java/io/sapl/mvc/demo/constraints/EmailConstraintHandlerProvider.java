@@ -15,15 +15,14 @@
  */
 package io.sapl.mvc.demo.constraints;
 
-import java.util.function.Consumer;
-
-import org.springframework.stereotype.Component;
-
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+import java.util.function.Consumer;
 
 /**
  * This class demonstrates the implementation of a custom constraint handler for

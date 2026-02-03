@@ -17,18 +17,17 @@
  */
 package io.sapl.demo.books.data;
 
-import java.util.List;
-
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
 import io.sapl.demo.books.domain.Book;
 import io.sapl.demo.books.domain.BookRepository;
 import io.sapl.demo.books.domain.LibraryUser;
 import io.sapl.demo.books.domain.LibraryUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Slf4j
 @Component

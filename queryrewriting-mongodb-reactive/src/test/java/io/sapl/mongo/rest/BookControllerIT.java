@@ -17,12 +17,9 @@
  */
 package io.sapl.mongo.rest;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
+import io.sapl.mongo.data.DemoData;
+import io.sapl.mongo.domain.Book;
+import io.sapl.mongo.domain.LibraryUser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -40,12 +37,14 @@ import org.springframework.security.core.context.SecurityContextImpl;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.mongodb.MongoDBContainer;
-
-import io.sapl.mongo.data.DemoData;
-import io.sapl.mongo.domain.Book;
-import io.sapl.mongo.domain.LibraryUser;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for BookController method-level security.

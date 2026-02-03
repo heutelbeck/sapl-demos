@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="https://www.thymeleaf.org"
-	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="https://www.thymeleaf.org"
+>
 <head>
 <title>Spring Security OAuth 2.0 Sample</title>
 <meta charset="utf-8" />
@@ -28,7 +28,7 @@
 				aria-label="Close">
 				<span aria-hidden="true">&times;</span>
 			</button>
-			<h4 th:text="${error}" class="text-center"></h4>
+			<h4 th:text="${error}" class="text-center">Error</h4>
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
@@ -51,8 +51,11 @@
 			<div th:if="${books}" class="panel-footer">
 				<h4>Books:</h4>
 				<table class="table table-condensed">
+					<thead>
+						<tr><th scope="col">Title</th></tr>
+					</thead>
 					<tbody>
-						<tr class="row" th:each="book : ${books}">
+						<tr th:each="book : ${books}">
 							<td th:text="${book}">book</td>
 						</tr>
 					</tbody>
@@ -62,8 +65,11 @@
 			<div th:if="${faculty}" class="panel-footer">
 				<h4>Faculty Members:</h4>
 				<table class="table table-condensed">
+					<thead>
+						<tr><th scope="col">Name</th></tr>
+					</thead>
 					<tbody>
-						<tr class="row" th:each="member : ${faculty}">
+						<tr th:each="member : ${faculty}">
 							<td th:text="${member}">member</td>
 						</tr>
 					</tbody>
@@ -73,8 +79,11 @@
 			<div th:if="${bestiary}" class="panel-footer">
 				<h4>Bestiary:</h4>
 				<table class="table table-condensed">
+					<thead>
+						<tr><th scope="col">Creature</th></tr>
+					</thead>
 					<tbody>
-						<tr class="row" th:each="beast : ${bestiary}">
+						<tr th:each="beast : ${bestiary}">
 							<td th:text="${beast}">beast</td>
 						</tr>
 					</tbody>

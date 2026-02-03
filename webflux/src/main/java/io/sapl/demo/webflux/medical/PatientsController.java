@@ -15,15 +15,13 @@
  */
 package io.sapl.demo.webflux.medical;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import tools.jackson.databind.node.JsonNodeFactory;
-
-import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 @RestController
 @RequestMapping("/")

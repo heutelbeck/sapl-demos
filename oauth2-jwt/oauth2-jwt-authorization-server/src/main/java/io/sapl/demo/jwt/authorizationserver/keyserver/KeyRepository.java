@@ -15,13 +15,12 @@
  */
 package io.sapl.demo.jwt.authorizationserver.keyserver;
 
+import com.nimbusds.jose.jwk.JWK;
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
-import org.springframework.stereotype.Component;
-
-import com.nimbusds.jose.jwk.JWK;
 
 @Component
 public class KeyRepository {

@@ -15,21 +15,11 @@
  */
 package io.sapl.mvc.demo;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
-import java.util.Collection;
-
+import io.sapl.mvc.demo.controller.UIController;
+import io.sapl.mvc.demo.domain.DemoData;
+import lombok.SneakyThrows;
 import org.htmlunit.WebClient;
-import org.htmlunit.html.HtmlAnchor;
-import org.htmlunit.html.HtmlForm;
-import org.htmlunit.html.HtmlHeading1;
-import org.htmlunit.html.HtmlHeading3;
-import org.htmlunit.html.HtmlInput;
-import org.htmlunit.html.HtmlPage;
-import org.htmlunit.html.HtmlTableRow;
+import org.htmlunit.html.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -42,9 +32,12 @@ import org.springframework.test.web.servlet.htmlunit.MockMvcWebClientBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import io.sapl.mvc.demo.controller.UIController;
-import io.sapl.mvc.demo.domain.DemoData;
-import lombok.SneakyThrows;
+import java.util.Collection;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @DirtiesContext
 @SpringBootTest(classes = MvcDemoApplication.class)

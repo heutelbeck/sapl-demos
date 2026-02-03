@@ -17,18 +17,17 @@
  */
 package io.sapl.demo.views.graph;
 
-import java.io.Serial;
-
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.lsp.graph.JsonGraphVisualization;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.Serial;
 
 /**
  * Demo view for the JSON graph visualization component.

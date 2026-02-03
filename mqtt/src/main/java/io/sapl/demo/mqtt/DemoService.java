@@ -15,13 +15,12 @@
  */
 package io.sapl.demo.mqtt;
 
+import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+
 import java.time.Duration;
 import java.time.Instant;
-
-import org.springframework.stereotype.Service;
-
-import io.sapl.spring.method.metadata.EnforceRecoverableIfDenied;
-import reactor.core.publisher.Flux;
 
 @Service
 public class DemoService {

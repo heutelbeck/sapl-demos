@@ -17,12 +17,9 @@
  */
 package io.sapl.mongo.security;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
-
+import io.sapl.mongo.data.DemoData;
+import io.sapl.mongo.domain.LibraryUserDetails;
+import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -36,11 +33,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-
-import io.sapl.mongo.data.DemoData;
-import io.sapl.mongo.domain.LibraryUserDetails;
-import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 import reactor.core.publisher.Mono;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebFluxSecurity

@@ -15,23 +15,20 @@
  */
 package org.demo;
 
-import java.util.concurrent.Callable;
-
-import javax.net.ssl.SSLException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
-
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.MultiAuthorizationSubscription;
 import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
+
+import javax.net.ssl.SSLException;
+import java.util.concurrent.Callable;
 
 @Command
 public class RemotePDPDemo implements Callable<Integer> {

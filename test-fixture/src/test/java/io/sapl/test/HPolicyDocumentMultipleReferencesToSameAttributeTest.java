@@ -15,14 +15,11 @@
  */
 package io.sapl.test;
 
-import static io.sapl.test.Matchers.isPermit;
-import static io.sapl.test.Matchers.args;
-import static io.sapl.test.Matchers.eq;
-
-import org.junit.jupiter.api.Test;
-
 import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
+import org.junit.jupiter.api.Test;
+
+import static io.sapl.test.Matchers.*;
 
 /**
  * Tests for policy documents that call the same attribute multiple times.
