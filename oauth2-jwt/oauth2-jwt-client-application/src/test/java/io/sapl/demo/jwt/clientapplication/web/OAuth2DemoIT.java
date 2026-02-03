@@ -102,7 +102,7 @@ class OAuth2DemoIT {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var tokenResponse = jsonMapper.readTree(response.getBody());
-        accessToken = tokenResponse.get("access_token").textValue();
+        accessToken = tokenResponse.get("access_token").asString();
         assertThat(accessToken).isNotBlank();
     }
 
