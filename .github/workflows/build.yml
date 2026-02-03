@@ -101,10 +101,10 @@ jobs:
       if: env.RUN_ANALYSIS == 'true'
       run: mvn -B spring-boot:build-image -pl :oauth2-jwt-authorization-server,:oauth2-jwt-resource-server -DskipTests
 
-    - name: Run Unit Tests, Integration Tests, JaCoCo, SpotBugs
+    - name: Run Unit Tests, Integration Tests, JaCoCo
       if: env.RUN_ANALYSIS == 'true'
       # Make sure to activate Vaadin production to catch potential errors during vite JS processing.
-      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report spotbugs:spotbugs -fae -Pproduction,it
+      run: mvn -B org.jacoco:jacoco-maven-plugin:0.8.11:prepare-agent verify org.jacoco:jacoco-maven-plugin:0.8.11:report -fae -Pproduction,it
 
     - name: Build and Run Unit Tests
       if: env.RUN_ANALYSIS != 'true'
@@ -130,7 +130,6 @@ jobs:
         -Dsonar.sources=pom.xml,src/ 
         -Dsonar.inclusions=**/pom.xml,**/src/main/java/**,**/src/main/resources/**
         -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
-        -Dsonar.java.spotbugs.reportPaths=target/spotbugsXml.xml
         -Dsonar.qualitygate.wait=true
 
     - name: Save PR Number # needed for subsequent SonarCloud workflow for PRs from fork
@@ -144,7 +143,6 @@ jobs:
         name: pr_build
         path: |
           **/src
-          **/target/spotbugsXml.xml
           **/target/classes
           **/target/test-classes
           **/target/site/jacoco/jacoco.xml

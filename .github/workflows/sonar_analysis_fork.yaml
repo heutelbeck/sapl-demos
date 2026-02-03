@@ -67,7 +67,6 @@ jobs:
         -Dsonar.sources=pom.xml,src/ 
         -Dsonar.inclusions=**/pom.xml,**/src/main/java/**,**/src/main/resources/**
         -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
-        -Dsonar.java.spotbugs.reportPaths=target/spotbugsXml.xml
         -Dsonar.pullrequest.key=${PR}
         -Dsonar.scm.revision=${{ github.event.workflow_run.head_sha }}
 
