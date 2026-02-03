@@ -127,9 +127,10 @@ jobs:
         -Dsonar.organization=heutelbeck
         -Dsonar.host.url=https://sonarcloud.io
         -Dsonar.projectKey=heutelbeck_sapl-demos
-        -Dsonar.sources=pom.xml,src/ 
+        -Dsonar.sources=pom.xml,src/
         -Dsonar.inclusions=**/pom.xml,**/src/main/java/**,**/src/main/resources/**
         -Dsonar.exclusions=**/xtext-gen/**/*,**/xtend-gen/**/*,**/emf-gen/**/*
+        -Dsonar.plsql.file.suffixes=
         -Dsonar.qualitygate.wait=true
 
     - name: Save PR Number # needed for subsequent SonarCloud workflow for PRs from fork
