@@ -18,6 +18,7 @@ package io.sapl.demo.webflux;
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -33,6 +34,7 @@ import java.util.List;
  * class to activate the reactive method security for methods returning a
  * Publisher<?>.
  */
+@Configuration
 @EnableWebFluxSecurity
 @EnableReactiveSaplMethodSecurity
 public class SecurityConfiguration {
@@ -49,7 +51,7 @@ public class SecurityConfiguration {
 
     @Bean
     MapReactiveUserDetailsService userDetailsService() {
-        val userDetails = User.withUsername("admin").password("admin").roles("ADMIN").build();
+        val userDetails = User.withUsername("admin").password("{noop}admin").roles("ADMIN").build();
         return new MapReactiveUserDetailsService(List.of(userDetails));
     }
 

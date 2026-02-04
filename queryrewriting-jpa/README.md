@@ -136,7 +136,7 @@ You need Java 21 or later and Maven installed on your system. The demo uses an e
 Navigate to the demo directory and start the Spring Boot application:
 
 ```bash
-cd queryrewriting-java
+cd queryrewriting-jpa
 mvn spring-boot:run
 ```
 

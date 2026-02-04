@@ -215,7 +215,7 @@ flowchart LR
 
 ### `@EnforceDropWhileDenied`
 
-Continuously re-evaluates authorization. During DENY periods, data is silently dropped�the client sees nothing but remains connected. When PERMIT resumes, data flows again automatically. Use when temporary access interruptions should be invisible.
+Continuously re-evaluates authorization. During DENY periods, data is silently dropped and the client sees nothing but remains connected. When PERMIT resumes, data flows again automatically. Use when temporary access interruptions should be invisible.
 
 ```mermaid
 flowchart LR

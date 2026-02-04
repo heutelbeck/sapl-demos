@@ -1,5 +1,6 @@
 package io.sapl.demo.webflux.classified;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +12,7 @@ import reactor.test.StepVerifier;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.function.Predicate;
 
 import static org.mockito.Mockito.when;
@@ -19,22 +21,27 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class DocumentsServiceTests {
 
+    @MockitoBean
+    Clock clock;
+
     @Autowired
     DocumentsService documentsService;
 
-    @MockitoBean
-    Clock mockClock;
+    @BeforeEach
+    void setUp() {
+        when(clock.getZone()).thenReturn(ZoneOffset.UTC);
+    }
 
     @Test
     @WithAnonymousUser
     void whenTimeZeroSecondOfMinute_thenAllRestricted() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH);
+        when(clock.instant()).thenReturn(Instant.EPOCH);
         StepVerifier.create(documentsService.getDocuments())
-                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_RESTRICTED))
+                .thenConsumeWhile(documentMatchesClearanceLevel(NatoSecurityClassification.NATO_RESTRICTED))
                 .verifyComplete();
     }
 
-    private Predicate<Document> documentMactchesClearanceLevel(NatoSecurityClassification clearance) {
+    private Predicate<Document> documentMatchesClearanceLevel(NatoSecurityClassification clearance) {
         return doc -> clearanceMatchesOrIsHigherThanClassification(clearance, doc.classification());
     }
 
@@ -46,18 +53,18 @@ class DocumentsServiceTests {
     @Test
     @WithAnonymousUser
     void whenTime25thSecondOfMinute_thenAllTopSecret() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(25)));
+        when(clock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(25)));
         StepVerifier.create(documentsService.getDocuments())
-                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.COSMIC_TOP_SECRET))
+                .thenConsumeWhile(documentMatchesClearanceLevel(NatoSecurityClassification.COSMIC_TOP_SECRET))
                 .verifyComplete();
     }
 
     @Test
     @WithAnonymousUser
     void whenTime45thSecondOfMinute_thenAllUnclassified() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45)));
+        when(clock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45)));
         StepVerifier.create(documentsService.getDocuments())
-                .thenConsumeWhile(documentMactchesClearanceLevel(NatoSecurityClassification.NATO_UNCLASSIFIED))
+                .thenConsumeWhile(documentMatchesClearanceLevel(NatoSecurityClassification.NATO_UNCLASSIFIED))
                 .verifyComplete();
     }
 

@@ -134,7 +134,7 @@ The second policy permits access for all other cases and attaches an obligation.
 
 ### Prerequisites
 
-You need Java 21 or later and Maven installed on your system. The demo uses Flapdoodle embedded MongoDB, so no separate MongoDB installation or Docker is required to run the application.
+You need Java 21 or later and Maven installed on your system. The demo uses Testcontainers with MongoDB, so Docker must be running to start the application.
 
 To run the integration tests (`mvn verify -Pit`), you need Docker installed for the Testcontainers-based tests.
 

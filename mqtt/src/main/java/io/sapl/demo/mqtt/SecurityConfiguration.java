@@ -17,6 +17,7 @@ package io.sapl.demo.mqtt;
 
 import io.sapl.spring.config.EnableReactiveSaplMethodSecurity;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -26,6 +27,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
  * class to activate the reactive method security for methods returning a
  * Publisher<?>.
  */
+@Configuration
 @EnableWebFluxSecurity
 @EnableReactiveSaplMethodSecurity
 public class SecurityConfiguration {
