@@ -239,7 +239,7 @@ io.sapl.pdp.embedded.pdp-config-type=RESOURCES
 io.sapl.pdp.embedded.policies-path=/policies
 ```
 
-**io.sapl.pdp.embedded.pdp-config-type** determines where to load policies from. Use RESOURCES to load from the classpath (bundled in the JAR) or FILESYSTEM to load from a directory on disk.
+**io.sapl.pdp.embedded.pdp-config-type** determines where to load policies from. Use RESOURCES to load from the classpath (bundled in the JAR), DIRECTORY to load from a directory on disk, MULTI_DIRECTORY for multi-tenant subdirectories, or BUNDLES for multi-tenant .saplbundle files.
 
 **io.sapl.pdp.embedded.policies-path** specifies the path containing .sapl policy files. For RESOURCES, this is relative to the classpath root.
 
