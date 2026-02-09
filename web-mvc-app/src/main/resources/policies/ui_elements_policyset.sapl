@@ -1,33 +1,70 @@
 import filter.blacken
 
 set "ui elements"
+
+/*
+The 'first-applicable' combination algorithm is used here to avoid overlapping or conflicting UI decisions for the same element, e.g., multiple policies trying to both show and hide a button.
+Policies are evaluated from top to bottom, and evaluation stops as soon as a policy yields an applicable decision (PERMIT or DENY) or an error.
+*/
 first or abstain errors propagate
+/*
+This 'for' statement scopes the policy set to UI-related resources only.
+It ensures that the policies are evaluated only for UI view elements whose identifiers start with the designated prefix, either as the full resource identifier or as the uiElement attribute.
+*/
 for resource =~ "^ui:view:.*" | resource.uiElement =~ "^ui:view:.*"
 
+/*
+Doctors may access the UI navigation element (button) for creating a new patient.
+This controls visibility and/or usability of the "create patient" button in the UI.
+*/
 policy "doctors may access the creation interface via navigation button"
 permit (action == "use") & (resource == "ui:view:patients:createPatientButton");
 	("ROLE_DOCTOR" in subject..authority);
 
+/*
+Doctors, administrators, and nurses may access the UI navigation element (button) for updating an existing patient's data.
+This governs access to the update view entry point in the UI, not the actual update operation on the repository or controller level.
+*/
 policy "doctors and administrators may access the update patient data interface via navigation button"
 permit action == "use" & resource == "ui:view:patient:updatePatientButton";
 	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);
 
+/*
+Only the attending doctor of the patient may access the UI element for deleting that patient's record.
+The policy checks that the subject is a doctor and that the subject is the attending doctor
+of the patient referenced by the UI element.
+*/
 policy "attending doctors can access delete patient button"
 permit action == "use" & resource.uiElement == "ui:view:patient:deletePatientButton";
 	("ROLE_DOCTOR" in subject..authority);
 	subject.name == resource.id.<patient.patientRecord>.attendingDoctor;
 
+/*
+Nurses must not edit the attending doctor, diagnosis, and classification (ICD-11) fields in the UI.
+This policy denies access to the respective form fields for nurses, effectively rendering them
+read-only or hidden depending on the PEP implementation.
+*/
 policy "nurses may not edit doctors, diagnosis and classification"
 deny  		resource == "ui:view:patients:icd11Field"
 		| 	resource == "ui:view:patients:doctorField"
 		| 	resource == "ui:view:patients:diagnosisField";
 	("ROLE_NURSE" in subject..authority);
 
+/*
+Administrators must not edit diagnosis and classification (ICD-11) fields in the UI.
+This preserves separation of duties: administrators may manage patients on a technical level,
+but they cannot change medical content in the UI.
+*/
 policy "administrators may not edit diagnosis and classification"
 deny  		resource == "ui:view:patients:icd11Field"
 		| 	resource == "ui:view:patients:diagnosisField";
 	("ROLE_ADMIN" in subject..authority);
 
+/*
+Staff members (doctors, administrators, and nurses) may generally edit UI fields.
+More specific deny-policies above restrict editing rights for particular roles and fields,
+while this policy provides a default permit for all other editable UI elements.
+*/
 policy "staff may edit all fields"
 permit (action == "edit");
 	("ROLE_DOCTOR" in subject..authority) || ("ROLE_ADMIN" in subject..authority) || ("ROLE_NURSE" in subject..authority);
