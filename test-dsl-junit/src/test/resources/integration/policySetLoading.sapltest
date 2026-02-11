@@ -192,3 +192,46 @@ requirement "Minimal integration test syntax" {
         expect deny;
 
 }
+
+requirement "Integration test loading full configuration from folder" {
+
+    scenario "load all policies and pdp.json from folder"
+        given
+            // Loads all .sapl files and pdp.json from the policiesIT folder
+            - configuration "policiesIT"
+        when "WILLI" attempts "read" on "foo"
+        // pdp.json has PRIORITY_DENY, policy_A denies -> deny wins
+        expect deny;
+
+    scenario "load configuration and override algorithm"
+        given
+            - configuration "policiesIT"
+            // Override pdp.json algorithm with permit-overrides
+            - priority permit or permit errors propagate
+        when "WILLI" attempts "read" on "foo"
+        // Override to permit-overrides, policy_B permits -> permit
+        expect permit;
+}
+
+requirement "Integration test loading only pdp.json configuration" {
+
+    scenario "load pdp.json config with explicit documents"
+        given
+            // Load only pdp.json (algorithm, variables, secrets)
+            - pdp-configuration "policiesIT/pdp.json"
+            // Specify documents separately
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+        when "WILLI" attempts "read" on "foo"
+        // pdp.json has PRIORITY_DENY, policy_A denies -> deny wins
+        expect deny;
+
+    scenario "load pdp.json config and override algorithm"
+        given
+            - pdp-configuration "policiesIT/pdp.json"
+            - documents "policiesIT/policy_A", "policiesIT/policy_B"
+            // Override pdp.json algorithm with permit-overrides
+            - priority permit or permit errors propagate
+        when "WILLI" attempts "read" on "foo"
+        // Override to permit-overrides, policy_B permits -> permit
+        expect permit;
+}

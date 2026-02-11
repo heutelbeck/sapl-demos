@@ -15,13 +15,13 @@ io.sapl.pdp:
 #                         by the PDP each individual calculation step is documented.
 #                         The trace is in JSON format and may become very large.
 #                         Recommended only as a last resort for troubleshooting.
-    print-trace: true
+    print-trace: false
 # print-json-report: true|false This is a JSON report summarizing the applied algorithms
 #                               and results of each evaluated policy (set) in the
 #                               decision-making process. It includes lists of all errors and values
 #                               of policy information point attributes encountered
 #                               during the evaluation of each policy (set).
-    print-json-report: true
+    print-json-report: false
 # print-text-report: true|false This will log a human-readable textual report based on the
 #                               same data as the 'print-json-report' option generates.
     print-text-report: true
@@ -41,6 +41,8 @@ spring:
   # do not show the default spring banner
   main.banner-mode: off
   jpa.open-in-view: false
+  # Converts POST requests with _method=DELETE into actual DELETE requests.
+  mvc.hiddenmethod.filter.enabled: true
 # Set the log level to DEBUG or TRACE to get detailed information about the
 # policy engine decision process.
 logging.level:

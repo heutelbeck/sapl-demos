@@ -18,25 +18,29 @@ package io.sapl.mvc.demo.constraints;
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
+import io.sapl.spring.constraints.api.RunnableConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.function.Consumer;
-
 /**
  * This class demonstrates the implementation of a custom constraint handler for
- * the SAPL spring-boot integration All spring components/beans implementing the
- * interface ConstraintHandler are automatically discovered and registered by
- * the spring policy enforcement points.
+ * the SAPL spring-boot integration. All spring components/beans implementing
+ * the interface RunnableConstraintHandlerProvider are automatically discovered
+ * and registered by the spring policy enforcement points.
+ * <p>
+ * This handler fires on each authorization decision containing a matching
+ * constraint, independent of the method return type. It is used for pure side
+ * effects like access logging.
  */
 @Slf4j
 @Service
-public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandlerProvider<Object> {
+public class LoggingConstraintHandlerProvider implements RunnableConstraintHandlerProvider {
+
+    private static final String ERROR_CONSTRAINT_NOT_OBJECT = "logAccess constraint is not an ObjectValue: %s";
 
     @Override
-    public Class<Object> getSupportedType() {
-        return Object.class;
+    public Signal getSignal() {
+        return Signal.ON_DECISION;
     }
 
     /**
@@ -55,7 +59,7 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
      * <p>
      * This ConstraintHandler in particular is for logging messages when access to a
      * resource is granted. Thus, the canHandle method returns true, if the type
-     * equals 'message'.
+     * equals 'logAccess'.
      * <p>
      * The PEP must first check if the runtime environment has the ability to handle
      * the constraint, as it must deny access to the resource if the constraint is
@@ -79,14 +83,14 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
      * implied behavior of the application.
      */
     @Override
-    public Consumer<Object> getHandler(Value constraint) {
+    public Runnable getHandler(Value constraint) {
         if (!(constraint instanceof ObjectValue obj)) {
-            return value -> { };
+            throw new IllegalStateException(ERROR_CONSTRAINT_NOT_OBJECT.formatted(constraint));
         }
         if (!(obj.get("message") instanceof TextValue message)) {
-            return value -> log.info("Access logged");
+            return () -> log.info("Access logged");
         }
-        return value -> log.info(message.value());
+        return () -> log.info(message.value());
     }
 
 }

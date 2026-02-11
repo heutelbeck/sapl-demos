@@ -37,6 +37,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DirtiesContext
 @SpringBootTest(classes = MvcDemoApplication.class)
@@ -68,10 +69,10 @@ class PatientRepositoryIT {
 
         static Stream<Arguments> authenticatedUsers() {
             return Stream.of(
-                Arguments.of("Julia", "DOCTOR"),
-                Arguments.of("Thomas", "NURSE"),
-                Arguments.of("Dominic", "VISITOR"),
-                Arguments.of("Horst", "ADMIN")
+                arguments("Julia", "DOCTOR"),
+                arguments("Thomas", "NURSE"),
+                arguments("Dominic", "VISITOR"),
+                arguments("Horst", "ADMIN")
             );
         }
 
@@ -93,9 +94,9 @@ class PatientRepositoryIT {
         void doctorCanAccessPatientWithFullData() {
             setAuthentication("Julia", "DOCTOR");
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getName()).isEqualTo("Lenny");
-            assertThat(patient.get().getDiagnosisText()).isNotNull();
+            assertThat(patient).isPresent()
+                    .get().satisfies(p -> assertThat(p).extracting(Patient::getName, Patient::getDiagnosisText)
+                            .containsExactly("Lenny", "Duodenal ulcer with acute haemorrhage."));
         }
 
         @Test
@@ -103,8 +104,9 @@ class PatientRepositoryIT {
         void nurseCanAccessPatientWithFullData() {
             setAuthentication("Thomas", "NURSE");
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getName()).isEqualTo("Lenny");
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getName)
+                    .isEqualTo("Lenny");
         }
 
         @Test
@@ -112,8 +114,9 @@ class PatientRepositoryIT {
         void adminCanAccessPatient() {
             setAuthentication("Horst", "ADMIN");
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getName()).isEqualTo("Lenny");
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getName)
+                    .isEqualTo("Lenny");
         }
 
         @Test
@@ -139,8 +142,9 @@ class PatientRepositoryIT {
             newPatient.setAttendingDoctor("Julia");
             newPatient.setAttendingNurse("Thomas");
             Patient saved = patientRepository.save(newPatient);
-            assertThat(saved.getId()).isNotNull();
-            assertThat(saved.getName()).isEqualTo("TestPatient");
+            assertThat(saved).satisfies(
+                    s -> assertThat(s.getId()).isNotNull(),
+                    s -> assertThat(s.getName()).isEqualTo("TestPatient"));
         }
 
         @Test
@@ -174,8 +178,9 @@ class PatientRepositoryIT {
             setAuthentication("Julia", "DOCTOR");
             patientRepository.updateAttendingNurseById("Brigitte", 1L);
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getAttendingNurse()).isEqualTo("Brigitte");
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getAttendingNurse)
+                    .isEqualTo("Brigitte");
         }
 
         @Test
@@ -184,8 +189,9 @@ class PatientRepositoryIT {
             setAuthentication("Thomas", "NURSE");
             patientRepository.updatePhoneNumberById("+49(0)123-456", 1L);
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getPhoneNumber()).isEqualTo("+49(0)123-456");
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getPhoneNumber)
+                    .isEqualTo("+49(0)123-456");
         }
 
         @Test
@@ -194,8 +200,36 @@ class PatientRepositoryIT {
             setAuthentication("Thomas", "NURSE");
             patientRepository.updateRoomNumberById("B.1.12", 1L);
             var patient = patientRepository.findById(1L);
-            assertThat(patient).isPresent();
-            assertThat(patient.get().getRoomNumber()).isEqualTo("B.1.12");
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getRoomNumber)
+                    .isEqualTo("B.1.12");
+        }
+    }
+
+    @Nested
+    @DisplayName("breaking the glass - non-attending doctor updates diagnosis")
+    class BreakingTheGlassTests {
+
+        @Test
+        @DisplayName("Attending doctor can update diagnosis without obligation")
+        void attendingDoctorCanUpdateDiagnosis() {
+            setAuthentication("Julia", "DOCTOR");
+            patientRepository.updateDiagnosisTextById("Updated diagnosis", 1L);
+            var patient = patientRepository.findById(1L);
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getDiagnosisText)
+                    .isEqualTo("Updated diagnosis");
+        }
+
+        @Test
+        @DisplayName("Non-attending doctor can update diagnosis (breaking the glass with email obligation)")
+        void nonAttendingDoctorCanUpdateDiagnosisWithEmailObligation() {
+            setAuthentication("Peter", "DOCTOR");
+            patientRepository.updateDiagnosisTextById("Emergency update", 1L);
+            var patient = patientRepository.findById(1L);
+            assertThat(patient).isPresent()
+                    .get().extracting(Patient::getDiagnosisText)
+                    .isEqualTo("Emergency update");
         }
     }
 }

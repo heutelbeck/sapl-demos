@@ -18,25 +18,30 @@ package io.sapl.mvc.demo.constraints;
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.ConsumerConstraintHandlerProvider;
+import io.sapl.spring.constraints.api.RunnableConstraintHandlerProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.function.Consumer;
-
 /**
  * This class demonstrates the implementation of a custom constraint handler for
- * the SAPL spring-boot integration All spring components/beans implementing the
- * interface ConstraintHandler are automatically discovered and registered by
- * the spring policy enforcement points.
+ * the SAPL spring-boot integration. All spring components/beans implementing
+ * the interface RunnableConstraintHandlerProvider are automatically discovered
+ * and registered by the spring policy enforcement points.
+ * <p>
+ * This handler fires on each authorization decision containing a matching
+ * constraint, independent of the method return type. It is used for pure side
+ * effects like sending notifications.
  */
 @Slf4j
 @Component
-public class EmailConstraintHandlerProvider implements ConsumerConstraintHandlerProvider<Object> {
+public class EmailConstraintHandlerProvider implements RunnableConstraintHandlerProvider {
+
+    private static final String ERROR_CONSTRAINT_NOT_OBJECT = "sendEmail constraint is not an ObjectValue: %s";
+    private static final String ERROR_FIELD_NOT_TEXT        = "sendEmail constraint field '%s' is not a TextValue: %s";
 
     @Override
-    public Class<Object> getSupportedType() {
-        return Object.class;
+    public Signal getSignal() {
+        return Signal.ON_DECISION;
     }
 
     /**
@@ -89,20 +94,20 @@ public class EmailConstraintHandlerProvider implements ConsumerConstraintHandler
      * implied behavior of the application.
      */
     @Override
-    public Consumer<Object> getHandler(Value constraint) {
+    public Runnable getHandler(Value constraint) {
         if (!(constraint instanceof ObjectValue obj)) {
-            return value -> { };
+            throw new IllegalStateException(ERROR_CONSTRAINT_NOT_OBJECT.formatted(constraint));
         }
         if (!(obj.get("recipient") instanceof TextValue recipient)) {
-            return value -> { };
+            throw new IllegalStateException(ERROR_FIELD_NOT_TEXT.formatted("recipient", obj.get("recipient")));
         }
         if (!(obj.get("subject") instanceof TextValue subject)) {
-            return value -> { };
+            throw new IllegalStateException(ERROR_FIELD_NOT_TEXT.formatted("subject", obj.get("subject")));
         }
         if (!(obj.get("message") instanceof TextValue message)) {
-            return value -> { };
+            throw new IllegalStateException(ERROR_FIELD_NOT_TEXT.formatted("message", obj.get("message")));
         }
-        return value -> sendEmail(recipient.value(), subject.value(), message.value());
+        return () -> sendEmail(recipient.value(), subject.value(), message.value());
     }
 
     /**
