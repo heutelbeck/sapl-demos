@@ -1,4 +1,4 @@
-policy "permit on emergency"
-permit action == "read" & resource == "time";
-	"status".<mqtt.messages> == "emergency";
-
+policy "permit on emergency"                     // Policy name for identification/logging
+  permit                                         // Effect: return PERMIT if all conditions below are satisfied
+  action == "read" & resource == "time";         // Condition 1: action must be exactly "read" AND resource must be exactly "time"
+  "status".<mqtt.messages> == "emergency";       // Condition 2: attribute "status", provided via MQTT PIP's topic messages, must have the value "emergency"
