@@ -1,4 +1,6 @@
-policy "policy write"
-permit
-  action == "write";
-  subject == "willi" & resource =~ "some.+";
+
+policy "policy write"                                    // Policy name for identification/logging
+permit                                                   // Effect: return PERMIT if all conditions below are satisfied
+  action == "write";                                     // Condition 1: the action in the authorization subscription must be exactly "write"
+  subject == "willi" & resource =~ "some.+";             // Condition 2: subject must be exactly "willi" AND resource must match the regex "some.+"
+  

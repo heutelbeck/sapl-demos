@@ -1,28 +1,48 @@
-import filter.blacken
-import filter.remove
-import simple.append
-import simple.length
+import filter.blacken                     // Import constraint function: blacken parts of strings
+import filter.remove                      // Import constraint function: remove fields/values
+import simple.append                      // Import function: append strings
+import simple.length                      // Import function: compute length of strings/arrays
 
 
-policy "policy read"
-permit
+policy "policy read"                      // Policy name for identification/logging
+permit                                    // Effect: return PERMIT if all conditions below are satisfied
+  // action in the authorization subscription must be "read"
   action == "read";
+ 
+  // subject must be exactly "willi" AND Condition 3: resource must match regex "some.+"
   subject == "willi" & resource =~ "some.+";
+  
+  // value 1 must appear in the slice ..[2] of the complex array
   1 in [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2 / 2]]..[2];
+  
+  // JSONPath expansion over nested arrays must produce exactly the given flattened sequence
   [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2], 6]..* == [0, [{"text": 1, "arr": [3, 4, 5]}, 1, 2], {"text": 1, "arr": [3, 4, 5]}, 1, [3, 4, 5], 3, 4, 5, 1, 2, 6];
 
+  // Local variable a: simple object with name and origin
   var a = {"name": "Felix", "origin": "Zurich"};
+  
+  // Local variable b: another object
   var b = {"name": "Hans", "origin": "Hagen"};
+  
+  // transformation pipeline must append " from <origin>" to each name and remove all origin fields resulting in the expected array of objects
   [a, b] |- { each @..name : append(" from ", @.origin), each @..origin : remove } == [{"name": "Felix from Zurich"}, {"name": "Hans from Hagen"}];
 
+  // Local variable input: plain string
   var input = "SAPL rocks";
+  // trivial check, value is unchanged
   input.<echo.echo> == "SAPL rocks";
 
+// log access with a message containing subject and resource
 obligation
     {
         "type" : "logAccess",
 		"message" : subject + " has read " + resource
     }
 
+// apply blacken to the name field 
 transform
 	{"name": "Homer"} |- { @.name : blacken(2,0,"\u2588") }
+
+	
+	
+	
