@@ -1,54 +1,57 @@
 /*
  * This set of demo policies illustrates how JWT can be used in tandem with SAPL.
  *
- * The JWT extensions for SAPL enable access to data contained in a JWT as attributes.
- * In addition, the JWT libraries allow for token validation and time-based policies
- * dynamically taking into account the time for which a JWT is valid.
+ * The JWT PIP reads the bearer token securely from subscription secrets and provides
+ * decoded claims and validation status via the <jwt.token> environment attribute.
+ *
+ * The bearer token never enters the SAPL evaluation context. It is only accessible
+ * to PIPs through the AttributeAccessContext. Enable automatic injection with:
+ *     io.sapl.jwt.inject-token=true
  */
 
 set "JWT Demo Policies"
 first or abstain errors propagate
 
 /*
- * The spring security libraries for OAuth2 JWT integration map each element of
- * the "scope" array in an JWT token to a Spring Principal authority, prepending
- * "SCOPE_" to each String representing the scope.
- * These can be references as any "ROLE_" or other authority provided by Spring
- * security.
+ * The Spring Security libraries for OAuth2 JWT integration map each element of
+ * the "scope" array in a JWT token to a Spring Principal authority, prepending
+ * "SCOPE_" to each string representing the scope.
+ * These can be referenced as any "ROLE_" or other authority provided by Spring
+ * Security.
+ *
+ * This policy does not require the JWT PIP at all. It uses standard Spring
+ * Security authorities.
  */
 policy "Scopes as Authority in Principal"
 permit resource == "books";
 	"SCOPE_books.read" in subject..authority;
 
 /*
- * In the demo, Spring does actually serialize the Principal in a way, that the token
- * is contained and can be directly accessed. This may not be the case in an arbitrary
- * PEP environment.
- *
- * However, note that by accessing the data directly this way does not validate the
- * JWT token in any way.
+ * The JWT PIP reads the bearer token from subscription secrets and decodes
+ * its claims. This is the recommended way to access JWT data in policies.
+ * The token is validated cryptographically against the configured public key
+ * server.
  */
-policy "Reading scopes as a claim from JWT JSON in the 'token' attribute of the subject"
+policy "Reading scopes from JWT via PIP"
 permit resource == "faculty";
-	"faculty.read" in subject.token.claims.scope;
+	"faculty.read" in <jwt.token>.payload.scope;
 
 /*
- * If the raw JWT token is contained as an attribute in the subject, the JWT function
- * library can be used to parse the token and to map it to a SAPL Value.
- *
- * Note:
- *   1. The resulting scheme is not necessarily the same as the token stemming from
- *      serialization of the Principal object as used in the example policy above.
- *   2. This also does not validate the token in any way.
+ * Another example of reading JWT claims via the PIP. The <jwt.token>
+ * attribute returns an object with header, payload, valid, and validity
+ * fields. Claims are accessible under payload.
  */
-policy "Reading scopes a raw JWT token available as a subject attribute"
+policy "Reading bestiary scope from JWT via PIP"
 permit resource == "bestiary";
-  "bestiary.read" in jwt.parseJwt(subject.principal.tokenValue).payload.scope;
+	"bestiary.read" in <jwt.token>.payload.scope;
 
 /*
- * This policy will evaluate to permit for the time the token is valid
+ * This policy uses the validity check of the JWT PIP. The token is checked
+ * against the configured public key server. The policy will evaluate to
+ * permit only while the token signature is valid and the token has not
+ * expired. When the token expires, the PIP reactively re-emits and the
+ * decision changes to deny.
  */
 policy "Policy to test timeout of token"
 permit resource == "mysteries";
-	subject.principal.tokenValue.<jwt.valid>;
-
+	<jwt.token>.valid;
