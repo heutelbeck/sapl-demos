@@ -75,7 +75,8 @@ public class DemoController {
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
         return recover(service.getFluxStringRecoverable(),
                 error -> log.warn("ACCESS DENIED ('{}') (data will automatically resume once access is granted again)",
-                        error.getMessage()))
+                        error.getMessage()),
+                recovery -> log.info("ACCESS RECOVERED ('{}') (data flow is resuming)", recovery.getMessage()))
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 

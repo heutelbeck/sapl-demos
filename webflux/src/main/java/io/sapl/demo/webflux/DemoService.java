@@ -229,12 +229,16 @@ public class DemoService {
      * the subscriber can explicitly handle the event that access is denied and
      * choose to stay subscribed or not.
      *
+     * With signalAccessRecovery = true, the PEP also emits an
+     * AccessRecoveredException on DENY-to-PERMIT transitions. This allows the
+     * subscriber to distinguish "access restored, source idle" from "still denied."
+     *
      * The @EnforceRecoverableIfDenied annotation cannot be combined with any other
      * enforcement annotation.
      * 
      * @return a protected sequence of messages, each delayed by 500ms.
      */
-    @EnforceRecoverableIfDenied
+    @EnforceRecoverableIfDenied(signalAccessRecovery = true)
     public Flux<String> getFluxStringRecoverable() {
         return Flux.just(
                 "TIME: %s <-obligation will log different messages over time until access denied. Access is denied within the last 20 seconds of a local minute. The DENY will be logged by the consumer of the service which is aware of the deny. During this time no events will be visible and data flow will resume on the start of the next minute.->)")
