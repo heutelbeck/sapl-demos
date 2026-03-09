@@ -21,7 +21,6 @@ import com.github.dockerjava.api.model.DeviceRequest;
 import com.github.dockerjava.api.model.Volume;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -34,9 +33,8 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-@Profile("dev")
+@Profile({"ollama-docker", "anthropic"})
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(name = "app.ollama.local", havingValue = "false", matchIfMissing = true)
 class OllamaContainerConfig {
 
     private static final DockerImageName OLLAMA_IMAGE = DockerImageName.parse("ollama/ollama:latest");

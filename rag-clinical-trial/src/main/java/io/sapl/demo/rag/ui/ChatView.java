@@ -41,6 +41,9 @@ import java.io.Serial;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Route("")
 @PageTitle("Clinical Trial AI Assistant")
@@ -59,9 +62,14 @@ public class ChatView extends VerticalLayout {
     private final Select<DemoUser> userSelector;
     private final Select<Purpose> purposeSelector;
     private final Select<String> overrideSelector;
+    private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
+
     private final List<MessageListItem> messages = new ArrayList<>();
     private transient Disposable currentSubscription;
+    private transient ScheduledExecutorService animator;
+    private volatile boolean animating;
     private boolean generating;
+    private int dotFrame;
 
     public ChatView(ChatService chatService) {
         this.chatService = chatService;
@@ -148,7 +156,7 @@ public class ChatView extends VerticalLayout {
         userMessage.setUserColorIndex(1);
         messages.add(userMessage);
 
-        val assistantMessage = new MessageListItem("Thinking...", Instant.now(), "AI Assistant");
+        val assistantMessage = new MessageListItem("Retrieving documents", Instant.now(), "AI Assistant");
         assistantMessage.setUserColorIndex(2);
         messages.add(assistantMessage);
         messageList.setItems(messages);
@@ -160,25 +168,64 @@ public class ChatView extends VerticalLayout {
         val principal      = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(), purpose.name());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
+        startStatusAnimation(assistantMessage, ui);
+
         currentSubscription = chatService.askStreaming(text.strip(), history, authentication, securityActive)
                 .subscribe(
                         token -> {
+                            stopStatusAnimation();
                             content.append(token);
                             ui.access(() -> {
                                 assistantMessage.setText(content.toString());
                                 messageList.setItems(messages);
                             });
                         },
-                        error -> ui.access(() -> {
-                            assistantMessage.setText(ERROR_GENERATION_FAILED);
-                            messageList.setItems(messages);
-                            onGenerationFinished();
-                        }),
+                        error -> {
+                            stopStatusAnimation();
+                            ui.access(() -> {
+                                assistantMessage.setText(ERROR_GENERATION_FAILED);
+                                messageList.setItems(messages);
+                                onGenerationFinished();
+                            });
+                        },
                         () -> ui.access(this::onGenerationFinished)
                 );
     }
 
+    private void startStatusAnimation(MessageListItem message, UI ui) {
+        dotFrame = 0;
+        animating = true;
+        animator = Executors.newSingleThreadScheduledExecutor();
+        animator.scheduleAtFixedRate(() -> {
+            if (!animating) {
+                return;
+            }
+            val status = chatService.getCurrentStatus();
+            if (status == null || status.isBlank()) {
+                return;
+            }
+            val dots = DOT_FRAMES[dotFrame % DOT_FRAMES.length];
+            dotFrame++;
+            ui.access(() -> {
+                if (!animating) {
+                    return;
+                }
+                message.setText(status + dots);
+                messageList.setItems(messages);
+            });
+        }, 0, 250, TimeUnit.MILLISECONDS);
+    }
+
+    private void stopStatusAnimation() {
+        animating = false;
+        if (animator != null) {
+            animator.shutdownNow();
+            animator = null;
+        }
+    }
+
     private void stopGeneration() {
+        stopStatusAnimation();
         if (currentSubscription != null && !currentSubscription.isDisposed()) {
             currentSubscription.dispose();
         }

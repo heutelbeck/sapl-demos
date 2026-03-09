@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Profile;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@Profile("dev")
+@Profile({"ollama-docker", "ollama-local", "anthropic"})
 @Configuration(proxyBeanMethods = false)
 class DevContainersConfig {
 

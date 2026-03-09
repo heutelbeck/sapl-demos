@@ -28,6 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -41,12 +42,22 @@ public class ChatService {
     private final ChatClient chatClient;
     private final DocumentRetrievalService retrievalService;
 
+    private final AtomicReference<String> currentStatus = new AtomicReference<>("");
+
+    public String getCurrentStatus() {
+        return currentStatus.get();
+    }
+
     public Flux<String> askStreaming(String userMessage, String conversationHistory,
                                      Authentication authentication, boolean securityActive) {
         log.info("Received query: {}", userMessage);
+        currentStatus.set("Retrieving documents");
         val searchRequest = SearchRequest.builder().query(userMessage).topK(TOP_K).build();
         return retrievalService.retrieve(Mono.just(searchRequest), securityActive)
-                .doOnNext(docs -> log.info("Retrieved {} document chunks from vector store", docs.size()))
+                .doOnNext(docs -> {
+                    log.info("Retrieved {} document chunks from vector store", docs.size());
+                    currentStatus.set("Generating response");
+                })
                 .map(documents -> {
                     val context = buildContext(documents);
                     return buildPrompt(userMessage, context, conversationHistory);
@@ -56,11 +67,28 @@ public class ChatService {
                     return chatClient.prompt().user(prompt).stream().content();
                 })
                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
-                .doOnComplete(() -> log.info("LLM streaming response complete"))
+                .doOnComplete(() -> {
+                    currentStatus.set("Done");
+                    log.info("LLM streaming response complete");
+                })
                 .onErrorResume(e -> {
+                    currentStatus.set("");
+                    if (isCancellation(e)) {
+                        log.debug("Generation cancelled by user");
+                        return Flux.empty();
+                    }
                     log.error("Streaming failed", e);
                     return Flux.just(ERROR_GENERATION_FAILED);
                 });
+    }
+
+    private static boolean isCancellation(Throwable e) {
+        for (var cause = e; cause != null; cause = cause.getCause()) {
+            if (cause instanceof InterruptedException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static String buildContext(List<Document> documents) {

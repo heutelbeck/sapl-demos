@@ -1,0 +1,18 @@
+spring:
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      init:
+        pull-model-strategy: when_missing
+        timeout: 60m
+        max-retries: 2
+      chat:
+        options:
+          model: qwen3:8b
+          temperature: 0.1
+      embedding:
+        options:
+          model: nomic-embed-text
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.anthropic.autoconfigure.AnthropicChatAutoConfiguration

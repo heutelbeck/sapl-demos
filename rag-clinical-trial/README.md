@@ -16,21 +16,35 @@ This demo showcases document-level access control in a Retrieval-Augmented Gener
 
 - JDK 21 or newer
 - Maven
-- Docker (for PostgreSQL/pgvector and Ollama testcontainers)
-- Alternatively: local Ollama installation with `qwen3:8b` and `nomic-embed-text` models
+- Docker (for PostgreSQL/pgvector and optionally Ollama)
 
 ## Running the Demo
 
-With Docker (testcontainers start automatically):
+The demo supports three model provider profiles. The default is `ollama-docker`.
+
+### Ollama in Docker (default)
+
+Starts an Ollama container automatically (with GPU fallback to CPU) and pulls models on first run. PostgreSQL/pgvector also runs in a testcontainer.
 
 ```bash
-cd rag-clinical-trial && mvn spring-boot:run
+mvn spring-boot:run -pl rag-clinical-trial
 ```
 
-With a local Ollama instance (skip Ollama testcontainer):
+### Ollama local
+
+Uses a locally installed Ollama instance at `localhost:11434`. You must have Ollama running with the `qwen3:8b` and `nomic-embed-text` models available.
 
 ```bash
-cd rag-clinical-trial && mvn spring-boot:run -Dapp.ollama.local=true
+mvn spring-boot:run -pl rag-clinical-trial -Dspring-boot.run.profiles=ollama-local
+```
+
+### Anthropic (Claude Haiku)
+
+Uses Claude Haiku for chat and a Docker Ollama container for embeddings (pgvector requires a local embedding model). Requires an `ANTHROPIC_API_KEY` environment variable.
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+mvn spring-boot:run -pl rag-clinical-trial -Dspring-boot.run.profiles=anthropic
 ```
 
 Access the application at [http://localhost:8080](http://localhost:8080).
@@ -130,30 +144,13 @@ Key dependencies beyond the standard Spring Boot starter:
 
 ## Configuration
 
-Key properties in `application.yml`:
+Configuration is split across profile-specific YAML files:
 
-```yaml
-app:
-  ollama:
-    local: false                    # Set to true to use a local Ollama instead of testcontainer
+| File | Contents |
+|------|----------|
+| `application.yml` | Shared config: server port, pgvector, SAPL PDP, Vaadin, logging |
+| `application-ollama-docker.yml` | Ollama chat (qwen3:8b) + embedding (nomic-embed-text) |
+| `application-ollama-local.yml` | Same as ollama-docker (container not started due to profile) |
+| `application-anthropic.yml` | Anthropic chat (Claude Haiku) + Ollama embedding (nomic-embed-text) |
 
-spring:
-  ai:
-    ollama:
-      chat:
-        options:
-          model: qwen3:8b
-      embedding:
-        options:
-          model: nomic-embed-text
-    vectorstore:
-      pgvector:
-        dimensions: 768
-        distance-type: COSINE_DISTANCE
-
-io:
-  sapl:
-    pdp:
-      embedded:
-        print-text-report: true     # Human-readable SAPL decision logs
-```
+Each profile excludes the unused chat auto-configuration to prevent conflicting `ChatModel` beans. The `anthropic` profile still starts an Ollama container for embeddings.
