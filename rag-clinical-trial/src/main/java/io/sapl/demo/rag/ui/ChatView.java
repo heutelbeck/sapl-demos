@@ -91,9 +91,9 @@ public class ChatView extends VerticalLayout {
         purposeSelector.addValueChangeListener(e -> clearChat());
 
         overrideSelector = new Select<>();
-        overrideSelector.setLabel("SAPL Override");
-        overrideSelector.setItems("Off", "On");
-        overrideSelector.setValue("Off");
+        overrideSelector.setLabel("SAPL Security");
+        overrideSelector.setItems("Active", "Deactivated");
+        overrideSelector.setValue("Active");
         overrideSelector.addValueChangeListener(e -> clearChat());
 
         val selectorLayout = new HorizontalLayout(userSelector, purposeSelector, overrideSelector);
@@ -156,7 +156,7 @@ public class ChatView extends VerticalLayout {
         val ui      = UI.getCurrent();
         val content = new StringBuilder();
         val history = buildConversationHistory();
-        val securityActive = "Off".equals(overrideSelector.getValue());
+        val securityActive = "Active".equals(overrideSelector.getValue());
         val principal      = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(), purpose.name());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 

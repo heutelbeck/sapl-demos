@@ -19,6 +19,7 @@ import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Binds;
 import com.github.dockerjava.api.model.DeviceRequest;
 import com.github.dockerjava.api.model.Volume;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @Profile("dev")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "app.ollama.local", havingValue = "false", matchIfMissing = true)
@@ -48,30 +50,55 @@ class OllamaContainerConfig {
     private static final OllamaContainer EARLY_OLLAMA;
 
     static {
+        EARLY_OLLAMA = startWithGpuFallback();
+    }
+
+    private static OllamaContainer startWithGpuFallback() {
         int containerPort = 11434;
 
+        // Try with GPU first, fall back to CPU-only if no GPU driver available
+        try {
+            val container = createContainer(containerPort, true);
+            container.start();
+            log.info("Ollama container started with GPU support");
+            configureBaseUrl(container, containerPort);
+            return container;
+        } catch (Exception e) {
+            log.info("GPU not available ({}), starting Ollama with CPU only", e.getMessage());
+            val container = createContainer(containerPort, false);
+            container.start();
+            log.info("Ollama container started with CPU only");
+            configureBaseUrl(container, containerPort);
+            return container;
+        }
+    }
+
+    private static OllamaContainer createContainer(int containerPort, boolean withGpu) {
         val c = new OllamaContainer(OLLAMA_IMAGE)
                 .withEnv("OLLAMA_KEEP_ALIVE", "5m")
                 .withEnv("OLLAMA_MODELS", "/models")
                 .withCommand("serve")
                 .withExposedPorts(containerPort)
-                .withCreateContainerCmdModifier(cmd ->
-                        Objects.requireNonNull(cmd.getHostConfig())
-                                .withDeviceRequests(List.of(new DeviceRequest()
-                                        .withCount(-1)
-                                        .withCapabilities(List.of(List.of("gpu")))))
-                                .withBinds(new Binds(new Bind("ollama-models", new Volume("/models")))));
+                .withCreateContainerCmdModifier(cmd -> {
+                    val hostConfig = Objects.requireNonNull(cmd.getHostConfig());
+                    if (withGpu) {
+                        hostConfig.withDeviceRequests(List.of(new DeviceRequest()
+                                .withCount(-1)
+                                .withCapabilities(List.of(List.of("gpu")))));
+                    }
+                    hostConfig.withBinds(new Binds(new Bind("ollama-models", new Volume("/models"))));
+                });
 
         c.setWaitStrategy(Wait.forHttp("/api/tags")
                 .forStatusCode(200)
                 .withStartupTimeout(Duration.ofMinutes(3)));
 
-        c.start();
+        return c;
+    }
 
-        val mappedPort = c.getMappedPort(containerPort);
+    private static void configureBaseUrl(OllamaContainer container, int containerPort) {
+        val mappedPort = container.getMappedPort(containerPort);
         System.setProperty("spring.ai.ollama.base-url", "http://localhost:" + mappedPort);
-
-        EARLY_OLLAMA = c;
     }
 
     @Bean(destroyMethod = "stop")
