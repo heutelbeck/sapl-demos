@@ -17,6 +17,7 @@ package io.sapl.demo.rag.config;
 
 import com.github.dockerjava.api.model.Bind;
 import com.github.dockerjava.api.model.Binds;
+import com.github.dockerjava.api.model.DeviceRequest;
 import com.github.dockerjava.api.model.Volume;
 import lombok.val;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,6 +29,7 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Objects;
 
 @Profile("dev")
@@ -55,6 +57,8 @@ class OllamaContainerConfig {
                 .withExposedPorts(containerPort)
                 .withCreateContainerCmdModifier(cmd ->
                         Objects.requireNonNull(cmd.getHostConfig())
+                                .withDeviceRequests(List.of(new DeviceRequest()
+                                        .withCapabilities(List.of(List.of("gpu")))))
                                 .withBinds(new Binds(new Bind("ollama-models", new Volume("/models")))));
 
         c.setWaitStrategy(Wait.forHttp("/api/tags")
