@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8080}
+
+app:
+  ollama:
+    local: false
+
+spring:
+  profiles:
+    default: dev
+  threads:
+    virtual:
+      enabled: true
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      init:
+        pull-model-strategy: when_missing
+        timeout: 60m
+        max-retries: 2
+      chat:
+        options:
+          model: qwen3:8b
+          temperature: 0.1
+      embedding:
+        options:
+          model: nomic-embed-text
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+        dimensions: 768
+        distance-type: COSINE_DISTANCE
+        index-type: HNSW
+
+io:
+  sapl:
+    pdp:
+      embedded:
+        print-text-report: true
+        print-json-report: false
+        print-trace: false
+        pretty-print-reports: false
+
+vaadin:
+  launch-browser: false
+  allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
+
+logging:
+  level:
+    io.sapl: info
+    org.springframework.ai.vectorstore: TRACE
+    org.springframework.jdbc.core: DEBUG
+    org.atmosphere: warn
+    org.springframework.boot.devtools.restart.ChangeableUrls: warn
+    org.springframework.security: warn

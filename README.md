@@ -36,6 +36,12 @@ If you are new to SAPL, start with these demos:
 | [queryrewriting-sql-reactive](queryrewriting-sql-reactive)         | Row-level security with R2DBC            |
 | [queryrewriting-mongodb-reactive](queryrewriting-mongodb-reactive) | Row-level security with reactive MongoDB |
 
+### AI / RAG
+
+| Demo | Description |
+|------|-------------|
+| [rag-clinical-trial](rag-clinical-trial) | SAPL-enforced document-level access control in a RAG pipeline |
+
 ### Integrations
 
 | Demo | Description |

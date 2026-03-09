@@ -1,0 +1,39 @@
+set "rag-retrieval"
+first or abstain
+for action == "retrieve"
+
+policy "bypass-when-security-disabled"
+permit
+  !environment.securityActive;
+
+policy "ci-adverse-event-handling"
+permit
+  subject.principal.role == "Chief Investigator";
+  subject.principal.purpose == "ADVERSE_EVENT_HANDLING";
+
+policy "ci-statistical-analysis"
+permit
+  subject.principal.role == "Chief Investigator";
+  subject.principal.purpose == "STATISTICAL_ANALYSIS";
+obligation
+  { "type": "filterDocuments", "excludeTypes": ["registry"] }
+
+policy "site-investigator-adverse-event-handling"
+permit
+  subject.principal.role == "Site Investigator";
+  subject.principal.purpose == "ADVERSE_EVENT_HANDLING";
+obligation
+  { "type": "filterDocuments", "filterSite": subject.principal.site }
+
+policy "site-investigator-statistical-analysis"
+permit
+  subject.principal.role == "Site Investigator";
+  subject.principal.purpose == "STATISTICAL_ANALYSIS";
+obligation
+  { "type": "filterDocuments", "filterSite": subject.principal.site, "excludeTypes": ["registry"] }
+
+policy "statistician"
+permit
+  subject.principal.role == "Statistician";
+obligation
+  { "type": "filterDocuments", "excludeTypes": ["registry", "adverse_event"] }

@@ -501,7 +501,12 @@ public class SaplTestLspEditorView extends VerticalLayout {
             editor.setAutocompleteTrigger(onTyping ? AutocompleteTrigger.ON_TYPING : AutocompleteTrigger.MANUAL);
         });
 
-        topRow.add(setDefault, showDoc, configId, dark, readOnly, autoComplete);
+        var folding = new Checkbox("Folding", false);
+        folding.addValueChangeListener(e -> editor.setFoldingEnabled(Boolean.TRUE.equals(e.getValue())));
+
+        var format = new Button("Autoformat", e -> editor.format());
+
+        topRow.add(setDefault, showDoc, format, configId, dark, readOnly, autoComplete, folding);
 
         var middleRow = new HorizontalLayout();
         middleRow.setWidthFull();
