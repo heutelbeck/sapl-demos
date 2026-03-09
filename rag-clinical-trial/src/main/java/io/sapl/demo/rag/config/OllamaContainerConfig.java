@@ -58,6 +58,7 @@ class OllamaContainerConfig {
                 .withCreateContainerCmdModifier(cmd ->
                         Objects.requireNonNull(cmd.getHostConfig())
                                 .withDeviceRequests(List.of(new DeviceRequest()
+                                        .withCount(-1)
                                         .withCapabilities(List.of(List.of("gpu")))))
                                 .withBinds(new Binds(new Bind("ollama-models", new Volume("/models")))));
 
