@@ -20,6 +20,7 @@ import com.github.dockerjava.api.model.Binds;
 import com.github.dockerjava.api.model.Volume;
 import lombok.val;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.testcontainers.containers.GenericContainer;
@@ -30,7 +31,6 @@ import java.time.Duration;
 import java.util.Objects;
 
 @Profile("dev")
-@SuppressWarnings("java:S1118") // Spring @Configuration, not a utility class
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = "app.ollama.local", havingValue = "false", matchIfMissing = true)
 class OllamaContainerConfig {
@@ -43,7 +43,6 @@ class OllamaContainerConfig {
         }
     }
 
-    @SuppressWarnings("unused")
     private static final OllamaContainer EARLY_OLLAMA;
 
     static {
@@ -68,6 +67,11 @@ class OllamaContainerConfig {
         System.setProperty("spring.ai.ollama.base-url", "http://localhost:" + mappedPort);
 
         EARLY_OLLAMA = c;
+    }
+
+    @Bean(destroyMethod = "stop")
+    OllamaContainer ollamaContainer() {
+        return EARLY_OLLAMA;
     }
 
 }
