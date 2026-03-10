@@ -58,6 +58,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @Route("")
@@ -90,8 +91,8 @@ public class ChatView extends VerticalLayout {
     private volatile boolean autoApprove;
     private volatile String currentStatusText = "";
     private volatile boolean animating;
-    private volatile StringBuilder activeContent;
-    private volatile MessageListItem activeAssistantMessage;
+    private final AtomicReference<StringBuffer> activeContent = new AtomicReference<>();
+    private final AtomicReference<MessageListItem> activeAssistantMessage = new AtomicReference<>();
     private boolean generating;
 
     public ChatView(ChatService chatService, AdverseEventData adverseEventData,
@@ -190,10 +191,11 @@ public class ChatView extends VerticalLayout {
         toolMessage.setUserColorIndex(3);
         messages.add(toolMessage);
 
-        activeAssistantMessage = new MessageListItem("", Instant.now(), "AI Assistant");
-        activeAssistantMessage.setUserColorIndex(2);
-        messages.add(activeAssistantMessage);
-        activeContent = new StringBuilder();
+        val message = new MessageListItem("", Instant.now(), "AI Assistant");
+        message.setUserColorIndex(2);
+        activeAssistantMessage.set(message);
+        messages.add(message);
+        activeContent.set(new StringBuffer());
         messageList.setItems(messages);
     }
 
@@ -239,10 +241,11 @@ public class ChatView extends VerticalLayout {
         userMessage.setUserColorIndex(1);
         messages.add(userMessage);
 
-        activeAssistantMessage = new MessageListItem("", Instant.now(), "AI Assistant");
-        activeAssistantMessage.setUserColorIndex(2);
-        messages.add(activeAssistantMessage);
-        activeContent = new StringBuilder();
+        val assistantMessage = new MessageListItem("", Instant.now(), "AI Assistant");
+        assistantMessage.setUserColorIndex(2);
+        activeAssistantMessage.set(assistantMessage);
+        messages.add(assistantMessage);
+        activeContent.set(new StringBuffer());
         messageList.setItems(messages);
 
         val ui = UI.getCurrent();
@@ -251,12 +254,12 @@ public class ChatView extends VerticalLayout {
         val principal = new DemoPrincipal(user.getDisplayName(), user.getRole());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
-        startDotAnimation(activeAssistantMessage, ui);
+        startDotAnimation(assistantMessage, ui);
 
         currentSubscription = chatService.askStreaming(text.strip(), history, status -> {
                     currentStatusText = status;
                     ui.access(() -> {
-                        activeAssistantMessage.setText(status);
+                        activeAssistantMessage.get().setText(status);
                         messageList.setItems(messages);
                     });
                 })
@@ -265,16 +268,16 @@ public class ChatView extends VerticalLayout {
                 .subscribe(
                         token -> {
                             stopDotAnimation();
-                            activeContent.append(token);
+                            activeContent.get().append(token);
                             ui.access(() -> {
-                                activeAssistantMessage.setText(activeContent.toString());
+                                activeAssistantMessage.get().setText(activeContent.get().toString());
                                 messageList.setItems(messages);
                             });
                         },
                         error -> {
                             stopDotAnimation();
                             ui.access(() -> {
-                                activeAssistantMessage.setText("An error occurred while generating the response. Please try again.");
+                                activeAssistantMessage.get().setText("An error occurred while generating the response. Please try again.");
                                 messageList.setItems(messages);
                                 onGenerationFinished();
                             });

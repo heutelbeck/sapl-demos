@@ -1,1 +1,5 @@
 src/main/frontend/
+src/main/bundles/
+frontend/generated/
+pnpmfile.js
+vite.generated.ts

@@ -46,7 +46,6 @@ class ApprovalDialog extends Dialog {
     ApprovalDialog(ApprovalRequest request, ApprovalService approvalService) {
         setCloseOnEsc(false);
         setCloseOnOutsideClick(false);
-        setModal(true);
         setHeaderTitle("Action Approval Required");
 
         val summarySpan = new Span(request.summary());
