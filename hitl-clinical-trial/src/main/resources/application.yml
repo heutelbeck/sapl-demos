@@ -1,0 +1,31 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  profiles:
+    default: ollama-docker
+  threads:
+    virtual:
+      enabled: true
+
+vaadin:
+  launch-browser: false
+  allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
+
+io:
+  sapl:
+    pdp:
+      embedded:
+        print-text-report: true
+        print-json-report: false
+        print-trace: false
+        pretty-print-reports: false
+
+logging:
+  level:
+    io.sapl: info
+    org.springframework.ai: INFO
+    org.springframework.ai.anthropic.api.StreamHelper: ERROR
+    org.atmosphere: warn
+    org.springframework.boot.devtools.restart.ChangeableUrls: warn
+    org.springframework.security: warn

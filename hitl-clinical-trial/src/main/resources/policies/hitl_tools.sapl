@@ -1,0 +1,13 @@
+set "hitl-tools"
+first or abstain
+for action in ["listAdverseEvents", "getAdverseEvent", "getSafetyGuidelines",
+               "notifyParticipant", "suspendParticipant", "exportSafetyReport"]
+
+policy "permit-all-read-tools"
+permit
+  action in ["listAdverseEvents", "getAdverseEvent", "getSafetyGuidelines"];
+
+policy "permit-action-tools-with-approval"
+permit
+  action in ["notifyParticipant", "suspendParticipant", "exportSafetyReport"];
+  subject.principal.role in ["Safety Officer", "Site Investigator"];

@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.security.core.Authentication;
@@ -59,7 +60,11 @@ public class ChatService {
                 })
                 .flatMapMany(prompt -> {
                     log.info("Sending prompt to LLM (streaming)");
-                    return chatClient.prompt().user(prompt).stream().content();
+                    return chatClient.prompt().user(prompt).stream().chatResponse()
+                            .scan(new StreamState("", ""), ChatService::processResponse)
+                            .skip(1)
+                            .map(StreamState::content)
+                            .filter(content -> !content.isEmpty());
                 })
                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
                 .doOnComplete(() -> log.info("LLM streaming response complete"))
@@ -80,6 +85,23 @@ public class ChatService {
             }
         }
         return false;
+    }
+
+    private record StreamState(String lastId, String content) {}
+
+    private static StreamState processResponse(StreamState previous, ChatResponse response) {
+        val id = response.getMetadata().getId();
+        val results = response.getResults();
+        val text = (results != null && !results.isEmpty()) ? results.getFirst().getOutput().getText() : null;
+        val content = text != null ? text : "";
+
+        if (id != null && !id.isEmpty() && !id.equals(previous.lastId()) && !previous.lastId().isEmpty()) {
+            log.info("Tool-calling round boundary: [{}] -> [{}]", previous.lastId(), id);
+            return new StreamState(id, "\n\n" + content);
+        }
+
+        val effectiveId = (id != null && !id.isEmpty()) ? id : previous.lastId();
+        return new StreamState(effectiveId, content);
     }
 
     private static String buildContext(List<Document> documents) {
