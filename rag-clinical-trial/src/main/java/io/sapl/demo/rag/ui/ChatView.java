@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Route("")
 @PageTitle("Clinical Trial AI Assistant")
@@ -52,6 +53,7 @@ public class ChatView extends VerticalLayout {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    private static final String   ACTIVE     = "Active";
     private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
 
     private final transient ChatService chatService;
@@ -69,7 +71,6 @@ public class ChatView extends VerticalLayout {
     private volatile String currentStatusText = "";
     private volatile boolean animating;
     private boolean generating;
-    private int dotFrame;
 
     public ChatView(ChatService chatService) {
         this.chatService = chatService;
@@ -100,8 +101,8 @@ public class ChatView extends VerticalLayout {
 
         overrideSelector = new Select<>();
         overrideSelector.setLabel("SAPL Security");
-        overrideSelector.setItems("Active", "Deactivated");
-        overrideSelector.setValue("Active");
+        overrideSelector.setItems(ACTIVE, "Deactivated");
+        overrideSelector.setValue(ACTIVE);
         overrideSelector.addValueChangeListener(e -> clearChat());
 
         val selectorLayout = new HorizontalLayout(userSelector, purposeSelector, overrideSelector);
@@ -164,7 +165,7 @@ public class ChatView extends VerticalLayout {
         val ui = UI.getCurrent();
         val content = new StringBuilder();
         val history = buildConversationHistory();
-        val securityActive = "Active".equals(overrideSelector.getValue());
+        val securityActive = ACTIVE.equals(overrideSelector.getValue());
         val principal = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(), purpose.name());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
@@ -200,7 +201,7 @@ public class ChatView extends VerticalLayout {
     }
 
     private void startDotAnimation(MessageListItem message, UI ui) {
-        dotFrame = 0;
+        val dotFrame = new AtomicInteger(0);
         animating = true;
         animator = Executors.newSingleThreadScheduledExecutor();
         animator.scheduleAtFixedRate(() -> {
@@ -211,8 +212,7 @@ public class ChatView extends VerticalLayout {
             if (status == null || status.isBlank()) {
                 return;
             }
-            val dots = DOT_FRAMES[dotFrame % DOT_FRAMES.length];
-            dotFrame++;
+            val dots = DOT_FRAMES[dotFrame.getAndIncrement() % DOT_FRAMES.length];
             ui.access(() -> {
                 if (!animating) {
                     return;

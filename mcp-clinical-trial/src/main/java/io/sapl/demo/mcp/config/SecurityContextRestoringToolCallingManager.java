@@ -53,7 +53,10 @@ class SecurityContextRestoringToolCallingManager implements ToolCallingManager {
         var reactorCtx = ToolCallReactiveContextHolder.getContext();
         if (reactorCtx.hasKey(SecurityContext.class)) {
             var securityContextMono = (Mono<SecurityContext>) reactorCtx.get((Object) SecurityContext.class);
-            SecurityContextHolder.setContext(securityContextMono.block());
+            var securityContext = securityContextMono.block();
+            if (securityContext != null) {
+                SecurityContextHolder.setContext(securityContext);
+            }
         }
         try {
             return delegate.executeToolCalls(prompt, chatResponse);
