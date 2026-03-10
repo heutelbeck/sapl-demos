@@ -22,7 +22,6 @@ import lombok.val;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -43,25 +42,20 @@ public class ChatService {
         val prompt = buildPrompt(userMessage, conversationHistory);
         toolCallStatus.update("Thinking");
 
-        // Tool calling may not work with streaming on Ollama.
-        // Use blocking call() wrapped in Flux for reliable tool execution.
-        return Flux.defer(() -> {
-            log.info("Sending prompt to LLM (may trigger tool calls)");
-            val response = chatClient.prompt().user(prompt).call().content();
-            toolCallStatus.update("Done");
-            log.info("LLM response complete ({} chars)", response != null ? response.length() : 0);
-            return Flux.just(response);
-        })
-        .subscribeOn(Schedulers.boundedElastic())
-        .onErrorResume(e -> {
-            toolCallStatus.update("");
-            if (isCancellation(e)) {
-                log.debug("Generation cancelled by user");
-                return Flux.empty();
-            }
-            log.error("Generation failed", e);
-            return Flux.just(ERROR_GENERATION_FAILED);
-        });
+        return chatClient.prompt().user(prompt).stream().content()
+                .doOnComplete(() -> {
+                    toolCallStatus.update("Done");
+                    log.info("LLM streaming response complete");
+                })
+                .onErrorResume(e -> {
+                    toolCallStatus.update("");
+                    if (isCancellation(e)) {
+                        log.debug("Generation cancelled by user");
+                        return Flux.empty();
+                    }
+                    log.error("Generation failed", e);
+                    return Flux.just(ERROR_GENERATION_FAILED);
+                });
     }
 
     private static boolean isCancellation(Throwable e) {

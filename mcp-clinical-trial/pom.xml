@@ -36,8 +36,8 @@
 	<inceptionYear>2017-2026</inceptionYear>
 
 	<name>MCP Clinical Trial Demo</name>
-	<description>Demonstrates tool-based clinical trial AI assistant with Spring AI tool calling.
-		Phase 1: no SAPL enforcement.</description>
+	<description>Demonstrates tool-based clinical trial AI assistant with Spring AI tool calling
+		and SAPL policy enforcement at the tool boundary.</description>
 
 	<properties>
 		<java.version>21</java.version>
@@ -46,6 +46,7 @@
 		<vaadin.version>25.0.4</vaadin.version>
 		<spring-ai.version>2.0.0-M2</spring-ai.version>
 		<lombok.version>1.18.42</lombok.version>
+		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 		<testcontainers.version>2.0.2</testcontainers.version>
 
 		<!-- Maven Plug-Ins -->
@@ -69,6 +70,13 @@
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
 				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.sapl</groupId>
+				<artifactId>sapl-bom</artifactId>
+				<version>${sapl.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -106,6 +114,10 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.sapl</groupId>
+			<artifactId>sapl-spring-boot-starter</artifactId>
 		</dependency>
 
 		<dependency>

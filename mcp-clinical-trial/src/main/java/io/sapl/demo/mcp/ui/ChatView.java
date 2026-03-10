@@ -30,9 +30,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.demo.mcp.chat.ChatService;
+import io.sapl.demo.mcp.domain.DemoPrincipal;
 import io.sapl.demo.mcp.domain.DemoUser;
 import io.sapl.demo.mcp.domain.Purpose;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import reactor.core.Disposable;
 
 import java.io.Serial;
@@ -43,6 +47,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Route("")
 @PageTitle("Clinical Trial AI Assistant (MCP)")
 public class ChatView extends VerticalLayout {
@@ -59,6 +64,7 @@ public class ChatView extends VerticalLayout {
     private final Div promptButtons;
     private final Select<DemoUser> userSelector;
     private final Select<Purpose> purposeSelector;
+    private final Select<String> securitySelector;
     private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
 
     private final List<MessageListItem> messages = new ArrayList<>();
@@ -95,7 +101,14 @@ public class ChatView extends VerticalLayout {
         purposeSelector.setWidthFull();
         purposeSelector.addValueChangeListener(e -> clearChat());
 
-        val selectorLayout = new HorizontalLayout(userSelector, purposeSelector);
+        securitySelector = new Select<>();
+        securitySelector.setLabel("SAPL Enforcement");
+        securitySelector.setItems("Active", "Deactivated");
+        securitySelector.setValue("Active");
+        securitySelector.setWidthFull();
+        securitySelector.addValueChangeListener(e -> clearChat());
+
+        val selectorLayout = new HorizontalLayout(userSelector, purposeSelector, securitySelector);
         selectorLayout.setWidthFull();
         selectorLayout.setDefaultVerticalComponentAlignment(Alignment.BASELINE);
 
@@ -155,9 +168,16 @@ public class ChatView extends VerticalLayout {
         val content = new StringBuilder();
         val history = buildConversationHistory();
 
+        val purpose = purposeSelector.getValue();
+        val securityActive = "Active".equals(securitySelector.getValue());
+        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(),
+                purpose != null ? purpose.name() : Purpose.STATISTICAL_ANALYSIS.name(), securityActive);
+        val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
+
         startStatusAnimation(assistantMessage, ui);
 
         currentSubscription = chatService.askStreaming(text.strip(), history)
+                .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
                 .subscribe(
                         token -> {
                             stopStatusAnimation();

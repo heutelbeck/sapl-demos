@@ -1,0 +1,45 @@
+set "mcp-tools"
+first or abstain
+for action in ["getStudyCatalog", "getStudyProtocol", "getPhq9Assessments",
+               "getAdverseEventReports", "getParticipantRegistry"]
+
+policy "bypass-when-security-disabled"
+permit
+  !subject.principal.securityActive;
+
+policy "catalog-and-protocol-open-to-all"
+permit
+  action in ["getStudyCatalog", "getStudyProtocol"];
+
+policy "ci-phq9-all-sites"
+permit
+  action == "getPhq9Assessments";
+  subject.principal.role == "Chief Investigator";
+
+policy "ci-adverse-events-all-sites"
+permit
+  action == "getAdverseEventReports";
+  subject.principal.role == "Chief Investigator";
+
+policy "ci-registry-adverse-event-purpose"
+permit
+  action == "getParticipantRegistry";
+  subject.principal.role == "Chief Investigator";
+  subject.principal.purpose == "ADVERSE_EVENT_HANDLING";
+
+policy "si-phq9-own-site"
+permit
+  action == "getPhq9Assessments";
+  subject.principal.role == "Site Investigator";
+  resource =~ ("(?i)" + subject.principal.site);
+
+policy "si-adverse-events-own-site"
+permit
+  action == "getAdverseEventReports";
+  subject.principal.role == "Site Investigator";
+  resource =~ ("(?i)" + subject.principal.site);
+
+policy "statistician-phq9-all-sites"
+permit
+  action == "getPhq9Assessments";
+  subject.principal.role == "Statistician";

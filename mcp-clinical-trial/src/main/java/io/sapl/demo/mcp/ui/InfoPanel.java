@@ -57,6 +57,7 @@ class InfoPanel extends Details {
         val tabSheet = new TabSheet();
         tabSheet.setWidthFull();
         tabSheet.add("Architecture", createArchitectureTab());
+        tabSheet.add("Access Control", createAccessControlTab());
         for (var i = 0; i < CORPUS_FILES.length; i++) {
             tabSheet.add(CORPUS_LABELS[i], createCorpusTab(CORPUS_FILES[i]));
         }
@@ -105,9 +106,56 @@ class InfoPanel extends Details {
                 </tbody>
                 </table>
                 <p style="font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);">
-                <b>Phase 1:</b> No access control. All tools are available to all users.
-                Phase 2 will add SAPL enforcement at both the catalog (discovery) and
-                each tool (access) level.</p>
+                <b>SAPL enforcement</b> is active on every tool call. Each <code>@Tool</code> method
+                is annotated with <code>@PreEnforce</code>, so the PDP evaluates the user's role,
+                site, and purpose before the tool executes. Toggle the "SAPL Enforcement" selector
+                to compare authorized vs. unrestricted access.</p>
+                </div>""");
+    }
+
+    private static Html createAccessControlTab() {
+        return new Html("""
+                <div>
+                <p>SAPL enforces tool-level access control based on three dimensions:
+                <b>role</b>, <b>site</b>, and <b>purpose</b>.</p>
+                <table style="border-collapse: collapse; width: 100%; font-size: var(--lumo-font-size-s);">
+                <thead>
+                <tr style="border-bottom: 2px solid var(--lumo-contrast-20pct);">
+                <th style="text-align: left; padding: 4px 8px;">Role</th>
+                <th style="text-align: left; padding: 4px 8px;">Catalog / Protocol</th>
+                <th style="text-align: left; padding: 4px 8px;">PHQ-9 Data</th>
+                <th style="text-align: left; padding: 4px 8px;">Adverse Events</th>
+                <th style="text-align: left; padding: 4px 8px;">Participant Registry</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr style="border-bottom: 1px solid var(--lumo-contrast-10pct);">
+                <td style="padding: 4px 8px;">Chief Investigator</td>
+                <td style="padding: 4px 8px;">Yes</td>
+                <td style="padding: 4px 8px;">All sites</td>
+                <td style="padding: 4px 8px;">All sites</td>
+                <td style="padding: 4px 8px;">AE purpose only</td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--lumo-contrast-10pct);">
+                <td style="padding: 4px 8px;">Site Investigator</td>
+                <td style="padding: 4px 8px;">Yes</td>
+                <td style="padding: 4px 8px;">Own site only</td>
+                <td style="padding: 4px 8px;">Own site only</td>
+                <td style="padding: 4px 8px;">No access</td>
+                </tr>
+                <tr>
+                <td style="padding: 4px 8px;">Statistician</td>
+                <td style="padding: 4px 8px;">Yes</td>
+                <td style="padding: 4px 8px;">All sites</td>
+                <td style="padding: 4px 8px;">No access</td>
+                <td style="padding: 4px 8px;">No access</td>
+                </tr>
+                </tbody>
+                </table>
+                <p style="font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);">
+                <b>AE purpose only</b> = Access requires "Adverse Event Handling" as the selected purpose
+                (GDPR Art. 5(1)(b), purpose limitation). Under "Statistical Analysis", the participant
+                registry tool call is denied by the PDP.</p>
                 </div>""");
     }
 

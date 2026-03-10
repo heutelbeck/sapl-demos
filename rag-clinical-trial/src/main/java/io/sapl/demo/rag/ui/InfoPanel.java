@@ -56,11 +56,31 @@ class InfoPanel extends Details {
     private static TabSheet createTabSheet() {
         val tabSheet = new TabSheet();
         tabSheet.setWidthFull();
+        tabSheet.add("Architecture", createArchitectureTab());
         tabSheet.add("Access Control", createAccessControlTab());
         for (var i = 0; i < CORPUS_FILES.length; i++) {
             tabSheet.add(CORPUS_LABELS[i], createCorpusTab(CORPUS_FILES[i]));
         }
         return tabSheet;
+    }
+
+    private static Html createArchitectureTab() {
+        return new Html("""
+                <div>
+                <p>This demo uses <b>Retrieval-Augmented Generation (RAG)</b> with a PgVector store.
+                Study documents are embedded and stored as vectors. When the user asks a question,
+                relevant documents are retrieved via similarity search and injected into the LLM prompt.</p>
+                <p>SAPL enforces access control at the <b>retrieval boundary</b>. Before documents
+                reach the LLM, the PDP evaluates the user's role, site, and purpose. Policy obligations
+                filter the retrieved document set:</p>
+                <ul style="font-size: var(--lumo-font-size-s);">
+                <li><b>Site filtering</b> removes documents from sites the user may not access</li>
+                <li><b>Type filtering</b> excludes sensitive document types (e.g., participant registry)</li>
+                </ul>
+                <p style="font-size: var(--lumo-font-size-s); color: var(--lumo-secondary-text-color);">
+                The LLM never sees documents that SAPL filtered out. Access control is enforced
+                before the context reaches the model, not after generation.</p>
+                </div>""");
     }
 
     private static Html createAccessControlTab() {

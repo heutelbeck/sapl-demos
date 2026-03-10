@@ -12,9 +12,19 @@ vaadin:
   launch-browser: false
   allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
 
+io:
+  sapl:
+    pdp:
+      embedded:
+        print-text-report: true
+        print-json-report: false
+        print-trace: false
+        pretty-print-reports: false
+
 logging:
   level:
-    org.springframework.ai: DEBUG
+    io.sapl: info
+    org.springframework.ai: INFO
     org.atmosphere: warn
     org.springframework.boot.devtools.restart.ChangeableUrls: warn
     org.springframework.security: warn

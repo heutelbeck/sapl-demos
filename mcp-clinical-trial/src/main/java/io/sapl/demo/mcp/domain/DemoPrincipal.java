@@ -15,5 +15,5 @@
  */
 package io.sapl.demo.mcp.domain;
 
-public record DemoPrincipal(String name, String role, String site, String purpose) {
+public record DemoPrincipal(String name, String role, String site, String purpose, boolean securityActive) {
 }
