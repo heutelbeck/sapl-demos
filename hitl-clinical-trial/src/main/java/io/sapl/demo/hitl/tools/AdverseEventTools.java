@@ -15,7 +15,14 @@
  */
 package io.sapl.demo.hitl.tools;
 
+import java.util.Map;
+
+import io.sapl.api.model.UndefinedValue;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.api.pdp.Decision;
+import io.sapl.api.pdp.PolicyDecisionPoint;
 import io.sapl.demo.hitl.approval.ApprovalService;
+import io.sapl.demo.hitl.approval.SessionIdHolder;
 import io.sapl.demo.hitl.domain.DemoPrincipal;
 import io.sapl.demo.hitl.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +41,7 @@ public class AdverseEventTools {
     static final String ERROR_ACTION_DENIED = "Action denied by operator. The tool call was not executed.";
 
     private final AdverseEventData data;
+    private final PolicyDecisionPoint pdp;
     private final ApprovalService approvalService;
     private final NotificationService notificationService;
 
@@ -59,6 +67,9 @@ public class AdverseEventTools {
     public String notifyParticipant(
             @ToolParam(description = "The recipient: a participant ID (e.g., P-003) or an emergency contact name") String recipient,
             @ToolParam(description = "The notification message to send") String message) {
+        if (!checkPolicy("notifyParticipant", Map.of("recipient", recipient, "message", message))) {
+            return ERROR_ACTION_DENIED;
+        }
         if (!requireApproval("notifyParticipant", "Notify " + recipient, "Message: " + message)) {
             return ERROR_ACTION_DENIED;
         }
@@ -71,6 +82,9 @@ public class AdverseEventTools {
     @Tool(description = "Suspends a participant from active treatment in the study. This is a safety-critical action that halts the participant's treatment protocol.")
     public String suspendParticipant(
             @ToolParam(description = "The participant ID to suspend, e.g., P-003") String participantId) {
+        if (!checkPolicy("suspendParticipant", Map.of("participantId", participantId))) {
+            return ERROR_ACTION_DENIED;
+        }
         if (!requireApproval("suspendParticipant", "Suspend participant " + participantId,
                 "Participant " + participantId + " will be suspended from active treatment.")) {
             return ERROR_ACTION_DENIED;
@@ -86,6 +100,9 @@ public class AdverseEventTools {
     @Tool(description = "Exports a safety report to the Data Safety Monitoring Board (DSMB). This is a safety-critical action that formally reports the adverse event for external review.")
     public String exportSafetyReport(
             @ToolParam(description = "The adverse event ID to report, e.g., AE-001") String eventId) {
+        if (!checkPolicy("exportSafetyReport", Map.of("eventId", eventId))) {
+            return ERROR_ACTION_DENIED;
+        }
         if (!requireApproval("exportSafetyReport", "Export safety report for " + eventId,
                 "Safety report for " + eventId + " will be exported to the DSMB for external review.")) {
             return ERROR_ACTION_DENIED;
@@ -99,12 +116,30 @@ public class AdverseEventTools {
                 + "Report reference: DSMB-SMILE-2025-" + eventId + ". Ethics committee notification queued.";
     }
 
-    private boolean requireApproval(String toolName, String summary, String detail) {
+    private boolean checkPolicy(String toolName, Object resource) {
         val auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !(auth.getPrincipal() instanceof DemoPrincipal principal)) {
             return false;
         }
-        return approvalService.requestApproval(principal.sessionId(), toolName, summary, detail, false);
+        val subscription = AuthorizationSubscription.of(principal, toolName, resource);
+        log.info("Authorization subscription: {}", subscription);
+        val decision = pdp.decideOnce(subscription).block();
+        if (decision == null || decision.decision() != Decision.PERMIT
+                || !decision.obligations().isEmpty()
+                || !(decision.resource() instanceof UndefinedValue)) {
+            log.info("PDP denied access to tool '{}': {}", toolName, decision);
+            return false;
+        }
+        log.info("PDP permitted access to tool '{}'", toolName);
+        return true;
+    }
+
+    private boolean requireApproval(String toolName, String summary, String detail) {
+        val sessionId = SessionIdHolder.get();
+        if (sessionId == null) {
+            return false;
+        }
+        return approvalService.requestApproval(sessionId, toolName, summary, detail, false);
     }
 
 }

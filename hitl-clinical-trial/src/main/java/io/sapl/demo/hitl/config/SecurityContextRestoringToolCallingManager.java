@@ -17,6 +17,7 @@ package io.sapl.demo.hitl.config;
 
 import java.util.List;
 
+import io.sapl.demo.hitl.approval.SessionIdHolder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -58,9 +59,13 @@ class SecurityContextRestoringToolCallingManager implements ToolCallingManager {
                 SecurityContextHolder.setContext(securityContext);
             }
         }
+        if (reactorCtx.hasKey(SessionIdHolder.CONTEXT_KEY)) {
+            SessionIdHolder.set(reactorCtx.get(SessionIdHolder.CONTEXT_KEY));
+        }
         try {
             return delegate.executeToolCalls(prompt, chatResponse);
         } finally {
+            SessionIdHolder.clear();
             SecurityContextHolder.clearContext();
         }
     }

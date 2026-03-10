@@ -35,6 +35,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.demo.hitl.approval.ApprovalRequest;
 import io.sapl.demo.hitl.approval.ApprovalService;
+import io.sapl.demo.hitl.approval.SessionIdHolder;
 import io.sapl.demo.hitl.chat.ChatService;
 import io.sapl.demo.hitl.domain.DemoPrincipal;
 import io.sapl.demo.hitl.domain.DemoUser;
@@ -247,7 +248,7 @@ public class ChatView extends VerticalLayout {
         val ui = UI.getCurrent();
         val history = buildConversationHistory();
 
-        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole(), sessionId);
+        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
         startDotAnimation(activeAssistantMessage, ui);
@@ -259,6 +260,7 @@ public class ChatView extends VerticalLayout {
                         messageList.setItems(messages);
                     });
                 })
+                .contextWrite(ctx -> ctx.put(SessionIdHolder.CONTEXT_KEY, sessionId))
                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
                 .subscribe(
                         token -> {
