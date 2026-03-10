@@ -15,11 +15,15 @@
  */
 package io.sapl.demo.hitl.tools;
 
+import io.sapl.demo.hitl.approval.ApprovalService;
+import io.sapl.demo.hitl.domain.DemoPrincipal;
 import io.sapl.demo.hitl.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -27,7 +31,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdverseEventTools {
 
+    static final String ERROR_ACTION_DENIED = "Action denied by operator. The tool call was not executed.";
+
     private final AdverseEventData data;
+    private final ApprovalService approvalService;
     private final NotificationService notificationService;
 
     @Tool(description = "Lists all active adverse events in the SMILE study with their ID, participant, severity, and status. Call this first to discover which events need attention.")
@@ -52,6 +59,9 @@ public class AdverseEventTools {
     public String notifyParticipant(
             @ToolParam(description = "The recipient: a participant ID (e.g., P-003) or an emergency contact name") String recipient,
             @ToolParam(description = "The notification message to send") String message) {
+        if (!requireApproval("notifyParticipant", "Notify " + recipient, "Message: " + message)) {
+            return ERROR_ACTION_DENIED;
+        }
         log.info("ACTION: notifyParticipant(recipient={}, message={})", recipient, message);
         notificationService.send("Notified " + recipient,
                 "Notification sent to " + recipient + ": " + message);
@@ -61,6 +71,10 @@ public class AdverseEventTools {
     @Tool(description = "Suspends a participant from active treatment in the study. This is a safety-critical action that halts the participant's treatment protocol.")
     public String suspendParticipant(
             @ToolParam(description = "The participant ID to suspend, e.g., P-003") String participantId) {
+        if (!requireApproval("suspendParticipant", "Suspend participant " + participantId,
+                "Participant " + participantId + " will be suspended from active treatment.")) {
+            return ERROR_ACTION_DENIED;
+        }
         log.info("ACTION: suspendParticipant(participantId={})", participantId);
         notificationService.send("Suspended " + participantId,
                 "Participant " + participantId + " has been suspended from active treatment. "
@@ -72,6 +86,10 @@ public class AdverseEventTools {
     @Tool(description = "Exports a safety report to the Data Safety Monitoring Board (DSMB). This is a safety-critical action that formally reports the adverse event for external review.")
     public String exportSafetyReport(
             @ToolParam(description = "The adverse event ID to report, e.g., AE-001") String eventId) {
+        if (!requireApproval("exportSafetyReport", "Export safety report for " + eventId,
+                "Safety report for " + eventId + " will be exported to the DSMB for external review.")) {
+            return ERROR_ACTION_DENIED;
+        }
         log.info("ACTION: exportSafetyReport(eventId={})", eventId);
         notificationService.send("Exported report for " + eventId,
                 "Safety report for " + eventId + " exported to DSMB. "
@@ -79,6 +97,14 @@ public class AdverseEventTools {
                         + ". Ethics committee notification queued.");
         return "Safety report for " + eventId + " exported to DSMB. "
                 + "Report reference: DSMB-SMILE-2025-" + eventId + ". Ethics committee notification queued.";
+    }
+
+    private boolean requireApproval(String toolName, String summary, String detail) {
+        val auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !(auth.getPrincipal() instanceof DemoPrincipal principal)) {
+            return false;
+        }
+        return approvalService.requestApproval(principal.sessionId(), toolName, summary, detail, false);
     }
 
 }

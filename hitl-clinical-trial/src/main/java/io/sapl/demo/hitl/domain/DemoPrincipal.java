@@ -15,5 +15,5 @@
  */
 package io.sapl.demo.hitl.domain;
 
-public record DemoPrincipal(String name, String role) {
+public record DemoPrincipal(String name, String role, String sessionId) {
 }

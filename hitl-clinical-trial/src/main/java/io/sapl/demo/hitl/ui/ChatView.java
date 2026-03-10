@@ -33,6 +33,8 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import io.sapl.demo.hitl.approval.ApprovalRequest;
+import io.sapl.demo.hitl.approval.ApprovalService;
 import io.sapl.demo.hitl.chat.ChatService;
 import io.sapl.demo.hitl.domain.DemoPrincipal;
 import io.sapl.demo.hitl.domain.DemoUser;
@@ -50,6 +52,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -67,8 +70,11 @@ public class ChatView extends VerticalLayout {
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     private final transient ChatService chatService;
+    private final transient ApprovalService approvalService;
+    private final transient String sessionId;
     private final transient Consumer<ActionEvent> actionListener;
     private final transient Consumer<String> toolCallListener;
+    private final transient Consumer<ApprovalRequest> approvalListener;
     private final MessageList messageList;
     private final TextField inputField;
     private final Button actionButton;
@@ -80,6 +86,7 @@ public class ChatView extends VerticalLayout {
     private final List<MessageListItem> messages = new ArrayList<>();
     private transient Disposable currentSubscription;
     private transient ScheduledExecutorService animator;
+    private volatile boolean autoApprove;
     private volatile String currentStatusText = "";
     private volatile boolean animating;
     private volatile StringBuilder activeContent;
@@ -87,8 +94,10 @@ public class ChatView extends VerticalLayout {
     private boolean generating;
 
     public ChatView(ChatService chatService, AdverseEventData adverseEventData,
-                    NotificationService notificationService) {
+                    NotificationService notificationService, ApprovalService approvalService) {
         this.chatService = chatService;
+        this.approvalService = approvalService;
+        this.sessionId = UUID.randomUUID().toString();
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -96,11 +105,20 @@ public class ChatView extends VerticalLayout {
         val ui = UI.getCurrent();
         actionListener = event -> ui.access(() -> addActionLogEntry(event));
         toolCallListener = toolName -> ui.access(() -> onToolCall(toolName));
+        approvalListener = request -> {
+            if (autoApprove && !request.forceHumanInteraction()) {
+                approvalService.resolve(request.requestId(), true);
+            } else {
+                ui.access(() -> new ApprovalDialog(request, approvalService).open());
+            }
+        };
         notificationService.addActionListener(actionListener);
         notificationService.addToolCallListener(toolCallListener);
+        approvalService.addListener(sessionId, approvalListener);
         addDetachListener(e -> {
             notificationService.removeActionListener(actionListener);
             notificationService.removeToolCallListener(toolCallListener);
+            approvalService.removeListener(sessionId, approvalListener);
         });
 
         val infoPanel = new InfoPanel(adverseEventData);
@@ -115,6 +133,7 @@ public class ChatView extends VerticalLayout {
 
         autoApproveToggle = new Checkbox("Auto-Approve Actions");
         autoApproveToggle.setValue(false);
+        autoApproveToggle.addValueChangeListener(e -> autoApprove = e.getValue());
 
         val selectorLayout = new HorizontalLayout(userSelector, autoApproveToggle);
         selectorLayout.setWidthFull();
@@ -228,7 +247,7 @@ public class ChatView extends VerticalLayout {
         val ui = UI.getCurrent();
         val history = buildConversationHistory();
 
-        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole());
+        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole(), sessionId);
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
         startDotAnimation(activeAssistantMessage, ui);

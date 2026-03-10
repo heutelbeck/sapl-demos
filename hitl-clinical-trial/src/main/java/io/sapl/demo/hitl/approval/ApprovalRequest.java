@@ -13,19 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.hitl.domain;
+package io.sapl.demo.hitl.approval;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
-public enum DemoUser {
-
-    DR_FISCHER("Dr. Elena Fischer", "Safety Officer"),
-    DR_BRANDT("Dr. Marcus Brandt", "Site Investigator");
-
-    private final String displayName;
-    private final String role;
-
+public record ApprovalRequest(String requestId, String sessionId, String toolName,
+                       String summary, String detail,
+                       boolean forceHumanInteraction, long deadlineEpochMillis) {
 }
