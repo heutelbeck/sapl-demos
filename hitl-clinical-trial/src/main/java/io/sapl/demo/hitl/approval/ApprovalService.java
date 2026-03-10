@@ -15,9 +15,9 @@
  */
 package io.sapl.demo.hitl.approval;
 
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -28,19 +28,45 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.stereotype.Service;
 
+import static java.lang.System.currentTimeMillis;
+import static java.util.UUID.randomUUID;
+
+/**
+ * Manages blocking human-in-the-loop approval for tool invocations. Listeners
+ * are registered per browser session so that approval dialogs route to the
+ * originating tab.
+ */
 @Slf4j
 @Service
 public class ApprovalService {
 
     static final int DEFAULT_TIMEOUT_SECONDS = 60;
+    static final String ERROR_APPROVAL_FAILED = "Approval failed for tool '{}' in session {}. Denying.";
+    static final String WARN_APPROVAL_INTERRUPTED = "Approval interrupted for tool '{}' in session {}. Denying.";
+    static final String WARN_APPROVAL_TIMED_OUT = "Approval timed out for tool '{}' in session {}. Denying.";
+    static final String WARN_NO_LISTENER = "No listener registered for session {}. Denying approval for tool '{}'.";
 
-    private final ConcurrentHashMap<String, CompletableFuture<Boolean>> pendingApprovals = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, CopyOnWriteArrayList<Consumer<ApprovalRequest>>> listeners = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CompletableFuture<Boolean>> pendingApprovals = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, CopyOnWriteArrayList<Consumer<ApprovalRequest>>> listeners = new ConcurrentHashMap<>();
 
+    /**
+     * Blocks the calling thread until the human approves, denies, or the request
+     * times out. Returns {@code false} (deny) on timeout, interruption, or if no
+     * listener is registered.
+     *
+     * @param sessionId browser session ID for routing the dialog
+     * @param toolName tool name shown in the dialog
+     * @param summary short summary shown in the dialog
+     * @param detail expanded detail shown in the dialog
+     * @param forceHumanInteraction if true, auto-approve cannot bypass the dialog
+     * @param timeoutSeconds seconds before auto-deny; values below 1 use the default
+     * @return true if approved, false otherwise
+     */
     public boolean requestApproval(String sessionId, String toolName, String summary, String detail,
-                                   boolean forceHumanInteraction) {
-        val requestId = UUID.randomUUID().toString();
-        val deadlineEpochMillis = System.currentTimeMillis() + DEFAULT_TIMEOUT_SECONDS * 1000L;
+                                   boolean forceHumanInteraction, int timeoutSeconds) {
+        val effectiveTimeout = timeoutSeconds > 0 ? timeoutSeconds : DEFAULT_TIMEOUT_SECONDS;
+        val requestId = randomUUID().toString();
+        val deadlineEpochMillis = currentTimeMillis() + effectiveTimeout * 1000L;
         val request = new ApprovalRequest(requestId, sessionId, toolName, summary, detail, forceHumanInteraction,
                 deadlineEpochMillis);
         val future = new CompletableFuture<Boolean>();
@@ -49,28 +75,34 @@ public class ApprovalService {
         try {
             val sessionListeners = listeners.get(sessionId);
             if (sessionListeners == null || sessionListeners.isEmpty()) {
-                log.warn("No listener registered for session {}. Denying approval for tool '{}'.", sessionId, toolName);
+                log.warn(WARN_NO_LISTENER, sessionId, toolName);
                 return false;
             }
             for (val listener : sessionListeners) {
                 listener.accept(request);
             }
-            return future.get(DEFAULT_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            return future.get(effectiveTimeout, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
-            log.warn("Approval timed out for tool '{}' in session {}. Denying.", toolName, sessionId);
+            log.warn(WARN_APPROVAL_TIMED_OUT, toolName, sessionId);
             return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.warn("Approval interrupted for tool '{}' in session {}. Denying.", toolName, sessionId);
+            log.warn(WARN_APPROVAL_INTERRUPTED, toolName, sessionId);
             return false;
         } catch (ExecutionException e) {
-            log.error("Approval failed for tool '{}' in session {}. Denying.", toolName, sessionId, e);
+            log.error(ERROR_APPROVAL_FAILED, toolName, sessionId, e);
             return false;
         } finally {
             pendingApprovals.remove(requestId);
         }
     }
 
+    /**
+     * Completes a pending approval request. Idempotent if already resolved.
+     *
+     * @param requestId the approval request to resolve
+     * @param approved true to approve, false to deny
+     */
     public void resolve(String requestId, boolean approved) {
         val future = pendingApprovals.get(requestId);
         if (future != null) {
@@ -78,10 +110,22 @@ public class ApprovalService {
         }
     }
 
+    /**
+     * Registers a listener that receives approval requests for the given session.
+     *
+     * @param sessionId the browser session ID
+     * @param listener callback invoked when an approval is requested
+     */
     public void addListener(String sessionId, Consumer<ApprovalRequest> listener) {
         listeners.computeIfAbsent(sessionId, k -> new CopyOnWriteArrayList<>()).add(listener);
     }
 
+    /**
+     * Removes a previously registered listener for the given session.
+     *
+     * @param sessionId the browser session ID
+     * @param listener the listener to remove
+     */
     public void removeListener(String sessionId, Consumer<ApprovalRequest> listener) {
         val sessionListeners = listeners.get(sessionId);
         if (sessionListeners != null) {

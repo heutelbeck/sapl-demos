@@ -28,12 +28,17 @@ import io.sapl.demo.hitl.approval.ApprovalRequest;
 import io.sapl.demo.hitl.approval.ApprovalService;
 import lombok.val;
 
+import java.io.Serial;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Math.max;
+import static java.lang.System.currentTimeMillis;
+
 class ApprovalDialog extends Dialog {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final transient ScheduledExecutorService countdown;
@@ -54,7 +59,7 @@ class ApprovalDialog extends Dialog {
         val details = new Details("Details", detailSpan);
         details.setWidthFull();
 
-        val remainingSeconds = Math.max(0, (request.deadlineEpochMillis() - System.currentTimeMillis()) / 1000);
+        val remainingSeconds = max(0, (request.deadlineEpochMillis() - currentTimeMillis()) / 1000);
         val countdownSpan = new Span("Auto-deny in " + remainingSeconds + "s");
         countdownSpan.getStyle().set("font-size", "var(--lumo-font-size-s)");
         countdownSpan.getStyle().set("color", "var(--lumo-secondary-text-color)");
@@ -84,10 +89,11 @@ class ApprovalDialog extends Dialog {
         val ui = UI.getCurrent();
         countdown = Executors.newSingleThreadScheduledExecutor();
         countdown.scheduleAtFixedRate(() -> {
-            val remaining = Math.max(0, (request.deadlineEpochMillis() - System.currentTimeMillis()) / 1000);
+            val remaining = max(0, (request.deadlineEpochMillis() - currentTimeMillis()) / 1000);
             ui.access(() -> {
                 countdownSpan.setText("Auto-deny in " + remaining + "s");
                 if (remaining <= 0) {
+                    approvalService.resolve(request.requestId(), false);
                     close();
                 }
             });

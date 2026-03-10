@@ -1,2 +1,24 @@
-policy "permit-all"
+set "hitl-tools"
+first or abstain
+for action in ["listAdverseEvents", "getAdverseEvent", "getSafetyGuidelines",
+               "notifyParticipant", "suspendParticipant", "exportSafetyReport"]
+
+policy "permit-read-tools"
 permit
+  action in ["listAdverseEvents", "getAdverseEvent", "getSafetyGuidelines"];
+
+policy "permit-export-report"
+permit
+  action == "exportSafetyReport";
+
+policy "permit-notify-with-approval"
+permit
+  action == "notifyParticipant";
+obligation
+  { "type": "humanApprovalRequired" }
+
+policy "permit-suspend-with-mandatory-approval"
+permit
+  action == "suspendParticipant";
+obligation
+  { "type": "humanApprovalRequired", "noAutoApprove": true, "timeout": "PT120S" }

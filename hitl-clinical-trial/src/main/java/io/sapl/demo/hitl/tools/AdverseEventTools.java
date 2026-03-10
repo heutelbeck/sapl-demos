@@ -15,9 +15,14 @@
  */
 package io.sapl.demo.hitl.tools;
 
+import java.time.Duration;
 import java.util.Map;
 
+import io.sapl.api.model.BooleanValue;
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
 import io.sapl.api.model.UndefinedValue;
+import io.sapl.api.model.Value;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.PolicyDecisionPoint;
@@ -39,6 +44,8 @@ import org.springframework.stereotype.Service;
 public class AdverseEventTools {
 
     static final String ERROR_ACTION_DENIED = "Action denied by operator. The tool call was not executed.";
+    static final String WARN_NO_SESSION_ID = "No session ID available for approval of tool '{}'";
+    static final String WARN_UNHANDLED_OBLIGATION = "Unhandled obligation for tool '{}': {}";
 
     private final AdverseEventData data;
     private final PolicyDecisionPoint pdp;
@@ -47,19 +54,16 @@ public class AdverseEventTools {
 
     @Tool(description = "Lists all active adverse events in the SMILE study with their ID, participant, severity, and status. Call this first to discover which events need attention.")
     public String listAdverseEvents() {
-        log.info("Tool executing: listAdverseEvents");
         return data.listAdverseEvents();
     }
 
     @Tool(description = "Retrieves detailed information about a specific adverse event by its ID (e.g., AE-001). Includes participant details, severity, timeline, and clinical notes.")
     public String getAdverseEvent(@ToolParam(description = "The adverse event ID, e.g., AE-001") String eventId) {
-        log.info("Tool executing: getAdverseEvent(eventId={})", eventId);
         return data.getAdverseEvent(eventId);
     }
 
     @Tool(description = "Retrieves the SMILE study safety response guidelines, including required actions for severe, moderate, and mild adverse events, and emergency contact information.")
     public String getSafetyGuidelines() {
-        log.info("Tool executing: getSafetyGuidelines");
         return data.getSafetyGuidelines();
     }
 
@@ -70,10 +74,6 @@ public class AdverseEventTools {
         if (!checkPolicy("notifyParticipant", Map.of("recipient", recipient, "message", message))) {
             return ERROR_ACTION_DENIED;
         }
-        if (!requireApproval("notifyParticipant", "Notify " + recipient, "Message: " + message)) {
-            return ERROR_ACTION_DENIED;
-        }
-        log.info("ACTION: notifyParticipant(recipient={}, message={})", recipient, message);
         notificationService.send("Notified " + recipient,
                 "Notification sent to " + recipient + ": " + message);
         return "Notification sent to " + recipient + ": " + message;
@@ -85,11 +85,6 @@ public class AdverseEventTools {
         if (!checkPolicy("suspendParticipant", Map.of("participantId", participantId))) {
             return ERROR_ACTION_DENIED;
         }
-        if (!requireApproval("suspendParticipant", "Suspend participant " + participantId,
-                "Participant " + participantId + " will be suspended from active treatment.")) {
-            return ERROR_ACTION_DENIED;
-        }
-        log.info("ACTION: suspendParticipant(participantId={})", participantId);
         notificationService.send("Suspended " + participantId,
                 "Participant " + participantId + " has been suspended from active treatment. "
                         + "Treatment protocol halted. Site investigator and sponsor notified.");
@@ -103,11 +98,6 @@ public class AdverseEventTools {
         if (!checkPolicy("exportSafetyReport", Map.of("eventId", eventId))) {
             return ERROR_ACTION_DENIED;
         }
-        if (!requireApproval("exportSafetyReport", "Export safety report for " + eventId,
-                "Safety report for " + eventId + " will be exported to the DSMB for external review.")) {
-            return ERROR_ACTION_DENIED;
-        }
-        log.info("ACTION: exportSafetyReport(eventId={})", eventId);
         notificationService.send("Exported report for " + eventId,
                 "Safety report for " + eventId + " exported to DSMB. "
                         + "Report reference: DSMB-SMILE-2025-" + eventId
@@ -122,24 +112,40 @@ public class AdverseEventTools {
             return false;
         }
         val subscription = AuthorizationSubscription.of(principal, toolName, resource);
-        log.info("Authorization subscription: {}", subscription);
+        log.debug("Authorization subscription: {}", subscription);
         val decision = pdp.decideOnce(subscription).block();
         if (decision == null || decision.decision() != Decision.PERMIT
-                || !decision.obligations().isEmpty()
                 || !(decision.resource() instanceof UndefinedValue)) {
             log.info("PDP denied access to tool '{}': {}", toolName, decision);
             return false;
         }
-        log.info("PDP permitted access to tool '{}'", toolName);
+        for (val obligation : decision.obligations()) {
+            if (!handleObligation(obligation, toolName, resource)) {
+                return false;
+            }
+        }
+        log.debug("PDP permitted access to tool '{}'", toolName);
         return true;
     }
 
-    private boolean requireApproval(String toolName, String summary, String detail) {
-        val sessionId = SessionIdHolder.get();
-        if (sessionId == null) {
+    private boolean handleObligation(Value obligation, String toolName, Object resource) {
+        if (!(obligation instanceof ObjectValue obj)
+                || !(obj.get("type") instanceof TextValue(var type))
+                || !"humanApprovalRequired".equals(type)) {
+            log.warn(WARN_UNHANDLED_OBLIGATION, toolName, obligation);
             return false;
         }
-        return approvalService.requestApproval(sessionId, toolName, summary, detail, false);
+        val forceHumanInteraction = obj.get("noAutoApprove") instanceof BooleanValue(var flag) && flag;
+        val timeoutSeconds = obj.get("timeout") instanceof TextValue(var iso)
+                ? (int) Duration.parse(iso).toSeconds()
+                : 0;
+        val sessionId = SessionIdHolder.get();
+        if (sessionId == null) {
+            log.warn(WARN_NO_SESSION_ID, toolName);
+            return false;
+        }
+        return approvalService.requestApproval(sessionId, toolName, toolName, resource.toString(),
+                forceHumanInteraction, timeoutSeconds);
     }
 
 }

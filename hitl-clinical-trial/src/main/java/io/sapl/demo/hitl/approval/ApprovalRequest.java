@@ -15,6 +15,17 @@
  */
 package io.sapl.demo.hitl.approval;
 
+/**
+ * Immutable request for human approval of a tool invocation.
+ *
+ * @param requestId unique identifier for this approval request
+ * @param sessionId browser session to route the approval dialog to
+ * @param toolName name of the tool requiring approval
+ * @param summary short description shown in the approval dialog
+ * @param detail expanded description shown in the approval dialog
+ * @param forceHumanInteraction if true, auto-approve cannot bypass the dialog
+ * @param deadlineEpochMillis epoch millis after which the request auto-denies
+ */
 public record ApprovalRequest(String requestId, String sessionId, String toolName,
                        String summary, String detail,
                        boolean forceHumanInteraction, long deadlineEpochMillis) {
