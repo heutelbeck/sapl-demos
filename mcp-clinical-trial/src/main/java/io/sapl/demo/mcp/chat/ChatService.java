@@ -15,7 +15,8 @@
  */
 package io.sapl.demo.mcp.chat;
 
-import io.sapl.demo.mcp.tools.ToolCallStatus;
+import java.util.function.Consumer;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -31,24 +32,15 @@ public class ChatService {
     private static final String ERROR_GENERATION_FAILED = "An error occurred while generating the response. Please try again.";
 
     private final ChatClient chatClient;
-    private final ToolCallStatus toolCallStatus;
 
-    public String getCurrentStatus() {
-        return toolCallStatus.get();
-    }
-
-    public Flux<String> askStreaming(String userMessage, String conversationHistory) {
+    public Flux<String> askStreaming(String userMessage, String conversationHistory, Consumer<String> onStatus) {
         log.info("Received query: {}", userMessage);
         val prompt = buildPrompt(userMessage, conversationHistory);
-        toolCallStatus.update("Thinking");
+        onStatus.accept("Thinking");
 
         return chatClient.prompt().user(prompt).stream().content()
-                .doOnComplete(() -> {
-                    toolCallStatus.update("Done");
-                    log.info("LLM streaming response complete");
-                })
+                .doOnComplete(() -> log.info("LLM streaming response complete"))
                 .onErrorResume(e -> {
-                    toolCallStatus.update("");
                     if (isCancellation(e)) {
                         log.debug("Generation cancelled by user");
                         return Flux.empty();

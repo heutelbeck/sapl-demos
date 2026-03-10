@@ -15,6 +15,10 @@
  */
 package io.sapl.demo.rag.chat;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,10 +31,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -42,21 +42,16 @@ public class ChatService {
     private final ChatClient chatClient;
     private final DocumentRetrievalService retrievalService;
 
-    private final AtomicReference<String> currentStatus = new AtomicReference<>("");
-
-    public String getCurrentStatus() {
-        return currentStatus.get();
-    }
-
     public Flux<String> askStreaming(String userMessage, String conversationHistory,
-                                     Authentication authentication, boolean securityActive) {
+                                     Authentication authentication, boolean securityActive,
+                                     Consumer<String> onStatus) {
         log.info("Received query: {}", userMessage);
-        currentStatus.set("Retrieving documents");
+        onStatus.accept("Retrieving documents");
         val searchRequest = SearchRequest.builder().query(userMessage).topK(TOP_K).build();
         return retrievalService.retrieve(Mono.just(searchRequest), securityActive)
                 .doOnNext(docs -> {
                     log.info("Retrieved {} document chunks from vector store", docs.size());
-                    currentStatus.set("Generating response");
+                    onStatus.accept("Generating response");
                 })
                 .map(documents -> {
                     val context = buildContext(documents);
@@ -67,12 +62,8 @@ public class ChatService {
                     return chatClient.prompt().user(prompt).stream().content();
                 })
                 .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication))
-                .doOnComplete(() -> {
-                    currentStatus.set("Done");
-                    log.info("LLM streaming response complete");
-                })
+                .doOnComplete(() -> log.info("LLM streaming response complete"))
                 .onErrorResume(e -> {
-                    currentStatus.set("");
                     if (isCancellation(e)) {
                         log.debug("Generation cancelled by user");
                         return Flux.empty();

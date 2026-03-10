@@ -52,7 +52,7 @@ public class ChatView extends VerticalLayout {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final String ERROR_GENERATION_FAILED = "An error occurred while generating the response. Please try again.";
+    private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
 
     private final transient ChatService chatService;
     private final MessageList messageList;
@@ -62,11 +62,11 @@ public class ChatView extends VerticalLayout {
     private final Select<DemoUser> userSelector;
     private final Select<Purpose> purposeSelector;
     private final Select<String> overrideSelector;
-    private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
 
     private final List<MessageListItem> messages = new ArrayList<>();
     private transient Disposable currentSubscription;
     private transient ScheduledExecutorService animator;
+    private volatile String currentStatusText = "";
     private volatile boolean animating;
     private boolean generating;
     private int dotFrame;
@@ -148,32 +148,39 @@ public class ChatView extends VerticalLayout {
         actionButton.setIcon(VaadinIcon.STOP.create());
         generating = true;
 
-        val user           = userSelector.getValue();
-        val purpose        = purposeSelector.getValue();
-        val userName       = user != null ? user.getDisplayName() : "User";
+        val user = userSelector.getValue();
+        val purpose = purposeSelector.getValue();
+        val userName = user != null ? user.getDisplayName() : "User";
 
         val userMessage = new MessageListItem(text.strip(), Instant.now(), userName);
         userMessage.setUserColorIndex(1);
         messages.add(userMessage);
 
-        val assistantMessage = new MessageListItem("Retrieving documents", Instant.now(), "AI Assistant");
+        val assistantMessage = new MessageListItem("", Instant.now(), "AI Assistant");
         assistantMessage.setUserColorIndex(2);
         messages.add(assistantMessage);
         messageList.setItems(messages);
 
-        val ui      = UI.getCurrent();
+        val ui = UI.getCurrent();
         val content = new StringBuilder();
         val history = buildConversationHistory();
         val securityActive = "Active".equals(overrideSelector.getValue());
-        val principal      = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(), purpose.name());
+        val principal = new DemoPrincipal(user.getDisplayName(), user.getRole(), user.getSite(), purpose.name());
         val authentication = new UsernamePasswordAuthenticationToken(principal, null, List.of());
 
-        startStatusAnimation(assistantMessage, ui);
+        startDotAnimation(assistantMessage, ui);
 
-        currentSubscription = chatService.askStreaming(text.strip(), history, authentication, securityActive)
+        currentSubscription = chatService.askStreaming(text.strip(), history, authentication, securityActive,
+                        status -> {
+                            currentStatusText = status;
+                            ui.access(() -> {
+                                assistantMessage.setText(status);
+                                messageList.setItems(messages);
+                            });
+                        })
                 .subscribe(
                         token -> {
-                            stopStatusAnimation();
+                            stopDotAnimation();
                             content.append(token);
                             ui.access(() -> {
                                 assistantMessage.setText(content.toString());
@@ -181,9 +188,9 @@ public class ChatView extends VerticalLayout {
                             });
                         },
                         error -> {
-                            stopStatusAnimation();
+                            stopDotAnimation();
                             ui.access(() -> {
-                                assistantMessage.setText(ERROR_GENERATION_FAILED);
+                                assistantMessage.setText("An error occurred while generating the response. Please try again.");
                                 messageList.setItems(messages);
                                 onGenerationFinished();
                             });
@@ -192,7 +199,7 @@ public class ChatView extends VerticalLayout {
                 );
     }
 
-    private void startStatusAnimation(MessageListItem message, UI ui) {
+    private void startDotAnimation(MessageListItem message, UI ui) {
         dotFrame = 0;
         animating = true;
         animator = Executors.newSingleThreadScheduledExecutor();
@@ -200,7 +207,7 @@ public class ChatView extends VerticalLayout {
             if (!animating) {
                 return;
             }
-            val status = chatService.getCurrentStatus();
+            val status = currentStatusText;
             if (status == null || status.isBlank()) {
                 return;
             }
@@ -216,7 +223,7 @@ public class ChatView extends VerticalLayout {
         }, 0, 250, TimeUnit.MILLISECONDS);
     }
 
-    private void stopStatusAnimation() {
+    private void stopDotAnimation() {
         animating = false;
         if (animator != null) {
             animator.shutdownNow();
@@ -225,7 +232,7 @@ public class ChatView extends VerticalLayout {
     }
 
     private void stopGeneration() {
-        stopStatusAnimation();
+        stopDotAnimation();
         if (currentSubscription != null && !currentSubscription.isDisposed()) {
             currentSubscription.dispose();
         }
@@ -238,6 +245,7 @@ public class ChatView extends VerticalLayout {
         actionButton.setIcon(VaadinIcon.PLAY.create());
         generating = false;
         currentSubscription = null;
+        currentStatusText = "";
         inputField.focus();
     }
 
