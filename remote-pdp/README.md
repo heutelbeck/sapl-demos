@@ -34,37 +34,26 @@ cd target
 java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-By default, the demo connects to `https://localhost:8443` using the default SAPL Node demo credentials.
+By default, the demo connects to `http://localhost:8443` (SAPL Node default: no auth, no TLS).
 
 ### Command Line Options
 
 ```
-Usage: <main class> [-h=<host>] [-k=<clientKey>] [-s=<clientSecret>]
+Usage: <main class> [-h=<host>]
 
 Options:
   -h, -host=<host>       Hostname of the policy decision point including prefix
-                         and port. E.g. 'https://example.org:8443'.
-  -k, -key=<clientKey>   Client key for the demo application, to be obtained
-                         from the PDP administrator.
-  -s, -secret=<clientSecret>
-                         Client secret for the demo application, to be obtained
-                         from the PDP administrator.
+                         and port. E.g. 'http://example.org:8443'.
 ```
 
 **Example with custom server:**
 ```bash
-java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
-  -h=https://myserver:8443 \
-  -k=myClientKey \
-  -s=myClientSecret
+java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar -h=http://myserver:8443
 ```
 
 ### Sample Output (No Server Running)
 
 ```
-[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - ------------------------------------------------------------------
-[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - !!! ATTENTION: don't not use insecure sslContext in production !!!
-[main] WARN io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - ------------------------------------------------------------------
 [main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription[subject="Willi", action="eat", resource="icecream", environment=undefined]
 [main] INFO org.demo.RemotePDPDemo - Multi: MultiAuthorizationSubscription { ... }
 [reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - Error : Connection refused: localhost/127.0.0.1:8443
@@ -86,9 +75,7 @@ java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar \
 ```java
 PolicyDecisionPoint pdp = RemotePolicyDecisionPoint.builder()
     .http()
-    .baseUrl("https://localhost:8443")
-    .basicAuth(clientKey, clientSecret)
-    .withUnsecureSSL()  // Only for testing with self-signed certificates!
+    .baseUrl("http://localhost:8443")
     .build();
 ```
 
@@ -156,4 +143,4 @@ Use the SAPL BOM for version management:
 
 ## Security Note
 
-The demo uses `withUnsecureSSL()` to accept self-signed certificates for local testing. **Never use this in production!** For production deployments, configure proper SSL/TLS certificates.
+By default, SAPL Node starts with no authentication and no TLS on localhost. For production deployments, configure authentication and TLS. See the [SAPL Node documentation](https://github.com/heutelbeck/sapl-policy-engine/tree/master/sapl-node) for details.

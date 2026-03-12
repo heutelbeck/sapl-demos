@@ -27,7 +27,6 @@ import picocli.CommandLine.Option;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
-import javax.net.ssl.SSLException;
 import java.util.concurrent.Callable;
 
 @Command
@@ -37,35 +36,17 @@ public class RemotePDPDemo implements Callable<Integer> {
 
     @Option(names = { "-h",
             "-host" }, description = "Hostname of the policy decision point including prefix and port. E.g. 'https://example.org:8443'.")
-    private String host = "https://localhost:8443";
-
-    // The default option set here are the default credentials of the SAPL Node
-
-    @Option(names = { "-k",
-            "-key" }, description = "Client key for the demo application, to be obtained from the PDP administrator.")
-    private String clientKey = "mybdpernDvaQHHzSn5VGsg";
-
-    @Option(names = { "-s",
-            "-secret" }, description = "Client secret for the demo application, to be obtained from the PDP administrator.")
-    private String clientSecret = "lHZ83Uv/8l6BtthixMyeyvzaTbAxe14rF50cvtzRNFY=";
+    private String host = "http://localhost:8443";
 
     public static void main(String... args) {
         System.exit(new CommandLine(new RemotePDPDemo()).execute(args));
     }
 
-    public Integer call() throws SSLException, JacksonException {
+    public Integer call() throws JacksonException {
 
         PolicyDecisionPoint pdp;
 
-        pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).basicAuth(clientKey, clientSecret)
-                .withUnsecureSSL().build();
-
-        /*
-         * To have the client use the default SSL verification use this constructor
-         * instead, or provide your own TrustManager/SslContext accordingly.
-         *
-         * var pdp = new RemotePolicyDecisionPoint(host, clientKey, clientSecret);
-         */
+        pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).build();
 
         final var authzSubscription = AuthorizationSubscription.of("Willi", "eat", "icecream");
         LOG.info("Subscription: {}", authzSubscription);
