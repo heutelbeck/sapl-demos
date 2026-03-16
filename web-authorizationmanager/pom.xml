@@ -45,7 +45,7 @@
 		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 
 		<!-- Dependencies -->
-		<lombok.version>1.18.42</lombok.version>
+		<lombok.version>1.18.44</lombok.version>
 
 		<!-- Maven Plug-Ins -->
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>

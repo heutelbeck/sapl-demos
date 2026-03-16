@@ -45,7 +45,7 @@
 		<!-- Dependencies -->
 		<vaadin.version>25.0.6</vaadin.version>
 		<spring-ai.version>2.0.0-M2</spring-ai.version>
-		<lombok.version>1.18.42</lombok.version>
+		<lombok.version>1.18.44</lombok.version>
 		<sapl.version>4.0.0-SNAPSHOT</sapl.version>
 		<testcontainers.version>2.0.2</testcontainers.version>
 

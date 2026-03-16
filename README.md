@@ -63,6 +63,26 @@ If you are new to SAPL, start with these demos:
 |------|-------------|
 | [editor-components](editor-components) | Vaadin-based SAPL policy editor components |
 
+## Running Policy Tests with the SAPL CLI
+
+The `run-sapl-tests.sh` script runs all demo project policy tests using the `sapl test` CLI command. This exercises the same `.sapltest` files used by JUnit but without requiring Maven or a JVM runtime.
+
+### Prerequisites
+
+The `sapl` native binary must be available. See [sapl.io](https://sapl.io) for installation instructions, or build from source with GraalVM.
+
+### Usage
+
+```bash
+./run-sapl-tests.sh
+./run-sapl-tests.sh --sapl /path/to/sapl
+SAPL=/path/to/sapl ./run-sapl-tests.sh
+```
+
+### Platform Notes
+
+The `sapl` native binary is platform-specific. Pre-built binaries are available for Linux, macOS, and Windows. On unsupported platforms, use the JAR distribution with JDK 21+. See the script header for full documentation of `sapl test` options, exit codes, and quality gate configuration.
+
 ## Prerequisites
 
 All demos require:

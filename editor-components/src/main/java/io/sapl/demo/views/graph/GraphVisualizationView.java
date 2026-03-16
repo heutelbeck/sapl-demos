@@ -23,6 +23,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.views.MainLayout;
 import io.sapl.vaadin.lsp.graph.JsonGraphVisualization;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ import java.io.Serial;
 public class GraphVisualizationView extends VerticalLayout {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private static final String AUTH_REQUEST_JSON = """
             {
