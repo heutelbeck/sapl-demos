@@ -27,13 +27,13 @@ import java.io.Serial;
 @Push
 @SpringBootApplication
 @StyleSheet(Lumo.UTILITY_STYLESHEET)
-public class McpClinicalTrialApplication implements AppShellConfigurator {
+public class ToolsClinicalTrialApplication implements AppShellConfigurator {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     public static void main(String[] args) {
-        SpringApplication.run(McpClinicalTrialApplication.class, args);
+        SpringApplication.run(ToolsClinicalTrialApplication.class, args);
     }
 
 }

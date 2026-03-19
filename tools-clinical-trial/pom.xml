@@ -35,7 +35,7 @@
 
 	<inceptionYear>2017-2026</inceptionYear>
 
-	<name>MCP Clinical Trial Demo</name>
+	<name>Tools Clinical Trial Demo</name>
 	<description>Demonstrates tool-based clinical trial AI assistant with Spring AI tool calling
 		and SAPL policy enforcement at the tool boundary.</description>
 

@@ -1,4 +1,4 @@
-set "mcp-tools"
+set "tools"
 first or abstain
 for action in ["getStudyCatalog", "getStudyProtocol", "getPhq9Assessments",
                "getAdverseEventReports", "getParticipantRegistry"]

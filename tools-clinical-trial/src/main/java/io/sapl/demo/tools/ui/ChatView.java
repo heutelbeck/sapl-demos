@@ -48,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Route("")
-@PageTitle("Clinical Trial AI Assistant (MCP)")
+@PageTitle("Clinical Trial AI Assistant")
 public class ChatView extends VerticalLayout {
 
     @Serial
