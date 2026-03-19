@@ -63,7 +63,7 @@ This is a multi-site research study conducted across two European sites. All enr
 
 | Visit | Timepoint        | Sequence | Procedures                                              |
 |-------|------------------|----------|---------------------------------------------------------|
-| V1    | Screening        | --       | Informed consent, eligibility assessment, demographics  |
+| V1    | Screening        | N/A      | Informed consent, eligibility assessment, demographics  |
 | V2    | Baseline (Day 0) | 1        | PHQ-9 assessment, app installation, training            |
 | V3    | Week 2           | 1        | PHQ-9 assessment, adverse event review, app usage review|
 | V4    | Week 4           | 2        | PHQ-9 assessment, adverse event review, app usage review|
