@@ -66,6 +66,8 @@ public class HumanApprovalConstraintHandlerProvider implements RunnableConstrain
     public Runnable getHandler(Value constraint) {
         val obj = (ObjectValue) constraint;
         val toolName = obj.get("toolName") instanceof TextValue(var name) ? name : "Action";
+        val summary  = obj.get("summary") instanceof TextValue(var s) ? s : toolName;
+        val detail   = obj.get("detail") instanceof TextValue(var d) ? d : toolName + " requires approval.";
         val forceHumanInteraction = obj.get("noAutoApprove") instanceof BooleanValue(var flag) && flag;
         val timeoutSeconds = obj.get("timeout") instanceof TextValue(var iso)
                 ? (int) Duration.parse(iso).toSeconds()
@@ -76,8 +78,8 @@ public class HumanApprovalConstraintHandlerProvider implements RunnableConstrain
                 log.warn(ERROR_NO_SESSION_ID);
                 throw new AccessDeniedException(ERROR_NO_SESSION_ID);
             }
-            val approved = approvalService.requestApproval(sessionId, toolName, toolName,
-                    toolName + " requires approval.", forceHumanInteraction, timeoutSeconds);
+            val approved = approvalService.requestApproval(sessionId, toolName, summary,
+                    detail, forceHumanInteraction, timeoutSeconds);
             if (!approved) {
                 throw new AccessDeniedException(ERROR_ACTION_DENIED);
             }

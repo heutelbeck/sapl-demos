@@ -15,10 +15,16 @@ policy "permit-notify-with-approval"
 permit
   action == "notifyParticipant";
 obligation
-  { "type": "humanApprovalRequired" }
+  { "type": "humanApprovalRequired",
+    "toolName": action,
+    "summary": "Notify participant " + resource.recipient,
+    "detail": resource.message }
 
 policy "permit-suspend-with-mandatory-approval"
 permit
   action == "suspendParticipant";
 obligation
-  { "type": "humanApprovalRequired", "noAutoApprove": true, "timeout": "PT120S" }
+  { "type": "humanApprovalRequired", "noAutoApprove": true, "timeout": "PT120S",
+    "toolName": action,
+    "summary": "Suspend participant " + resource.participantId,
+    "detail": "Participant " + resource.participantId + " will be suspended from active treatment." }
