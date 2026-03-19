@@ -15,7 +15,10 @@
  */
 package io.sapl.demo.hitl.config;
 
+import io.sapl.demo.hitl.approval.ApprovalDeniedException;
+import io.sapl.demo.hitl.approval.ApprovalTimeoutException;
 import org.springframework.ai.model.tool.ToolCallingManager;
+import org.springframework.ai.tool.execution.DefaultToolExecutionExceptionProcessor;
 import org.springframework.ai.tool.execution.ToolExecutionExceptionProcessor;
 import org.springframework.ai.tool.resolution.ToolCallbackResolver;
 import io.sapl.spring.config.EnableSaplMethodSecurity;
@@ -39,6 +42,19 @@ class SecurityConfig {
                 .toolExecutionExceptionProcessor(toolExecutionExceptionProcessor)
                 .build();
         return new SecurityContextRestoringToolCallingManager(defaultManager);
+    }
+
+    @Bean
+    ToolExecutionExceptionProcessor toolExecutionExceptionProcessor() {
+        var defaultProcessor = DefaultToolExecutionExceptionProcessor.builder().build();
+        return exception -> {
+            for (var cause = exception.getCause(); cause != null; cause = cause.getCause()) {
+                if (cause instanceof ApprovalDeniedException || cause instanceof ApprovalTimeoutException) {
+                    return cause.getMessage();
+                }
+            }
+            return defaultProcessor.process(exception);
+        };
     }
 
     @Bean

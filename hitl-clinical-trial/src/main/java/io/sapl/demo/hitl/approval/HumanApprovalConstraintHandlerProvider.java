@@ -45,7 +45,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HumanApprovalConstraintHandlerProvider implements RunnableConstraintHandlerProvider {
 
-    static final String ERROR_ACTION_DENIED = "Action denied by operator.";
     static final String ERROR_NO_SESSION_ID = "No session ID available for approval. Denying.";
 
     private final ApprovalService approvalService;
@@ -78,10 +77,12 @@ public class HumanApprovalConstraintHandlerProvider implements RunnableConstrain
                 log.warn(ERROR_NO_SESSION_ID);
                 throw new AccessDeniedException(ERROR_NO_SESSION_ID);
             }
-            val approved = approvalService.requestApproval(sessionId, toolName, summary,
+            val result = approvalService.requestApproval(sessionId, toolName, summary,
                     detail, forceHumanInteraction, timeoutSeconds);
-            if (!approved) {
-                throw new AccessDeniedException(ERROR_ACTION_DENIED);
+            switch (result) {
+                case APPROVED -> { /* proceed */ }
+                case DENIED -> throw new ApprovalDeniedException(toolName, summary);
+                case TIMED_OUT -> throw new ApprovalTimeoutException(toolName, summary, timeoutSeconds);
             }
         };
     }

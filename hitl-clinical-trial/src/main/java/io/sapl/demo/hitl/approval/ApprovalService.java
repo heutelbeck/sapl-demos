@@ -51,8 +51,7 @@ public class ApprovalService {
 
     /**
      * Blocks the calling thread until the human approves, denies, or the request
-     * times out. Returns {@code false} (deny) on timeout, interruption, or if no
-     * listener is registered.
+     * times out.
      *
      * @param sessionId browser session ID for routing the dialog
      * @param toolName tool name shown in the dialog
@@ -60,9 +59,9 @@ public class ApprovalService {
      * @param detail expanded detail shown in the dialog
      * @param forceHumanInteraction if true, auto-approve cannot bypass the dialog
      * @param timeoutSeconds seconds before auto-deny; values below 1 use the default
-     * @return true if approved, false otherwise
+     * @return the outcome of the approval request
      */
-    public boolean requestApproval(String sessionId, String toolName, String summary, String detail,
+    ApprovalResult requestApproval(String sessionId, String toolName, String summary, String detail,
                                    boolean forceHumanInteraction, int timeoutSeconds) {
         val effectiveTimeout = timeoutSeconds > 0 ? timeoutSeconds : DEFAULT_TIMEOUT_SECONDS;
         val requestId = randomUUID().toString();
@@ -76,22 +75,24 @@ public class ApprovalService {
             val sessionListeners = listeners.get(sessionId);
             if (sessionListeners == null || sessionListeners.isEmpty()) {
                 log.warn(WARN_NO_LISTENER, sessionId, toolName);
-                return false;
+                return ApprovalResult.DENIED;
             }
             for (val listener : sessionListeners) {
                 listener.accept(request);
             }
-            return future.get(effectiveTimeout, TimeUnit.SECONDS);
+            return Boolean.TRUE.equals(future.get(effectiveTimeout, TimeUnit.SECONDS))
+                    ? ApprovalResult.APPROVED
+                    : ApprovalResult.DENIED;
         } catch (TimeoutException e) {
             log.warn(WARN_APPROVAL_TIMED_OUT, toolName, sessionId);
-            return false;
+            return ApprovalResult.TIMED_OUT;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.warn(WARN_APPROVAL_INTERRUPTED, toolName, sessionId);
-            return false;
+            return ApprovalResult.DENIED;
         } catch (ExecutionException e) {
             log.error(ERROR_APPROVAL_FAILED, toolName, sessionId, e);
-            return false;
+            return ApprovalResult.DENIED;
         } finally {
             pendingApprovals.remove(requestId);
         }
