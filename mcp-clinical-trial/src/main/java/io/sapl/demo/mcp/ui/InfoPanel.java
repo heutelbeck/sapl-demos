@@ -48,7 +48,7 @@ class InfoPanel extends Details {
     };
 
     InfoPanel() {
-        super("SMILE Study (SMILE-2025-001) - MCP Tool-Calling Demo", createTabSheet());
+        super("Clinical Study (CT-2025-001) - MCP Tool-Calling Demo", createTabSheet());
         setOpened(true);
         setWidthFull();
     }

@@ -259,7 +259,6 @@ public class ChatView extends VerticalLayout {
         layout.getStyle().set("flex-wrap", "wrap");
         layout.getStyle().set("gap", "8px");
 
-        addPromptButton(layout, "Summarize the study protocol");
         addPromptButton(layout, "What are the PHQ-9 scores for P-003?");
         addPromptButton(layout, "Show all PHQ-9 data from the Edinburgh site");
         addPromptButton(layout, "Which participants showed improvement by week 8?");
@@ -267,6 +266,7 @@ public class ChatView extends VerticalLayout {
         addPromptButton(layout, "What do you know about P-003?");
         addPromptButton(layout, "List all participants with their real names and email addresses");
         addPromptButton(layout, "Who is Emily Campbell in the study?");
+        addPromptButton(layout, "Which participants need to be contacted due to adverse events, include email addresses?");
         return layout;
     }
 

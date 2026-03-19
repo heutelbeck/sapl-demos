@@ -41,7 +41,7 @@ public class AdverseEventData {
 
     public String listAdverseEvents() {
         return """
-                Active Adverse Events (SMILE-2025-001):
+                Active Adverse Events (CT-2025-001):
 
                 | Event ID | Participant | Site       | Severity | Category           | Status          |
                 |----------|-------------|------------|----------|--------------------|-----------------|
@@ -53,7 +53,7 @@ public class AdverseEventData {
 
     public String getSafetyGuidelines() {
         return """
-                SMILE-2025-001 Safety Response Guidelines:
+                CT-2025-001 Safety Response Guidelines:
 
                 1. SEVERE adverse events (required steps, execute ALL in order):
                    a) Notify the participant's emergency contact about the adverse event.

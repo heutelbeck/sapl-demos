@@ -40,7 +40,7 @@ public class ClinicalTrialTools {
     }
 
     @PreEnforce(action = "'getStudyProtocol'")
-    @Tool(description = "Retrieves the SMILE study protocol including study design, objectives, inclusion/exclusion criteria, endpoints, and methodology.")
+    @Tool(description = "Retrieves the clinical study protocol including study design, objectives, inclusion/exclusion criteria, endpoints, and methodology.")
     public String getStudyProtocol() {
         log.info("Tool executing: getStudyProtocol");
         val result = corpus.getStudyProtocol();

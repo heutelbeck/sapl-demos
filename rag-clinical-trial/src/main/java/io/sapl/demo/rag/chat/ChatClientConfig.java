@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 class ChatClientConfig {
 
     private static final String SYSTEM_PROMPT = """
-            You are the AI assistant for the SMILE study (SMILE-2025-001),
+            You are the AI assistant for the clinical study (CT-2025-001),
             a multi-site Horizon Europe research study of gamified CBT for
             adolescent depression, conducted at Heidelberg and Edinburgh.
 

@@ -10,6 +10,9 @@ spring:
 
 vaadin:
   launch-browser: false
+  devmode:
+    devTools:
+      enabled: false
   allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
 
 io:

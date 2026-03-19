@@ -32,7 +32,7 @@ public class AdverseEventTools {
     private final NotificationService notificationService;
 
     @PreEnforce(action = "'listAdverseEvents'")
-    @Tool(description = "Lists all active adverse events in the SMILE study with their ID, participant, severity, and status. Call this first to discover which events need attention.")
+    @Tool(description = "Lists all active adverse events in the clinical study with their ID, participant, severity, and status. Call this first to discover which events need attention.")
     public String listAdverseEvents() {
         return data.listAdverseEvents();
     }
@@ -44,7 +44,7 @@ public class AdverseEventTools {
     }
 
     @PreEnforce(action = "'getSafetyGuidelines'")
-    @Tool(description = "Retrieves the SMILE study safety response guidelines, including required actions for severe, moderate, and mild adverse events, and emergency contact information.")
+    @Tool(description = "Retrieves the clinical study safety response guidelines, including required actions for severe, moderate, and mild adverse events, and emergency contact information.")
     public String getSafetyGuidelines() {
         return data.getSafetyGuidelines();
     }
@@ -76,10 +76,10 @@ public class AdverseEventTools {
             @ToolParam(description = "The adverse event ID to report, e.g., AE-001") String eventId) {
         notificationService.send("Exported report for " + eventId,
                 "Safety report for " + eventId + " exported to DSMB. "
-                        + "Report reference: DSMB-SMILE-2025-" + eventId
+                        + "Report reference: DSMB-CT-2025-" + eventId
                         + ". Ethics committee notification queued.");
         return "Safety report for " + eventId + " exported to DSMB. "
-                + "Report reference: DSMB-SMILE-2025-" + eventId + ". Ethics committee notification queued.";
+                + "Report reference: DSMB-CT-2025-" + eventId + ". Ethics committee notification queued.";
     }
 
 }

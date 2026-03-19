@@ -30,7 +30,7 @@ class InfoPanel extends Details {
     private static final long serialVersionUID = 1L;
 
     InfoPanel(AdverseEventData data) {
-        super("SMILE Study (SMILE-2025-001) - Human-in-the-Loop Demo", createTabSheet(data));
+        super("Clinical Study (CT-2025-001) - Human-in-the-Loop Demo", createTabSheet(data));
         setOpened(true);
         setWidthFull();
     }

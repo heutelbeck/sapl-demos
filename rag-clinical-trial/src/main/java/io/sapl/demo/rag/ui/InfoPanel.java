@@ -48,7 +48,7 @@ class InfoPanel extends Details {
     };
 
     InfoPanel() {
-        super("SMILE Study (SMILE-2025-001) - Demo Scenario", createTabSheet());
+        super("Clinical Study (CT-2025-001) - Demo Scenario", createTabSheet());
         setOpened(true);
         setWidthFull();
     }

@@ -1,10 +1,10 @@
-# SMILE Study Protocol
+# Study Protocol
 
 ## Study Overview
 
-**Title:** SMILE -- Strengthening Mental Health of Young People through Innovation and Learning in Europe
+**Title:** A Randomized Controlled Clinical Trial
 
-**Protocol Number:** SMILE-2025-001
+**Protocol Number:** CT-2025-001
 
 **Funding:** Horizon Europe Grant 101080923
 
