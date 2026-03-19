@@ -362,6 +362,7 @@ public class ChatView extends VerticalLayout {
     private void clearChat() {
         messages.clear();
         messageList.setItems(messages);
+        actionLog.removeAll();
     }
 
     private String buildConversationHistory() {
