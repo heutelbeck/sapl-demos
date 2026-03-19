@@ -38,7 +38,7 @@ import reactor.core.publisher.Mono;
 public class ChatService {
 
     private static final String ERROR_GENERATION_FAILED = "An error occurred while generating the response. Please try again.";
-    private static final int    TOP_K                   = 10;
+    private static final int    TOP_K                   = 25;
 
     private final ChatClient chatClient;
     private final DocumentRetrievalService retrievalService;

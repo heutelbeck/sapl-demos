@@ -100,7 +100,7 @@ class DocumentIngestionService {
             val metadata = METADATA_BY_FILE.getOrDefault(fileKey, Map.of());
 
             val config = MarkdownDocumentReaderConfig.builder()
-                    .withHorizontalRuleCreateDocument(true)
+                    .withHorizontalRuleCreateDocument(false)
                     .withIncludeCodeBlock(true)
                     .withIncludeBlockquote(true)
                     .build();
