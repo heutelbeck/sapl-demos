@@ -13,18 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.mcp.domain;
+package io.sapl.demo.tools.domain;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
-public enum Purpose {
-
-    STATISTICAL_ANALYSIS("Statistical Analysis"),
-    ADVERSE_EVENT_HANDLING("Adverse Event Handling");
-
-    private final String displayName;
-
+public record DemoPrincipal(String name, String role, String site, String purpose, boolean securityActive) {
 }

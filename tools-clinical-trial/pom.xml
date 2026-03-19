@@ -29,7 +29,7 @@
 	</parent>
 
 	<groupId>io.sapl</groupId>
-	<artifactId>mcp-clinical-trial</artifactId>
+	<artifactId>tools-clinical-trial</artifactId>
 	<version>4.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 

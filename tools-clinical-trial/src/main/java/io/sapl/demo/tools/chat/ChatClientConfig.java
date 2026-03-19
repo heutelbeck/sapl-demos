@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.mcp.chat;
+package io.sapl.demo.tools.chat;
 
-import io.sapl.demo.mcp.tools.ClinicalTrialTools;
+import io.sapl.demo.tools.tools.ClinicalTrialTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

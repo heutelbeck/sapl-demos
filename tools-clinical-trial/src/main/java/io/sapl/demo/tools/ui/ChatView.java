@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.mcp.ui;
+package io.sapl.demo.tools.ui;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.UI;
@@ -29,10 +29,10 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import io.sapl.demo.mcp.chat.ChatService;
-import io.sapl.demo.mcp.domain.DemoPrincipal;
-import io.sapl.demo.mcp.domain.DemoUser;
-import io.sapl.demo.mcp.domain.Purpose;
+import io.sapl.demo.tools.chat.ChatService;
+import io.sapl.demo.tools.domain.DemoPrincipal;
+import io.sapl.demo.tools.domain.DemoUser;
+import io.sapl.demo.tools.domain.Purpose;
 import lombok.val;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;

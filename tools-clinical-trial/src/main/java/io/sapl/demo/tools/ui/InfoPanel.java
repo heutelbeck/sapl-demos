@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.mcp.ui;
+package io.sapl.demo.tools.ui;
 
 import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.details.Details;

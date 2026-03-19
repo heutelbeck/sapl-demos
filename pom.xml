@@ -61,7 +61,7 @@
 		<module>mqtt</module>
 		<module>editor-components</module>
 		<module>rag-clinical-trial</module>
-		<module>mcp-clinical-trial</module>
+		<module>tools-clinical-trial</module>
 		<module>hitl-clinical-trial</module>
 	</modules>
 
