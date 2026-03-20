@@ -1,0 +1,9 @@
+policy "permit-redacted"
+permit
+  action == "readRedacted";
+  resource == "redacted";
+obligation
+  {
+    "type": "redactFields",
+    "fields": ["ssn", "creditCard"]
+  }

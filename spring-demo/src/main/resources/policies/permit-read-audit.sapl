@@ -1,0 +1,4 @@
+policy "permit-read-audit"
+permit
+  action == "readAudit";
+  resource == "audit";

@@ -1,0 +1,12 @@
+policy "permit-clinician-export"
+permit
+  action == "exportData";
+  var sequenceEndDates = {
+                         "1" : "2026-01-05T10:00:00+01:00",
+                         "2" : "2026-02-18T10:00:00+01:00",
+                         "3" : "2026-09-01T10:00:00+02:00"
+                        };
+  <jwt.token>.payload.user_role == "CLINICIAN";
+  <jwt.token>.payload.pilotId == resource.pilotId;
+  var timeGate = sequenceEndDates[("" + resource.sequenceId)];
+  <time.nowIsAfter(timeGate)>;

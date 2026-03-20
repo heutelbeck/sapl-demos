@@ -1,0 +1,127 @@
+{
+  "realm": "demo",
+  "enabled": true,
+  "clients": [
+    {
+      "clientId": "demo-app",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "dev-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "redirectUris": ["http://localhost:3000/*"],
+      "webOrigins": ["http://localhost:3000"],
+      "protocolMappers": [
+        {
+          "name": "user_role-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "user_role",
+            "claim.name": "user_role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        },
+        {
+          "name": "pilotId-mapper",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "pilotId",
+            "claim.name": "pilotId",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "clinician1",
+      "enabled": true,
+      "firstName": "Clinician",
+      "lastName": "One",
+      "email": "clinician1@example.com",
+      "emailVerified": true,
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "user_role": ["CLINICIAN"],
+        "pilotId": ["1"]
+      }
+    },
+    {
+      "username": "clinician2",
+      "enabled": true,
+      "firstName": "Clinician",
+      "lastName": "Two",
+      "email": "clinician2@example.com",
+      "emailVerified": true,
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "user_role": ["CLINICIAN"],
+        "pilotId": ["2"]
+      }
+    },
+    {
+      "username": "participant1",
+      "enabled": true,
+      "firstName": "Participant",
+      "lastName": "One",
+      "email": "participant1@example.com",
+      "emailVerified": true,
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "user_role": ["PARTICIPANT"],
+        "pilotId": ["1"]
+      }
+    },
+    {
+      "username": "participant2",
+      "enabled": true,
+      "firstName": "Participant",
+      "lastName": "Two",
+      "email": "participant2@example.com",
+      "emailVerified": true,
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "attributes": {
+        "user_role": ["PARTICIPANT"],
+        "pilotId": ["2"]
+      }
+    }
+  ]
+}

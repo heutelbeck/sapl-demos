@@ -1,0 +1,16 @@
+policy "permit-read-patients"
+permit
+  action == "readPatients";
+  resource == "patients";
+obligation
+  {
+    "type": "filterJsonContent",
+    "actions": [
+      {
+        "type": "blacken",
+        "path": "$.ssn",
+        "replacement": "*",
+        "discloseRight": 4
+      }
+    ]
+  }

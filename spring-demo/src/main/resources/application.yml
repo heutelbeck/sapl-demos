@@ -1,0 +1,28 @@
+server:
+  port: 3000
+
+io:
+  sapl:
+    pdp:
+      embedded:
+        pdp-config-type: RESOURCES
+        config-path: /policies
+        policies-path: /policies
+        print-text-report: true
+        print-json-report: false
+        print-trace: false
+        pretty-print-reports: false
+
+spring:
+  main:
+    banner-mode: off
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_URL:http://localhost:8080}/realms/demo/protocol/openid-connect/certs
+
+logging:
+  level:
+    io.sapl: DEBUG
+    org.springframework.security: WARN

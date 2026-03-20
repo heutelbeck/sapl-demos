@@ -1,0 +1,14 @@
+policy "permit-transfer"
+permit
+  action == "transfer";
+  resource == "account";
+obligation
+  {
+    "type": "capTransferAmount",
+    "maxAmount": 5000
+  }
+obligation
+  {
+    "type": "logAccess",
+    "message": "Fund transfer executed"
+  }

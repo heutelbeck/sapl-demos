@@ -1,0 +1,4 @@
+policy "permit-service-list-patients"
+permit
+  action == "listPatients";
+  resource == "patients";

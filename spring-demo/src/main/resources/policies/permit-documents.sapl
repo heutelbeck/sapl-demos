@@ -1,0 +1,9 @@
+policy "permit-documents"
+permit
+  action == "readDocuments";
+  resource == "documents";
+obligation
+  {
+    "type": "filterByClassification",
+    "maxLevel": "INTERNAL"
+  }

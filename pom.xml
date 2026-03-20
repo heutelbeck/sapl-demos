@@ -63,6 +63,7 @@
 		<module>rag-clinical-trial</module>
 		<module>tools-clinical-trial</module>
 		<module>hitl-clinical-trial</module>
+		<module>spring-demo</module>
 	</modules>
 
 </project>

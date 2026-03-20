@@ -1,0 +1,13 @@
+policy "permit-error-handling"
+permit
+  action == "readErrorDemo";
+  resource == "errorDemo";
+obligation
+  {
+    "type": "notifyOnError"
+  }
+obligation
+  {
+    "type": "enrichError",
+    "supportUrl": "https://support.example.com/errors"
+  }

@@ -1,0 +1,16 @@
+policy "permit-service-patient-detail"
+permit
+  action == "getPatientDetail";
+  resource.type == "patientDetail";
+obligation
+  {
+    "type": "filterJsonContent",
+    "actions": [
+      {
+        "type": "blacken",
+        "path": "$.ssn",
+        "replacement": "*",
+        "discloseRight": 4
+      }
+    ]
+  }

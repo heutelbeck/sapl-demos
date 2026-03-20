@@ -1,0 +1,14 @@
+policy "permit-service-search-patients"
+permit
+  action == "searchPatients";
+  resource == "patientSearch";
+obligation
+  {
+    "type": "logAccess",
+    "message": "Patient search query executed"
+  }
+obligation
+  {
+    "type": "filterByClassification",
+    "maxLevel": "INTERNAL"
+  }

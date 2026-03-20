@@ -1,0 +1,10 @@
+policy "permit-replaced"
+permit
+  action == "readReplaced";
+  resource == "replaced";
+transform
+  {
+    "message": "This resource was replaced by the PDP",
+    "policyGenerated": true,
+    "originalResourceIgnored": true
+  }

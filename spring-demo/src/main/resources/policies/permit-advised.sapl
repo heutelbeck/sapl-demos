@@ -1,0 +1,14 @@
+policy "permit-advised"
+permit
+  action == "readAdvised";
+  resource == "advised";
+advice
+  {
+    "type": "logAccess",
+    "message": "Advisory: medical data accessed"
+  }
+advice
+  {
+    "type": "nonExistentAdviceHandler",
+    "note": "No handler exists for this type -- but access is still granted because advice is best-effort"
+  }

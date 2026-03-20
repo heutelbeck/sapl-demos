@@ -1,0 +1,24 @@
+policy "permit-patient-full"
+permit
+  action == "readPatientFull";
+  resource == "patientFull";
+obligation
+  {
+    "type": "filterJsonContent",
+    "actions": [
+      {
+        "type": "blacken",
+        "path": "$.ssn",
+        "discloseRight": 4
+      },
+      {
+        "type": "delete",
+        "path": "$.internal_notes"
+      },
+      {
+        "type": "replace",
+        "path": "$.email",
+        "replacement": "redacted@example.com"
+      }
+    ]
+  }

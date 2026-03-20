@@ -27,6 +27,7 @@ If you are new to SAPL, start with these demos:
 | [webflux](webflux)                                           | Reactive method security with streaming PEP annotations |
 | [web-authorizationmanager](web-authorizationmanager)         | Filter chain authorization in Spring MVC                |
 | [webflux-authorizationmanager](webflux-authorizationmanager) | Filter chain authorization in WebFlux                   |
+| [spring-demo](spring-demo)                                   | Multi-framework test suite demo (28 endpoints, all constraint handler types, SSE streaming, JWT) |
 
 ### Database Query Rewriting
 
