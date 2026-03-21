@@ -25,7 +25,8 @@ public class StreamingService {
         return heartbeatSource();
     }
 
-    @EnforceRecoverableIfDenied(action = "'stream:heartbeat'", resource = "'heartbeat'")
+    @EnforceRecoverableIfDenied(action = "'stream:heartbeat'", resource = "'heartbeat'",
+            signalAccessRecovery = true)
     public Flux<HeartbeatEvent> heartbeatRecoverable() {
         return heartbeatSource();
     }
