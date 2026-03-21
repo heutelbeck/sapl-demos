@@ -17,6 +17,7 @@
  */
 package io.sapl.demo.views.sapltesteditor;
 
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,6 +26,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.demo.views.MainLayout;
+import io.sapl.demo.views.ThemeChangedEvent;
 import io.sapl.vaadin.DocumentChangedEvent;
 import io.sapl.vaadin.ValidationFinishedEvent;
 import io.sapl.vaadin.ValidationStatusDisplay;
@@ -446,7 +448,7 @@ public class SaplTestLspEditorView extends VerticalLayout {
         setSpacing(true);
 
         var config = new SaplEditorLspConfiguration();
-        config.setDarkTheme(true);
+        config.setDarkTheme(false);
         config.setHasLineNumbers(true);
         config.setWsUrl(WS_URL);
 
@@ -464,6 +466,10 @@ public class SaplTestLspEditorView extends VerticalLayout {
 
         // Load default content after component is attached to ensure proper initialization
         editor.addAttachListener(event -> editor.setDocument(DEFAULT_TEST));
+
+        addAttachListener(event -> ComponentUtil.addListener(
+                event.getUI(), ThemeChangedEvent.class,
+                e -> editor.setDarkTheme(e.isDarkMode())));
     }
 
     private VerticalLayout buildControls() {
@@ -489,9 +495,6 @@ public class SaplTestLspEditorView extends VerticalLayout {
             log.info("Configuration ID set to: {}", value);
         });
 
-        var dark = new Checkbox("Dark theme", true);
-        dark.addValueChangeListener(e -> editor.setDarkTheme(Boolean.TRUE.equals(e.getValue())));
-
         var readOnly = new Checkbox("Read-only", false);
         readOnly.addValueChangeListener(e -> editor.setReadOnly(Boolean.TRUE.equals(e.getValue())));
 
@@ -506,7 +509,7 @@ public class SaplTestLspEditorView extends VerticalLayout {
 
         var format = new Button("Autoformat", e -> editor.format());
 
-        topRow.add(setDefault, showDoc, format, configId, dark, readOnly, autoComplete, folding);
+        topRow.add(setDefault, showDoc, format, configId, readOnly, autoComplete, folding);
 
         var middleRow = new HorizontalLayout();
         middleRow.setWidthFull();

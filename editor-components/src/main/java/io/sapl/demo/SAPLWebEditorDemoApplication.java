@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.Serial;
 
-@ColorScheme(ColorScheme.Value.DARK)
+@ColorScheme(ColorScheme.Value.LIGHT_DARK)
 @SpringBootApplication
 public class SAPLWebEditorDemoApplication implements AppShellConfigurator {
 

@@ -17,6 +17,7 @@
  */
 package io.sapl.demo.views.jsoneditor;
 
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,6 +25,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.demo.views.MainLayout;
+import io.sapl.demo.views.ThemeChangedEvent;
 import io.sapl.vaadin.lsp.JsonEditor;
 import io.sapl.vaadin.lsp.JsonEditorConfiguration;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +101,7 @@ public class JsonEditorView extends VerticalLayout {
         setSpacing(true);
 
         var config = new JsonEditorConfiguration();
-        config.setDarkTheme(true);
+        config.setDarkTheme(false);
         config.setHasLineNumbers(true);
 
         editor = new JsonEditor(config);
@@ -108,6 +110,10 @@ public class JsonEditorView extends VerticalLayout {
         editor.setDocument(DEFAULT_JSON);
 
         add(editor, buildControls());
+
+        addAttachListener(event -> ComponentUtil.addListener(
+                event.getUI(), ThemeChangedEvent.class,
+                e -> editor.setDarkTheme(e.isDarkMode())));
     }
 
     private VerticalLayout buildControls() {
@@ -124,16 +130,13 @@ public class JsonEditorView extends VerticalLayout {
         var setDefault = new Button("Reset to Default", e -> editor.setDocument(DEFAULT_JSON));
         var showDoc = new Button("Log Document", e -> log.info("Document:\n{}", editor.getDocument()));
 
-        var dark = new Checkbox("Dark theme", true);
-        dark.addValueChangeListener(e -> editor.setDarkTheme(Boolean.TRUE.equals(e.getValue())));
-
         var readOnly = new Checkbox("Read-only", false);
         readOnly.addValueChangeListener(e -> editor.setReadOnly(Boolean.TRUE.equals(e.getValue())));
 
         var lint = new Checkbox("Lint", true);
         lint.addValueChangeListener(e -> editor.setLint(Boolean.TRUE.equals(e.getValue())));
 
-        topRow.add(setDefault, showDoc, dark, readOnly, lint);
+        topRow.add(setDefault, showDoc, readOnly, lint);
 
         var middleRow = new HorizontalLayout();
         middleRow.setWidthFull();

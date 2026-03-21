@@ -17,6 +17,7 @@
  */
 package io.sapl.demo.views.graph;
 
+import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,6 +26,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import io.sapl.api.SaplVersion;
 import io.sapl.demo.views.MainLayout;
+import io.sapl.demo.views.ThemeChangedEvent;
 import io.sapl.vaadin.lsp.graph.JsonGraphVisualization;
 import lombok.extern.slf4j.Slf4j;
 
@@ -120,6 +122,10 @@ public class GraphVisualizationView extends VerticalLayout {
         graph.setJsonData(AUTH_REQUEST_JSON);
 
         add(graph, buildControls());
+
+        addAttachListener(event -> ComponentUtil.addListener(
+                event.getUI(), ThemeChangedEvent.class,
+                e -> graph.setDarkTheme(e.isDarkMode())));
     }
 
     private HorizontalLayout buildControls() {
