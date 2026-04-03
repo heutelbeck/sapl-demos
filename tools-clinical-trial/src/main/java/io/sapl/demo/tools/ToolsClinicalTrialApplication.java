@@ -16,6 +16,7 @@
 package io.sapl.demo.tools;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
+import io.sapl.api.SaplVersion;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.theme.lumo.Lumo;
@@ -30,7 +31,7 @@ import java.io.Serial;
 public class ToolsClinicalTrialApplication implements AppShellConfigurator {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     public static void main(String[] args) {
         SpringApplication.run(ToolsClinicalTrialApplication.class, args);

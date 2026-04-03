@@ -24,6 +24,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.views.MainLayout;
 import io.sapl.demo.views.ThemeChangedEvent;
 import io.sapl.vaadin.lsp.JsonEditor;
@@ -42,7 +43,7 @@ import java.io.Serial;
 public class JsonEditorView extends VerticalLayout {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private static final String DEFAULT_JSON = """
             {

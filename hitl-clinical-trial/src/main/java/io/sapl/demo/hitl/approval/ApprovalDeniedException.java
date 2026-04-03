@@ -17,6 +17,7 @@ package io.sapl.demo.hitl.approval;
 
 import java.io.Serial;
 
+import io.sapl.api.SaplVersion;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -26,7 +27,7 @@ import org.springframework.security.access.AccessDeniedException;
 public class ApprovalDeniedException extends AccessDeniedException {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     public ApprovalDeniedException(String toolName, String summary) {
         super("Operator denied '" + toolName + "': " + summary);

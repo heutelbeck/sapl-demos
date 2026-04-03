@@ -15,6 +15,7 @@
  */
 package io.sapl.mvc.demo.controller;
 
+import io.sapl.api.SaplVersion;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
 import io.sapl.api.pdp.PolicyDecisionPoint;
@@ -32,7 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
+import java.io.Serial;
 
 @Slf4j
 @Controller
@@ -52,7 +53,8 @@ public class UIController {
     @StandardException
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     public static class ResourceNotFoundException extends RuntimeException {
-        private static final long serialVersionUID = -3700918290606460911L;
+        @Serial
+        private static final long serialVersionUID = SaplVersion.VERSION_UID;
     }
 
     // @PreEnforce

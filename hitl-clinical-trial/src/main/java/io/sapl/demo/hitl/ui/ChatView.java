@@ -33,6 +33,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.hitl.approval.ApprovalRequest;
 import io.sapl.demo.hitl.approval.ApprovalService;
 import io.sapl.demo.hitl.approval.SessionIdHolder;
@@ -66,7 +67,7 @@ import java.util.function.Consumer;
 public class ChatView extends VerticalLayout {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };
     private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");

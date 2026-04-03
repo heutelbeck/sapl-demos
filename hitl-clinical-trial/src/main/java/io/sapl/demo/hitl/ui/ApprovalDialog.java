@@ -24,6 +24,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.hitl.approval.ApprovalRequest;
 import io.sapl.demo.hitl.approval.ApprovalService;
 import lombok.val;
@@ -39,7 +40,7 @@ import static java.lang.System.currentTimeMillis;
 class ApprovalDialog extends Dialog {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private final transient ScheduledExecutorService countdown;
 

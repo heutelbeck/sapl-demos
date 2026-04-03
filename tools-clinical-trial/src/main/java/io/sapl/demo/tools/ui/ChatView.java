@@ -29,6 +29,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import io.sapl.api.SaplVersion;
 import io.sapl.demo.tools.chat.ChatService;
 import io.sapl.demo.tools.domain.DemoPrincipal;
 import io.sapl.demo.tools.domain.DemoUser;
@@ -52,7 +53,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ChatView extends VerticalLayout {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private static final String   ACTIVE     = "Active";
     private static final String[] DOT_FRAMES = { "", ".", "..", "...", "..", "." };

@@ -16,6 +16,7 @@
 package io.sapl.demo.tools.ui;
 
 import com.vaadin.flow.component.Html;
+import io.sapl.api.SaplVersion;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -29,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 class InfoPanel extends Details {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     private static final String[] CORPUS_FILES = {
             "study_protocol.md",

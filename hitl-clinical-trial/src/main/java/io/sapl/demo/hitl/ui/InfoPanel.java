@@ -16,6 +16,7 @@
 package io.sapl.demo.hitl.ui;
 
 import com.vaadin.flow.component.Html;
+import io.sapl.api.SaplVersion;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Pre;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -27,7 +28,7 @@ import java.io.Serial;
 class InfoPanel extends Details {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = SaplVersion.VERSION_UID;
 
     InfoPanel(AdverseEventData data) {
         super("Clinical Study (CT-2025-001) - Human-in-the-Loop Demo", createTabSheet(data));
