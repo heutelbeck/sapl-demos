@@ -31,7 +31,7 @@ mvn clean package
 
 ```bash
 cd target
-java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar remote-pdp-4.0.0-jar-with-dependencies.jar
 ```
 
 By default, the demo connects to `http://localhost:8443` (SAPL Node default: no auth, no TLS).
@@ -48,7 +48,7 @@ Options:
 
 **Example with custom server:**
 ```bash
-java -jar remote-pdp-4.0.0-SNAPSHOT-jar-with-dependencies.jar -h=http://myserver:8443
+java -jar remote-pdp-4.0.0-jar-with-dependencies.jar -h=http://myserver:8443
 ```
 
 ### Sample Output (No Server Running)
@@ -133,7 +133,7 @@ Use the SAPL BOM for version management:
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-bom</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>

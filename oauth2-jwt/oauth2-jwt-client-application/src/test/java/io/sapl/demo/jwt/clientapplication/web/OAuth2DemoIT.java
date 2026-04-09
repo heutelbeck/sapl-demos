@@ -37,7 +37,7 @@ class OAuth2DemoIT {
 
     private static final Duration TIMEOUT_SPINUP = Duration.ofMinutes(2);
     private static final String   REGISTRY       = System.getProperty("docker.registry", "local/");
-    private static final String   TAG            = ":4.0.0-SNAPSHOT";
+    private static final String   TAG            = ":4.0.0";
     private static final boolean  USE_LOCAL      = REGISTRY.startsWith("local");
 
     private static final int     AUTH_SERVER_PORT     = 9000;

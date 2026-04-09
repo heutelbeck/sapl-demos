@@ -30,7 +30,7 @@ Run the executable JAR:
 
 ```bash
 cd target
-java -jar embedded-pdp-no-framework-4.0.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar embedded-pdp-no-framework-4.0.0-jar-with-dependencies.jar
 ```
 
 ### Command Line Options
@@ -217,7 +217,7 @@ Use the SAPL BOM for version management:
         <dependency>
             <groupId>io.sapl</groupId>
             <artifactId>sapl-bom</artifactId>
-            <version>4.0.0-SNAPSHOT</version>
+            <version>4.0.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>

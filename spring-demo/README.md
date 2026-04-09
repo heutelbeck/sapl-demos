@@ -96,6 +96,6 @@ All 23 `.sapl` policy files are identical across the Python, NestJS, .NET, and S
 ## Dependencies
 
 - Spring Boot 4.0.3 (WebFlux)
-- SAPL 4.0.0-SNAPSHOT (`sapl-spring-boot-starter`)
+- SAPL 4.0.0 (`sapl-spring-boot-starter`)
 - Spring Security OAuth2 Resource Server (JWT validation)
 - Lombok
