@@ -47,7 +47,7 @@
 
 		<!-- Dependencies -->
 		<lombok.version>1.18.44</lombok.version>
-		<bouncycastle.version>1.83</bouncycastle.version>
+		<bouncycastle.version>1.84</bouncycastle.version>
 
 		<!-- Maven Plug-Ins -->
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
