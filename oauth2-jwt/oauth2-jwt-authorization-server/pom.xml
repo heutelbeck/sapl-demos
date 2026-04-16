@@ -43,7 +43,7 @@
 		<java.version>21</java.version>
 
 		<!-- Dependencies -->
-		<bouncycastle.version>1.83</bouncycastle.version>
+		<bouncycastle.version>1.84</bouncycastle.version>
 
 		<!-- Docker -->
 		<docker-registry-url>local</docker-registry-url>
