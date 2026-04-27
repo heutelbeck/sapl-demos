@@ -2,56 +2,57 @@ package io.sapl.demo.spring.handler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.UnaryOperator;
+import java.util.Set;
+
+import org.springframework.stereotype.Component;
 
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.MappingConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
+import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
+import io.sapl.spring.pep.constraints.Signal.OutputSignal;
+import io.sapl.spring.pep.constraints.SignalType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-class ClassificationFilterHandler implements MappingConstraintHandlerProvider<Object> {
+class ClassificationFilterHandler implements ConstraintHandlerProvider {
+
+    private static final SignalType OUTPUT_OBJECT = OutputSignal.typeFor(Object.class);
 
     private static final Map<String, Integer> CLASSIFICATION_LEVELS = Map.of(
             "PUBLIC", 0,
             "INTERNAL", 1,
             "CONFIDENTIAL", 2,
-            "SECRET", 3
-    );
+            "SECRET", 3);
 
     private final ObjectMapper mapper;
 
     @Override
-    public Class<Object> getSupportedType() {
-        return Object.class;
-    }
-
-    @Override
-    public boolean isResponsible(Value constraint) {
+    public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
         if (!(constraint instanceof ObjectValue obj)) {
-            return false;
+            return List.of();
         }
-        return obj.get("type") instanceof TextValue t && "filterByClassification".equals(t.value());
-    }
-
-    @Override
-    public UnaryOperator<Object> getHandler(Value constraint) {
-        var obj = (ObjectValue) constraint;
-        var maxLevelValue = obj.get("maxLevel");
-        var maxLevel = maxLevelValue instanceof TextValue t ? t.value() : "PUBLIC";
-        var maxRank = CLASSIFICATION_LEVELS.getOrDefault(maxLevel, 0);
-        return value -> {
+        if (!(obj.get("type") instanceof TextValue(String type)) || !"filterByClassification".equals(type)) {
+            return List.of();
+        }
+        if (!supportedSignals.contains(OUTPUT_OBJECT)) {
+            return List.of();
+        }
+        var maxLevel = obj.get("maxLevel") instanceof TextValue(String level) ? level : "PUBLIC";
+        var maxRank  = CLASSIFICATION_LEVELS.getOrDefault(maxLevel, 0);
+        Mapper<Object> handler = value -> {
             if (value instanceof List<?> list) {
                 return list.stream().filter(element -> isAllowed(element, maxLevel, maxRank)).toList();
             }
             return isAllowed(value, maxLevel, maxRank) ? value : null;
         };
+        return List.of(new ScopedConstraintHandler(handler, OUTPUT_OBJECT, 50));
     }
 
     private boolean isAllowed(Object element, String maxLevel, int maxRank) {
@@ -76,5 +77,4 @@ class ClassificationFilterHandler implements MappingConstraintHandlerProvider<Ob
         Map<?, ?> map = mapper.convertValue(element, Map.class);
         return map.get("classification") instanceof String s ? s : null;
     }
-
 }

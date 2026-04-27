@@ -1,9 +1,9 @@
 /*
- * Tests for the filter_set policy which protects the /secret endpoint.
+ * Tests for the filter_set policy that protects the demo endpoints.
  *
- * The policy uses permit-unless-deny combining algorithm and contains
- * a single policy "deny_secret" that blocks anonymous users from
- * accessing GET /secret.
+ * The set uses the `priority deny or permit errors abstain` algorithm.
+ * Every policy in the set is exercised here so condition coverage stays
+ * at 100%.
  */
 
 requirement "Anonymous users cannot access /secret" {
@@ -30,7 +30,7 @@ requirement "Anonymous users cannot access /secret" {
         expect deny;
 }
 
-requirement "Authenticated users can access /secret" {
+requirement "Authenticated users can access /secret with the X-Authorized-By obligation" {
 
     given
         - document "filter_set"
@@ -42,7 +42,8 @@ requirement "Authenticated users can access /secret" {
             { "method": "GET" }
         on
             { "requestedURI": "/secret" }
-        expect permit;
+        expect decision is permit,
+            with obligation containing key "type" with value matching text "response-header";
 
     scenario "authenticated user with multiple roles permitted"
         when
@@ -63,7 +64,7 @@ requirement "Authenticated users can access /secret" {
         expect permit;
 }
 
-requirement "Other endpoints are accessible to everyone (permit-unless-deny)" {
+requirement "Other endpoints are accessible to everyone (audit_all permits by default)" {
 
     given
         - document "filter_set"
@@ -117,5 +118,55 @@ requirement "Only GET method is blocked for anonymous on /secret" {
             { "method": "DELETE" }
         on
             { "requestedURI": "/secret" }
+        expect permit;
+}
+
+requirement "GET /echo-correlation carries the request-header obligation" {
+
+    given
+        - document "filter_set"
+
+    scenario "GET /echo-correlation produces the request-header obligation"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "requestedURI": "/echo-correlation" }
+        expect decision is permit,
+            with obligation containing key "type" with value matching text "request-header";
+
+    scenario "POST /echo-correlation does not match the tag policy and stays a plain permit"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "POST" }
+        on
+            { "requestedURI": "/echo-correlation" }
+        expect permit;
+}
+
+requirement "GET /teapot is denied with a custom deny page" {
+
+    given
+        - document "filter_set"
+
+    scenario "authenticated GET /teapot is denied with the deny-page obligation"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "GET" }
+        on
+            { "requestedURI": "/teapot" }
+        expect decision is deny,
+            with obligation containing key "type" with value matching text "deny-page";
+
+    scenario "POST /teapot does not match the deny condition and is permitted"
+        when
+            { "authority": [ { "authority": "ROLE_USER" } ] }
+        attempts
+            { "method": "POST" }
+        on
+            { "requestedURI": "/teapot" }
         expect permit;
 }

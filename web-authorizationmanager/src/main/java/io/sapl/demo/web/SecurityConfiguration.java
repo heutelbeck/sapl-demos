@@ -15,7 +15,11 @@
  */
 package io.sapl.demo.web;
 
-import io.sapl.spring.manager.SaplAuthorizationManager;
+import static io.sapl.spring.pep.http.servlet.SaplHttpSecurityConfigurer.saplHttp;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,7 +30,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebSecurity
@@ -34,22 +39,27 @@ public class SecurityConfiguration {
 
     @Bean
     UserDetailsService userDetailsService() {
-        @SuppressWarnings("deprecation") // Demo Code!
+        @SuppressWarnings("deprecation") // Demo Code
         UserDetails user = User.withDefaultPasswordEncoder().username("user").password("user").roles("USER").build();
         return new InMemoryUserDetailsManager(user);
     }
 
+    /*
+     * The configurer customizer narrows the subscription to the three fields
+     * the demo policies reference (subject..authority, action.method,
+     * resource.requestedURI). The default factory ships the entire
+     * serialized request which works but is verbose. To replace the factory
+     * globally instead, declare a single
+     * @Bean AuthorizationSubscriptionFactory and the configurer call below
+     * collapses to http.with(saplHttp(), withDefaults()).
+     */
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, SaplAuthorizationManager saplAuthzManager) {
-        // @formatter:off
-		return http.authorizeHttpRequests(requests -> 
-						requests.anyRequest()
-				                .access(saplAuthzManager)
-				    )
-				   .formLogin(withDefaults())
-				   .httpBasic(withDefaults())
-				   .build();
-		// @formatter:on
+    SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper mapper) throws Exception {
+        return http.with(saplHttp(),
+                c -> c.subscriptionFactory((auth, request) -> AuthorizationSubscription.of(auth,
+                        Map.of("method", request.getMethod()),
+                        Map.of("requestedURI", request.getRequestURI()), mapper)))
+                .formLogin(withDefaults()).httpBasic(withDefaults()).build();
     }
 
 }

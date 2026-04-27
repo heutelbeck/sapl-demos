@@ -15,55 +15,78 @@
  */
 package io.sapl.demo.rag.chat;
 
-import io.sapl.api.model.ArrayValue;
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
-import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.MethodInvocationConstraintHandlerProvider;
-import lombok.extern.slf4j.Slf4j;
-import lombok.val;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Service;
+
+import io.sapl.api.model.ArrayValue;
+import io.sapl.api.model.ObjectValue;
+import io.sapl.api.model.TextValue;
+import io.sapl.api.model.Value;
+import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
+import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
+import io.sapl.spring.pep.constraints.Signal.InputSignal;
+import io.sapl.spring.pep.constraints.SignalType;
+import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import reactor.core.publisher.Mono;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
+/**
+ * Mutates the protected method's first argument (a
+ * {@code Mono<SearchRequest>}) to apply SAPL-derived filters before the
+ * vector-store call. Triggered by SAPL obligations of type
+ * {@code filterDocuments} on the {@link InputSignal} (the legacy
+ * MethodInvocation handler phase).
+ * </p>
+ * Migrated from the legacy {@code MethodInvocationConstraintHandlerProvider}
+ * to the unified {@link ConstraintHandlerProvider} interface returning a
+ * {@link Mapper}{@code <MethodInvocation>}: the mapper mutates the live
+ * arguments array on the invocation and returns the same invocation, so the
+ * downstream reactive chain sees the rewritten request when subscribed.
+ */
 @Slf4j
 @Service
-class DocumentFilterConstraintHandlerProvider implements MethodInvocationConstraintHandlerProvider {
+class DocumentFilterConstraintHandlerProvider implements ConstraintHandlerProvider {
 
-    private static final String CONSTRAINT_TYPE = "filterDocuments";
+    private static final String CONSTRAINT_TYPE  = "filterDocuments";
+    private static final int    DEFAULT_PRIORITY = 50;
 
     @Override
-    public boolean isResponsible(Value constraint) {
-        return constraint instanceof ObjectValue ov
-                && ov.containsKey("type")
-                && ov.get("type") instanceof TextValue(String value)
-                && value.equals(CONSTRAINT_TYPE);
+    public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
+        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+            return List.of();
+        }
+        if (!supportedSignals.contains(InputSignal.TYPE)) {
+            return List.of();
+        }
+        if (!(constraint instanceof ObjectValue obligation)) {
+            return List.of();
+        }
+        Mapper<MethodInvocation> mapper = invocation -> rewriteFirstArgument(invocation, obligation);
+        return List.of(new ScopedConstraintHandler(mapper, InputSignal.TYPE, DEFAULT_PRIORITY));
     }
 
-    @Override
     @SuppressWarnings("unchecked")
-    public Consumer<ReflectiveMethodInvocation> getHandler(Value constraint) {
-        return methodInvocation -> {
-            if (!(constraint instanceof ObjectValue ov)) {
-                return;
-            }
-
-            val args = methodInvocation.getArguments();
-            var searchRequestMono = (Mono<SearchRequest>) args[0];
-            if (searchRequestMono == null) {
-                return;
-            }
-
-            args[0] = searchRequestMono.map(request -> applyFilters(request, ov));
-            methodInvocation.setArguments(args);
-        };
+    private static MethodInvocation rewriteFirstArgument(MethodInvocation invocation, ObjectValue obligation) {
+        val args              = invocation.getArguments();
+        val searchRequestMono = (Mono<SearchRequest>) args[0];
+        if (searchRequestMono == null) {
+            return invocation;
+        }
+        args[0] = searchRequestMono.map(request -> applyFilters(request, obligation));
+        if (invocation instanceof ReflectiveMethodInvocation reflective) {
+            reflective.setArguments(args);
+        }
+        return invocation;
     }
 
     private static SearchRequest applyFilters(SearchRequest request, ObjectValue obligation) {
@@ -75,17 +98,15 @@ class DocumentFilterConstraintHandlerProvider implements MethodInvocationConstra
             val builder = new FilterExpressionBuilder();
             for (val type : excludeTypes) {
                 val ne = builder.ne("type", type).build();
-                filter = filter != null
-                        ? new Filter.Expression(Filter.ExpressionType.AND, filter, ne)
-                        : ne;
+                filter = filter != null ? new Filter.Expression(Filter.ExpressionType.AND, filter, ne) : ne;
             }
         }
 
         if (obligation.containsKey("filterSite") && obligation.get("filterSite") instanceof TextValue(String value)) {
             log.info("SAPL filtering: restricting to site '{}' (and 'all')", value);
             val builder = new FilterExpressionBuilder();
-            val siteEq = builder.eq("site", value).build();
-            val allEq = builder.eq("site", "all").build();
+            val siteEq  = builder.eq("site", value).build();
+            val allEq   = builder.eq("site", "all").build();
             if (filter != null) {
                 // Distribute AND over OR to avoid jsonpath precedence bug in PgVectorStore:
                 // OR(AND(filter, site=x), AND(filter, site=all))
@@ -108,12 +129,8 @@ class DocumentFilterConstraintHandlerProvider implements MethodInvocationConstra
                 ? new Filter.Expression(Filter.ExpressionType.AND, existingFilter, filter)
                 : filter;
 
-        return SearchRequest.builder()
-                .query(request.getQuery())
-                .topK(request.getTopK())
-                .similarityThreshold(request.getSimilarityThreshold())
-                .filterExpression(combinedFilter)
-                .build();
+        return SearchRequest.builder().query(request.getQuery()).topK(request.getTopK())
+                .similarityThreshold(request.getSimilarityThreshold()).filterExpression(combinedFilter).build();
     }
 
     private static List<String> extractStringList(ObjectValue ov, String key) {
@@ -127,5 +144,4 @@ class DocumentFilterConstraintHandlerProvider implements MethodInvocationConstra
         }
         return result;
     }
-
 }

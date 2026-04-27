@@ -17,7 +17,7 @@
  */
 package io.sapl.mongo.domain;
 
-import io.sapl.spring.method.metadata.QueryEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
@@ -27,7 +27,7 @@ import reactor.core.publisher.Flux;
 public interface BookRepository extends ReactiveMongoRepository<Book, Long> {
 
     @Query("{}")
-    @QueryEnforce(action = "'findAll'")
+    @PreEnforce(action = "'findAll'")
     Flux<Book> findAllBooks();
 
 }

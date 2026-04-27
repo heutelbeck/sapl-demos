@@ -17,8 +17,10 @@ package io.sapl.demo.webflux;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -33,6 +35,27 @@ public class DemoController {
     @GetMapping(value = "/secret", produces = MediaType.TEXT_PLAIN_VALUE)
     public Mono<String> secretData() {
         return Mono.just("Secret information");
+    }
+
+    /**
+     * Echoes the {@code X-Correlation-Id} header back. The SAPL policy
+     * injects this header on permit through an
+     * {@code HttpRequestMutationSignal} obligation, so the body always reads
+     * {@code demo-correlation-id} regardless of what the client sent.
+     */
+    @GetMapping(value = "/echo-correlation", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> echoCorrelation(@RequestHeader(name = "X-Correlation-Id", required = false) String id) {
+        return Mono.just(id == null ? "no correlation id" : id);
+    }
+
+    /**
+     * Always denied by policy with an obligation that shapes the deny
+     * response into HTTP 418 with a custom body, demonstrating
+     * {@code HttpDenialSignal} customisation.
+     */
+    @GetMapping(value = "/teapot", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<String> teapot() {
+        return Mono.just("this should never be reached");
     }
 
 }

@@ -17,7 +17,7 @@
  */
 package io.sapl.r2dbc.domain;
 
-import io.sapl.spring.method.metadata.QueryEnforce;
+import io.sapl.spring.method.metadata.PreEnforce;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
@@ -27,7 +27,7 @@ import reactor.core.publisher.Flux;
 public interface BookRepository extends R2dbcRepository<Book, Long> {
 
     @NonNull
-    @QueryEnforce(action = "'findAll'")
+    @PreEnforce(action = "'findAll'")
     Flux<Book> findAll();
 
 }

@@ -15,20 +15,19 @@
  */
 package io.sapl.demo.webflux;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.JsonNodeFactory;
-
-import static io.sapl.spring.method.reactive.RecoverableFluxes.recover;
 
 @Slf4j
 @RestController
@@ -71,13 +70,20 @@ public class DemoController {
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 
+    // TODO recover behaviour: the 4.0 io.sapl.spring.method.reactive.RecoverableFluxes
+    // helper is gone. Once the streaming PEPs (@EnforceTillDenied,
+    // @EnforceDropWhileDenied, @EnforceRecoverableIfDenied) ship as real
+    // enforcement (not scaffolds), revisit this endpoint and rebuild the
+    // "deny -> suspend -> resume" lifecycle around the new lifecycle signals
+    // (SubscriptionSignal, CancelSignal, CompleteSignal, TerminationSignal,
+    // AfterTerminationSignal) so the demo shows the same end-to-end flow as
+    // 4.0 did. The stub below logs the deny and ends the stream.
     @GetMapping(value = "/enforcerecoverableifdeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-        return recover(service.getFluxStringRecoverable(),
-                error -> log.warn("ACCESS DENIED ('{}') (data will automatically resume once access is granted again)",
-                        error.getMessage()),
-                recovery -> log.info("ACCESS RECOVERED ('{}') (data flow is resuming)", recovery.getMessage()))
-                .map(value -> ServerSentEvent.<String>builder().data(value).build());
+        return service.getFluxStringRecoverable()
+                .onErrorResume(AccessDeniedException.class, error -> {
+                    log.warn("ACCESS DENIED ('{}') (no streaming recovery in this build)", error.getMessage());
+                    return Flux.empty();
+                }).map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
-
 }

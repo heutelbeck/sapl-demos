@@ -49,35 +49,35 @@ requirement "Policy Set should permit access with MongoDB query manipulation obl
             { "principal": { "dataScope": [1, 2, 3, 4, 5] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongoQueryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
 
     scenario "permit zoe with sections 1 and 2"
         when
             { "principal": { "dataScope": [1, 2] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongoQueryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
 
     scenario "permit bob with sections 3 and 4"
         when
             { "principal": { "dataScope": [3, 4] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongoQueryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
 
     scenario "permit ann with section 5 only"
         when
             { "principal": { "dataScope": [5] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongoQueryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
 
-    scenario "obligation has conditions array"
+    scenario "obligation has criteria array"
         when
             { "principal": { "dataScope": [1, 2] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "conditions";
+        expect decision is permit, with obligation containing key "criteria";
 }
 
 requirement "Policy Set should not apply to other actions" {

@@ -13,6 +13,8 @@ deny
 policy "enforce filtering"
 permit
 obligation 	{
-		    type       : "mongoQueryManipulation",
-		    conditions : [ "{ 'category' : { '$in' : " + subject.principal.dataScope + " } }" ]
+		    "type": "mongo:queryManipulation",
+		    "criteria": [
+		        { "column": "category", "op": "in", "value": subject.principal.dataScope }
+		    ]
 	    }

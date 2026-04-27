@@ -16,6 +16,7 @@
 package io.sapl.demo.web;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +32,27 @@ public class RestService {
     @GetMapping("secret")
     public String secretService() {
         return "secret information";
+    }
+
+    /**
+     * Echoes the {@code X-Correlation-Id} header back in the body. The SAPL
+     * policy injects this header on permit through an
+     * {@code HttpRequestMutationSignal} obligation, so the controller's view
+     * of the header is what the client observes coming back.
+     */
+    @GetMapping("echo-correlation")
+    public String echoCorrelation(@RequestHeader(name = "X-Correlation-Id", required = false) String id) {
+        return id == null ? "no correlation id" : id;
+    }
+
+    /**
+     * Always denied by policy with an obligation that shapes the deny
+     * response into HTTP 418 with a custom body, demonstrating
+     * {@code HttpDenialSignal} customisation.
+     */
+    @GetMapping("teapot")
+    public String teapot() {
+        return "this should never be reached";
     }
 
 }

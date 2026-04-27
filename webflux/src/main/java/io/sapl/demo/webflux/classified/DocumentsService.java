@@ -31,7 +31,7 @@ public class DocumentsService {
                     a nose was disgusting.\
                     """), };
 
-    @PreEnforce(genericsType = Document.class)
+    @PreEnforce
     public Flux<Document> getDocuments() {
         return Flux.fromArray(documents);
     }

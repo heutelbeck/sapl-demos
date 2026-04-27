@@ -24,7 +24,7 @@
 
 	<groupId>io.sapl</groupId>
 	<artifactId>remote-pdp</artifactId>
-	<version>4.0.0</version>
+	<version>4.1.0-SNAPSHOT</version>
 
 	<inceptionYear>2017-2026</inceptionYear>
 
@@ -41,7 +41,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
 		<!-- SAPL Version -->
-		<sapl.version>4.0.0</sapl.version>
+		<sapl.version>4.1.0-SNAPSHOT</sapl.version>
 
 		<!-- Dependencies -->
 		<slf4j.version>2.0.17</slf4j.version>

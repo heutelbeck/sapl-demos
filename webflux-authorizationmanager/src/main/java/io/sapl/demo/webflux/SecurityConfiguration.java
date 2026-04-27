@@ -15,8 +15,11 @@
  */
 package io.sapl.demo.webflux;
 
-import io.sapl.spring.manager.ReactiveSaplAuthorizationManager;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Map;
+
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -26,33 +29,39 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
-import static org.springframework.security.config.Customizer.withDefaults;
+import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.spring.pep.http.reactive.SaplServerHttpSecurityConfigurer;
+import reactor.core.publisher.Mono;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @EnableWebFluxSecurity
-@RequiredArgsConstructor
 public class SecurityConfiguration {
-
-    private final ReactiveSaplAuthorizationManager saplAuthzManager;
 
     @Bean
     MapReactiveUserDetailsService userDetailsService() {
-        @SuppressWarnings("deprecation") // Demo Code!
+        @SuppressWarnings("deprecation") // Demo Code
         UserDetails user = User.withDefaultPasswordEncoder().username("user").password("user").roles("USER").build();
         return new MapReactiveUserDetailsService(user);
     }
 
+    /*
+     * The configurer customizer narrows the subscription to the three fields
+     * the demo policies reference (subject..authority, action.method,
+     * resource.requestedURI). The default factory ships the entire
+     * serialized request which works but is verbose. To replace the factory
+     * globally instead, declare a single
+     * @Bean ReactiveAuthorizationSubscriptionFactory and the configurer
+     * call below collapses to
+     * SaplServerHttpSecurityConfigurer.apply(http, context).
+     */
     @Bean
-    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-        // @formatter:off
-		return http.authorizeExchange(exchange -> 
-		            	exchange.anyExchange()
-				                .access(saplAuthzManager)
-				    )
-				   .formLogin(withDefaults())
-				   .httpBasic(withDefaults())
-				   .build();
-		// @formatter:off
-	}
-	
+    SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http, ApplicationContext context,
+            ObjectMapper mapper) {
+        SaplServerHttpSecurityConfigurer.apply(http, context,
+                c -> c.subscriptionFactory((auth, exchange) -> Mono.just(AuthorizationSubscription.of(auth,
+                        Map.of("method", exchange.getRequest().getMethod().name()),
+                        Map.of("requestedURI", exchange.getRequest().getURI().getPath()), mapper))));
+        return http.formLogin(withDefaults()).httpBasic(withDefaults()).build();
+    }
 }

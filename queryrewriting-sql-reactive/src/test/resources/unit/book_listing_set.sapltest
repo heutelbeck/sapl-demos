@@ -39,20 +39,20 @@ requirement "Policy Set should deny access when dataScope is null, undefined, or
         expect deny;
 }
 
-requirement "Policy Set should permit access with r2dbcQueryManipulation obligation when dataScope has values" {
+requirement "Policy Set should permit access with relational:queryManipulation obligation when dataScope has values" {
 
     given
         - document "book_listing_set"
 
-    scenario "permit boss with all sections and r2dbc query manipulation"
+    scenario "permit boss with all sections and relational query manipulation"
         when
             { "principal": { "dataScope": [1, 2, 3, 4, 5] } }
         attempts
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "r2dbcQueryManipulation",
-            "conditions": [ "category IN (1, 2, 3, 4, 5)" ]
+            "type": "relational:queryManipulation",
+            "criteria": [ { "column": "category", "op": "in", "value": [1, 2, 3, 4, 5] } ]
         };
 
     scenario "permit zoe with sections 1 and 2"
@@ -62,8 +62,8 @@ requirement "Policy Set should permit access with r2dbcQueryManipulation obligat
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "r2dbcQueryManipulation",
-            "conditions": [ "category IN (1, 2)" ]
+            "type": "relational:queryManipulation",
+            "criteria": [ { "column": "category", "op": "in", "value": [1, 2] } ]
         };
 
     scenario "permit bob with sections 3 and 4"
@@ -73,8 +73,8 @@ requirement "Policy Set should permit access with r2dbcQueryManipulation obligat
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "r2dbcQueryManipulation",
-            "conditions": [ "category IN (3, 4)" ]
+            "type": "relational:queryManipulation",
+            "criteria": [ { "column": "category", "op": "in", "value": [3, 4] } ]
         };
 
     scenario "permit ann with section 5 only"
@@ -84,8 +84,8 @@ requirement "Policy Set should permit access with r2dbcQueryManipulation obligat
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "r2dbcQueryManipulation",
-            "conditions": [ "category IN (5)" ]
+            "type": "relational:queryManipulation",
+            "criteria": [ { "column": "category", "op": "in", "value": [5] } ]
         };
 }
 

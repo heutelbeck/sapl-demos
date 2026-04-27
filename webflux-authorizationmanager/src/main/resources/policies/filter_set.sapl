@@ -1,17 +1,76 @@
 /*
- * This policy set uses the 'permit-unless-deny' combining algorithm.
- * This means that access is permitted unless a policy in the set
- * explicitly denied access.
+ * Demo policy set for the Reactive WebFlux Authorization Manager.
+ *
+ * Combining algorithm: priority-based deny-overrides; errors abstain so a
+ * broken policy never escalates a permit decision into a deny.
  */
 set "filter_set"
 priority deny or permit errors abstain
 
 /*
- * This policy black-lists GET requests to the requestURI '/secret' for all
- * unauthenticated users.
+ * Audit advice fires on every decision via DecisionSignal. The handler
+ * records the decision in an in-memory probe for the demo and the test
+ * suite.
  */
-policy "deny_secret"
+policy "audit_all"
+permit
+advice
+    { "type": "audit:log" }
+
+/*
+ * Anonymous users are denied access to /secret. No deny obligation, so
+ * Spring Security's authentication entry point routes anonymous denials
+ * to the login form (or 401 with httpBasic). The audit advice is
+ * repeated here because the combining algorithm only collects
+ * obligations and advice from policies that voted for the winning
+ * decision.
+ */
+policy "deny_secret_anonymous"
 deny
     action.method == "GET";
     "ROLE_ANONYMOUS" in subject..authority;
-    resource.contextPath == "/secret";
+    resource.requestedURI == "/secret";
+advice
+    { "type": "audit:log" }
+
+/*
+ * On permit for /secret, attach a response header obligation that the
+ * ResponseHeaderHandler turns into an X-Authorized-By header on the
+ * outgoing response (HttpResponseSignal).
+ */
+policy "stamp_secret_response"
+permit
+    action.method == "GET";
+    resource.requestedURI == "/secret";
+obligation
+    { "type": "response-header", "name": "X-Authorized-By", "value": "SAPL" }
+
+/*
+ * On permit for /echo-correlation, attach a request header obligation
+ * that the RequestHeaderHandler injects via HttpRequestMutationSignal.
+ * The controller echoes the header back in the response body, so a
+ * client can observe that the policy-driven mutation reached the
+ * controller layer.
+ */
+policy "tag_echo_request"
+permit
+    action.method == "GET";
+    resource.requestedURI == "/echo-correlation";
+obligation
+    { "type": "request-header", "name": "X-Correlation-Id", "value": "demo-correlation-id" }
+
+/*
+ * Always deny /teapot with a deny obligation that the DenyPageHandler
+ * turns into an HTTP 418 response with a custom body
+ * (HttpDenialSignal). Demonstrates authenticated-deny customisation:
+ * unlike anonymous deny, this path goes through the SAPL access-denied
+ * handler and never reaches Spring Security's entry point.
+ */
+policy "deny_teapot_with_custom_page"
+deny
+    action.method == "GET";
+    resource.requestedURI == "/teapot";
+obligation
+    { "type": "deny-page", "status": 418, "body": "I'm a teapot. Brew tea instead." }
+advice
+    { "type": "audit:log" }

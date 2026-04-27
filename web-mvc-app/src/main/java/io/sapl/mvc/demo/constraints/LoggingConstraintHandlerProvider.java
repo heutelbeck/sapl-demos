@@ -15,82 +15,55 @@
  */
 package io.sapl.mvc.demo.constraints;
 
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.stereotype.Service;
+
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.RunnableConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ConstraintHandler.Runner;
+import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
+import io.sapl.spring.pep.constraints.Signal.DecisionSignal;
+import io.sapl.spring.pep.constraints.SignalType;
+import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
 /**
- * This class demonstrates the implementation of a custom constraint handler for
- * the SAPL spring-boot integration. All spring components/beans implementing
- * the interface RunnableConstraintHandlerProvider are automatically discovered
- * and registered by the spring policy enforcement points.
- * <p>
- * This handler fires on each authorization decision containing a matching
- * constraint, independent of the method return type. It is used for pure side
- * effects like access logging.
+ * Custom side-effect constraint handler. Fires a {@link Runner} at the
+ * {@link DecisionSignal} for any decision carrying a {@code logAccess}
+ * obligation/advice; the runner emits a log entry.
+ * </p>
+ * Migrated from the legacy {@code RunnableConstraintHandlerProvider} to the
+ * unified {@link ConstraintHandlerProvider} interface that now backs the
+ * shim-signal architecture: the provider explicitly chooses the signal type
+ * and priority via {@link ScopedConstraintHandler}.
  */
 @Slf4j
 @Service
-public class LoggingConstraintHandlerProvider implements RunnableConstraintHandlerProvider {
+public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvider {
 
-    private static final String ERROR_CONSTRAINT_NOT_OBJECT = "logAccess constraint is not an ObjectValue: %s";
+    private static final String CONSTRAINT_TYPE  = "logAccess";
+    private static final int    DEFAULT_PRIORITY = 50;
 
     @Override
-    public Signal getSignal() {
-        return Signal.ON_DECISION;
+    public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
+        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+            return List.of();
+        }
+        if (!supportedSignals.contains(DecisionSignal.TYPE)) {
+            return List.of();
+        }
+        Runner runner = runnerFor(constraint);
+        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.TYPE, DEFAULT_PRIORITY));
     }
 
-    /**
-     * Upon receiving a decision from the PDP containing a constraint, i.e. an
-     * advice or obligation, the PEP will check all registered ConstraintHandler
-     * beans and ask them if they are able to handle a given constraint as defined
-     * by the policy.
-     * <p>
-     * Generally, there is no specific scheme to constraints. Any JSON object may be
-     * an appropriate constraint. Its contents solely depends on the domain modeling
-     * decisions of the application and policy author.
-     * <p>
-     * So each ConstraintHandler requires knowledge about the domain. In this case
-     * it is assumed, that the constraint object contains a field 'type' to
-     * disambiguate different constraints from each other.
-     * <p>
-     * This ConstraintHandler in particular is for logging messages when access to a
-     * resource is granted. Thus, the canHandle method returns true, if the type
-     * equals 'logAccess'.
-     * <p>
-     * The PEP must first check if the runtime environment has the ability to handle
-     * the constraint, as it must deny access to the resource if the constraint is
-     * an obligation that cannot be handled. In this case no other advice or
-     * obligations have to be followed.
-     * <p>
-     * It is a good practice to validate the overall constraint object given, as an
-     * invalid constraint cannot be handled and declining a constraint at this stage
-     * leads to a clean behavior in case of obligations.
-     */
-    @Override
-    public boolean isResponsible(Value constraint) {
-        if (!(constraint instanceof ObjectValue obj)) {
-            return false;
+    private static Runner runnerFor(Value constraint) {
+        if (constraint instanceof ObjectValue obj && obj.get("message") instanceof TextValue(String message)) {
+            return () -> log.info(message);
         }
-        return obj.get("type") instanceof TextValue type && "logAccess".equals(type.value());
+        return () -> log.info("Access logged");
     }
-
-    /**
-     * The handle method actually acts on the given constraint and executes the
-     * implied behavior of the application.
-     */
-    @Override
-    public Runnable getHandler(Value constraint) {
-        if (!(constraint instanceof ObjectValue obj)) {
-            throw new IllegalStateException(ERROR_CONSTRAINT_NOT_OBJECT.formatted(constraint));
-        }
-        if (!(obj.get("message") instanceof TextValue message)) {
-            return () -> log.info("Access logged");
-        }
-        return () -> log.info(message.value());
-    }
-
 }

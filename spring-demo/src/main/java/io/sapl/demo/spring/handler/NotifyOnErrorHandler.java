@@ -1,30 +1,37 @@
 package io.sapl.demo.spring.handler;
 
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.stereotype.Component;
 
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.constraints.api.ErrorHandlerProvider;
+import io.sapl.spring.pep.constraints.ConstraintHandler.Consumer;
+import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
+import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
+import io.sapl.spring.pep.constraints.Signal.ErrorSignal;
+import io.sapl.spring.pep.constraints.SignalType;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-class NotifyOnErrorHandler implements ErrorHandlerProvider {
+class NotifyOnErrorHandler implements ConstraintHandlerProvider {
 
     @Override
-    public boolean isResponsible(Value constraint) {
+    public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
         if (!(constraint instanceof ObjectValue obj)) {
-            return false;
+            return List.of();
         }
-        return obj.get("type") instanceof TextValue t && "notifyOnError".equals(t.value());
+        if (!(obj.get("type") instanceof TextValue(String type)) || !"notifyOnError".equals(type)) {
+            return List.of();
+        }
+        if (!supportedSignals.contains(ErrorSignal.TYPE)) {
+            return List.of();
+        }
+        Consumer<Throwable> handler = error -> log
+                .warn("[ERROR-NOTIFY] Error during policy-protected operation: {}", error.getMessage());
+        return List.of(new ScopedConstraintHandler(handler, ErrorSignal.TYPE, 50));
     }
-
-    @Override
-    public Consumer<Throwable> getHandler(Value constraint) {
-        return error -> log.warn("[ERROR-NOTIFY] Error during policy-protected operation: {}",
-                error.getMessage());
-    }
-
 }

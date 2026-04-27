@@ -13,43 +13,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.webflux;
+package io.sapl.demo.web.handlers;
 
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import io.sapl.spring.pep.constraints.ConstraintHandler.Runner;
+import io.sapl.api.pdp.AuthorizationDecision;
+import io.sapl.spring.pep.constraints.ConstraintHandler;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
-import io.sapl.spring.pep.constraints.Signal.DecisionSignal;
+import io.sapl.spring.pep.constraints.Signal;
 import io.sapl.spring.pep.constraints.SignalType;
+import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 4.1 side-effect handler that fires once per decision.
+ * Claims the {@code audit:log} advice and attaches a Consumer to
+ * {@link Signal.DecisionSignal} that logs the decision and records it in the
+ * {@link AuditProbe}.
  */
 @Slf4j
-@Service
-public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvider {
+@Component
+@RequiredArgsConstructor
+public class AuditLogHandler implements ConstraintHandlerProvider {
+
+    private static final String CONSTRAINT_TYPE = "audit:log";
+
+    private final AuditProbe probe;
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"logAccess".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(DecisionSignal.TYPE)) {
-            return List.of();
-        }
-        var messageText = obj.get("message") instanceof TextValue(String text) ? text : "Access logged";
-        Runner handler = () -> log.info(messageText);
-        return List.of(new ScopedConstraintHandler(handler, DecisionSignal.TYPE, 50));
+        ConstraintHandler.Consumer<AuthorizationDecision> handler = decision -> {
+            log.info("SAPL audit: decision={}", decision.decision());
+            probe.record(decision.decision());
+        };
+        return List.of(new ScopedConstraintHandler(handler, Signal.DecisionSignal.TYPE, 0));
     }
 }
