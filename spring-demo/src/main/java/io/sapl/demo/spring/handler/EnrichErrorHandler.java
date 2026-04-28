@@ -27,7 +27,7 @@ class EnrichErrorHandler implements ConstraintHandlerProvider {
         if (!(obj.get("type") instanceof TextValue(String type)) || !"enrichError".equals(type)) {
             return List.of();
         }
-        if (!supportedSignals.contains(ErrorSignal.TYPE)) {
+        if (!supportedSignals.contains(ErrorSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         var supportUrl = obj.get("supportUrl") instanceof TextValue(String url) ? url
@@ -38,6 +38,6 @@ class EnrichErrorHandler implements ConstraintHandlerProvider {
             enriched.initCause(error);
             return enriched;
         };
-        return List.of(new ScopedConstraintHandler(mapper, ErrorSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, ErrorSignal.SIGNAL_TYPE, 50));
     }
 }

@@ -53,7 +53,7 @@ public class EmailConstraintHandlerProvider implements ConstraintHandlerProvider
         if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
             return List.of();
         }
-        if (!supportedSignals.contains(DecisionSignal.TYPE)) {
+        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         if (!(constraint instanceof ObjectValue obj)) {
@@ -69,7 +69,7 @@ public class EmailConstraintHandlerProvider implements ConstraintHandlerProvider
             return List.of();
         }
         Runner runner = () -> sendEmail(recipient, subject, message);
-        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.TYPE, DEFAULT_PRIORITY));
+        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
     }
 
     private static void sendEmail(String recipient, String subject, String message) {

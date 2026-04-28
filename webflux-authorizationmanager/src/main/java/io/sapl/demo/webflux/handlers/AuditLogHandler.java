@@ -54,6 +54,6 @@ public class AuditLogHandler implements ConstraintHandlerProvider {
             log.info("SAPL audit: decision={}", decision.decision());
             probe.record(decision.decision());
         };
-        return List.of(new ScopedConstraintHandler(handler, Signal.DecisionSignal.TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, Signal.DecisionSignal.SIGNAL_TYPE, 0));
     }
 }

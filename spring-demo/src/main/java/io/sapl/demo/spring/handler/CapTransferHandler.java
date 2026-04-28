@@ -31,7 +31,7 @@ class CapTransferHandler implements ConstraintHandlerProvider {
         if (!(obj.get("type") instanceof TextValue(String type)) || !"capTransferAmount".equals(type)) {
             return List.of();
         }
-        if (!supportedSignals.contains(InputSignal.TYPE)) {
+        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         var maxAmount = obj.get("maxAmount") instanceof NumberValue(java.math.BigDecimal n) ? n.doubleValue() : 0.0;
@@ -50,6 +50,6 @@ class CapTransferHandler implements ConstraintHandlerProvider {
             }
             return invocation;
         };
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, 50));
     }
 }

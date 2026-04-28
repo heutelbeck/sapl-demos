@@ -48,7 +48,7 @@ public class ResponseHeaderHandler implements ConstraintHandlerProvider {
         if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
             return List.of();
         }
-        if (!supportedSignals.contains(Signal.HttpResponseSignal.TYPE)) {
+        if (!supportedSignals.contains(Signal.HttpResponseSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         if (!(constraint instanceof ObjectValue object) || !(object.get("name") instanceof TextValue(String name))
@@ -59,6 +59,6 @@ public class ResponseHeaderHandler implements ConstraintHandlerProvider {
         val capturedValue = value;
         ConstraintHandler.Consumer<MutableHttpResponse> handler = response -> response.setHeader(capturedName,
                 capturedValue);
-        return List.of(new ScopedConstraintHandler(handler, Signal.HttpResponseSignal.TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, Signal.HttpResponseSignal.SIGNAL_TYPE, 0));
     }
 }

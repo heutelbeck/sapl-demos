@@ -27,11 +27,11 @@ class NotifyOnErrorHandler implements ConstraintHandlerProvider {
         if (!(obj.get("type") instanceof TextValue(String type)) || !"notifyOnError".equals(type)) {
             return List.of();
         }
-        if (!supportedSignals.contains(ErrorSignal.TYPE)) {
+        if (!supportedSignals.contains(ErrorSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         Consumer<Throwable> handler = error -> log
                 .warn("[ERROR-NOTIFY] Error during policy-protected operation: {}", error.getMessage());
-        return List.of(new ScopedConstraintHandler(handler, ErrorSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(handler, ErrorSignal.SIGNAL_TYPE, 50));
     }
 }

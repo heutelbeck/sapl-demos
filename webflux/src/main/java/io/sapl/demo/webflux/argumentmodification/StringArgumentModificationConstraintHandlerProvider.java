@@ -34,7 +34,7 @@ public class StringArgumentModificationConstraintHandlerProvider implements Cons
         if (!(obj.get(SUFFIX) instanceof TextValue(String suffix))) {
             return List.of();
         }
-        if (!supportedSignals.contains(InputSignal.TYPE)) {
+        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         Mapper<MethodInvocation> mapper = invocation -> {
@@ -50,6 +50,6 @@ public class StringArgumentModificationConstraintHandlerProvider implements Cons
             }
             return invocation;
         };
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, 50));
     }
 }

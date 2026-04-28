@@ -53,11 +53,11 @@ public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvid
         if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
             return List.of();
         }
-        if (!supportedSignals.contains(DecisionSignal.TYPE)) {
+        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         Runner runner = runnerFor(constraint);
-        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.TYPE, DEFAULT_PRIORITY));
+        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
     }
 
     private static Runner runnerFor(Value constraint) {

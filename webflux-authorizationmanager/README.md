@@ -103,7 +103,7 @@ public class RequestHeaderHandler implements ConstraintHandlerProvider {
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
         if (!ConstraintResponsibility.isResponsible(constraint, "request-header")) return List.of();
-        if (!supportedSignals.contains(Signal.HttpRequestMutationSignal.TYPE))    return List.of();
+        if (!supportedSignals.contains(Signal.HttpRequestMutationSignal.SIGNAL_TYPE))    return List.of();
         // read name + value from the obligation, return a Consumer<MutableHttpRequest>
         ...
     }

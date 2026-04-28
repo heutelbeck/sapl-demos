@@ -51,7 +51,7 @@ public class DenyPageHandler implements ConstraintHandlerProvider {
         if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
             return List.of();
         }
-        if (!supportedSignals.contains(Signal.HttpDenialSignal.TYPE)) {
+        if (!supportedSignals.contains(Signal.HttpDenialSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         if (!(constraint instanceof ObjectValue object) || !(object.get("status") instanceof NumberValue(var status))
@@ -64,6 +64,6 @@ public class DenyPageHandler implements ConstraintHandlerProvider {
             response.setStatusCode(capturedStatus);
             response.writeBody("text/plain;charset=UTF-8", capturedBody);
         };
-        return List.of(new ScopedConstraintHandler(handler, Signal.HttpDenialSignal.TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, Signal.HttpDenialSignal.SIGNAL_TYPE, 0));
     }
 }

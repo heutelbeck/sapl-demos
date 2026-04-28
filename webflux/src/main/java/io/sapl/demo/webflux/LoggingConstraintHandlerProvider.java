@@ -45,11 +45,11 @@ public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvid
         if (!(obj.get("type") instanceof TextValue(String type)) || !"logAccess".equals(type)) {
             return List.of();
         }
-        if (!supportedSignals.contains(DecisionSignal.TYPE)) {
+        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         var messageText = obj.get("message") instanceof TextValue(String text) ? text : "Access logged";
         Runner handler = () -> log.info(messageText);
-        return List.of(new ScopedConstraintHandler(handler, DecisionSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(handler, DecisionSignal.SIGNAL_TYPE, 50));
     }
 }

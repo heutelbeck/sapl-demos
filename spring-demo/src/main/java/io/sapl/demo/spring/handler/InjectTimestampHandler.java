@@ -33,7 +33,7 @@ class InjectTimestampHandler implements ConstraintHandlerProvider {
         if (!(obj.get("type") instanceof TextValue(String type)) || !"injectTimestamp".equals(type)) {
             return List.of();
         }
-        if (!supportedSignals.contains(InputSignal.TYPE)) {
+        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         Mapper<MethodInvocation> mapper = invocation -> {
@@ -53,6 +53,6 @@ class InjectTimestampHandler implements ConstraintHandlerProvider {
             log.info("[METHOD] Injected policy timestamp: {}", timestamp);
             return invocation;
         };
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, 50));
     }
 }

@@ -44,11 +44,11 @@ public class EnforceCategoryFilteringConstraintHandlerProvider implements Constr
         if (!(obj.get(LIMIT_CATEGORIES) instanceof ArrayValue constraintCategories)) {
             return List.of();
         }
-        if (!supportedSignals.contains(InputSignal.TYPE)) {
+        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
             return List.of();
         }
         Mapper<MethodInvocation> mapper = invocation -> rewriteFilterArgument(invocation, constraintCategories);
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.TYPE, DEFAULT_PRIORITY));
+        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
     }
 
     private static MethodInvocation rewriteFilterArgument(MethodInvocation invocation,
