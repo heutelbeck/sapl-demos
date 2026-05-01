@@ -41,7 +41,7 @@ import static org.awaitility.Awaitility.await;
 @TestPropertySource(properties = "demo.mqtt.auto-publish=false")
 class MqttPolicyEnforcementTests {
 
-    private static final String ACCESS_DENIED_MARKER = "Access Denied";
+    private static final String SUSPENDED_MARKER = "Stream suspended";
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
 
     @LocalServerPort
@@ -73,15 +73,15 @@ class MqttPolicyEnforcementTests {
         try {
             // Phase 1: Wait for data events during "emergency"
             await().atMost(TIMEOUT).untilAsserted(() -> {
-                assertThat(events.stream().anyMatch(e -> !e.contains(ACCESS_DENIED_MARKER))).isTrue();
+                assertThat(events.stream().anyMatch(e -> !e.contains(SUSPENDED_MARKER))).isTrue();
             });
             sawData.set(true);
             int phase1Count = events.size();
 
-            // Phase 2: Change to "ok" (deny) and wait for ACCESS_DENIED
+            // Phase 2: Change to "ok" (suspend) and wait for the suspend marker
             publishStatus("ok");
             await().atMost(TIMEOUT).untilAsserted(() -> {
-                assertThat(events.stream().skip(phase1Count).anyMatch(e -> e.contains(ACCESS_DENIED_MARKER))).isTrue();
+                assertThat(events.stream().skip(phase1Count).anyMatch(e -> e.contains(SUSPENDED_MARKER))).isTrue();
             });
             sawDenied.set(true);
             int phase2Count = events.size();
@@ -89,7 +89,7 @@ class MqttPolicyEnforcementTests {
             // Phase 3: Change back to "emergency" (permit) and wait for recovery
             publishStatus("emergency");
             await().atMost(TIMEOUT).untilAsserted(() -> {
-                assertThat(events.stream().skip(phase2Count).anyMatch(e -> !e.contains(ACCESS_DENIED_MARKER))).isTrue();
+                assertThat(events.stream().skip(phase2Count).anyMatch(e -> !e.contains(SUSPENDED_MARKER))).isTrue();
             });
             sawRecovery.set(true);
 

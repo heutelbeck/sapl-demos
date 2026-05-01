@@ -68,7 +68,7 @@ public class DemoController {
     public Flux<ServerSentEvent<String>> dropWhileDeny() {
         return service.getFluxStringDroppable()
                 .onErrorResume(AccessDeniedException.class,
-                        e -> Flux.just(String.format("ACCESS DENIED ('%s')", e.getMessage())))
+                        e -> Flux.just(String.format("STREAM SUSPENDED ('%s')", e.getMessage())))
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 
@@ -76,8 +76,8 @@ public class DemoController {
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
         return RecoverableFluxes
                 .recover(service.getFluxStringRecoverable(),
-                        denial -> log.warn("ACCESS DENIED ('{}')", denial.getMessage()),
-                        grant -> log.info("ACCESS GRANTED ('{}')", grant.getMessage()))
+                        suspended -> log.warn("STREAM SUSPENDED ('{}')", suspended.getMessage()),
+                        resumed -> log.info("STREAM RESUMED ('{}')", resumed.getMessage()))
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 }

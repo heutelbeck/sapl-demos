@@ -32,16 +32,16 @@ import static io.sapl.spring.pep.streaming.RecoverableFluxes.recoverWith;
 @RequiredArgsConstructor
 public class DemoController {
 
-    private static final String ACCESS_DENIED_MESSAGE = "Access Denied: The data stream is temporarily suspended. "
-            + "Stream will recover upon a MQTT event stating that the system is in 'emergency' state again.";
+    private static final String STREAM_SUSPENDED_MESSAGE = "Stream suspended: the data stream is temporarily paused. "
+            + "Stream will resume upon a MQTT event stating that the system is in 'emergency' state again.";
 
     private final DemoService       service;
 
     @GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
         return recoverWith(service.getFluxStringRecoverable(),
-                error -> log.info("Access denied: {}", error.getMessage()),
-                () -> ACCESS_DENIED_MESSAGE)
+                suspended -> log.info("Stream suspended: {}", suspended.getMessage()),
+                () -> STREAM_SUSPENDED_MESSAGE)
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 
