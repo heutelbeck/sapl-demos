@@ -1,5 +1,5 @@
 set "permit on emergency"
-priority deny or abstain errors propagate
+first or abstain errors propagate
 for action == "read" & resource == "time"
 
     policy "permit during emergency"
@@ -8,4 +8,3 @@ for action == "read" & resource == "time"
 
     policy "suspend off emergency"
     suspend
-        "status".<mqtt.messages> != "emergency";
