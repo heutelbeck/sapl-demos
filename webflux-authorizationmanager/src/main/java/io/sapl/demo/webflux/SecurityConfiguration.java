@@ -48,11 +48,10 @@ public class SecurityConfiguration {
     /*
      * The configurer customizer narrows the subscription to the three fields
      * the demo policies reference (subject..authority, action.method,
-     * resource.requestedURI). The default factory ships the entire
-     * serialized request which works but is verbose. To replace the factory
-     * globally instead, declare a single
-     * @Bean ReactiveAuthorizationSubscriptionFactory and the configurer
-     * call below collapses to
+     * resource.path). The default factory ships the entire serialized
+     * request which works but is verbose. To replace the factory globally
+     * instead, declare a single @Bean ReactiveAuthorizationSubscriptionFactory
+     * and the configurer call below collapses to
      * SaplServerHttpSecurityConfigurer.apply(http, context).
      */
     @Bean
@@ -61,7 +60,7 @@ public class SecurityConfiguration {
         SaplServerHttpSecurityConfigurer.apply(http, context,
                 c -> c.subscriptionFactory((auth, exchange) -> Mono.just(AuthorizationSubscription.of(auth,
                         Map.of("method", exchange.getRequest().getMethod().name()),
-                        Map.of("requestedURI", exchange.getRequest().getURI().getPath()), mapper))));
+                        Map.of("path", exchange.getRequest().getURI().getPath()), mapper))));
         return http.formLogin(withDefaults()).httpBasic(withDefaults()).build();
     }
 }

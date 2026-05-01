@@ -8,8 +8,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Service;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -28,15 +26,14 @@ public class StringArgumentModificationConstraintHandlerProvider implements Cons
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
-            return List.of();
-        }
-        if (!(obj.get(SUFFIX) instanceof TextValue(String suffix))) {
+        var suffixOpt = ConstraintHandlerProvider.stringField(constraint, SUFFIX);
+        if (suffixOpt.isEmpty()) {
             return List.of();
         }
         if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
             return List.of();
         }
+        var suffix = suffixOpt.get();
         Mapper<MethodInvocation> mapper = invocation -> {
             Object[] originalArguments = invocation.getArguments();
             Object[] newArguments      = Arrays.copyOf(originalArguments, originalArguments.length);

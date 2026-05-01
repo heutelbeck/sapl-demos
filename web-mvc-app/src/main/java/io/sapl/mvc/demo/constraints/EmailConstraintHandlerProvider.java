@@ -20,17 +20,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Runner;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal.DecisionSignal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 /**
  * Custom side-effect constraint handler. Fires a {@link Runner} at the
@@ -50,26 +46,18 @@ public class EmailConstraintHandlerProvider implements ConstraintHandlerProvider
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, DecisionSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
+        var fieldsOpt = ConstraintHandlerProvider.requiredStringFields(constraint, "recipient", "subject", "message");
+        if (fieldsOpt.isEmpty()) {
             return List.of();
         }
-        if (!(constraint instanceof ObjectValue obj)) {
-            return List.of();
-        }
-        if (!(obj.get("recipient") instanceof TextValue(String recipient))) {
-            return List.of();
-        }
-        if (!(obj.get("subject") instanceof TextValue(String subject))) {
-            return List.of();
-        }
-        if (!(obj.get("message") instanceof TextValue(String message))) {
-            return List.of();
-        }
-        Runner runner = () -> sendEmail(recipient, subject, message);
-        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
+        var fields = fieldsOpt.get();
+        Runner runner = () -> sendEmail(fields.get("recipient"), fields.get("subject"), fields.get("message"));
+        return List.of(new ScopedConstraintHandler(runner, signalOpt.get(), DEFAULT_PRIORITY));
     }
 
     private static void sendEmail(String recipient, String subject, String message) {

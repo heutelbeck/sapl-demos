@@ -3,10 +3,13 @@
  *
  * Tests for the permitOnEmergency.sapl policy that demonstrates
  * Attribute Stream-Based Access Control (ASBAC) using MQTT messages
- * as a dynamic attribute source.
+ * as a dynamic attribute source. The policy emits PERMIT during
+ * emergency and SUSPEND otherwise so a streaming subscription
+ * survives the off-emergency window and resumes when emergency
+ * returns.
  */
 
-requirement "Permit access only during emergency status" {
+requirement "Permit during emergency, suspend otherwise" {
 
     given
         - document "permitOnEmergency"
@@ -17,17 +20,17 @@ requirement "Permit access only during emergency status" {
         when "user" attempts "read" on "time"
         expect permit;
 
-    scenario "not-applicable when MQTT status is ok"
+    scenario "suspend when MQTT status is ok"
         given
             - attribute "statusMock" "status".<mqtt.messages> emits "ok"
         when "user" attempts "read" on "time"
-        expect not-applicable;
+        expect suspend;
 
-    scenario "not-applicable when MQTT status is any other value"
+    scenario "suspend when MQTT status is any other value"
         given
             - attribute "statusMock" "status".<mqtt.messages> emits "normal"
         when "user" attempts "read" on "time"
-        expect not-applicable;
+        expect suspend;
 
     scenario "indeterminate when MQTT PIP returns error"
         given
@@ -65,38 +68,38 @@ requirement "Streaming - decision changes dynamically with MQTT status" {
     given
         - document "permitOnEmergency"
 
-    scenario "permit then not-applicable as status changes from emergency to ok"
+    scenario "permit then suspend as status changes from emergency to ok"
         given
             - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
         when "user" attempts "read" on "time"
         expect permit
         then
             - attribute "statusMock" emits "ok"
-        expect not-applicable;
+        expect suspend;
 
-    scenario "not-applicable then permit as status changes from ok to emergency"
+    scenario "suspend then permit as status changes from ok to emergency"
         given
             - attribute "statusMock" "status".<mqtt.messages> emits "ok"
         when "user" attempts "read" on "time"
-        expect not-applicable
+        expect suspend
         then
             - attribute "statusMock" emits "emergency"
         expect permit;
 
-    scenario "alternating permit and not-applicable with multiple status changes"
+    scenario "alternating permit and suspend with multiple status changes"
         given
             - attribute "statusMock" "status".<mqtt.messages> emits "emergency"
         when "user" attempts "read" on "time"
         expect permit
         then
             - attribute "statusMock" emits "ok"
-        expect not-applicable
+        expect suspend
         then
             - attribute "statusMock" emits "emergency"
         expect permit
         then
             - attribute "statusMock" emits "normal"
-        expect not-applicable
+        expect suspend
         verify
             - attribute "status".<mqtt.messages> is called 1 times;
 }

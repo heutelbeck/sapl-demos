@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import static io.sapl.spring.method.reactive.RecoverableFluxes.recoverWith;
+import static io.sapl.spring.pep.streaming.RecoverableFluxes.recoverWith;
 
 @Slf4j
 @RestController

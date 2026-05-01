@@ -20,8 +20,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Runner;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -39,17 +37,13 @@ public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvid
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, "logAccess", supportedSignals,
+                DecisionSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"logAccess".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
-            return List.of();
-        }
-        var messageText = obj.get("message") instanceof TextValue(String text) ? text : "Access logged";
+        var messageText = ConstraintHandlerProvider.stringField(constraint, "message").orElse("Access logged");
         Runner handler = () -> log.info(messageText);
-        return List.of(new ScopedConstraintHandler(handler, DecisionSignal.SIGNAL_TYPE, 50));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 50));
     }
 }

@@ -27,7 +27,6 @@ import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,13 +46,15 @@ public class AuditLogHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, Signal.DecisionSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         ConstraintHandler.Consumer<AuthorizationDecision> handler = decision -> {
             log.info("SAPL audit: decision={}", decision.decision());
             probe.record(decision.decision());
         };
-        return List.of(new ScopedConstraintHandler(handler, Signal.DecisionSignal.SIGNAL_TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 0));
     }
 }

@@ -17,7 +17,7 @@ requirement "Anonymous users cannot access /secret" {
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect deny;
 
     scenario "anonymous user with multiple roles including ROLE_ANONYMOUS denied"
@@ -26,7 +26,7 @@ requirement "Anonymous users cannot access /secret" {
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect deny;
 }
 
@@ -41,7 +41,7 @@ requirement "Authenticated users can access /secret with the X-Authorized-By obl
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect decision is permit,
             with obligation containing key "type" with value matching text "response-header";
 
@@ -51,7 +51,7 @@ requirement "Authenticated users can access /secret with the X-Authorized-By obl
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect permit;
 
     scenario "admin user permitted GET /secret"
@@ -60,7 +60,7 @@ requirement "Authenticated users can access /secret with the X-Authorized-By obl
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect permit;
 }
 
@@ -75,7 +75,7 @@ requirement "Other endpoints are accessible to everyone (audit_all permits by de
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/public" }
+            { "path": "/public" }
         expect permit;
 
     scenario "authenticated user permitted GET /public"
@@ -84,7 +84,7 @@ requirement "Other endpoints are accessible to everyone (audit_all permits by de
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/public" }
+            { "path": "/public" }
         expect permit;
 }
 
@@ -99,7 +99,7 @@ requirement "Only GET method is blocked for anonymous on /secret" {
         attempts
             { "method": "POST" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect permit;
 
     scenario "anonymous user permitted PUT /secret"
@@ -108,7 +108,7 @@ requirement "Only GET method is blocked for anonymous on /secret" {
         attempts
             { "method": "PUT" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect permit;
 
     scenario "anonymous user permitted DELETE /secret"
@@ -117,7 +117,7 @@ requirement "Only GET method is blocked for anonymous on /secret" {
         attempts
             { "method": "DELETE" }
         on
-            { "requestedURI": "/secret" }
+            { "path": "/secret" }
         expect permit;
 }
 
@@ -132,7 +132,7 @@ requirement "GET /echo-correlation carries the request-header obligation" {
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/echo-correlation" }
+            { "path": "/echo-correlation" }
         expect decision is permit,
             with obligation containing key "type" with value matching text "request-header";
 
@@ -142,7 +142,7 @@ requirement "GET /echo-correlation carries the request-header obligation" {
         attempts
             { "method": "POST" }
         on
-            { "requestedURI": "/echo-correlation" }
+            { "path": "/echo-correlation" }
         expect permit;
 }
 
@@ -157,7 +157,7 @@ requirement "GET /teapot is denied with a custom deny page" {
         attempts
             { "method": "GET" }
         on
-            { "requestedURI": "/teapot" }
+            { "path": "/teapot" }
         expect decision is deny,
             with obligation containing key "type" with value matching text "deny-page";
 
@@ -167,6 +167,6 @@ requirement "GET /teapot is denied with a custom deny page" {
         attempts
             { "method": "POST" }
         on
-            { "requestedURI": "/teapot" }
+            { "path": "/teapot" }
         expect permit;
 }

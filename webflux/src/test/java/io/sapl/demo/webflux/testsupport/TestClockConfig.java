@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.demo.mqtt;
+package io.sapl.demo.webflux.testsupport;
 
-import io.sapl.spring.method.metadata.StreamEnforce;
-import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-
-import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 
-@Service
-public class DemoService {
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
-    @StreamEnforce(subject = "authentication.getName()", action = "'read'", resource = "'time'",
-            signalTransitions = true)
-    public Flux<String> getFluxStringRecoverable() {
-        return Flux.interval(Duration.ofMillis(500L))
-                .map(i -> String.format("event after subscription %d - time %s", i, Instant.now()));
+/**
+ * Registers a {@link TestClock} as the {@code Clock} bean for tests.
+ * Initial instant is {@link Instant#EPOCH}; tests adjust per test via
+ * {@link TestClock#setInstant(Instant)} or {@link TestClock#advance}.
+ */
+@TestConfiguration
+public class TestClockConfig {
+
+    @Bean
+    @Primary
+    public TestClock testClock() {
+        return new TestClock(Instant.EPOCH, ZoneOffset.UTC);
     }
-
 }

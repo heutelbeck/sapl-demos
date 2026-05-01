@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -21,23 +19,19 @@ class EnrichErrorHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, "enrichError", supportedSignals,
+                ErrorSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"enrichError".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(ErrorSignal.SIGNAL_TYPE)) {
-            return List.of();
-        }
-        var supportUrl = obj.get("supportUrl") instanceof TextValue(String url) ? url
-                : "https://support.example.com";
+        var supportUrl = ConstraintHandlerProvider.stringField(constraint, "supportUrl")
+                .orElse("https://support.example.com");
         Mapper<Throwable> mapper = error -> {
             log.info("[ERROR-ENRICH] Enriching error with support URL: {}", supportUrl);
             var enriched = new RuntimeException(error.getMessage() + " | Support: " + supportUrl);
             enriched.initCause(error);
             return enriched;
         };
-        return List.of(new ScopedConstraintHandler(mapper, ErrorSignal.SIGNAL_TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, signalOpt.get(), 50));
     }
 }

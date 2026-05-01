@@ -35,7 +35,6 @@ import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal.InputSignal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import reactor.core.publisher.Mono;
@@ -62,17 +61,15 @@ class DocumentFilterConstraintHandlerProvider implements ConstraintHandlerProvid
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, InputSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
-            return List.of();
-        }
-        if (!(constraint instanceof ObjectValue obligation)) {
-            return List.of();
-        }
+        // constraintTypeAndSignal already verified the value is a typed ObjectValue.
+        var obligation = (ObjectValue) constraint;
         Mapper<MethodInvocation> mapper = invocation -> rewriteFirstArgument(invocation, obligation);
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
+        return List.of(new ScopedConstraintHandler(mapper, signalOpt.get(), DEFAULT_PRIORITY));
     }
 
     @SuppressWarnings("unchecked")

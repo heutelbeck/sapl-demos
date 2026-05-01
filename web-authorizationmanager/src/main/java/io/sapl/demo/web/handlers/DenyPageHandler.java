@@ -29,7 +29,6 @@ import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import io.sapl.spring.pep.http.MutableHttpResponse;
 import lombok.val;
 
@@ -48,10 +47,9 @@ public class DenyPageHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(Signal.HttpDenialSignal.SIGNAL_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, Signal.HttpDenialSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         if (!(constraint instanceof ObjectValue object) || !(object.get("status") instanceof NumberValue(var status))
@@ -64,6 +62,6 @@ public class DenyPageHandler implements ConstraintHandlerProvider {
             response.setStatusCode(capturedStatus);
             response.writeBody("text/plain;charset=UTF-8", capturedBody);
         };
-        return List.of(new ScopedConstraintHandler(handler, Signal.HttpDenialSignal.SIGNAL_TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 0));
     }
 }

@@ -20,13 +20,10 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Consumer;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
-import io.sapl.spring.pep.constraints.Signal.OutputSignal;
 import io.sapl.spring.pep.constraints.SignalType;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,30 +36,21 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class EmailConstraintHandlerProvider implements ConstraintHandlerProvider {
 
-    private static final SignalType OUTPUT_OBJECT = OutputSignal.typeFor(Object.class);
-
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndAnyOutputSignal(constraint, "sendEmail",
+                supportedSignals);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"sendEmail".equals(type)) {
+        var fieldsOpt = ConstraintHandlerProvider.requiredStringFields(constraint, "recipient", "subject", "message");
+        if (fieldsOpt.isEmpty()) {
             return List.of();
         }
-        if (!supportedSignals.contains(OUTPUT_OBJECT)) {
-            return List.of();
-        }
-        if (!(obj.get("recipient") instanceof TextValue(String recipient))) {
-            return List.of();
-        }
-        if (!(obj.get("subject") instanceof TextValue(String subject))) {
-            return List.of();
-        }
-        if (!(obj.get("message") instanceof TextValue(String message))) {
-            return List.of();
-        }
-        Consumer<Object> handler = value -> sendEmail(recipient, subject, message);
-        return List.of(new ScopedConstraintHandler(handler, OUTPUT_OBJECT, 50));
+        var fields           = fieldsOpt.get();
+        Consumer<Object> handler = value -> sendEmail(fields.get("recipient"), fields.get("subject"),
+                fields.get("message"));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 50));
     }
 
     private static void sendEmail(String recipient, String subject, String message) {

@@ -9,8 +9,6 @@ import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -27,13 +25,9 @@ class InjectTimestampHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
-            return List.of();
-        }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"injectTimestamp".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, "injectTimestamp",
+                supportedSignals, InputSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         Mapper<MethodInvocation> mapper = invocation -> {
@@ -53,6 +47,6 @@ class InjectTimestampHandler implements ConstraintHandlerProvider {
             log.info("[METHOD] Injected policy timestamp: {}", timestamp);
             return invocation;
         };
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, signalOpt.get(), 50));
     }
 }

@@ -6,13 +6,10 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
-import io.sapl.spring.pep.constraints.Signal.OutputSignal;
 import io.sapl.spring.pep.constraints.SignalType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +19,6 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 @RequiredArgsConstructor
 class ClassificationFilterHandler implements ConstraintHandlerProvider {
-
-    private static final SignalType OUTPUT_OBJECT = OutputSignal.typeFor(Object.class);
 
     private static final Map<String, Integer> CLASSIFICATION_LEVELS = Map.of(
             "PUBLIC", 0,
@@ -35,16 +30,12 @@ class ClassificationFilterHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndAnyOutputSignal(constraint, "filterByClassification",
+                supportedSignals);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"filterByClassification".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(OUTPUT_OBJECT)) {
-            return List.of();
-        }
-        var maxLevel = obj.get("maxLevel") instanceof TextValue(String level) ? level : "PUBLIC";
+        var maxLevel = ConstraintHandlerProvider.stringField(constraint, "maxLevel").orElse("PUBLIC");
         var maxRank  = CLASSIFICATION_LEVELS.getOrDefault(maxLevel, 0);
         Mapper<Object> handler = value -> {
             if (value instanceof List<?> list) {
@@ -52,7 +43,7 @@ class ClassificationFilterHandler implements ConstraintHandlerProvider {
             }
             return isAllowed(value, maxLevel, maxRank) ? value : null;
         };
-        return List.of(new ScopedConstraintHandler(handler, OUTPUT_OBJECT, 50));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 50));
     }
 
     private boolean isAllowed(Object element, String maxLevel, int maxRank) {

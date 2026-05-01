@@ -22,7 +22,7 @@ public class DocumentsService {
             new Document(NatoSecurityClassification.NATO_CONFIDENTIAL, "Sum of 2 and 2",
                     "Contrary to common belief, 2+2 is not 5. In fact it is 4."),
             new Document(NatoSecurityClassification.NATO_SECRET, "Tea Preparation Secrets",
-                    "When brewing green tea for board members, remember to cool the water down to 80°C before adding the tea leafes."),
+                    "When brewing green tea for board members, remember to cool the water down to 80°C before adding the tea leaves."),
             new Document(NatoSecurityClassification.COSMIC_TOP_SECRET, "Alien Visitor Factsheet", """
                     The only extraterrestrial alien to ever have visited Earth appeared in 2018. \
                     His name was Bob and he really enjoyed Taylor Swift, cow-tipping, and long \

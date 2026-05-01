@@ -33,15 +33,11 @@ class StreamingController {
         return streamingService.heartbeatDropWhileDenied().map(StreamingController::toSse);
     }
 
-    // TODO recover behaviour: the 4.0 io.sapl.spring.method.reactive.RecoverableFluxes
-    // helper used to inject suspend/resume signals into the stream. Once the
-    // streaming PEPs (@EnforceTillDenied, @EnforceDropWhileDenied,
-    // @EnforceRecoverableIfDenied) ship as real enforcement (they are
-    // scaffolds in this build), revisit and rebuild the
-    // "deny -> ACCESS_SUSPENDED -> resume -> ACCESS_RESTORED" lifecycle
-    // around the new lifecycle signals (SubscriptionSignal, CancelSignal,
-    // CompleteSignal, TerminationSignal, AfterTerminationSignal). For now
-    // both endpoints below pass the protected stream through unchanged.
+    // TODO recover behaviour: rebuild the "deny -> ACCESS_SUSPENDED -> resume
+    // -> ACCESS_RESTORED" lifecycle using io.sapl.spring.pep.streaming
+    // .RecoverableFluxes once the demo's policies use the suspend verb to
+    // drive the suspended state. For now both endpoints below pass the
+    // protected stream through unchanged.
     @GetMapping(value = "/heartbeat/terminated-by-callback", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<Object>> heartbeatTerminatedByCallback() {
         return streamingService.heartbeatRecoverable().cast(Object.class).map(StreamingController::toSse);

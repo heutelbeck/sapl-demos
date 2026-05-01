@@ -20,18 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import java.time.Clock;
+import io.sapl.demo.webflux.testsupport.TestClock;
+import io.sapl.demo.webflux.testsupport.TestClockConfig;
+
 import java.time.Duration;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
 
 /**
@@ -41,20 +42,21 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@Import(TestClockConfig.class)
 class DemoControllerTests {
 
     @Autowired
     WebTestClient webTestClient;
 
-    @MockitoBean
-    Clock mockClock;
+    @Autowired
+    TestClock testClock;
 
     // ========== /changedstring - @PostEnforce with transform ==========
 
     @Test
     @WithAnonymousUser
     void whenGetChangedString_thenReturnsTransformedString() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH);
+        testClock.setInstant(Instant.EPOCH);
         webTestClient.get().uri("/changedstring")
                 .accept(MediaType.TEXT_PLAIN)
                 .exchange()
@@ -68,19 +70,19 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetNumbers_thenReturnsSSEStream() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH);
+        testClock.setInstant(Instant.EPOCH);
         webTestClient.get().uri("/numbers")
                 .accept(MediaType.APPLICATION_NDJSON)
                 .exchange()
                 .expectStatus().isOk();
     }
 
-    // ========== /enforcetilldeny - @EnforceTillDenied ==========
+    // ========== /enforcetilldeny - @StreamEnforce ==========
 
     @Test
     @WithAnonymousUser
     void whenGetEnforceTillDenyAndPermitted_thenReturnsData() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
+        testClock.setInstant(Instant.EPOCH); // second 0, permits
         webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcetilldeny")
                 .accept(MediaType.APPLICATION_NDJSON)
@@ -91,7 +93,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetEnforceTillDenyAndDenied_thenReturnsAccessDeniedMessage() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45))); // second 45, denies
+        testClock.setInstant(Instant.EPOCH.plus(Duration.ofSeconds(45))); // second 45, denies
         webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcetilldeny")
                 .accept(MediaType.APPLICATION_NDJSON)
@@ -101,12 +103,12 @@ class DemoControllerTests {
                 .value(body -> assertThat(body).contains("ACCESS DENIED"));
     }
 
-    // ========== /enforcedropwhiledeny - @EnforceDropWhileDenied ==========
+    // ========== /enforcedropwhiledeny - @StreamEnforce + suspend policy ==========
 
     @Test
     @WithAnonymousUser
     void whenGetEnforceDropWhileDenyAndPermitted_thenReturnsData() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
+        testClock.setInstant(Instant.EPOCH); // second 0, permits
         webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcedropwhiledeny")
                 .accept(MediaType.APPLICATION_NDJSON)
@@ -114,12 +116,12 @@ class DemoControllerTests {
                 .expectStatus().isOk();
     }
 
-    // ========== /enforcerecoverableifdeny - @EnforceRecoverableIfDenied ==========
+    // ========== /enforcerecoverableifdeny - @StreamEnforce(signalTransitions=true) + suspend policy ==========
 
     @Test
     @WithAnonymousUser
     void whenGetEnforceRecoverableIfDenyAndPermitted_thenReturnsData() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH); // second 0, permits
+        testClock.setInstant(Instant.EPOCH); // second 0, permits
         webTestClient.mutate().responseTimeout(Duration.ofSeconds(2)).build()
                 .get().uri("/enforcerecoverableifdeny")
                 .accept(MediaType.APPLICATION_NDJSON)
@@ -133,7 +135,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetDocumentsAtRestrictedClearance_thenReturnsFilteredDocuments() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH); // restricted clearance
+        testClock.setInstant(Instant.EPOCH); // restricted clearance
         webTestClient.get().uri("/documents")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -145,7 +147,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetDocumentsAtTopSecretClearance_thenReturnsMoreDocuments() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(25))); // top secret
+        testClock.setInstant(Instant.EPOCH.plus(Duration.ofSeconds(25))); // top secret
         webTestClient.get().uri("/documents")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -159,7 +161,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetPatientsWithBlackenedData_thenReturnsTransformedPatients() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH); // blackened data
+        testClock.setInstant(Instant.EPOCH); // blackened data
         webTestClient.get().uri("/patients")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -171,7 +173,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetPatientsWithFullData_thenReturnsUnmodifiedPatients() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH.plus(Duration.ofSeconds(45))); // full data
+        testClock.setInstant(Instant.EPOCH.plus(Duration.ofSeconds(45))); // full data
         webTestClient.get().uri("/patients")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
@@ -185,7 +187,7 @@ class DemoControllerTests {
     @Test
     @WithAnonymousUser
     void whenGetStringWithArgumentModification_thenReturnsModifiedString() {
-        when(mockClock.instant()).thenReturn(Instant.EPOCH);
+        testClock.setInstant(Instant.EPOCH);
         webTestClient.get().uri("/string")
                 .exchange()
                 .expectStatus().isOk()

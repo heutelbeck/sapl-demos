@@ -28,7 +28,6 @@ import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import io.sapl.spring.pep.http.MutableHttpRequest;
 import lombok.val;
 
@@ -46,10 +45,9 @@ public class RequestHeaderHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(Signal.HttpRequestMutationSignal.SIGNAL_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, Signal.HttpRequestMutationSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         if (!(constraint instanceof ObjectValue object) || !(object.get("name") instanceof TextValue(String name))
@@ -60,6 +58,6 @@ public class RequestHeaderHandler implements ConstraintHandlerProvider {
         val capturedValue = value;
         ConstraintHandler.Consumer<MutableHttpRequest> handler = request -> request.setHeader(capturedName,
                 capturedValue);
-        return List.of(new ScopedConstraintHandler(handler, Signal.HttpRequestMutationSignal.SIGNAL_TYPE, 0));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 0));
     }
 }

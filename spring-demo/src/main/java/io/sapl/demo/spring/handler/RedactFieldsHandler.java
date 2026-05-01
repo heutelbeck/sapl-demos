@@ -14,7 +14,6 @@ import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
-import io.sapl.spring.pep.constraints.Signal.OutputSignal;
 import io.sapl.spring.pep.constraints.SignalType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,24 +24,20 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 class RedactFieldsHandler implements ConstraintHandlerProvider {
 
-    private static final SignalType OUTPUT_OBJECT = OutputSignal.typeFor(Object.class);
-
     private final ObjectMapper mapper;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndAnyOutputSignal(constraint, "redactFields",
+                supportedSignals);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"redactFields".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(OUTPUT_OBJECT)) {
-            return List.of();
-        }
+        // The "fields" attribute is an array, not a single string, so use the typed
+        // accessor directly rather than the stringField helper.
         List<String> fields = new ArrayList<>();
-        if (obj.get("fields") instanceof ArrayValue arr) {
+        if (constraint instanceof ObjectValue obj && obj.get("fields") instanceof ArrayValue arr) {
             for (var element : arr) {
                 if (element instanceof TextValue(String text)) {
                     fields.add(text);
@@ -59,6 +54,6 @@ class RedactFieldsHandler implements ConstraintHandlerProvider {
             }
             return map;
         };
-        return List.of(new ScopedConstraintHandler(handler, OUTPUT_OBJECT, 50));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 50));
     }
 }

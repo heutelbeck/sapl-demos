@@ -28,7 +28,7 @@ policy "deny_secret_anonymous"
 deny
     action.method == "GET";
     "ROLE_ANONYMOUS" in subject..authority;
-    resource.requestedURI == "/secret";
+    resource.path == "/secret";
 advice
     { "type": "audit:log" }
 
@@ -40,7 +40,7 @@ advice
 policy "stamp_secret_response"
 permit
     action.method == "GET";
-    resource.requestedURI == "/secret";
+    resource.path == "/secret";
 obligation
     { "type": "response-header", "name": "X-Authorized-By", "value": "SAPL" }
 
@@ -54,7 +54,7 @@ obligation
 policy "tag_echo_request"
 permit
     action.method == "GET";
-    resource.requestedURI == "/echo-correlation";
+    resource.path == "/echo-correlation";
 obligation
     { "type": "request-header", "name": "X-Correlation-Id", "value": "demo-correlation-id" }
 
@@ -68,7 +68,7 @@ obligation
 policy "deny_teapot_with_custom_page"
 deny
     action.method == "GET";
-    resource.requestedURI == "/teapot";
+    resource.path == "/teapot";
 obligation
     { "type": "deny-page", "status": 418, "body": "I'm a teapot. Brew tea instead." }
 advice

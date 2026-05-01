@@ -20,15 +20,12 @@ import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Runner;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal.DecisionSignal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,20 +47,17 @@ public class LoggingConstraintHandlerProvider implements ConstraintHandlerProvid
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, DecisionSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         Runner runner = runnerFor(constraint);
-        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
+        return List.of(new ScopedConstraintHandler(runner, signalOpt.get(), DEFAULT_PRIORITY));
     }
 
     private static Runner runnerFor(Value constraint) {
-        if (constraint instanceof ObjectValue obj && obj.get("message") instanceof TextValue(String message)) {
-            return () -> log.info(message);
-        }
-        return () -> log.info("Access logged");
+        var message = ConstraintHandlerProvider.stringField(constraint, "message").orElse("Access logged");
+        return () -> log.info(message);
     }
 }

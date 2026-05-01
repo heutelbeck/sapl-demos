@@ -31,7 +31,6 @@ import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
 import io.sapl.spring.pep.constraints.ScopedConstraintHandler;
 import io.sapl.spring.pep.constraints.Signal.DecisionSignal;
 import io.sapl.spring.pep.constraints.SignalType;
-import io.sapl.spring.pep.constraints.providers.ConstraintResponsibility;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -62,17 +61,14 @@ public class HumanApprovalConstraintHandlerProvider implements ConstraintHandler
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!ConstraintResponsibility.isResponsible(constraint, CONSTRAINT_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, CONSTRAINT_TYPE,
+                supportedSignals, DecisionSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!supportedSignals.contains(DecisionSignal.SIGNAL_TYPE)) {
-            return List.of();
-        }
-        if (!(constraint instanceof ObjectValue obj)) {
-            return List.of();
-        }
-        Runner runner = buildRunner(obj);
-        return List.of(new ScopedConstraintHandler(runner, DecisionSignal.SIGNAL_TYPE, DEFAULT_PRIORITY));
+        // constraintTypeAndSignal already verified the value is a typed ObjectValue.
+        Runner runner = buildRunner((ObjectValue) constraint);
+        return List.of(new ScopedConstraintHandler(runner, signalOpt.get(), DEFAULT_PRIORITY));
     }
 
     private Runner buildRunner(ObjectValue obj) {

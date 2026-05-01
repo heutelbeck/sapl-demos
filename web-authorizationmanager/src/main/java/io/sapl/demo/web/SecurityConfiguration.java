@@ -47,18 +47,18 @@ public class SecurityConfiguration {
     /*
      * The configurer customizer narrows the subscription to the three fields
      * the demo policies reference (subject..authority, action.method,
-     * resource.requestedURI). The default factory ships the entire
-     * serialized request which works but is verbose. To replace the factory
-     * globally instead, declare a single
-     * @Bean AuthorizationSubscriptionFactory and the configurer call below
-     * collapses to http.with(saplHttp(), withDefaults()).
+     * resource.path). The default factory ships the entire serialized
+     * request which works but is verbose. To replace the factory globally
+     * instead, declare a single @Bean AuthorizationSubscriptionFactory and
+     * the configurer call below collapses to
+     * http.with(saplHttp(), withDefaults()).
      */
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper mapper) throws Exception {
         return http.with(saplHttp(),
                 c -> c.subscriptionFactory((auth, request) -> AuthorizationSubscription.of(auth,
                         Map.of("method", request.getMethod()),
-                        Map.of("requestedURI", request.getRequestURI()), mapper)))
+                        Map.of("path", request.getRequestURI()), mapper)))
                 .formLogin(withDefaults()).httpBasic(withDefaults()).build();
     }
 

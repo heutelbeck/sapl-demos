@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import io.sapl.api.model.NumberValue;
 import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Mapper;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -25,15 +24,12 @@ class CapTransferHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, "capTransferAmount",
+                supportedSignals, InputSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"capTransferAmount".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(InputSignal.SIGNAL_TYPE)) {
-            return List.of();
-        }
+        var obj       = (ObjectValue) constraint;
         var maxAmount = obj.get("maxAmount") instanceof NumberValue(java.math.BigDecimal n) ? n.doubleValue() : 0.0;
         Mapper<MethodInvocation> mapper = invocation -> {
             var args    = invocation.getArguments();
@@ -50,6 +46,6 @@ class CapTransferHandler implements ConstraintHandlerProvider {
             }
             return invocation;
         };
-        return List.of(new ScopedConstraintHandler(mapper, InputSignal.SIGNAL_TYPE, 50));
+        return List.of(new ScopedConstraintHandler(mapper, signalOpt.get(), 50));
     }
 }

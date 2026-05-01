@@ -5,8 +5,6 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import io.sapl.api.model.ObjectValue;
-import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
 import io.sapl.spring.pep.constraints.ConstraintHandler.Consumer;
 import io.sapl.spring.pep.constraints.ConstraintHandlerProvider;
@@ -21,17 +19,13 @@ class NotifyOnErrorHandler implements ConstraintHandlerProvider {
 
     @Override
     public List<ScopedConstraintHandler> getConstraintHandlers(Value constraint, Set<SignalType> supportedSignals) {
-        if (!(constraint instanceof ObjectValue obj)) {
-            return List.of();
-        }
-        if (!(obj.get("type") instanceof TextValue(String type)) || !"notifyOnError".equals(type)) {
-            return List.of();
-        }
-        if (!supportedSignals.contains(ErrorSignal.SIGNAL_TYPE)) {
+        var signalOpt = ConstraintHandlerProvider.constraintTypeAndSignal(constraint, "notifyOnError", supportedSignals,
+                ErrorSignal.SIGNAL_TYPE);
+        if (signalOpt.isEmpty()) {
             return List.of();
         }
         Consumer<Throwable> handler = error -> log
                 .warn("[ERROR-NOTIFY] Error during policy-protected operation: {}", error.getMessage());
-        return List.of(new ScopedConstraintHandler(handler, ErrorSignal.SIGNAL_TYPE, 50));
+        return List.of(new ScopedConstraintHandler(handler, signalOpt.get(), 50));
     }
 }

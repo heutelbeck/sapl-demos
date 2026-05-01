@@ -1,11 +1,36 @@
-policy "streaming-heartbeat-time-based"
-permit
-  action == "stream:heartbeat";
-  resource == "heartbeat";
-  var second = time.secondOf(<time.now>);
-  second >= 0 && second < 20 || second >= 40;
-obligation
-  {
-    "type": "logAccess",
-    "message": "Streaming heartbeat access"
-  }
+set "streaming-heartbeat-time-based"
+priority deny or abstain errors propagate
+for resource == "heartbeat"
+
+    policy "streaming-heartbeat-permit-window"
+    permit
+        action == "stream:heartbeat:terminate" | action == "stream:heartbeat:suspend";
+        var second = time.secondOf(<time.now>);
+        second >= 0 && second < 20 || second >= 40;
+    obligation
+        {
+            "type": "logAccess",
+            "message": "Streaming heartbeat access"
+        };
+
+    policy "streaming-heartbeat-terminate-window"
+    deny
+        action == "stream:heartbeat:terminate";
+        var second = time.secondOf(<time.now>);
+        second >= 20 && second < 40;
+    obligation
+        {
+            "type": "logAccess",
+            "message": "Heartbeat denied (terminating subscription)"
+        };
+
+    policy "streaming-heartbeat-suspend-window"
+    suspend
+        action == "stream:heartbeat:suspend";
+        var second = time.secondOf(<time.now>);
+        second >= 20 && second < 40;
+    obligation
+        {
+            "type": "logAccess",
+            "message": "Heartbeat suspended (subscription preserved)"
+        }
