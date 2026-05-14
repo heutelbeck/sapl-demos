@@ -56,7 +56,7 @@ java -jar remote-pdp-4.0.0-jar-with-dependencies.jar -h=http://myserver:8443
 ```
 [main] INFO org.demo.RemotePDPDemo - Subscription: AuthorizationSubscription[subject="Willi", action="eat", resource="icecream", environment=undefined]
 [main] INFO org.demo.RemotePDPDemo - Multi: MultiAuthorizationSubscription { ... }
-[reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemoteHttpPolicyDecisionPoint - Error : Connection refused: localhost/127.0.0.1:8443
+[reactor-http-nio-2] ERROR io.sapl.pdp.remote.RemoteHttpReactivePolicyDecisionPoint - Error : Connection refused: localhost/127.0.0.1:8443
 [reactor-http-nio-2] INFO org.demo.RemotePDPDemo - Decision: IdentifiableAuthorizationDecision[subscriptionId=, decision=AuthorizationDecision[decision=INDETERMINATE, ...]]
 ```
 

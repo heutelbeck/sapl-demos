@@ -74,7 +74,7 @@ class GPolicyWithComplexExpectStepTest {
                 "diagnosisText", Value.of("█████████████"),
                 "icd11Code", Value.of("ic███████")));
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withFunctionLibrary(new FilterFunctionLibrary())
                 .withPolicyFromResource(POLICY)
                 .whenDecide(AuthorizationSubscription.of(subject, action, resource))
                 .expectDecisionMatches(isPermit()
@@ -90,7 +90,7 @@ class GPolicyWithComplexExpectStepTest {
     @Test
     void whenAdminAccessesPatientData_thenObligationContainsLogAccessType() {
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withFunctionLibrary(new FilterFunctionLibrary())
                 .withPolicyFromResource(POLICY)
                 .whenDecide(AuthorizationSubscription.of(subject, action, resource))
                 .expectDecisionMatches(isPermit()
@@ -116,7 +116,7 @@ class GPolicyWithComplexExpectStepTest {
                 "icd11Code", Value.of("ic███████")));
 
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(FilterFunctionLibrary.class)
+                .withFunctionLibrary(new FilterFunctionLibrary())
                 .withPolicyFromResource(POLICY)
                 .whenDecide(AuthorizationSubscription.of(subject, action, resource))
                 .expectDecisionMatches(isPermit().withResource(expectedResource))

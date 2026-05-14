@@ -19,7 +19,8 @@ import io.sapl.api.attributes.Attribute;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import reactor.core.publisher.Flux;
+import io.sapl.api.stream.Stream;
+import io.sapl.api.stream.Streams;
 
 /**
  * A simple non-streaming PIP echoing its input.
@@ -28,8 +29,8 @@ import reactor.core.publisher.Flux;
 public class EchoPIP {
 
     @Attribute(name = "echo")
-    public Flux<Value> echo(TextValue value) {
-        return Flux.just(value);
+    public Stream<Value> echo(TextValue value) {
+        return Streams.just(value);
     }
 
 }

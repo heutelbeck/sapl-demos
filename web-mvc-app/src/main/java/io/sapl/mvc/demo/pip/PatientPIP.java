@@ -18,6 +18,8 @@ package io.sapl.mvc.demo.pip;
 import io.sapl.api.attributes.Attribute;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.*;
+import io.sapl.api.stream.Stream;
+import io.sapl.api.stream.Streams;
 import io.sapl.mvc.demo.domain.Relation;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -68,11 +70,11 @@ public class PatientPIP {
      *
      */
     @Attribute(name = "relatives")
-    public Flux<Value> getRelations(NumberValue leftHandValue) {
+    public Stream<Value> getRelations(NumberValue leftHandValue) {
         final List<Relation> relations     = relationRepo.findByPatientId(leftHandValue.value().longValue());
         final List<TextValue>   relationNames = relations.stream().map(Relation::getUsername).map(Value::of).toList();
         final ArrayValue     jsonNode      = ArrayValue.builder().addAll(relationNames).build();
-        return Flux.just(jsonNode);
+        return Streams.just(jsonNode);
     }
 
     /**
@@ -95,16 +97,16 @@ public class PatientPIP {
      *
      */
     @Attribute(name = "patientRecord")
-    public Flux<Value> getPatientRecord(NumberValue patientId) {
+    public Stream<Value> getPatientRecord(NumberValue patientId) {
         try {
             val maybePatient  = patientRepo.findById(patientId.value().longValue());
             if(maybePatient.isEmpty()) {
-                return Flux.just(Value.NULL);
+                return Streams.just(Value.NULL);
             }
             final JsonNode jsonNode = mapper.convertValue(maybePatient.get(), JsonNode.class);
-            return Flux.just(ValueJsonMarshaller.fromJsonNode(jsonNode));
+            return Streams.just(ValueJsonMarshaller.fromJsonNode(jsonNode));
         } catch (IllegalArgumentException  e) {
-            return Flux.just(Value.NULL);
+            return Streams.just(Value.NULL);
         }
     }
 

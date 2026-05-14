@@ -17,7 +17,7 @@ package org.demo;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.MultiAuthorizationSubscription;
-import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.reactive.api.pdp.ReactivePolicyDecisionPoint;
 import io.sapl.pdp.remote.RemotePolicyDecisionPoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class RemotePDPDemo implements Callable<Integer> {
 
     public Integer call() throws JacksonException {
 
-        PolicyDecisionPoint pdp;
+        ReactivePolicyDecisionPoint pdp;
 
         pdp = RemotePolicyDecisionPoint.builder().http().baseUrl(host).build();
 

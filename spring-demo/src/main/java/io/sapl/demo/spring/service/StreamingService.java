@@ -42,7 +42,7 @@ public class StreamingService {
      * subscription survives; items are dropped silently while suspended;
      * boundary crossings surface as non-terminal exceptions on the error
      * channel. Subscribers consume them via {@code onErrorContinue} or
-     * {@code RecoverableFluxes}.
+     * {@code TransitionSignals}.
      */
     @StreamEnforce(action = "'stream:heartbeat:suspend'", resource = "'heartbeat'", signalTransitions = true)
     public Flux<HeartbeatEvent> heartbeatRecoverable() {

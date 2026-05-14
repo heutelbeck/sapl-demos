@@ -192,7 +192,7 @@ public class DemoService {
      * exceptions on the error channel
      * ({@code AccessDeniedException} on entry to suspended,
      * {@code AccessGrantedException} on resume), consumable via
-     * {@code onErrorContinue} or {@code RecoverableFluxes}.
+     * {@code onErrorContinue} or {@code TransitionSignals}.
      *
      * Without {@code onErrorContinue} the first signal terminates the
      * subscription, defeating the purpose of {@code signalTransitions}.

@@ -46,7 +46,7 @@ class EPolicyStreamingTest {
         var timestamp6 = Value.of("2021-02-08T16:16:06.000Z"); // second = 6
 
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(TemporalFunctionLibrary.class)
+                .withFunctionLibrary(new TemporalFunctionLibrary())
                 .withPolicyFromResource(POLICY)
                 .givenEnvironmentAttribute("timeMock", "time.now", args(), timestamp1)
                 .whenDecide(AuthorizationSubscription.of("ROLE_DOCTOR", "read", "heartBeatData"))

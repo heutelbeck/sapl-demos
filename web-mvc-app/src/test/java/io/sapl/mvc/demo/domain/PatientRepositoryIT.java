@@ -110,12 +110,12 @@ class PatientRepositoryIT {
         }
 
         @Test
-        @DisplayName("Admin can access patient")
+        @DisplayName("Admin can access patient with redacted diagnosis (blacken transform)")
         void adminCanAccessPatient() {
             setAuthentication("Horst", "ADMIN");
             var patient = patientRepository.findById(1L);
             assertThat(patient).isPresent()
-                    .get().extracting(Patient::getName)
+                    .get().extracting("name")
                     .isEqualTo("Lenny");
         }
 

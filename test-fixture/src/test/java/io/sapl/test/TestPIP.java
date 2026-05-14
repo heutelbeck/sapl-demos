@@ -20,7 +20,8 @@ import io.sapl.api.attributes.AttributeAccessContext;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.Value;
-import reactor.core.publisher.Flux;
+import io.sapl.api.stream.Stream;
+import io.sapl.api.stream.Streams;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
 public class TestPIP {
@@ -30,8 +31,8 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Flux<Value> upper(TextValue leftHandValue, AttributeAccessContext ctx) {
-        return Flux.just(Value.of(leftHandValue.value().toUpperCase()));
+    public Stream<Value> upper(TextValue leftHandValue, AttributeAccessContext ctx) {
+        return Streams.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 
 }

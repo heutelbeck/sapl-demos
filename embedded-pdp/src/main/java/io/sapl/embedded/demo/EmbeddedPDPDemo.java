@@ -17,9 +17,9 @@ package io.sapl.embedded.demo;
 
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.pdp.BlockingPolicyDecisionPoint;
+import io.sapl.pdp.PDPComponents;
 import io.sapl.pdp.PolicyDecisionPointBuilder;
-import io.sapl.pdp.PolicyDecisionPointBuilder.PDPComponents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -36,7 +36,7 @@ import java.util.concurrent.Callable;
  * the PDP. The demo runs a few performance tests and illustrates different ways
  * of invoking the PDP.
  */
-@Command(name = "sapl-demo-embedded", version = "4.0.0", mixinStandardHelpOptions = true,
+@Command(name = "sapl-demo-embedded", version = "4.1.0", mixinStandardHelpOptions = true,
         description = "This demo shows how to manually construct a PDP without infrastructure support. "
                 + "A Custom Policy Information Point and Function Library are bound to the PDP. "
                 + "The demo runs a few performance tests and illustrates different ways of invoking the PDP.")
@@ -71,11 +71,11 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     private static final int TEST_RUNS = 20;
 
-    private static final double BILLION = 1_000_000_000.0D;
+    private static final double NS_PER_S  = 1_000_000_000.0D;
+    private static final double NS_PER_MS = 1_000_000.0D;
+    private static final double NS_PER_US = 1_000.0D;
 
-    private static final double MILLION = 1_000_000.0D;
-
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.####");
+    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#.00");
 
     private static boolean useTestRuns = false;
 
@@ -93,23 +93,21 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
 
     @Override
     public Integer call() throws Exception {
-        var components = buildPdpComponents();
-        var pdp        = components.pdp();
-
-        blockingUsageDemo(pdp);
-        reactiveUsageDemo(pdp);
-        runPerformanceDemoSingleBlocking(pdp);
-        runPerformanceDemoSingleSequentialReactive(pdp);
-        runPerformanceDemoSingleSequentialPure(pdp);
-        LOGGER.info("End of demo.");
-        components.dispose();
+        try (var components = buildPdpComponents()) {
+            var pdp = components.pdp();
+            blockingDecisionDemo(pdp);
+            streamingDecisionDemo(pdp);
+            runBlockingDecideOnceBenchmark(pdp);
+            runStreamingDecideTakeOneBenchmark(pdp);
+            LOGGER.info("End of demo.");
+        }
         return 0;
     }
 
     private PDPComponents buildPdpComponents() {
         var builder = PolicyDecisionPointBuilder.withDefaults()
                 .withPolicyInformationPoint(new EchoPIP())
-                .withFunctionLibrary(SimpleFunctionLibrary.class);
+                .withFunctionLibrary(new SimpleFunctionLibrary());
 
         if (filesystem) {
             /*
@@ -135,36 +133,36 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
     }
 
     /**
-     * If traditional blocking behavior is required, use decideOnceBlocking(). This is not
-     * applicable in multithreaded environments, e.g., web applications. The Reactor
-     * runtime will likely complain that this behavior is not permitted.
+     * Single decision via the blocking PDP. decideOnce returns the value
+     * directly, no Reactor on the call path.
      */
-    private static void blockingUsageDemo(PolicyDecisionPoint pdp) {
+    private static void blockingDecisionDemo(BlockingPolicyDecisionPoint pdp) {
         LOGGER.info("");
-        LOGGER.info("Demo Part 1: Accessing the PDP in a blocking manner using decideOnceBlocking()");
-        var readDecision = pdp.decideOnceBlocking(READ_SUBSCRIPTION);
-        LOGGER.info("Decision for action 'read' : {}", readDecision != null ? readDecision.decision() : "null");
-        var writeDecision = pdp.decideOnceBlocking(WRITE_SUBSCRIPTION);
-        LOGGER.info("Decision for action 'write': {}", writeDecision != null ? writeDecision.decision() : "null");
+        LOGGER.info("Demo Part 1: Single blocking decisions via decideOnce()");
+        var readDecision = pdp.decideOnce(READ_SUBSCRIPTION);
+        LOGGER.info("Decision for action 'read' : {}", readDecision.decision());
+        var writeDecision = pdp.decideOnce(WRITE_SUBSCRIPTION);
+        LOGGER.info("Decision for action 'write': {}", writeDecision.decision());
         LOGGER.info("");
         LOGGER.info(LINE);
     }
 
     /**
-     * If only one result is required, the appropriate way to consume exactly one
-     * decision event is to use decideOnce() and subscribe accordingly. In this demo
-     * these will be processed sequentially, as this application is not declaring
-     * schedulers.
+     * Continuous decision stream. decide() returns a SAPL Stream which
+     * delivers updated decisions whenever the authorization context
+     * changes. Always close the stream (try-with-resources).
      */
-    private static void reactiveUsageDemo(PolicyDecisionPoint pdp) {
+    private static void streamingDecisionDemo(BlockingPolicyDecisionPoint pdp) throws InterruptedException {
         LOGGER.info("");
-        LOGGER.info("Demo Part 2: Accessing the PDP in a reactive manner using decideOnce().subscribe()");
-
-        LOGGER.info("Single reactive decision using decideOnce().subscribe()...");
-        pdp.decideOnce(READ_SUBSCRIPTION)
-                .subscribe(authzDecision -> handleAuthorizationDecision(ACTION_READ, authzDecision));
-        pdp.decideOnce(WRITE_SUBSCRIPTION)
-                .subscribe(authzDecision -> handleAuthorizationDecision(ACTION_WRITE, authzDecision));
+        LOGGER.info("Demo Part 2: Streaming decisions via decide()");
+        try (var stream = pdp.decide(READ_SUBSCRIPTION)) {
+            var decision = stream.awaitNext();
+            handleAuthorizationDecision(ACTION_READ, decision);
+        }
+        try (var stream = pdp.decide(WRITE_SUBSCRIPTION)) {
+            var decision = stream.awaitNext();
+            handleAuthorizationDecision(ACTION_WRITE, decision);
+        }
         LOGGER.info("");
         LOGGER.info(LINE);
     }
@@ -173,85 +171,77 @@ public class EmbeddedPDPDemo implements Callable<Integer> {
         LOGGER.info("Decision for action '{}': {}", action, authzDecision.decision());
     }
 
-    private static void runPerformanceDemoSingleBlocking(PolicyDecisionPoint pdp) {
+    private static void runBlockingDecideOnceBenchmark(BlockingPolicyDecisionPoint pdp) {
         var runs = getRuns();
         LOGGER.info("");
-        LOGGER.info("Demo Part 3: Perform a small benchmark for blocking decisions.");
+        LOGGER.info("Demo Part 3: Benchmark for decideOnce() (single blocking decision).");
 
         LOGGER.info("Warming up for {} runs...", runs);
         for (var i = 0; i < runs; i++) {
-            pdp.decide(READ_SUBSCRIPTION).blockFirst();
+            pdp.decideOnce(WRITE_SUBSCRIPTION);
         }
         LOGGER.info("Measure time for {} runs...", runs);
         var start = System.nanoTime();
         for (var i = 0; i < runs; i++) {
-            pdp.decide(READ_SUBSCRIPTION).blockFirst();
+            pdp.decideOnce(WRITE_SUBSCRIPTION);
         }
         var end = System.nanoTime();
         LOGGER.info("");
-        logResults("Benchmark results for blocking PDP access:", runs, start, end);
+        logResults("Benchmark results for decideOnce():", runs, start, end);
         LOGGER.info("");
         LOGGER.info(LINE);
     }
 
-    private static void runPerformanceDemoSingleSequentialReactive(PolicyDecisionPoint pdp) {
+    private static void runStreamingDecideTakeOneBenchmark(BlockingPolicyDecisionPoint pdp) throws InterruptedException {
         var runs = getRuns();
         LOGGER.info("");
-        LOGGER.info("Demo Part 4: Perform a small benchmark for sequential .take(1) decisions.");
+        LOGGER.info("Demo Part 4: Benchmark for decide() reading the first decision off the stream.");
 
         LOGGER.info("Warming up for {} runs...", runs);
         for (var i = 0; i < runs; i++) {
-            pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
-        }
-        LOGGER.info("Measure time for {} runs...", runs);
-
-        var start = System.nanoTime();
-        for (var i = 0; i < runs; i++) {
-            pdp.decide(READ_SUBSCRIPTION).take(1).subscribe();
-        }
-        var end = System.nanoTime();
-        LOGGER.info("");
-        logResults("Benchmark results for .take(1) access:", runs, start, end);
-        LOGGER.info("");
-        LOGGER.info(LINE);
-    }
-
-    private static void runPerformanceDemoSingleSequentialPure(PolicyDecisionPoint pdp) {
-        var runs = getRuns();
-        LOGGER.info("");
-        LOGGER.info("Demo Part 5: Perform a small benchmark for sequential .take(1) decisions.");
-
-        LOGGER.info("Warming up for {} runs...", runs);
-        for (var i = 0; i < runs; i++) {
-            pdp.decideOnceBlocking(READ_SUBSCRIPTION);
+            try (var stream = pdp.decide(WRITE_SUBSCRIPTION)) {
+                stream.awaitNext();
+            }
         }
         LOGGER.info("Measure time for {} runs...", runs);
 
         var start = System.nanoTime();
         for (var i = 0; i < runs; i++) {
-            pdp.decideOnceBlocking(READ_SUBSCRIPTION);
+            try (var stream = pdp.decide(WRITE_SUBSCRIPTION)) {
+                stream.awaitNext();
+            }
         }
         var end = System.nanoTime();
         LOGGER.info("");
-        logResults("Benchmark results for .take(1) access:", runs, start, end);
+        logResults("Benchmark results for decide() + first:", runs, start, end);
         LOGGER.info("");
         LOGGER.info(LINE);
     }
 
-    private static double nanoToMs(double nanoseconds) {
-        return nanoseconds / MILLION;
-    }
-
-    private static double nanoToS(double nanoseconds) {
-        return nanoseconds / BILLION;
+    /**
+     * Formats a nanosecond duration using the largest temporal unit for
+     * which the value is at least one. Tried in order: s, ms, μs, ns.
+     */
+    private static String formatDuration(double nanoseconds) {
+        if (nanoseconds >= NS_PER_S) {
+            return DECIMAL_FORMAT.format(nanoseconds / NS_PER_S) + " s";
+        }
+        if (nanoseconds >= NS_PER_MS) {
+            return DECIMAL_FORMAT.format(nanoseconds / NS_PER_MS) + " ms";
+        }
+        if (nanoseconds >= NS_PER_US) {
+            return DECIMAL_FORMAT.format(nanoseconds / NS_PER_US) + " μs";
+        }
+        return DECIMAL_FORMAT.format(nanoseconds) + " ns";
     }
 
     private static void logResults(String title, int runs, long start, long end) {
         if (LOGGER.isInfoEnabled()) {
+            final double totalNs = (double) end - start;
             LOGGER.info(title);
             LOGGER.info("Runs  : {}", runs);
-            LOGGER.info("Total : {} s", DECIMAL_FORMAT.format(nanoToS((double) end - start)));
-            LOGGER.info("Avg.  : {} ms", DECIMAL_FORMAT.format(nanoToMs(((double) end - start) / runs)));
+            LOGGER.info("Total : {}", formatDuration(totalNs));
+            LOGGER.info("Avg.  : {}", formatDuration(totalNs / runs));
         }
     }
 

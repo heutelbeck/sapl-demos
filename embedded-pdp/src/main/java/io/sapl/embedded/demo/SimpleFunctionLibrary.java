@@ -25,10 +25,6 @@ import io.sapl.api.model.Value;
 @FunctionLibrary(name = "simple", description = "some simple functions")
 public class SimpleFunctionLibrary {
 
-    private SimpleFunctionLibrary() {
-        // Utility class with only static methods. Cannot instantiate.
-    }
-
     @Function
     public static Value length(Value parameter) {
         return switch (parameter) {

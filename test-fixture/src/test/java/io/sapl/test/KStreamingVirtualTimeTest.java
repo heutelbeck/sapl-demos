@@ -44,7 +44,7 @@ class KStreamingVirtualTimeTest {
         var timestamp6 = Value.of("2021-02-08T16:16:06.000Z"); // second = 6
 
         SaplTestFixture.createIntegrationTest()
-                .withFunctionLibrary(TemporalFunctionLibrary.class)
+                .withFunctionLibrary(new TemporalFunctionLibrary())
                 .withConfigurationFromResources("policiesIT")
                 .givenEnvironmentAttribute("timeMock", "time.now", args(any()), timestamp1)
                 .whenDecide(AuthorizationSubscription.of("WILLI", "read", "bar"))

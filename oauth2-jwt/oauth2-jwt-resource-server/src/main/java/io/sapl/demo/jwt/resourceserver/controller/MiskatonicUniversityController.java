@@ -17,7 +17,7 @@ package io.sapl.demo.jwt.resourceserver.controller;
 
 import io.sapl.api.pdp.AuthorizationDecision;
 import io.sapl.api.pdp.AuthorizationSubscription;
-import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.reactive.api.pdp.ReactivePolicyDecisionPoint;
 import io.sapl.spring.method.metadata.PreEnforce;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -34,7 +34,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class MiskatonicUniversityController {
 
-    private final PolicyDecisionPoint pdp;
+    private final ReactivePolicyDecisionPoint pdp;
 
     private final ObjectMapper mapper;
 

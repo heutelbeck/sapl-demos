@@ -18,7 +18,7 @@ package io.sapl.mvc.demo.controller;
 import io.sapl.api.SaplVersion;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.reactive.api.pdp.ReactivePolicyDecisionPoint;
 import io.sapl.mvc.demo.domain.Patient;
 import io.sapl.mvc.demo.domain.PatientRepository;
 import io.sapl.spring.method.metadata.PreEnforce;
@@ -46,7 +46,7 @@ public class UIController {
 
     private final ObjectMapper om;
 
-    private final PolicyDecisionPoint pdp;
+    private final ReactivePolicyDecisionPoint pdp;
 
     private final PatientRepository patientRepository;
 

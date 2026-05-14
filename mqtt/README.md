@@ -84,16 +84,16 @@ The expression `"status".<mqtt.messages>` creates a **subscription** to the MQTT
 ```java
 @GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
 public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-    return recoverWith(service.getFluxStringRecoverable(),
-            error -> log.info("Access denied: {}", error.getMessage()),
-            () -> ACCESS_DENIED_MESSAGE)
+    return onSuspend(service.getFluxStringRecoverable(),
+            suspended -> log.info("Stream suspended: {}", suspended.getMessage()),
+            () -> STREAM_SUSPENDED_MESSAGE)
             .map(value -> ServerSentEvent.<String>builder().data(value).build());
 }
 ```
 
-The `RecoverableFluxes.recoverWith()` utility:
-1. Logs the access denied event
-2. Emits a user-friendly message to the client  
+The `TransitionSignals.onSuspend()` utility:
+1. Logs the suspend boundary
+2. Emits a user-friendly message to the client
 3. Continues streaming when access is granted again
 
 ## Key Components
@@ -104,7 +104,7 @@ The `RecoverableFluxes.recoverWith()` utility:
 | `SaplMqttConfiguration.java` | Registers the `MqttPolicyInformationPoint` bean                          |
 | `permitOnEmergency.sapl`     | Policy that permits access only during "emergency" state                 |
 | `DemoService.java`           | Service method secured with `@EnforceRecoverableIfDenied`                |
-| `DemoController.java`        | REST controller using `RecoverableFluxes.recoverWith()`                  |
+| `DemoController.java`        | REST controller using `TransitionSignals.onSuspend()`                    |
 
 ## ASBAC Use Cases
 

@@ -156,25 +156,30 @@ public class LoggingConstraintHandlerProvider implements ConsumerConstraintHandl
 }
 ```
 
-## Handling `@EnforceRecoverableIfDenied`
+## Handling `@StreamEnforce(signalTransitions = true)`
 
-The `RecoverableFluxes` utility provides clean error handling:
+The `TransitionSignals` utility translates the non-terminal boundary
+exceptions emitted under `signalTransitions = true` into ordinary
+callbacks:
 
 ```java
 @GetMapping("/enforcerecoverableifdeny")
 public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-    return recover(service.getFluxStringRecoverable(),
-            error -> log.warn("ACCESS DENIED - will resume when permitted"))
+    return TransitionSignals.onTransitions(service.getFluxStringRecoverable(),
+            suspended -> log.warn("STREAM SUSPENDED - will resume when permitted"),
+            granted   -> log.info("STREAM RESUMED"))
             .map(value -> ServerSentEvent.<String>builder().data(value).build());
 }
 ```
 
-| Method                                  | Behavior                                         |
-|-----------------------------------------|--------------------------------------------------|
-| `recover(flux)`                         | Drop `AccessDeniedException` and continue        |
-| `recover(flux, consumer)`               | Execute side-effect (e.g., logging) and continue |
-| `recoverWith(flux, supplier)`           | Emit replacement value to client                 |
-| `recoverWith(flux, consumer, supplier)` | Side-effect + replacement value                  |
+| Method                                                          | Behavior                                                |
+|-----------------------------------------------------------------|---------------------------------------------------------|
+| `onSuspend(flux, consumer)`                                     | Observe suspend boundary and continue                   |
+| `onSuspend(flux, consumer, supplier)`                           | Observe suspend boundary and emit a replacement value   |
+| `onGranted(flux, consumer)`                                     | Observe grant boundary and continue                     |
+| `onGranted(flux, consumer, supplier)`                           | Observe grant boundary and emit a replacement value     |
+| `onTransitions(flux, onSuspend, onGranted)`                     | Observe both boundaries in one call                     |
+| `onTransitions(flux, onSuspend, emitOn, onGranted, emitOn)`     | Observe both boundaries and emit per-direction values   |
 
 ## PEP Annotations
 
@@ -228,7 +233,7 @@ flowchart LR
 
 ### `@EnforceRecoverableIfDenied`
 
-Continuously re-evaluates authorization. On DENY, emits an `AccessDeniedException` that can be caught and handled. Combined with `RecoverableFluxes`, the client can be notified of denied access while the stream continues. Use when clients need explicit notification of access changes.
+Continuously re-evaluates authorization. On DENY, emits an `AccessDeniedException` that can be caught and handled. Combined with `TransitionSignals`, the client can be notified of denied access while the stream continues. Use when clients need explicit notification of access changes.
 
 ```mermaid
 flowchart LR

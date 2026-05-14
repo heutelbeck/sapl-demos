@@ -10,6 +10,6 @@ public class SaplMqttConfiguration {
 
     @Bean
     MqttPolicyInformationPoint mqttPolicyInformationPoint() {
-        return new MqttPolicyInformationPoint(new SaplMqttClient());
+        return new MqttPolicyInformationPoint(SaplMqttClient.withDefaults());
     }
 }

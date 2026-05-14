@@ -21,7 +21,8 @@ import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
 import io.sapl.api.model.UndefinedValue;
 import io.sapl.api.model.Value;
-import reactor.core.publisher.Flux;
+import io.sapl.api.stream.Stream;
+import io.sapl.api.stream.Streams;
 
 import java.util.Map;
 
@@ -33,25 +34,25 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Flux<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
-        return Flux.just(Value.of(leftHandValue.value().toUpperCase()));
+    public Stream<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
+        return Streams.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 
     @Attribute
-    public Flux<Value> hasEnvVar(TextValue leftHandValue, Map<String, Value> variables) {
-        return Flux.just(variables.getOrDefault(leftHandValue.value(), Value.of("something")));
+    public Stream<Value> hasEnvVar(TextValue leftHandValue, Map<String, Value> variables) {
+        return Streams.just(variables.getOrDefault(leftHandValue.value(), Value.of("something")));
     }
 
     @Attribute
-    public Flux<Value> hasAuthzSubVar(TextValue leftHandValue, Map<String, Value> variables) {
+    public Stream<Value> hasAuthzSubVar(TextValue leftHandValue, Map<String, Value> variables) {
         final var env = variables.get("environment");
         if (env instanceof UndefinedValue) {
-            return Flux.just(Value.of("no environment"));
+            return Streams.just(Value.of("no environment"));
         }
         if (!(env instanceof ObjectValue objectValue)) {
-            return Flux.just(Value.of("no object"));
+            return Streams.just(Value.of("no object"));
         }
         var v = objectValue.get(leftHandValue.value());
-        return Flux.just(Value.of(v==null?"something else":v.toString()));
+        return Streams.just(Value.of(v==null?"something else":v.toString()));
     }
 }

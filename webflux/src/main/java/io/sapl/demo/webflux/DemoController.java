@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.sapl.spring.pep.streaming.RecoverableFluxes;
+import io.sapl.spring.pep.streaming.TransitionSignals;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,10 +74,10 @@ public class DemoController {
 
     @GetMapping(value = "/enforcerecoverableifdeny", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-        return RecoverableFluxes
-                .recover(service.getFluxStringRecoverable(),
+        return TransitionSignals
+                .onTransitions(service.getFluxStringRecoverable(),
                         suspended -> log.warn("STREAM SUSPENDED ('{}')", suspended.getMessage()),
-                        resumed -> log.info("STREAM RESUMED ('{}')", resumed.getMessage()))
+                        granted -> log.info("STREAM RESUMED ('{}')", granted.getMessage()))
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());
     }
 }

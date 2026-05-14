@@ -3,7 +3,7 @@ package io.sapl.demo.spring.controller;
 import io.sapl.api.model.UndefinedValue;
 import io.sapl.api.pdp.AuthorizationSubscription;
 import io.sapl.api.pdp.Decision;
-import io.sapl.api.pdp.PolicyDecisionPoint;
+import io.sapl.reactive.api.pdp.ReactivePolicyDecisionPoint;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,7 @@ class HelloController {
 
     record HelloResponse(String message) {}
 
-    private final PolicyDecisionPoint pdp;
+    private final ReactivePolicyDecisionPoint pdp;
 
     @GetMapping("/api/hello")
     Mono<HelloResponse> getHello() {

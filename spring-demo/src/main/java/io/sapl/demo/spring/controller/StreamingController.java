@@ -35,7 +35,7 @@ class StreamingController {
 
     // TODO recover behaviour: rebuild the "deny -> ACCESS_SUSPENDED -> resume
     // -> ACCESS_RESTORED" lifecycle using io.sapl.spring.pep.streaming
-    // .RecoverableFluxes once the demo's policies use the suspend verb to
+    // .TransitionSignals once the demo's policies use the suspend verb to
     // drive the suspended state. For now both endpoints below pass the
     // protected stream through unchanged.
     @GetMapping(value = "/heartbeat/terminated-by-callback", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

@@ -30,7 +30,7 @@ class BPolicyWithSimpleFunctionTest {
     @Test
     void whenUsingRealFunctionLibrary_thenPermit() {
         SaplTestFixture.createSingleTest()
-                .withFunctionLibrary(TemporalFunctionLibrary.class)
+                .withFunctionLibrary(new TemporalFunctionLibrary())
                 .withPolicyFromResource(POLICY)
                 .whenDecide(AuthorizationSubscription.of("willi", "read", "something"))
                 .expectPermit()

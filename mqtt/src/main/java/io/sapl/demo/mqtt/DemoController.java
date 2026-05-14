@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
-import static io.sapl.spring.pep.streaming.RecoverableFluxes.recoverWith;
+import static io.sapl.spring.pep.streaming.TransitionSignals.onSuspend;
 
 @Slf4j
 @RestController
@@ -39,7 +39,7 @@ public class DemoController {
 
     @GetMapping(value = "/secured", produces = MediaType.APPLICATION_NDJSON_VALUE)
     public Flux<ServerSentEvent<String>> recoverAfterDeny() {
-        return recoverWith(service.getFluxStringRecoverable(),
+        return onSuspend(service.getFluxStringRecoverable(),
                 suspended -> log.info("Stream suspended: {}", suspended.getMessage()),
                 () -> STREAM_SUSPENDED_MESSAGE)
                 .map(value -> ServerSentEvent.<String>builder().data(value).build());

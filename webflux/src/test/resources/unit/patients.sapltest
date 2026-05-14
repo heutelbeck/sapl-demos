@@ -69,5 +69,5 @@ requirement "Streaming transformation changes with time" {
             - attribute "nowMock" emits "t3"
         expect permit
         verify
-            - attribute <time.now> is called 3 times;
+            - attribute <time.now> is called 1 times;
 }

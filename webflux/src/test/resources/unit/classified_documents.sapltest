@@ -78,5 +78,5 @@ requirement "Streaming clearance level changes with time" {
             - attribute "nowMock" emits "t3"
         expect decision is permit, with obligation containing key "clearance" with value matching text "NATO_UNCLASSIFIED"
         verify
-            - attribute <time.now> is called 3 times;
+            - attribute <time.now> is called 1 times;
 }
