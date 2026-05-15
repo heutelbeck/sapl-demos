@@ -31,9 +31,14 @@ permit resource == "books";
  * its claims. This is the recommended way to access JWT data in policies.
  * The token is validated cryptographically against the configured public key
  * server.
+ *
+ * The <jwt.token>.valid check guards against forged or unverifiable tokens.
+ * Without it the policy would permit access for any JWT with the right
+ * scope claim, regardless of signature.
  */
 policy "Reading scopes from JWT via PIP"
 permit resource == "faculty";
+	<jwt.token>.valid;
 	"faculty.read" in <jwt.token>.payload.scope;
 
 /*
@@ -43,6 +48,7 @@ permit resource == "faculty";
  */
 policy "Reading bestiary scope from JWT via PIP"
 permit resource == "bestiary";
+	<jwt.token>.valid;
 	"bestiary.read" in <jwt.token>.payload.scope;
 
 /*

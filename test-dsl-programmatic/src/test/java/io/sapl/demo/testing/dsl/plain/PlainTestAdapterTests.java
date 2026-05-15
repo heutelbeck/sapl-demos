@@ -98,14 +98,15 @@ class PlainTestAdapterTests {
             }
         }).blockLast();
 
-        // Verify we got results
         assertThat(finalResults[0]).isNotNull();
-        assertThat(finalResults[0].total()).isGreaterThan(0);
-
-        // Log summary
         var results = finalResults[0];
         LOG.info("Test execution completed: {} passed, {} failed, {} errors", results.passed(), results.failed(),
                 results.errors());
+        assertThat(results.total()).isGreaterThan(0);
+        assertThat(results.scenarioResults())
+                .filteredOn(r -> r.status() != TestStatus.PASSED)
+                .as("failed or errored scenarios")
+                .isEmpty();
     }
 
     private static List<SaplDocument> loadPolicies() {

@@ -16,6 +16,7 @@
 package io.sapl.test;
 
 import io.sapl.api.pdp.AuthorizationSubscription;
+import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -33,6 +34,7 @@ class JSimplePDPTest {
     void whenEvaluatingCombinedPolicies_thenPermit() {
         SaplTestFixture.createIntegrationTest()
                 .withConfigurationFromResources("policiesIT")
+                .withFunctionLibrary(new TemporalFunctionLibrary())
                 .whenDecide(AuthorizationSubscription.of("WILLI", "read", "foo"))
                 .expectPermit()
                 .verify();

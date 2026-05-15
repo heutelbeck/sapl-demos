@@ -146,9 +146,10 @@ requirement "Attribute mocking with object entities" {
             // Entity can be a complex JSON object
             - attribute "upperMock" {"id": 1, "name": "willi"}.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        // Won't match because policy uses subject string ("willi"), not object
-        // No mock matches -> returns error Value -> policy evaluates to indeterminate
-        expect indeterminate;
+        // Won't match because policy uses subject string ("willi"), not object.
+        // No mock matches -> attribute returns UNDEFINED -> condition is false
+        // -> policy is not-applicable.
+        expect not-applicable;
 
     scenario "mock with matching object entity"
         given
@@ -156,14 +157,14 @@ requirement "Attribute mocking with object entities" {
             // But subject is string "willi", not an object, so won't match
             - attribute "upperMock" matching object.<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        expect indeterminate;
+        expect not-applicable;
 
     scenario "mock with array entity"
         given
             // Entity is an array - won't match string subject "willi"
             - attribute "upperMock" ["willi", "admin"].<test.upper> emits "WILLI"
         when "willi" attempts "read" on "something"
-        expect indeterminate;
+        expect not-applicable;
 }
 
 requirement "Attribute mocking with undefined values" {
