@@ -11,7 +11,7 @@ for resource == "heartbeat"
         {
             "type": "logAccess",
             "message": "Streaming heartbeat access"
-        };
+        }
 
     policy "streaming-heartbeat-terminate-window"
     deny
@@ -22,7 +22,7 @@ for resource == "heartbeat"
         {
             "type": "logAccess",
             "message": "Heartbeat denied (terminating subscription)"
-        };
+        }
 
     policy "streaming-heartbeat-suspend-window"
     suspend

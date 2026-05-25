@@ -150,8 +150,9 @@ public class DemoService {
      * plan; an explicit DENY ends the Flux with an
      * AccessDeniedException.
      *
-     * Policy verbs INDETERMINATE, NOT_APPLICABLE, and SUSPEND would
-     * normally suspend the subscription; this method's policy uses only
+     * Under the strict fail-closed default, INDETERMINATE and
+     * NOT_APPLICABLE also terminate; only an explicit SUSPEND from the
+     * PDP silences without terminating. This method's policy uses only
      * PERMIT and DENY so the visible behaviour is "stream until denied."
      *
      * @return a protected sequence of messages, each delayed by 500ms.

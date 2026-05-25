@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.sapl.demo.spring.service.StreamingService;
+import io.sapl.spring.pep.streaming.TransitionSignals;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 
@@ -33,11 +34,6 @@ class StreamingController {
         return streamingService.heartbeatDropWhileDenied().map(StreamingController::toSse);
     }
 
-    // TODO recover behaviour: rebuild the "deny -> ACCESS_SUSPENDED -> resume
-    // -> ACCESS_RESTORED" lifecycle using io.sapl.spring.pep.streaming
-    // .TransitionSignals once the demo's policies use the suspend verb to
-    // drive the suspended state. For now both endpoints below pass the
-    // protected stream through unchanged.
     @GetMapping(value = "/heartbeat/terminated-by-callback", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<Object>> heartbeatTerminatedByCallback() {
         return streamingService.heartbeatRecoverable().cast(Object.class).map(StreamingController::toSse);
@@ -50,7 +46,12 @@ class StreamingController {
 
     @GetMapping(value = "/heartbeat/recoverable", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     Flux<ServerSentEvent<Object>> heartbeatRecoverable() {
-        return streamingService.heartbeatRecoverable().cast(Object.class).map(StreamingController::toSse);
+        Flux<Object> raw         = streamingService.heartbeatRecoverable().cast(Object.class);
+        Flux<Object> withSuspend = TransitionSignals.onSuspend(raw, e -> {},
+                () -> new StreamSignal("ACCESS_SUSPENDED", "Stream paused by policy"));
+        return TransitionSignals.onGranted(withSuspend, e -> {},
+                () -> new StreamSignal("ACCESS_RESTORED", "Stream resumed by policy"))
+                .map(StreamingController::toSse);
     }
 
     private static ServerSentEvent<Object> toSse(Object data) {
