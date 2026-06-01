@@ -16,10 +16,10 @@ public class StreamingService {
     /**
      * Default {@code @StreamEnforce}: terminates on the first non-PERMIT
      * decision. Companion policy uses {@code deny} during the closed
-     * window (action {@code stream:heartbeat:terminate}) so the visible
-     * behaviour is "stream until denied terminates."
+     * window (action {@code stream:terminate}) so the visible behaviour
+     * is "stream until denied terminates."
      */
-    @StreamEnforce(action = "'stream:heartbeat:terminate'", resource = "'heartbeat'")
+    @StreamEnforce(action = "'stream:terminate'", resource = "'heartbeat'")
     public Flux<HeartbeatEvent> heartbeatTillDenied() {
         return heartbeatSource();
     }
@@ -27,25 +27,25 @@ public class StreamingService {
     /**
      * Default {@code @StreamEnforce} against a policy that uses
      * {@code suspend} during the closed window (action
-     * {@code stream:heartbeat:suspend}). The subscription survives the
-     * suspension; items are dropped silently; the next PERMIT resumes
-     * the flow. Subscriber sees no boundary signals.
+     * {@code stream:suspend}). The subscription survives the suspension;
+     * items are dropped silently; the next PERMIT resumes the flow.
+     * Subscriber sees no boundary signals.
      */
-    @StreamEnforce(action = "'stream:heartbeat:suspend'", resource = "'heartbeat'")
-    public Flux<HeartbeatEvent> heartbeatDropWhileDenied() {
+    @StreamEnforce(action = "'stream:suspend'", resource = "'heartbeat'")
+    public Flux<HeartbeatEvent> heartbeatSilentSuspending() {
         return heartbeatSource();
     }
 
     /**
      * {@code @StreamEnforce(signalTransitions = true)} against the same
-     * suspend-using policy as {@link #heartbeatDropWhileDenied()}. The
+     * suspend-using policy as {@link #heartbeatSilentSuspending()}. The
      * subscription survives; items are dropped silently while suspended;
      * boundary crossings surface as non-terminal exceptions on the error
      * channel. Subscribers consume them via {@code onErrorContinue} or
      * {@code TransitionSignals}.
      */
-    @StreamEnforce(action = "'stream:heartbeat:suspend'", resource = "'heartbeat'", signalTransitions = true)
-    public Flux<HeartbeatEvent> heartbeatRecoverable() {
+    @StreamEnforce(action = "'stream:suspend'", resource = "'heartbeat'", signalTransitions = true)
+    public Flux<HeartbeatEvent> heartbeatObservedSuspending() {
         return heartbeatSource();
     }
 

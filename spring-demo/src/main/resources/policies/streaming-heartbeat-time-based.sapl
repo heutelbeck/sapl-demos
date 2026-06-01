@@ -4,7 +4,7 @@ for resource == "heartbeat"
 
     policy "streaming-heartbeat-permit-window"
     permit
-        action == "stream:heartbeat:terminate" | action == "stream:heartbeat:suspend";
+        action == "stream:terminate" | action == "stream:suspend";
         var second = time.secondOf(<time.now>);
         second >= 0 && second < 20 || second >= 40;
     obligation
@@ -15,7 +15,7 @@ for resource == "heartbeat"
 
     policy "streaming-heartbeat-terminate-window"
     deny
-        action == "stream:heartbeat:terminate";
+        action == "stream:terminate";
         var second = time.secondOf(<time.now>);
         second >= 20 && second < 40;
     obligation
@@ -26,7 +26,7 @@ for resource == "heartbeat"
 
     policy "streaming-heartbeat-suspend-window"
     suspend
-        action == "stream:heartbeat:suspend";
+        action == "stream:suspend";
         var second = time.secondOf(<time.now>);
         second >= 20 && second < 40;
     obligation

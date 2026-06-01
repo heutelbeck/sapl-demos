@@ -29,24 +29,14 @@ class StreamingController {
                         Flux.just(toSse(new StreamSignal("ACCESS_DENIED", "Stream terminated by policy"))));
     }
 
-    @GetMapping(value = "/heartbeat/drop-while-denied", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<Object>> heartbeatDropWhileDenied() {
-        return streamingService.heartbeatDropWhileDenied().map(StreamingController::toSse);
+    @GetMapping(value = "/heartbeat/silent-suspending", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    Flux<ServerSentEvent<Object>> heartbeatSilentSuspending() {
+        return streamingService.heartbeatSilentSuspending().map(StreamingController::toSse);
     }
 
-    @GetMapping(value = "/heartbeat/terminated-by-callback", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<Object>> heartbeatTerminatedByCallback() {
-        return streamingService.heartbeatRecoverable().cast(Object.class).map(StreamingController::toSse);
-    }
-
-    @GetMapping(value = "/heartbeat/drop-with-callbacks", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<Object>> heartbeatDropWithCallbacks() {
-        return streamingService.heartbeatDropWhileDenied().map(StreamingController::toSse);
-    }
-
-    @GetMapping(value = "/heartbeat/recoverable", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ServerSentEvent<Object>> heartbeatRecoverable() {
-        Flux<Object> raw         = streamingService.heartbeatRecoverable().cast(Object.class);
+    @GetMapping(value = "/heartbeat/observed-suspending", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    Flux<ServerSentEvent<Object>> heartbeatObservedSuspending() {
+        Flux<Object> raw         = streamingService.heartbeatObservedSuspending().cast(Object.class);
         Flux<Object> withSuspend = TransitionSignals.onSuspend(raw, e -> {},
                 () -> new StreamSignal("ACCESS_SUSPENDED", "Stream paused by policy"));
         return TransitionSignals.onGranted(withSuspend, e -> {},
