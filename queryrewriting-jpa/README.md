@@ -406,4 +406,4 @@ The test output shows each requirement and scenario, making it easy to understan
 
 ## Related Demos
 
-For the same security scenario using SAPL's built-in reactive SQL (R2DBC) query manipulation without a custom constraint handler, see the queryrewriting-sql-reactive project. For the reactive MongoDB equivalent, see queryrewriting-mongodb-reactive.
+For the same security scenario using SAPL's built-in reactive SQL (R2DBC) query rewriting without a custom constraint handler, see the queryrewriting-sql-reactive project. For the reactive MongoDB equivalent, see queryrewriting-mongodb-reactive.

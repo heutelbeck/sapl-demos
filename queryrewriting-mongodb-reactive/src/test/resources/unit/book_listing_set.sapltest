@@ -9,7 +9,7 @@
  *   pat  - New intern (empty scope [] - access denied)
  *
  * Note: This policy uses action == "findAll" (literal string) and
- * mongoQueryManipulation obligation format for MongoDB query rewriting.
+ * mongoQueryRewriting obligation format for MongoDB query rewriting.
  */
 
 requirement "Policy Set should deny access when dataScope is null, undefined, or empty" {
@@ -39,7 +39,7 @@ requirement "Policy Set should deny access when dataScope is null, undefined, or
         expect deny;
 }
 
-requirement "Policy Set should permit access with MongoDB query manipulation obligation" {
+requirement "Policy Set should permit access with MongoDB query rewriting obligation" {
 
     given
         - document "book_listing_set"
@@ -49,28 +49,28 @@ requirement "Policy Set should permit access with MongoDB query manipulation obl
             { "principal": { "dataScope": [1, 2, 3, 4, 5] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryRewriting";
 
     scenario "permit zoe with sections 1 and 2"
         when
             { "principal": { "dataScope": [1, 2] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryRewriting";
 
     scenario "permit bob with sections 3 and 4"
         when
             { "principal": { "dataScope": [3, 4] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryRewriting";
 
     scenario "permit ann with section 5 only"
         when
             { "principal": { "dataScope": [5] } }
         attempts "findAll"
         on "books"
-        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryManipulation";
+        expect decision is permit, with obligation containing key "type" with value matching text "mongo:queryRewriting";
 
     scenario "obligation has criteria array"
         when

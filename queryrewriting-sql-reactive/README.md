@@ -1,14 +1,14 @@
-# Demo: Spring Data R2DBC Query Manipulation
+# Demo: Spring Data R2DBC Query Rewriting
 
-This demonstration shows how SAPL enforces row-level security with Spring Data R2DBC using built-in query manipulation. Policies automatically rewrite SQL queries to add WHERE conditions that filter rows based on user permissions. Unlike the queryrewriting-java example which requires a custom constraint handler, this demo uses SAPL's native R2DBC integration that handles query manipulation automatically.
+This demonstration shows how SAPL enforces row-level security with Spring Data R2DBC using built-in query rewriting. Policies automatically rewrite SQL queries to add WHERE conditions that filter rows based on user permissions. Unlike the queryrewriting-java example which requires a custom constraint handler, this demo uses SAPL's native R2DBC integration that handles query rewriting automatically.
 
-## Understanding R2DBC Query Manipulation
+## Understanding R2DBC Query Rewriting
 
 SAPL's Spring Data R2DBC integration intercepts repository method calls and rewrites SQL queries based on policy decisions. When a policy permits access, it can attach an obligation that specifies filter conditions. SAPL's infrastructure automatically appends these conditions to the SQL query before execution.
 
-With this approach, you do not need to write custom constraint handler code. The obligation format is standardized and handled by the framework. The query manipulation happens at the repository level, so you can add row-level security to existing repositories without changing your service layer.
+With this approach, you do not need to write custom constraint handler code. The obligation format is standardized and handled by the framework. The query rewriting happens at the repository level, so you can add row-level security to existing repositories without changing your service layer.
 
-### How Query Manipulation Works
+### How Query Rewriting Works
 
 When you call a repository method annotated with @QueryEnforce, SAPL evaluates the applicable policies. If the decision is permit with an obligation containing query conditions, SAPL modifies the SQL query to include those conditions in the WHERE clause.
 
@@ -205,7 +205,7 @@ public interface BookRepository extends R2dbcRepository<Book, Long> {
 
 The @QueryEnforce annotation tells SAPL to evaluate applicable policies before allowing the method to execute. SAPL constructs an authorization subscription from the method context, including the authenticated user as the subject and the method details as the action.
 
-Unlike the queryrewriting-java demo which uses @PreEnforce with a custom constraint handler, @QueryEnforce enables SAPL's built-in query manipulation. The framework handles the obligation processing automatically.
+Unlike the queryrewriting-java demo which uses @PreEnforce with a custom constraint handler, @QueryEnforce enables SAPL's built-in query rewriting. The framework handles the obligation processing automatically.
 
 ### How the Authorization Subscription is Built
 
@@ -370,4 +370,4 @@ The test output shows each requirement and scenario, making it easy to understan
 
 ## Related Demos
 
-For the same security scenario using Spring Data JPA (blocking) with a custom constraint handler that manipulates method arguments, see the queryrewriting-java project. For the MongoDB equivalent using SAPL's native MongoDB query manipulation, see queryrewriting-mongodb-reactive.
+For the same security scenario using Spring Data JPA (blocking) with a custom constraint handler that manipulates method arguments, see the queryrewriting-java project. For the MongoDB equivalent using SAPL's native MongoDB query rewriting, see queryrewriting-mongodb-reactive.

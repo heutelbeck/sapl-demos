@@ -1,14 +1,14 @@
-# Demo: Spring Data MongoDB Reactive Query Manipulation
+# Demo: Spring Data MongoDB Reactive Query Rewriting
 
-This demonstration shows how SAPL enforces row-level security with Spring Data MongoDB using built-in query manipulation. Policies automatically rewrite MongoDB queries to add filter conditions that restrict which documents users can access. Like the R2DBC demo, this uses SAPL's native database integration that handles query manipulation automatically without requiring custom constraint handlers.
+This demonstration shows how SAPL enforces row-level security with Spring Data MongoDB using built-in query rewriting. Policies automatically rewrite MongoDB queries to add filter conditions that restrict which documents users can access. Like the R2DBC demo, this uses SAPL's native database integration that handles query rewriting automatically without requiring custom constraint handlers.
 
-## Understanding MongoDB Query Manipulation
+## Understanding MongoDB Query Rewriting
 
 SAPL's Spring Data MongoDB integration intercepts repository method calls and rewrites queries based on policy decisions. When a policy permits access, it can attach an obligation containing MongoDB Query Language (MQL) conditions. SAPL's infrastructure automatically combines these conditions with the original query before execution.
 
-With this approach, you do not need to write custom constraint handler code. The obligation format uses standard MQL syntax that MongoDB developers already know. The query manipulation happens at the repository level.
+With this approach, you do not need to write custom constraint handler code. The obligation format uses standard MQL syntax that MongoDB developers already know. The query rewriting happens at the repository level.
 
-### How Query Manipulation Works
+### How Query Rewriting Works
 
 When you call a repository method annotated with @QueryEnforce, SAPL evaluates the applicable policies. If the decision is permit with an obligation containing MongoDB conditions, SAPL modifies the query to include those conditions.
 
@@ -28,16 +28,16 @@ This filtering happens at the database level. MongoDB returns only the documents
 
 ### The MongoDB Obligation Format
 
-MongoDB query manipulation uses a specific obligation structure:
+MongoDB query rewriting uses a specific obligation structure:
 
 ```json
 {
-    "type": "mongoQueryManipulation",
+    "type": "mongoQueryRewriting",
     "conditions": [ "{ \"category\": { \"$in\": [1, 2] } }" ]
 }
 ```
 
-The type field identifies this as a MongoDB query manipulation obligation. The conditions array contains one or more MQL filter expressions as strings. Multiple conditions are combined with a logical AND.
+The type field identifies this as a MongoDB query rewriting obligation. The conditions array contains one or more MQL filter expressions as strings. Multiple conditions are combined with a logical AND.
 
 ## The Domain Model
 
@@ -105,7 +105,7 @@ The policy implements these authorization rules:
 The policy set translates these requirements into SAPL:
 
 ```sapl
-set "List and filter books - MongoDB query manipulation"
+set "List and filter books - MongoDB query rewriting"
 
 first-applicable
 
@@ -119,7 +119,7 @@ where
 policy "enforce filtering"
 permit
 obligation {
-    "type"       : "mongoQueryManipulation",
+    "type"       : "mongoQueryRewriting",
     "conditions" : [ "{ \"category\" : { \"$in\" : " + subject.principal.dataScope + " } }" ]
 }
 ```
@@ -128,7 +128,7 @@ The policy set header establishes that this set uses first-applicable combining,
 
 The first policy explicitly denies access when the user's dataScope is null, undefined, or an empty array. This handles the case of users like pat who have no assigned sections.
 
-The second policy permits access for all other cases and attaches an obligation. The obligation uses the mongoQueryManipulation type and constructs an MQL condition that filters documents by their category field. The $in operator matches any document whose category appears in the user's dataScope array.
+The second policy permits access for all other cases and attaches an obligation. The obligation uses the mongoQueryRewriting type and constructs an MQL condition that filters documents by their category field. The $in operator matches any document whose category appears in the user's dataScope array.
 
 ## Using the Demo
 
@@ -285,12 +285,12 @@ requirement "Policy Set should deny access when dataScope is null, undefined, or
 
 This requirement verifies the denial rule. The first scenario tests that a user whose dataScope is null receives a deny decision. The second scenario confirms the same for an empty array. Notice that the action is specified as a simple string "findAll" rather than a Java method descriptor, matching how MongoDB actions are represented.
 
-### Testing MongoDB Query Manipulation Obligations
+### Testing MongoDB Query Rewriting Obligations
 
-When testing permit decisions with MongoDB query manipulation, you can verify that the obligation has the correct structure:
+When testing permit decisions with MongoDB query rewriting, you can verify that the obligation has the correct structure:
 
 ```
-requirement "Policy Set should permit access with MongoDB query manipulation obligation" {
+requirement "Policy Set should permit access with MongoDB query rewriting obligation" {
 
     given
         - document "book_listing_set"
@@ -302,7 +302,7 @@ requirement "Policy Set should permit access with MongoDB query manipulation obl
         on "books"
         expect decision is permit,
             with obligation containing key "type"
-            with value matching text "mongoQueryManipulation";
+            with value matching text "mongoQueryRewriting";
 
     scenario "permit zoe with sections 1 and 2"
         when
@@ -311,7 +311,7 @@ requirement "Policy Set should permit access with MongoDB query manipulation obl
         on "books"
         expect decision is permit,
             with obligation containing key "type"
-            with value matching text "mongoQueryManipulation";
+            with value matching text "mongoQueryRewriting";
 
     scenario "obligation has conditions array"
         when
@@ -323,7 +323,7 @@ requirement "Policy Set should permit access with MongoDB query manipulation obl
 }
 ```
 
-These scenarios verify that the obligation contains the required mongoQueryManipulation type and includes a conditions array. The test uses partial matching to verify key structural elements without asserting the exact MQL string, which makes the tests more resilient to formatting changes.
+These scenarios verify that the obligation contains the required mongoQueryRewriting type and includes a conditions array. The test uses partial matching to verify key structural elements without asserting the exact MQL string, which makes the tests more resilient to formatting changes.
 
 ### Verifying Policy Scope
 
@@ -380,4 +380,4 @@ The test output shows each requirement and scenario, making it easy to understan
 
 ## Related Demos
 
-For the same security scenario using Spring Data JPA (blocking) with a custom constraint handler that manipulates method arguments, see the queryrewriting-java project. For the reactive SQL equivalent using SAPL's native R2DBC query manipulation, see queryrewriting-sql-reactive.
+For the same security scenario using Spring Data JPA (blocking) with a custom constraint handler that manipulates method arguments, see the queryrewriting-java project. For the reactive SQL equivalent using SAPL's native R2DBC query rewriting, see queryrewriting-sql-reactive.

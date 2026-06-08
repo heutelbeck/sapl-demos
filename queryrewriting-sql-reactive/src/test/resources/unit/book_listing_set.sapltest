@@ -39,19 +39,19 @@ requirement "Policy Set should deny access when dataScope is null, undefined, or
         expect deny;
 }
 
-requirement "Policy Set should permit access with relational:queryManipulation obligation when dataScope has values" {
+requirement "Policy Set should permit access with relational:queryRewriting obligation when dataScope has values" {
 
     given
         - document "book_listing_set"
 
-    scenario "permit boss with all sections and relational query manipulation"
+    scenario "permit boss with all sections and relational query rewriting"
         when
             { "principal": { "dataScope": [1, 2, 3, 4, 5] } }
         attempts
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "relational:queryManipulation",
+            "type": "relational:queryRewriting",
             "criteria": [ { "column": "category", "op": "in", "value": [1, 2, 3, 4, 5] } ]
         };
 
@@ -62,7 +62,7 @@ requirement "Policy Set should permit access with relational:queryManipulation o
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "relational:queryManipulation",
+            "type": "relational:queryRewriting",
             "criteria": [ { "column": "category", "op": "in", "value": [1, 2] } ]
         };
 
@@ -73,7 +73,7 @@ requirement "Policy Set should permit access with relational:queryManipulation o
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "relational:queryManipulation",
+            "type": "relational:queryRewriting",
             "criteria": [ { "column": "category", "op": "in", "value": [3, 4] } ]
         };
 
@@ -84,7 +84,7 @@ requirement "Policy Set should permit access with relational:queryManipulation o
             "findAll"
         on "books"
         expect decision is permit, with obligation equals {
-            "type": "relational:queryManipulation",
+            "type": "relational:queryRewriting",
             "criteria": [ { "column": "category", "op": "in", "value": [5] } ]
         };
 }

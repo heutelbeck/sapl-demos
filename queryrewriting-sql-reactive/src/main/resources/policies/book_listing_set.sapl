@@ -1,4 +1,4 @@
-set "List and filter books - R2DBC query manipulation"
+set "List and filter books - R2DBC query rewriting"
 
 first or abstain errors propagate
 
@@ -13,7 +13,7 @@ deny
 policy "enforce filtering"
 permit
 obligation {
-                "type": "relational:queryManipulation",
+                "type": "relational:queryRewriting",
                 "criteria": [
                     { "column": "category", "op": "in", "value": subject.principal.dataScope }
                 ]

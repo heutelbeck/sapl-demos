@@ -1,4 +1,4 @@
-set "List and filter books - MongoDB query manipulation"
+set "List and filter books - MongoDB query rewriting"
 
 first or abstain errors propagate
 
@@ -13,7 +13,7 @@ deny
 policy "enforce filtering"
 permit
 obligation 	{
-		    "type": "mongo:queryManipulation",
+		    "type": "mongo:queryRewriting",
 		    "criteria": [
 		        { "column": "category", "op": "in", "value": subject.principal.dataScope }
 		    ]
