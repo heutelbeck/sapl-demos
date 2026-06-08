@@ -40,7 +40,7 @@ class StreamingController {
         Flux<Object> withSuspend = TransitionSignals.onSuspend(raw, e -> {},
                 () -> new StreamSignal("ACCESS_SUSPENDED", "Stream paused by policy"));
         return TransitionSignals.onGranted(withSuspend, e -> {},
-                () -> new StreamSignal("ACCESS_RESTORED", "Stream resumed by policy"))
+                () -> new StreamSignal("ACCESS_GRANTED", "Access granted by policy"))
                 .map(StreamingController::toSse);
     }
 
