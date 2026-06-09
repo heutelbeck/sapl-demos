@@ -44,11 +44,10 @@ class StreamingController {
     }
 
     private Flux<ServerSentEvent<Object>> observedSuspendingSse() {
-        Flux<Object> raw         = streamingService.heartbeatObservedSuspending().cast(Object.class);
-        Flux<Object> withSuspend = TransitionSignals.onSuspend(raw, e -> {},
-                () -> new StreamSignal("ACCESS_SUSPENDED", "Stream paused by policy"));
-        return TransitionSignals.onGranted(withSuspend, e -> {},
-                () -> new StreamSignal("ACCESS_GRANTED", "Access granted by policy"))
+        Flux<Object> raw = streamingService.heartbeatObservedSuspending().cast(Object.class);
+        return TransitionSignals.onTransitions(raw,
+                e -> {}, () -> new StreamSignal("ACCESS_SUSPENDED", "Stream paused by policy"),
+                e -> {}, () -> new StreamSignal("ACCESS_GRANTED", "Access granted by policy"))
                 .map(StreamingController::toSse);
     }
 
