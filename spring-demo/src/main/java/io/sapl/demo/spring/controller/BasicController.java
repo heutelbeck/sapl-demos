@@ -5,6 +5,7 @@ import java.util.List;
 import io.sapl.demo.spring.domain.Patients;
 import io.sapl.demo.spring.domain.Patients.Patient;
 import io.sapl.demo.spring.service.PatientService;
+import io.sapl.demo.spring.service.PatientService.PatientSummary;
 import io.sapl.demo.spring.service.PatientService.TransferResult;
 import io.sapl.spring.method.metadata.PostEnforce;
 import io.sapl.spring.method.metadata.PreEnforce;
@@ -45,4 +46,39 @@ class BasicController {
         return patientService.doTransfer(amount, recipient);
     }
 
+    // Service-layer endpoints: enforcement is on the PatientService methods, not here.
+
+    @GetMapping("/api/services/patients")
+    Mono<List<Patient>> listPatients() {
+        return patientService.listPatients();
+    }
+
+    @GetMapping("/api/services/patients/find")
+    Mono<List<Patient>> findPatient(@RequestParam(defaultValue = "") String name) {
+        return patientService.findPatient(name);
+    }
+
+    @GetMapping("/api/services/patients/search")
+    Mono<List<Patient>> searchPatients(@RequestParam(name = "q", defaultValue = "") String query) {
+        return patientService.searchPatients(query);
+    }
+
+    @GetMapping("/api/services/patients/{patientId}")
+    Mono<Patient> getPatientDetail(@PathVariable String patientId) {
+        return patientService.getPatientDetail(patientId)
+                .switchIfEmpty(Mono.error(
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found")));
+    }
+
+    @GetMapping("/api/services/patients/{patientId}/summary")
+    Mono<PatientSummary> getPatientSummary(@PathVariable String patientId) {
+        return patientService.getPatientSummary(patientId)
+                .switchIfEmpty(Mono.error(
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Patient not found")));
+    }
+
+    @PostMapping("/api/services/transfer")
+    Mono<TransferResult> serviceTransfer(@RequestParam(defaultValue = "10000.0") Double amount) {
+        return patientService.doTransfer(amount, "default-account");
+    }
 }
