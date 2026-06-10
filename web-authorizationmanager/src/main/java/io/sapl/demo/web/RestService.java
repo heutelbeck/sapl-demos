@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 @RestController
 @RequestMapping("/")
@@ -42,7 +43,7 @@ public class RestService {
      */
     @GetMapping("echo-correlation")
     public String echoCorrelation(@RequestHeader(name = "X-Correlation-Id", required = false) String id) {
-        return id == null ? "no correlation id" : id;
+        return id == null ? "no correlation id" : HtmlUtils.htmlEscape(id);
     }
 
     /**

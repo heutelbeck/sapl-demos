@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
 
 import reactor.core.publisher.Mono;
 
@@ -45,7 +46,7 @@ public class DemoController {
      */
     @GetMapping(value = "/echo-correlation", produces = MediaType.TEXT_PLAIN_VALUE)
     public Mono<String> echoCorrelation(@RequestHeader(name = "X-Correlation-Id", required = false) String id) {
-        return Mono.just(id == null ? "no correlation id" : id);
+        return Mono.just(id == null ? "no correlation id" : HtmlUtils.htmlEscape(id));
     }
 
     /**

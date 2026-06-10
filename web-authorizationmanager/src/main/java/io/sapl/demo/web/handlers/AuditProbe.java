@@ -34,7 +34,7 @@ public class AuditProbe {
 
     private final List<Entry> entries = new CopyOnWriteArrayList<>();
 
-    public void record(Decision decision) {
+    public void recordDecision(Decision decision) {
         entries.add(new Entry(decision));
     }
 

@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -84,7 +84,7 @@ class HandlerScenariosTests {
         @WithMockUser(username = "user", roles = "USER")
         void authenticatedTeapotRecordsDeny() {
             webTestClient.get().uri("/teapot").accept(MediaType.TEXT_PLAIN).exchange().expectStatus()
-                    .isEqualTo(HttpStatus.I_AM_A_TEAPOT);
+                    .isEqualTo(HttpStatusCode.valueOf(418));
             assertThat(auditProbe.entries()).anyMatch(entry -> entry.decision() == Decision.DENY);
         }
     }
@@ -125,7 +125,7 @@ class HandlerScenariosTests {
         @WithMockUser(username = "user", roles = "USER")
         void teapotProducesCustomDenyPage() {
             webTestClient.get().uri("/teapot").accept(MediaType.TEXT_PLAIN).exchange().expectStatus()
-                    .isEqualTo(HttpStatus.I_AM_A_TEAPOT).expectBody(String.class)
+                    .isEqualTo(HttpStatusCode.valueOf(418)).expectBody(String.class)
                     .isEqualTo("I'm a teapot. Brew tea instead.");
         }
 
