@@ -15,25 +15,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.sapl.mongo.domain;
+package io.sapl.mongo;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@Data
-@Document("book")
-@NoArgsConstructor
-@AllArgsConstructor
-public class Book {
-    @Id
-    Long    id;
-    String  name;
-    Integer category;     // library section, 1 to 5
-    Boolean restricted;   // rare or reference-only material
-    Integer minimumAge;   // youngest patron permitted to borrow it
-    String  curator;      // staff member maintaining the record (nullable)
-    String  callNumber;   // Dewey-style classification, e.g. "813.54"
+@SpringBootApplication
+public class SaplSpringDataMongoBlockingDemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SaplSpringDataMongoBlockingDemoApplication.class, args);
+    }
+
 }

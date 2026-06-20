@@ -17,18 +17,19 @@
  */
 package io.sapl.mongo.data;
 
+import java.util.List;
+
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
 import io.sapl.mongo.domain.Book;
 import io.sapl.mongo.domain.BookRepository;
 import io.sapl.mongo.domain.LibraryUser;
 import io.sapl.mongo.domain.LibraryUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
@@ -103,9 +104,8 @@ public class DemoData {
     @EventListener(ApplicationReadyEvent.class)
     public void loadDemoData() {
         log.info("Loading demo book collection...");
-        bookRepository.deleteAll()
-                .thenMany(bookRepository.saveAll(DEMO_BOOKS))
-                .blockLast();
+        bookRepository.deleteAll();
+        bookRepository.saveAll(DEMO_BOOKS);
         log.info("Demo data loaded successfully.");
     }
 

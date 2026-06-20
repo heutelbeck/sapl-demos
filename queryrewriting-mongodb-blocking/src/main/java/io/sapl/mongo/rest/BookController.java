@@ -17,6 +17,8 @@
  */
 package io.sapl.mongo.rest;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,8 +31,6 @@ import io.sapl.mongo.domain.BookQueryService.BookView;
 import io.sapl.mongo.domain.BookQueryService.ProvenanceView;
 import io.sapl.mongo.domain.BookRepository;
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Exposes every MongoDB shim hook as an endpoint so the effect of the query
@@ -45,78 +45,78 @@ public class BookController {
     private final BookRepository   repository;
     private final BookQueryService queryService;
 
-    // Repository path (the surface SimpleReactiveMongoRepository bottoms out on).
+    // Repository path (the surface SimpleMongoRepository bottoms out on).
 
     @GetMapping("/")
-    public Flux<Book> findAll() {
+    public List<Book> findAll() {
         return repository.findAllBooks();
     }
 
     @GetMapping("/repository/by-category-floor")
-    public Flux<Book> byCategoryFloor(@RequestParam(defaultValue = "1") int floor) {
+    public List<Book> byCategoryFloor(@RequestParam(defaultValue = "1") int floor) {
         return repository.findByCategoryGreaterThanEqual(floor);
     }
 
     @GetMapping("/repository/count")
-    public Mono<Long> repositoryCount(@RequestParam(defaultValue = "1") int floor) {
+    public long repositoryCount(@RequestParam(defaultValue = "1") int floor) {
         return repository.countByCategoryGreaterThanEqual(floor);
     }
 
     // Legacy template path.
 
     @GetMapping("/template/find")
-    public Flux<Book> legacyFind() {
+    public List<Book> legacyFind() {
         return queryService.legacyFindAll();
     }
 
     // Fluent find chain.
 
     @GetMapping("/fluent/all")
-    public Flux<Book> fluentAll() {
+    public List<Book> fluentAll() {
         return queryService.fluentAll();
     }
 
     @GetMapping("/fluent/count")
-    public Mono<Long> fluentCount() {
+    public long fluentCount() {
         return queryService.fluentCount();
     }
 
     @GetMapping("/fluent/named")
-    public Flux<Book> fluentNamed(@RequestParam(defaultValue = ".*") String pattern) {
+    public List<Book> fluentNamed(@RequestParam(defaultValue = ".*") String pattern) {
         return queryService.fluentNamedLike(pattern);
     }
 
     @GetMapping("/fluent/titles")
-    public Flux<BookView> fluentTitles() {
+    public List<BookView> fluentTitles() {
         return queryService.fluentTitles();
     }
 
     // Fluent write builders (selection narrowed).
 
     @PostMapping("/fluent/review")
-    public Mono<Long> markReviewed() {
+    public long markReviewed() {
         return queryService.markReviewed();
     }
 
     @DeleteMapping("/fluent")
-    public Mono<Long> purge() {
+    public long purge() {
         return queryService.purge();
     }
 
     // Narrowing variants: same template APIs, different policies (one obligation shape each).
 
     @GetMapping("/open-shelf")
-    public Flux<Book> openShelf() {
+    public List<Book> openShelf() {
         return queryService.openShelf();
     }
 
     @GetMapping("/age-appropriate")
-    public Flux<Book> ageAppropriate() {
+    public List<Book> ageAppropriate() {
         return queryService.ageAppropriate();
     }
 
     @GetMapping("/provenance")
-    public Flux<ProvenanceView> provenance() {
+    public List<ProvenanceView> provenance() {
         return queryService.provenance();
     }
 

@@ -1,0 +1,17 @@
+set "Cataloguing provenance - MongoDB query rewriting"
+
+first or abstain errors propagate
+
+for action == "auditProvenance"
+
+policy "provenance filtering"
+permit
+obligation {
+        "type": "mongo:queryRewriting",
+        "criteria": [
+            { "column": "curator", "op": "isNotNull" }
+        ],
+        "conditions": [
+            "{ \"callNumber\": { \"$regex\": \"^8\" } }"
+        ]
+    }

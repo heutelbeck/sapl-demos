@@ -80,7 +80,7 @@ class BookControllerIT {
      * Creates a test user with the specified data scope.
      */
     private static LibraryUser testUser(String name, List<Integer> dataScope) {
-        return new LibraryUser(name, 0, dataScope, List.of());
+        return new LibraryUser(name, 0, dataScope, 99, List.of());
     }
 
     /**

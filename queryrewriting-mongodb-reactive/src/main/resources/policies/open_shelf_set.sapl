@@ -1,0 +1,20 @@
+set "Open shelf browsing - MongoDB query rewriting"
+
+first or abstain errors propagate
+
+for action == "browseOpenShelf"
+
+policy "open shelf filtering"
+permit
+obligation {
+        "type": "mongo:queryRewriting",
+        "criteria": [
+            { "or": [
+                { "and": [
+                    { "column": "category",   "op": "in", "value": subject.principal.dataScope },
+                    { "column": "restricted", "op": "!=", "value": true }
+                ]},
+                { "column": "curator", "op": "=", "value": subject.principal.username }
+            ]}
+        ]
+    }

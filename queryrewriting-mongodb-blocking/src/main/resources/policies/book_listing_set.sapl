@@ -1,0 +1,20 @@
+et "List and filter books - MongoDB query rewriting"
+
+first or abstain errors propagate
+
+for action == "findAll"
+
+policy "deny if scope null or empty"
+deny
+    subject.principal.dataScope == undefined ||
+    subject.principal.dataScope == null ||
+    subject.principal.dataScope == [];
+
+policy "enforce filtering"
+permit
+obligation 	{
+		    "type": "mongo:queryRewriting",
+		    "criteria": [
+		        { "column": "category", "op": "in", "value": subject.principal.dataScope }
+		    ]
+	    }

@@ -1,0 +1,19 @@
+set "Age-appropriate browsing - MongoDB query rewriting"
+
+first or abstain errors propagate
+
+for action == "browseAgeAppropriate"
+
+policy "deny if age unknown"
+deny
+    subject.principal.age == undefined ||
+    subject.principal.age == null;
+
+policy "age filtering"
+permit
+obligation {
+        "type": "mongo:queryRewriting",
+        "criteria": [
+            { "column": "minimumAge", "op": "<=", "value": subject.principal.age }
+        ]
+    }

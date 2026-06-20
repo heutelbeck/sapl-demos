@@ -17,26 +17,27 @@
  */
 package io.sapl.mongo.domain;
 
-import io.sapl.spring.method.metadata.PreEnforce;
+import java.util.List;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import io.sapl.spring.method.metadata.PreEnforce;
 
 @Repository
-public interface BookRepository extends ReactiveMongoRepository<Book, Long> {
+public interface BookRepository extends MongoRepository<Book, Long> {
 
     @Query("{}")
     @PreEnforce(action = "'findAll'")
-    Flux<Book> findAllBooks();
+    List<Book> findAllBooks();
 
     // A derived query. The obligation is AND-combined with the derived filter, so the
     // result is the intersection of "category >= floor" and the caller's data scope.
     @PreEnforce(action = "'findAll'")
-    Flux<Book> findByCategoryGreaterThanEqual(Integer categoryFloor);
+    List<Book> findByCategoryGreaterThanEqual(Integer categoryFloor);
 
     @PreEnforce(action = "'findAll'")
-    Mono<Long> countByCategoryGreaterThanEqual(Integer categoryFloor);
+    long countByCategoryGreaterThanEqual(Integer categoryFloor);
 
 }
