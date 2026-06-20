@@ -206,6 +206,10 @@
 						<version>${maven-failsafe-plugin.version}</version>
 						<configuration>
 							<argLine>@{argLine} -Xshare:off -XX:+EnableDynamicAgentLoading</argLine>
+							<trimStackTrace>false</trimStackTrace>
+							<enableAssertions>true</enableAssertions>
+							<!-- Use original classes, not the repackaged JAR -->
+							<classesDirectory>${project.build.outputDirectory}</classesDirectory>
 						</configuration>
 						<executions>
 							<execution>
