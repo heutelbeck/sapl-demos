@@ -1,4 +1,4 @@
-et "List and filter books - MongoDB query rewriting"
+set "List and filter books - MongoDB query rewriting"
 
 first or abstain errors propagate
 
