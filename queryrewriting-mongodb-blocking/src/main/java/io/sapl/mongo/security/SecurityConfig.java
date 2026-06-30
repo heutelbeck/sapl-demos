@@ -51,7 +51,7 @@ import io.sapl.spring.config.EnableSaplMethodSecurity;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) {
         return http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .formLogin(withDefaults())
@@ -112,7 +112,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         return config.getAuthenticationManager();
     }
 

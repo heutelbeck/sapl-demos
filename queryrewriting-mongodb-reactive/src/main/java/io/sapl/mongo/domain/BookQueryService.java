@@ -17,6 +17,9 @@
  */
 package io.sapl.mongo.domain;
 
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -77,13 +80,13 @@ public class BookQueryService {
     @PreEnforce(action = "'findAll'")
     public Mono<Long> markReviewed() {
         return template.update(Book.class).apply(new Update().set("reviewed", true)).all()
-                .map(result -> result.getModifiedCount());
+                .map(UpdateResult::getModifiedCount);
     }
 
     /** Fluent remove builder; the selection is narrowed, so only in-scope books are deleted. */
     @PreEnforce(action = "'findAll'")
     public Mono<Long> purge() {
-        return template.remove(Book.class).all().map(result -> result.getDeletedCount());
+        return template.remove(Book.class).all().map(DeleteResult::getDeletedCount);
     }
 
     /*

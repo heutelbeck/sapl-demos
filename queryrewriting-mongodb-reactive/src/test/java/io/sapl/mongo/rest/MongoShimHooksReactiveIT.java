@@ -197,10 +197,13 @@ class MongoShimHooksReactiveIT {
     @Test
     @DisplayName("a user with an empty scope is denied on every path")
     void emptyScopeDenied() {
-        var denied = user(List.of());
-        assertThatThrownBy(() -> booksAsUser(denied, controller.fluentAll())).isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> asUser(denied, controller.fluentCount())).isInstanceOf(AccessDeniedException.class);
-        assertThatThrownBy(() -> booksAsUser(denied, controller.findAll())).isInstanceOf(AccessDeniedException.class);
+        var denied      = user(List.of());
+        var fluentAll   = controller.fluentAll();
+        var fluentCount = controller.fluentCount();
+        var findAll     = controller.findAll();
+        assertThatThrownBy(() -> booksAsUser(denied, fluentAll)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> asUser(denied, fluentCount)).isInstanceOf(AccessDeniedException.class);
+        assertThatThrownBy(() -> booksAsUser(denied, findAll)).isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
