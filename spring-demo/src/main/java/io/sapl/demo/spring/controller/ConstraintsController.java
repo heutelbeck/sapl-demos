@@ -30,7 +30,7 @@ class ConstraintsController {
 
     record LoggedResponse(String message, Map<String, Object> data) {}
 
-    record AuditedResponse(String message, Map<String, Object> record) {}
+    record AuditedResponse(String message, @JsonProperty("record") Map<String, Object> auditRecord) {}
 
     record FinancialRecord(String name, String ssn, String creditCard, String email, double balance) {}
 

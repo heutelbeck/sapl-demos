@@ -54,7 +54,7 @@ public class SecurityConfiguration {
      * http.with(saplHttp(), withDefaults()).
      */
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper mapper) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, ObjectMapper mapper) {
         return http.with(saplHttp(),
                 c -> c.subscriptionFactory((auth, request) -> AuthorizationSubscription.of(auth,
                         Map.of("method", request.getMethod()),

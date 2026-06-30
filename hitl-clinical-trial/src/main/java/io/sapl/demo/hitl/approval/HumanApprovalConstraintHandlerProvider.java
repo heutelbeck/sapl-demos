@@ -52,7 +52,8 @@ import lombok.val;
 @RequiredArgsConstructor
 public class HumanApprovalConstraintHandlerProvider implements ConstraintHandlerProvider {
 
-    static final String ERROR_NO_SESSION_ID = "No session ID available for approval. Denying.";
+    static final String ERROR_NO_SESSION_ID          = "No session ID available for approval. Denying.";
+    static final String ERROR_UNEXPECTED_APPROVAL    = "Unexpected approval result. Denying.";
 
     private static final String CONSTRAINT_TYPE  = "humanApprovalRequired";
     private static final int    DEFAULT_PRIORITY = 50;
@@ -91,6 +92,7 @@ public class HumanApprovalConstraintHandlerProvider implements ConstraintHandler
             case APPROVED  -> { /* proceed */ }
             case DENIED    -> throw new ApprovalDeniedException(toolName, summary);
             case TIMED_OUT -> throw new ApprovalTimeoutException(toolName, summary, timeoutSeconds);
+            default        -> throw new AccessDeniedException(ERROR_UNEXPECTED_APPROVAL);
             }
         };
     }
