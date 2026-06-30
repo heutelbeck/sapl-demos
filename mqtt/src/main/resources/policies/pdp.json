@@ -5,7 +5,7 @@
 		"errorHandling": "PROPAGATE"
 	},
 	"variables": {
-		"mqttPipConfig": {
+		"mqtt": {
 			"defaultBrokerConfigName": "demo",
 			"brokerConfig": [
 				{

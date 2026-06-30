@@ -1,7 +1,5 @@
 package io.sapl.demo.testing.dsl.junit;
 
-import io.sapl.functions.libraries.FilterFunctionLibrary;
-import io.sapl.functions.libraries.TemporalFunctionLibrary;
 import io.sapl.test.junit.ImportType;
 import io.sapl.test.junit.JUnitTestAdapter;
 
@@ -32,8 +30,8 @@ public class TestAdapter extends JUnitTestAdapter {
      */
     @Override
     protected Map<ImportType, Map<String, Object>> getFixtureRegistrations() {
-        return Map.of(ImportType.STATIC_FUNCTION_LIBRARY,
-                Map.of("filter", FilterFunctionLibrary.class, "temporal", TemporalFunctionLibrary.class),
-                ImportType.PIP, Map.of("upper", new TestPIP()));
+        // FilterFunctionLibrary and TemporalFunctionLibrary are loaded automatically as
+        // default libraries, so only the custom PIP needs to be registered here.
+        return Map.of(ImportType.PIP, Map.of("upper", new TestPIP()));
     }
 }

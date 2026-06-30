@@ -16,6 +16,7 @@
 package io.sapl.demo.testing.dsl.junit;
 
 import io.sapl.api.attributes.Attribute;
+import io.sapl.api.attributes.AttributeAccessContext;
 import io.sapl.api.attributes.PolicyInformationPoint;
 import io.sapl.api.model.ObjectValue;
 import io.sapl.api.model.TextValue;
@@ -23,8 +24,6 @@ import io.sapl.api.model.UndefinedValue;
 import io.sapl.api.model.Value;
 import io.sapl.api.stream.Stream;
 import io.sapl.api.stream.Streams;
-
-import java.util.Map;
 
 @PolicyInformationPoint(name = TestPIP.NAME, description = TestPIP.DESCRIPTION)
 public class TestPIP {
@@ -34,18 +33,18 @@ public class TestPIP {
     public static final String DESCRIPTION = "Policy information Point for testing";
 
     @Attribute
-    public Stream<Value> upper(TextValue leftHandValue, Map<String, Value> variables) {
+    public Stream<Value> upper(TextValue leftHandValue, AttributeAccessContext ctx) {
         return Streams.just(Value.of(leftHandValue.value().toUpperCase()));
     }
 
     @Attribute
-    public Stream<Value> hasEnvVar(TextValue leftHandValue, Map<String, Value> variables) {
-        return Streams.just(variables.getOrDefault(leftHandValue.value(), Value.of("something")));
+    public Stream<Value> hasEnvVar(TextValue leftHandValue, AttributeAccessContext ctx) {
+        return Streams.just(ctx.variables().getOrDefault(leftHandValue.value(), Value.of("something")));
     }
 
     @Attribute
-    public Stream<Value> hasAuthzSubVar(TextValue leftHandValue, Map<String, Value> variables) {
-        final var env = variables.get("environment");
+    public Stream<Value> hasAuthzSubVar(TextValue leftHandValue, AttributeAccessContext ctx) {
+        final var env = ctx.variables().get("environment");
         if (env instanceof UndefinedValue) {
             return Streams.just(Value.of("no environment"));
         }

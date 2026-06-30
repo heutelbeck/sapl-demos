@@ -141,30 +141,29 @@ requirement "Attribute mocking with object entities" {
     given
         - document "policyWithSinglePIP"
 
-    scenario "mock with JSON object as entity"
-        given
-            // Entity can be a complex JSON object
-            - attribute "upperMock" {"id": 1, "name": "willi"}.<test.upper> emits "WILLI"
-        when "willi" attempts "read" on "something"
-        // Won't match because policy uses subject string ("willi"), not object.
-        // No mock matches -> attribute returns UNDEFINED -> condition is false
-        // -> policy is not-applicable.
-        expect not-applicable;
+    // An entity matcher that does not match the actual entity skips the mock; the
+    // attribute then resolves via the registered PIP. The subject is the string
+    // "willi", so an object/array entity matcher never matches and the real test.upper
+    // answers with "WILLI", permitting the request. Each mock emits "NOT_WILLI" to make
+    // the fallthrough observable: had the mock applied, the policy would be not-applicable.
 
-    scenario "mock with matching object entity"
+    scenario "object entity matcher skips the mock, real PIP answers"
         given
-            // Use matching syntax for entity - matches any object
-            // But subject is string "willi", not an object, so won't match
-            - attribute "upperMock" matching object.<test.upper> emits "WILLI"
+            - attribute "upperMock" {"id": 1, "name": "willi"}.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
-        expect not-applicable;
+        expect permit;
 
-    scenario "mock with array entity"
+    scenario "matching-object entity matcher skips the mock, real PIP answers"
         given
-            // Entity is an array - won't match string subject "willi"
-            - attribute "upperMock" ["willi", "admin"].<test.upper> emits "WILLI"
+            - attribute "upperMock" matching object.<test.upper> emits "NOT_WILLI"
         when "willi" attempts "read" on "something"
-        expect not-applicable;
+        expect permit;
+
+    scenario "array entity matcher skips the mock, real PIP answers"
+        given
+            - attribute "upperMock" ["willi", "admin"].<test.upper> emits "NOT_WILLI"
+        when "willi" attempts "read" on "something"
+        expect permit;
 }
 
 requirement "Attribute mocking with undefined values" {

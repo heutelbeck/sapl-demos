@@ -48,7 +48,7 @@ class PlainTestAdapterTests {
     private static final Logger LOG = LoggerFactory.getLogger(PlainTestAdapterTests.class);
 
     @Test
-    void executeAllTests() {
+    void executeAllTests() throws Exception {
         LOG.info("=== SAPL PlainTestAdapter Demo ===");
 
         // Load policies and tests
@@ -67,39 +67,42 @@ class PlainTestAdapterTests {
         LOG.info("--- Executing Tests ---");
 
         // Collect results
-        var allResults = new ArrayList<ScenarioResult>();
-        PlainTestResults[] finalResults = new PlainTestResults[1];
+        var               allResults   = new ArrayList<ScenarioResult>();
+        PlainTestResults  finalResults = null;
 
-        // Demonstrate reactive execution with progress events
-        adapter.executeReactive(config).doOnNext(event -> {
-            if (event instanceof ScenarioCompleted(ScenarioResult result)) {
-                var status = switch (result.status()) {
-                    case PASSED -> "[PASS]";
-                    case FAILED -> "[FAIL]";
-                    case ERROR -> "[ERROR]";
-                };
-                LOG.info("{} {} > {}", status, result.requirementName(), result.scenarioName());
-                if (result.failureMessage() != null) {
-                    LOG.info("       {}", result.failureMessage());
-                }
-                allResults.add(result);
-            } else if (event instanceof ExecutionCompleted(PlainTestResults results)) {
-                LOG.info("--- Results ---");
-                LOG.info("Total: {}  Passed: {}  Failed: {}  Errors: {}", results.total(), results.passed(),
-                        results.failed(), results.errors());
-                finalResults[0] = results;
+        // Demonstrate streaming execution with progress events
+        try (var events = adapter.executeStreaming(config)) {
+            TestEvent event;
+            while ((event = events.awaitNext()) != null) {
+                if (event instanceof ScenarioCompleted(ScenarioResult result)) {
+                    var status = switch (result.status()) {
+                        case PASSED -> "[PASS]";
+                        case FAILED -> "[FAIL]";
+                        case ERROR -> "[ERROR]";
+                    };
+                    LOG.info("{} {} > {}", status, result.requirementName(), result.scenarioName());
+                    if (result.failureMessage() != null) {
+                        LOG.info("       {}", result.failureMessage());
+                    }
+                    allResults.add(result);
+                } else if (event instanceof ExecutionCompleted(PlainTestResults results)) {
+                    LOG.info("--- Results ---");
+                    LOG.info("Total: {}  Passed: {}  Failed: {}  Errors: {}", results.total(), results.passed(),
+                            results.failed(), results.errors());
+                    finalResults = results;
 
-                if (!results.allPassed()) {
-                    LOG.warn("Some tests failed:");
-                    results.scenarioResults().stream().filter(r -> r.status() != TestStatus.PASSED)
-                            .forEach(r -> LOG.warn("  - {} > {}: {}", r.requirementName(), r.scenarioName(),
-                                    r.failureMessage()));
+                    if (!results.allPassed()) {
+                        LOG.warn("Some tests failed:");
+                        results.scenarioResults().stream().filter(r -> r.status() != TestStatus.PASSED)
+                                .forEach(r -> LOG.warn("  - {} > {}: {}", r.requirementName(), r.scenarioName(),
+                                        r.failureMessage()));
+                    }
                 }
             }
-        }).blockLast();
+        }
 
-        assertThat(finalResults[0]).isNotNull();
-        var results = finalResults[0];
+        assertThat(finalResults).isNotNull();
+        var results = finalResults;
         LOG.info("Test execution completed: {} passed, {} failed, {} errors", results.passed(), results.failed(),
                 results.errors());
         assertThat(results.total()).isGreaterThan(0);
