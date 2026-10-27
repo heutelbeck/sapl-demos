@@ -18,15 +18,22 @@
 package io.sapl.r2dbc;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = SaplR2dbcDemoApplication.class)
 class ApplicationStartsUpTest {
+
+	@Mock
+	private ConfigurableApplicationContext context;
 
 	@Test
 	void when_applicationStarts_then_runApplication() {
@@ -34,7 +41,7 @@ class ApplicationStartsUpTest {
 
 			mocked.when(() -> SpringApplication.run(SaplR2dbcDemoApplication.class
 					))
-					.thenReturn(mock(ConfigurableApplicationContext.class));
+					.thenReturn(context);
 
 			SaplR2dbcDemoApplication.main(new String[] {});
 

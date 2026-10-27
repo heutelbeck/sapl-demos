@@ -16,16 +16,16 @@
 package io.sapl.demo.jwt.authorizationserver.keyserver;
 
 import com.nimbusds.jose.jwk.JWK;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Repository
 public class KeyRepository {
 
-    private Map<String, JWK> keysById = new HashMap<>();
+    private final Map<String, JWK> keysById = new HashMap<>();
 
     public void add(JWK key) {
         keysById.put(key.getKeyID(), key);

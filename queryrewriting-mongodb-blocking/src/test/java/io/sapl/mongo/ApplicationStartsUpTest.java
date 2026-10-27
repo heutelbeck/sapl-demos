@@ -17,23 +17,26 @@
  */
 package io.sapl.mongo;
 
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+@ExtendWith(MockitoExtension.class)
 class ApplicationStartsUpTest {
 
     @Test
-    void when_applicationStarts_then_runApplication() {
+    void when_applicationStarts_then_runApplication(@Mock ConfigurableApplicationContext context) {
         try (MockedStatic<SpringApplication> mocked = mockStatic(SpringApplication.class)) {
 
             mocked.when(() -> SpringApplication.run(SaplSpringDataMongoBlockingDemoApplication.class))
-                    .thenReturn(mock(ConfigurableApplicationContext.class));
+                    .thenReturn(context);
 
             SaplSpringDataMongoBlockingDemoApplication.main(new String[] {});
 
