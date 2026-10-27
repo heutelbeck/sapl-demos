@@ -63,6 +63,7 @@ If you are new to SAPL, start with these demos:
 | Demo | Description |
 |------|-------------|
 | [editor-components](editor-components) | Vaadin-based SAPL policy editor components |
+| [vaadin-app](vaadin-app) | Vaadin Flow application with SAPL enforced navigation, components and forms |
 
 ## Running Policy Tests with the SAPL CLI
 

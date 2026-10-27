@@ -66,7 +66,7 @@ class BookControllerIT {
 
     @Container
     @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0");
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:9.0.4");
 
     @Autowired
     BookController controller;

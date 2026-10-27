@@ -1,0 +1,16 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  mustache:
+    check-template-location: false
+
+vaadin:
+  launch-browser: false
+  allowed-packages: com.vaadin,org.vaadin,dev.hilla,io.sapl
+
+logging:
+  level:
+    io.sapl: info
+    org.atmosphere: warn
+    org.springframework.boot.devtools.restart.ChangeableUrls: warn
