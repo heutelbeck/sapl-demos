@@ -65,7 +65,7 @@ class MongoShimHooksReactiveIT {
 
     @Container
     @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:8.0");
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:9.0.4");
 
     // zoe's scope: Children & Young Adult (1) and Science Fiction & Fantasy (2) = 6 books.
     private static final List<Integer> ZOE_SCOPE     = List.of(1, 2);
