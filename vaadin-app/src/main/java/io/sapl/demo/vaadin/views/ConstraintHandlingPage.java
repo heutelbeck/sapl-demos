@@ -19,6 +19,7 @@ package io.sapl.demo.vaadin.views;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -131,8 +132,8 @@ public final class ConstraintHandlingPage extends VerticalLayout {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                label.getUI().ifPresent(
-                        ui -> ui.access(() -> label.setText("time: " + LocalDateTime.now().format(formatter))));
+                label.getUI().ifPresent(ui -> ui.access(
+                        () -> label.setText("time: " + LocalDateTime.now(ZoneId.systemDefault()).format(formatter))));
             }
         }, 0, 1000);
         addDetachListener(event -> timer.cancel());

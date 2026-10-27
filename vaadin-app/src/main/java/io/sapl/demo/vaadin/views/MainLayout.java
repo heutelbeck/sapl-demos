@@ -112,7 +112,7 @@ public class MainLayout extends AppLayout implements AfterNavigationObserver {
     }
 
     private List<RouterLink> createLinks() {
-        MainLayout.MenuItemInfo[] menuItems      = new MainLayout.MenuItemInfo[] {                                       //
+        MainLayout.MenuItemInfo[] menuItems = {                                       //
                 new MainLayout.MenuItemInfo("Home Page", HomePage.class),                                //
                 new MainLayout.MenuItemInfo("Single- and Multisubscription Page",
                         SingleAndMultisubscriptionPage.class),                                                           //

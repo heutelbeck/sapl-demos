@@ -49,7 +49,7 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) {
         val matcher = PathPatternRequestMatcher.withDefaults();
         http.authorizeHttpRequests(auth -> auth.requestMatchers(matcher.matcher("/images/*")).permitAll());
         http.with(VaadinSecurityConfigurer.vaadin(), vaadin -> vaadin.loginView(LoginView.class));
