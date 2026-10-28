@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.1.2</version>
 		<relativePath />
 	</parent>
 
@@ -45,11 +45,11 @@
 		<sapl.version>4.2.0-SNAPSHOT</sapl.version>
 
 		<!-- Dependencies -->
-		<lombok.version>1.18.46</lombok.version>
+		<lombok.version>1.18.48</lombok.version>
 
 		<!-- Maven Plug-Ins -->
-		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
 
 		<!-- Base argLine for JDK21+ -->
 		<argLine />

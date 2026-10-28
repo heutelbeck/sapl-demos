@@ -43,9 +43,9 @@
 		<sapl.version>4.2.0-SNAPSHOT</sapl.version>
 
 		<!-- Dependencies -->
-		<junit.version>6.0.2</junit.version>
+		<junit.version>6.1.3</junit.version>
 		<assertj.version>3.27.7</assertj.version>
-		<slf4j.version>2.0.17</slf4j.version>
+		<slf4j.version>2.0.20</slf4j.version>
 
 		<!-- Base argLine for JDK21+ -->
 		<argLine />

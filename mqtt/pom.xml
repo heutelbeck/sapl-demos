@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.0</version>
+		<version>4.1.2</version>
 		<relativePath />
 	</parent>
 
@@ -38,18 +38,19 @@
 	<description>Shows how to use data streams from MQTT as a dynamic source of data for policy decisions.</description>
 
 	<properties>
+		<bouncycastle.version>1.86</bouncycastle.version>
 		<java.version>21</java.version>
 
 		<!-- SAPL Version -->
 		<sapl.version>4.2.0-SNAPSHOT</sapl.version>
 
 		<!-- Dependencies -->
-		<lombok.version>1.18.46</lombok.version>
-		<hivemq.version>2025.5</hivemq.version>
+		<lombok.version>1.18.48</lombok.version>
+		<hivemq.version>2026.5</hivemq.version>
 
 		<!-- Maven Plug-Ins -->
-		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
-		<maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.6.1</maven-surefire-plugin.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
 
 		<!-- Base argLine for JDK21+ -->
 		<argLine />
@@ -57,6 +58,21 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcutil-jdk18on</artifactId>
+				<version>${bouncycastle.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>io.sapl</groupId>
 				<artifactId>sapl-bom</artifactId>
