@@ -41,7 +41,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<sapl.version>4.2.0-SNAPSHOT</sapl.version>
-		<vaadin.version>25.2.1</vaadin.version>
+		<vaadin.version>25.3.4</vaadin.version>
 		<argLine />
 	</properties>
 
