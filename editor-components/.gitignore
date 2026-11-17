@@ -16,6 +16,9 @@ src/main/frontend/generated/
 src/main/frontend/index.html
 pnpmfile.js
 vite.generated.ts
+vite.config.ts
+tsconfig.json
+types.d.ts
 
 # Browser drivers for local integration tests
 drivers/
